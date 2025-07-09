@@ -14,7 +14,7 @@ export default function NoCourse() {
           height: 200,
           width: 180,
         }}
-        source={require("../../assets/images/book1.png")}
+        source={require("../../assets/images/book1.webp")}
       />
       <Text
         style={{
