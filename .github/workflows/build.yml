@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # env: # ✅ Sentry auth info from GitHub secrets
-    #   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-    #   SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-    #   SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+    env: # ✅ Sentry auth info from GitHub secrets
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
     steps:
       - name: Checkout code
@@ -64,5 +64,5 @@ jobs:
           path: android/app/build/outputs/bundle/release/app-release.aab
 
       # ✅ Optional: debug output if Sentry fails
-      # - name: Sentry Info
-      #   run: npx sentry-cli info
+      - name: Sentry Info
+        run: npx sentry-cli info
