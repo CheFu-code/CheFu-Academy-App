@@ -1,0 +1,194 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { doc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import * as Progress from "react-native-progress";
+import Button from "../../component/Shared/Button";
+import { db } from "../../config/fireConfig";
+import { Colors } from "../../constant/Colors";
+
+export default function Quiz() {
+  const { courseParams } = useLocalSearchParams();
+  const course = JSON.parse(courseParams);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedOption, setSelectedOption] = useState();
+  const quiz = course?.quiz;
+  const router = useRouter();
+  const [result, setResult] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const GetProgress = (currentPage) => {
+    const percentage = currentPage / quiz?.length;
+    return percentage;
+  };
+
+  const OnOptionSelect = (selectedChoice) => {
+    setResult((prev) => ({
+      ...prev,
+      [currentPage]: {
+        userChoice: selectedChoice,
+        isCorrect: quiz[currentPage]?.correctAns == selectedChoice,
+        question: quiz[currentPage]?.question,
+        correctAns: quiz[currentPage]?.correctAns,
+      },
+    }));
+    // console.log(result);
+  };
+
+  const onQuizFinish = async () => {
+    setLoading(true);
+    try {
+      await updateDoc(doc(db, "course", course?.docId), {
+        quizResult: result,
+      });
+      setLoading(false);
+
+      router.replace({
+        pathname: "/quiz/summary",
+        params: {
+          quizResultParam: JSON.stringify(result),
+        },
+      });
+    } catch (e) {
+      setLoading(false);
+      console.log(e);
+    }
+  };
+
+  return (
+    <View
+      style={{
+        backgroundColor: Colors.BG_COLOR,
+        flex: 1,
+      }}
+    >
+      <Image
+        style={{
+          height: 500,
+          width: "100%",
+          position: "absolute",
+        }}
+        source={require("../../assets/images/graph.png")}
+      />
+      <View
+        style={{
+          position: "absolute",
+          padding: 25,
+          marginTop: 10,
+          width: "100%",
+        }}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Pressable onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={22} color={"white"} />
+          </Pressable>
+          <Text
+            style={{
+              fontFamily: "outfit-bold",
+              fontSize: 17,
+              color: Colors.WHITE,
+            }}
+          >
+            {currentPage + 1} of {quiz?.length}
+          </Text>
+        </View>
+        <View
+          style={{
+            marginTop: 20,
+          }}
+        >
+          <Progress.Bar
+            progress={GetProgress(currentPage)}
+            color={Colors.GREEN}
+            width={Dimensions.get("screen").width * 0.85}
+          />
+        </View>
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          style={{
+            padding: 20,
+            backgroundColor: Colors.BG_GRAY,
+            marginTop: 30,
+            height: Dimensions.get("screen").height * 0.65,
+            elevation: 1,
+            borderRadius: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 19,
+              fontFamily: "outfit-bold",
+              textAlign: "center",
+            }}
+          >
+            {quiz[currentPage]?.question}
+          </Text>
+
+          {quiz[currentPage]?.options.map((item, index) => (
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedOption(index);
+                OnOptionSelect(item);
+              }}
+              style={{
+                padding: 5,
+                borderWidth: 0.6,
+                borderColor: selectedOption == index ? Colors.GREEN : null,
+                borderRadius: 15,
+                marginTop: 8,
+                backgroundColor:
+                  selectedOption == index ? Colors.LIGHT_GREEN : null,
+              }}
+              key={index}
+            >
+              <Text
+                style={{
+                  fontFamily: "outfit",
+                  fontSize: 15,
+                }}
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        {selectedOption?.toString() && quiz?.length - 1 > currentPage && (
+          <Button
+            onPress={() => {
+              setCurrentPage(currentPage + 1);
+              setSelectedOption(null);
+            }}
+            text={"Next"}
+            loading={loading}
+            disabled={loading}
+          />
+        )}
+
+        {selectedOption?.toString() && quiz?.length - 1 == currentPage && (
+          <Button
+            onPress={() => onQuizFinish()}
+            text={"Finish"}
+            loading={loading}
+            disabled={loading}
+          />
+        )}
+      </View>
+    </View>
+  );
+}

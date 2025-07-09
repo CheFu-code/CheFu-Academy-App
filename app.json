@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "CheFu Academy",
+    "slug": "chefu-academy",
+    "version": "1.2025.1",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo.png",
+    "scheme": "chefu-academy",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#1B263B"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.chefu.chefuacademy"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/logo.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#1B263B"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

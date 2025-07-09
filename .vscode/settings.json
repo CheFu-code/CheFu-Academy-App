@@ -1,0 +1,19 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit",
+    "source.sortMembers": "explicit"
+  },
+  "cSpell.words": [
+    "appspot",
+    "cheforumreal",
+    "ellipsize",
+    "firebaseapp",
+    "firestore",
+    "HCCPEMB",
+    "IZOYY",
+    "JCNs",
+    "Pressable",
+    "rgba"
+  ]
+}

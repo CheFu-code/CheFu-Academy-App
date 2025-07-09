@@ -1,0 +1,152 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import FlipCard from "react-native-flip-card";
+import { Colors } from "../../constant/Colors";
+
+export default function Flashcards() {
+  const { courseParams } = useLocalSearchParams();
+  const course = JSON.parse(courseParams);
+  const flashcard = course?.flashcards;
+  const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(0);
+  const width = Dimensions.get("screen").width;
+
+  const onScroll = (event) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const newIndex = Math.floor(contentOffsetX / width);
+    setCurrentPage(newIndex);
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+      <Image
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: 500,
+        }}
+        source={require("../../assets/images/graph.png")}
+      />
+      <View
+        style={{
+          position: "absolute",
+          padding: 25,
+          marginTop: 10,
+          width: "100%",
+        }}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Pressable onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={22} color={"white"} />
+          </Pressable>
+          <Text
+            style={{
+              fontFamily: "outfit-bold",
+              fontSize: 17,
+              color: Colors.WHITE,
+            }}
+          >
+            {currentPage + 1} of {flashcard?.length}
+          </Text>
+        </View>
+
+        <FlatList
+          data={flashcard}
+          pagingEnabled={true}
+          horizontal={true}
+          onScroll={onScroll}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <View
+              key={index}
+              style={{
+                // width: width * 0.9,
+                height: 500,
+                marginTop: 20,
+                display: "flex",
+                // backgroundColor: Colors.BG_COLOR,
+                // marginHorizontal: width * 0.05,
+              }}
+            >
+              <FlipCard style={styles.flipCard}>
+                <View style={styles.flipFront}>
+                  <Text
+                    style={{
+                      fontFamily: "outfit-bold",
+                      fontSize: 20,
+                      textAlign: "center",
+                      color: Colors.PRIMARY,
+                    }}
+                  >
+                    {item?.front}
+                  </Text>
+                </View>
+                <View style={styles.flipBack}>
+                  <Text
+                    style={{
+                      fontFamily: "outfit",
+                      fontSize: 20,
+                      textAlign: "center",
+                      color: Colors.BLACK,
+                      padding: 20,
+                    }}
+                  >
+                    {item?.back}
+                  </Text>
+                </View>
+              </FlipCard>
+            </View>
+          )}
+        />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  flipCard: {
+    width: Dimensions.get("screen").width * 0.78,
+    height: 400,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.BG_GRAY,
+    borderRadius: 20,
+    marginHorizontal: Dimensions.get("screen").width * 0.03,
+    // elevation: 1,
+  },
+  flipBack: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    height: "100%",
+    backgroundColor: Colors.LIGHT_GREEN,
+  },
+  flipFront: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    backgroundColor: Colors.BG_GRAY,
+    borderRadius: 20,
+  },
+});
