@@ -65,14 +65,14 @@ export default function Home() {
           />
           <View
             style={{
-              paddingTop: Platform.OS == "ios" && 45,
+              paddingTop: Platform.OS === "ios" && 45,
               padding: 25,
               // flex: 1,
             }}
           >
             <Header />
 
-            {courseList?.length == 0 ? (
+            {courseList?.length === 0 ? (
               <NoCourse />
             ) : (
               <View>

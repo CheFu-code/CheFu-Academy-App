@@ -152,7 +152,6 @@ export default function QuizSummary() {
             flex: 1,
             borderRadius: 15,
             borderWidth: 1,
-            marginTop: 10,
           }}
         >
           <FlatList

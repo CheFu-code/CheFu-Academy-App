@@ -62,6 +62,7 @@ export default function AddCourse() {
           topicIdea = JSON.parse(cleanedResponse);
         } catch (e) {
           topicIdea = [];
+          console.error("Failed to parse AI response:", e);
           Alert.alert(
             "Error",
             "AI response was not valid JSON.\n" + cleanedResponse
@@ -80,7 +81,7 @@ export default function AddCourse() {
   };
 
   const onTopicSelect = (topic) => {
-    const isAlreadyExist = selectedTopic.find((item) => item == topic);
+    const isAlreadyExist = selectedTopic.find((item) => item === topic);
     if (!isAlreadyExist) {
       setSelectedTopic((prev) => [...prev, topic]);
     } else {
@@ -90,7 +91,7 @@ export default function AddCourse() {
   };
 
   const isTopicSelected = (topic) => {
-    const selection = selectedTopic.find((item) => item == topic);
+    const selection = selectedTopic.find((item) => item === topic);
     return selection ? true : false;
   };
 
@@ -117,6 +118,7 @@ export default function AddCourse() {
       try {
         coursesObj = JSON.parse(aiResp);
       } catch (e) {
+        console.error("Failed to parse AI response:", e);
         Alert.alert(
           "Error",
           `AI response was not valid JSON.\nResponse: ${aiResp}`
