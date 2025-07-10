@@ -166,12 +166,15 @@ export default function AddCourse() {
       keyboardShouldPersistTaps="handled"
     >
       <View style={{ flex: 1 }}>
-        <View style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 20,
-        }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 20,
+            marginTop: 30,
+          }}
+        >
           <Pressable onPress={() => router.back()}>
             <Ionicons
               style={{
@@ -222,7 +225,7 @@ export default function AddCourse() {
           style={styles.textInput}
           numberOfLines={3}
           multiline={true}
-          placeholder="(Example: Learn Biology)"
+          placeholder="Example: Learn Biology"
         />
 
         <Button
@@ -230,7 +233,8 @@ export default function AddCourse() {
           type="fill"
           onPress={generateTopic}
           loading={loading}
-          disabled={loading}
+          disabled={loading || !userInput.trim()}
+          opacity={loading || !userInput.trim() ? 0.4 : 1}
         />
 
         <View

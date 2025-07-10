@@ -1,10 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import {
-  signInWithEmailAndPassword
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -30,27 +28,36 @@ const SignIn = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const { setUserDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
-  const [shouldNavigate, setShouldNavigate] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
-  useEffect(() => {
-    if (shouldNavigate) {
-      router.replace("/(tabs)/home");
-    }
-  }, [shouldNavigate]);
+  const [showPassword, setShowPassword] = useState(false);
 
   const SUPPORT_EMAIL = "kurisanimaluleke77@gmail.com";
 
-  const getUserDetail = async (uid) => {
-    const result = await getDoc(doc(db, "users", uid));
-    setUserDetail(result.data());
+  // UPDATED: changed param from uid to email to match firestore doc key usage
+  const getUserDetail = async (email) => {
+    try {
+      const result = await getDoc(doc(db, "users", email));
+      if (result.exists()) {
+        setUserDetail(result.data());
+      } else {
+        console.warn("User data not found in Firestore.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
-  const handleSignIn = () => {
+  // UPDATED: use async/await and removed shouldNavigate state
+  const handleSignIn = async () => {
     const cleanEmail = email.trim().toLowerCase();
+
+    // Clear errors before validation
+    setEmailError("");
+    setPasswordError("");
+
     if (!cleanEmail) {
       setEmailError("Please enter your email");
       return;
@@ -59,56 +66,60 @@ const SignIn = () => {
       setPasswordError("Please enter your password");
       return;
     }
-    setLoading(true);
-    signInWithEmailAndPassword(auth, cleanEmail, password)
-      .then(async (resp) => {
-        const user = resp.user;
-        await getUserDetail(user.uid);
-        ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
-        setLoading(false);
-        setShouldNavigate(true);
-      })
-      .catch((e) => {
-        setLoading(false);
-        const contactSupport = () => Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
-        switch (e.code) {
-          case "auth/operation-not-allowed":
-            Alert.alert(
-              "Login Not Enabled",
-              "Email/password accounts are not enabled. Please contact support.",
-              [
-                { text: "Cancel", style: "cancel" },
-                { text: "Contact Now", onPress: contactSupport },
-              ]
-            );
-            break;
-          case "auth/internal-error":
-            Alert.alert(
-              "Internal Error",
-              "Something went wrong. Please try again later or contact support.",
-              [
-                { text: "Cancel", style: "cancel" },
-                { text: "Contact", onPress: contactSupport },
-              ]
-            );
-            break;
-          case "auth/network-request-failed":
-            Alert.alert(
-              "Network Error",
-              "Please check your internet connection and try again. Contact support if the problem persists.",
-              [
-                { text: "Cancel", style: "cancel" },
-                { text: "Contact", onPress: contactSupport },
-              ]
-            );
-            break;
-          default:
-            Alert.alert("Error", e.message);
-        }
-      });
-  };
 
-  const [showPassword, setShowPassword] = useState(false);
+    setLoading(true);
+    try {
+      const resp = await signInWithEmailAndPassword(auth, cleanEmail, password);
+      await getUserDetail(resp.user.email); // Using email as Firestore doc key
+      ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
+      router.replace("/(tabs)/home");
+    } catch (e) {
+      setLoading(false);
+      const contactSupport = () => Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
+      switch (e.code) {
+        case "auth/operation-not-allowed":
+          Alert.alert(
+            "Login Not Enabled",
+            "Email/password accounts are not enabled. Please contact support.",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Contact Now", onPress: contactSupport },
+            ]
+          );
+          break;
+        case "auth/invalid-credential":
+          ToastAndroid.show(
+            "Invalid credentials. Please try again.",
+            ToastAndroid.SHORT
+          );
+          break;
+        case "auth/internal-error":
+          Alert.alert(
+            "Internal Error",
+            "Something went wrong. Please try again later or contact support.",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Contact", onPress: contactSupport },
+            ]
+          );
+          break;
+        case "auth/network-request-failed":
+          Alert.alert(
+            "Network Error",
+            "Please check your internet connection and try again. Contact support if the problem persists.",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Contact", onPress: contactSupport },
+            ]
+          );
+          break;
+        default:
+          Alert.alert("Error", e.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView
@@ -156,14 +167,28 @@ const SignIn = () => {
               placeholder="Email"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
-              onChangeText={(value) => setEmail(value)}
+              onChangeText={(value) => {
+                setEmail(value);
+                if (emailError) setEmailError("");
+              }}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
+            {emailError ? (
+              <Text style={{ color: "red", alignSelf: "flex-start" }}>
+                {emailError}
+              </Text>
+            ) : null}
+
             <View style={styles.passwordContainer}>
               <TextInput
                 placeholder="Password"
                 placeholderTextColor={Colors.GRAY}
                 secureTextEntry={!showPassword}
-                onChangeText={(value) => setPassword(value)}
+                onChangeText={(value) => {
+                  setPassword(value);
+                  if (passwordError) setPasswordError("");
+                }}
                 autoCapitalize="none"
                 style={{
                   flex: 1,
@@ -180,6 +205,12 @@ const SignIn = () => {
                 />
               </Pressable>
             </View>
+            {passwordError ? (
+              <Text style={{ color: "red", alignSelf: "flex-start" }}>
+                {passwordError}
+              </Text>
+            ) : null}
+
             <Pressable
               onPress={() => router.push("/auth/forgotPassword")}
               style={{ alignSelf: "flex-end", marginTop: 10 }}
@@ -204,7 +235,7 @@ const SignIn = () => {
               {!loading ? (
                 <Text
                   style={{
-                    fontFamily: "out-fit",
+                    fontFamily: "outfit", // FIXED typo from "out-fit"
                     fontSize: 20,
                     textAlign: "center",
                     color: Colors.WHITE,
@@ -225,20 +256,11 @@ const SignIn = () => {
                 marginTop: 20,
               }}
             >
-              <Text
-                style={{
-                  color: Colors.WHITE,
-                }}
-              >
+              <Text style={{ color: Colors.WHITE }}>
                 Don't have an account?{" "}
               </Text>
               <Pressable onPress={() => router.push("/auth/signUp")}>
-                <Text
-                  style={{
-                    color: Colors.PRIMARY,
-                    fontWeight: "bold",
-                  }}
-                >
+                <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>
                   Sign Up
                 </Text>
               </Pressable>
@@ -273,11 +295,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: "100%",
     backgroundColor: "transparent",
-  },
-
-  toggleText: {
-    color: Colors.PRIMARY,
-    fontWeight: "bold",
-    padding: 10,
   },
 });

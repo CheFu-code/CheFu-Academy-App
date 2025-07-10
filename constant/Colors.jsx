@@ -9,4 +9,6 @@ export const Colors = {
   RED: "#f51c0c",
   LIGHT_RED: "#ffc8c4",
   BG_COLOR: "#1B263B",
+  YELLOW: "#FFD700",
+  LIGHT_YELLOW: "#FFF9C4",
 };

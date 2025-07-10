@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
 import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
@@ -85,18 +86,22 @@ export default function Progress({ enroll = false }) {
         >
           Course Progress
         </Text>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          onRefresh={() => GetCourseList()}
-          refreshing={loading}
-          data={courseList}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePress(item)}>
-              <CourseProgressCard item={item} width={"97%"} />
-            </TouchableOpacity>
-          )}
-        />
+        {courseList.length > 0 ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            onRefresh={() => GetCourseList()}
+            refreshing={loading}
+            data={courseList}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => handlePress(item)}>
+                <CourseProgressCard item={item} width={"97%"} />
+              </TouchableOpacity>
+            )}
+          />
+        ) : (
+          !loading && <NoCourse /> // ✅ Show only when not loading
+        )}
       </View>
     </View>
   );

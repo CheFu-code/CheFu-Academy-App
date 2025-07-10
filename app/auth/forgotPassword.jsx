@@ -1,4 +1,3 @@
-// /app/auth/forgotPassword.js
 import { useRouter } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
@@ -21,35 +20,60 @@ const ForgotPassword = () => {
 
   const handleReset = () => {
     const cleanEmail = email.trim().toLowerCase();
+
+    console.log("[DEBUG] Attempting to reset password for:", cleanEmail);
+
     if (!cleanEmail) {
       Alert.alert("Enter Email", "Please enter your email address.");
+      console.warn("[DEBUG] No email entered.");
       return;
     }
 
-    if (loading) return; // Prevent multiple submissions
+    if (loading) {
+      console.log("[DEBUG] Already loading, skipping duplicate request.");
+      return;
+    }
+
     setLoading(true);
+    console.log("[DEBUG] Sending reset email...");
 
     sendPasswordResetEmail(auth, cleanEmail)
       .then(() => {
         setLoading(false);
-        Alert.alert("Check Your Email", "Password reset link sent.");
+        console.log("[DEBUG] Password reset email sent successfully.");
+        Alert.alert(
+          "Check Your Email",
+          `Password reset link sent to ${cleanEmail}.`
+        );
         router.back();
       })
       .catch((error) => {
         setLoading(false);
-        Alert.alert("Error", error.message);
         console.error("Error sending password reset email:", error);
-        if (error.code === "auth/user-not-found") {
-          Alert.alert("User Not Found", "No user found with this email.");
-        } else if (error.code === "auth/invalid-email") {
-          Alert.alert("Invalid Email", "The email address is not valid.");
-        } else if (error.code === "auth/missing-email") {
-          Alert.alert("Missing Email", "Please enter your email address.");
-        } else if (error.code === "auth/network-request-failed") {
-          Alert.alert(
-            "Network Error",
-            "Please check your internet connection."
-          );
+        Alert.alert("Error", error.message);
+
+        switch (error.code) {
+          case "auth/user-not-found":
+            console.warn("[DEBUG] No user found with this email.");
+            Alert.alert("User Not Found", "No user found with this email.");
+            break;
+          case "auth/invalid-email":
+            console.warn("[DEBUG] Invalid email format.");
+            Alert.alert("Invalid Email", "The email address is not valid.");
+            break;
+          case "auth/missing-email":
+            console.warn("[DEBUG] Missing email.");
+            Alert.alert("Missing Email", "Please enter your email address.");
+            break;
+          case "auth/network-request-failed":
+            console.warn("[DEBUG] Network error occurred.");
+            Alert.alert(
+              "Network Error",
+              "Please check your internet connection."
+            );
+            break;
+          default:
+            console.warn("[DEBUG] Unhandled error:", error.code);
         }
       });
   };
@@ -61,7 +85,10 @@ const ForgotPassword = () => {
         style={styles.input}
         placeholder="Enter your email"
         placeholderTextColor={Colors.GRAY}
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={(text) => {
+          console.log("[DEBUG] Email input changed to:", text);
+          setEmail(text);
+        }}
         autoCapitalize="none"
       />
       <TouchableOpacity
@@ -82,7 +109,13 @@ const ForgotPassword = () => {
           </Text>
         )}
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.back()} style={styles.cancel}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log("[DEBUG] Cancel button pressed, navigating back.");
+          router.back();
+        }}
+        style={styles.cancel}
+      >
         <Text style={styles.cancelText}>Cancel</Text>
       </TouchableOpacity>
     </SafeAreaView>
