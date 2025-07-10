@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useContext } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function Header() {
@@ -23,7 +24,7 @@ export default function Header() {
             fontFamily: "outfit-bold",
             fontSize: 24,
             color: "#fff",
-            marginTop: 10,
+            marginTop: 25,
           }}
         >
           Hello, {userDetail?.fullname}
@@ -32,11 +33,11 @@ export default function Header() {
           style={{
             fontFamily: "outfit-regular",
             fontSize: 16,
-            color: "#666",
+            color: Colors.GREEN,
             marginTop: 5,
           }}
         >
-          Start Learning
+          Expand Your Knowledge
         </Text>
       </View>
       <TouchableOpacity>

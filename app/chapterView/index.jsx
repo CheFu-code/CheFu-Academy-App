@@ -82,7 +82,7 @@ export default function ChapterView() {
       setCopying(false);
       // Optionally, you can show a toast or alert to indicate that the text has been copied
       // For example, you can use a library like react-native-toast-message or similar
-      ToastAndroid.show("Code copied to clipboard!", ToastAndroid.SHORT);
+      ToastAndroid.show("Code copied to clipboard!", ToastAndroid.CENTER);
       setTimeout(() => setCopied(false), 1200);
     } catch (error) {
       ToastAndroid.show("Error copying code!", ToastAndroid.SHORT);
@@ -112,7 +112,7 @@ export default function ChapterView() {
           <Ionicons
             style={{
               padding: 3,
-              marginTop: 16,
+              marginTop: 25,
               borderRadius: 10,
               backgroundColor: Colors.BG_GRAY,
               opacity: loader ? 0.4 : 1,
@@ -125,10 +125,10 @@ export default function ChapterView() {
         <Progress.Bar
           style={{
             // backgroundColor: Colors.GREEN,
-            marginTop: 20,
+            marginTop: 25,
           }}
           progress={GetProgress(currentPage)}
-          width={Dimensions.get("screen").width * 0.70}
+          width={Dimensions.get("screen").width * 0.7}
         />
       </View>
       <ScrollView
@@ -237,16 +237,22 @@ export default function ChapterView() {
           </Text>
         )}
       </ScrollView>
-      {chapters?.content?.length - 1 != currentPage ? (
-        <Button onPress={() => setCurrentPage(currentPage + 1)} text={"Next"} />
-      ) : (
-        <Button
-          onPress={() => onChapterComplete()}
-          loading={loader}
-          text={"Finish"}
-          disabled={loader}
-        />
-      )}
+
+      <View style={{ marginBottom: 29 }}>
+        {chapters?.content?.length - 1 != currentPage ? (
+          <Button
+            onPress={() => setCurrentPage(currentPage + 1)}
+            text={"Next"}
+          />
+        ) : (
+          <Button
+            onPress={() => onChapterComplete()}
+            loading={loader}
+            text={"Finish"}
+            disabled={loader}
+          />
+        )}
+      </View>
     </SafeAreaView>
   );
 }

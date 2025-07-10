@@ -133,8 +133,8 @@ export default function Intro({ course, enroll }) {
         onPress={() => router.back()}
         style={{
           position: "absolute",
-          padding: 15,
-          marginTop: 15,
+          padding: 20,
+          marginTop: 25,
         }}
       >
         <Ionicons size={24} color={Colors.BLACK} name="arrow-back" />

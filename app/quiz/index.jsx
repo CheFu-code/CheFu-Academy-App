@@ -73,7 +73,7 @@ export default function Quiz() {
     >
       <Image
         style={{
-          height: 500,
+          height: 550,
           width: "100%",
           position: "absolute",
         }}
@@ -83,7 +83,7 @@ export default function Quiz() {
         style={{
           position: "absolute",
           padding: 25,
-          marginTop: 10,
+          marginTop: 30,
           width: "100%",
         }}
       >
@@ -110,7 +110,7 @@ export default function Quiz() {
         </View>
         <View
           style={{
-            marginTop: 20,
+            marginTop: 30,
           }}
         >
           <Progress.Bar

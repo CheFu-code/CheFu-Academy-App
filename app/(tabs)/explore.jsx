@@ -5,51 +5,56 @@ import { CourseCategory } from "../../constant/Option";
 
 export default function Explore() {
   return (
-    <FlatList
+    <View
       style={{
-        backgroundColor: Colors.BG_COLOR,
         flex: 1,
+        backgroundColor: Colors.BG_COLOR,
       }}
-      data={[]}
-      ListHeaderComponent={
-        <View
+    >
+      <View
+        style={{
+          padding: 25,
+          marginTop: 30,
+          backgroundColor: Colors.BG_COLOR,
+        }}
+      >
+        <Text
           style={{
-            padding: 25,
-            flex: 1,
-            backgroundColor: Colors.BG_COLOR,
+            fontFamily: "outfit-bold",
+            fontSize: 26,
+            color: Colors.PRIMARY,
           }}
         >
-          <Text
-            style={{
-              fontFamily: "outfit-bold",
-              fontSize: 26,
-              color: Colors.PRIMARY,
-            }}
-          >
-            Explore more courses
-          </Text>
+          Explore more courses
+        </Text>
+      </View>
 
-          {CourseCategory.map((item, index) => (
-            <View
-              style={{
-                marginTop: 10,
-              }}
-              key={item}
-            >
-              {/* <Text
+      <FlatList
+        style={{
+          backgroundColor: Colors.BG_COLOR,
+          flex: 1,
+        }}
+        data={[]}
+        ListHeaderComponent={
+          <View
             style={{
-              fontFamily: "outfit",
-              fontSize: 17,
-              color: Colors.WHITE,
+              padding: 20,
+              backgroundColor: Colors.BG_COLOR,
             }}
           >
-            {item}
-          </Text> */}
-              <CourseListByCategory category={item} />
-            </View>
-          ))}
-        </View>
-      }
-    />
+            {CourseCategory.map((item, index) => (
+              <View
+                style={{
+                  marginTop: 10,
+                }}
+                key={item}
+              >
+                <CourseListByCategory category={item} />
+              </View>
+            ))}
+          </View>
+        }
+      />
+    </View>
   );
 }

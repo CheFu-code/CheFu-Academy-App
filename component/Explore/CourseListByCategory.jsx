@@ -16,9 +16,7 @@ export default function CourseListByCategory({ category }) {
   const GetCourseListByCategory = async () => {
     setCourseList([]);
     setLoading(true);
-    // Log the category prop before querying
-    console.log("[DEBUG] Category prop:", category);
-    // Fetch all courses, not filtered
+    
     const q = query(
       collection(db, "course"),
       orderBy("createdOn", "desc")
@@ -27,13 +25,11 @@ export default function CourseListByCategory({ category }) {
     const data = [];
     querySnapshot.forEach((doc) => {
       const docData = doc.data();
-      // Log the category field of each document
-      console.log("[DEBUG] Firestore doc:", doc.id, "category:", docData.category);
+      
       if (docData.category === category) {
         data.push({ id: doc.id, ...docData });
       }
     });
-    console.log("[DEBUG] Filtered data array:", data);
     setCourseList(data);
     setLoading(false);
   };

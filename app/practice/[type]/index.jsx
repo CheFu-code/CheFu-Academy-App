@@ -66,11 +66,12 @@ export default function PracticeTypeHomeScreen() {
           style={{
             backgroundColor: Colors.BG_COLOR,
             flex: 1,
+            marginBottom: 30,
           }}
         >
           <Image
             style={{
-              height: 200,
+              height: 300,
               width: "100%",
               borderBottomRightRadius: 25,
               borderBottomLeftRadius: 25,
@@ -88,6 +89,7 @@ export default function PracticeTypeHomeScreen() {
               flexDirection: "row",
               gap: 10,
               alignItems: "center",
+              marginTop: 27,
             }}
           >
             <Pressable onPress={() => router.back()}>

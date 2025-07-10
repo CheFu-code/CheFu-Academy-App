@@ -40,6 +40,7 @@ export default function Chapters({ course }) {
       </Text>
 
       <FlatList
+        style={{ marginBottom: 40 }}
         data={course?.chapters || []}
         showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => {

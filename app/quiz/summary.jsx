@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
@@ -54,6 +54,8 @@ export default function QuizSummary() {
           position: "absolute",
           width: "100%",
           padding: 35,
+          marginTop: 30,
+          flex: 1,
         }}
       >
         <Text
@@ -107,7 +109,11 @@ export default function QuizSummary() {
               <Text style={styles.resultText}>
                 Total Question: {totalQuestion}
               </Text>
-              <Ionicons name="help-circle" size={20} color={Colors.PRIMARY} />
+              <MaterialCommunityIcons
+                name="file-question-outline"
+                size={20}
+                color={Colors.PRIMARY}
+              />
             </View>
 
             <View style={styles.resultTextContainer}>
@@ -139,7 +145,7 @@ export default function QuizSummary() {
           style={{
             fontFamily: "outfit-bold",
             fontSize: 15,
-            marginTop: 5,
+            marginTop: 20,
             color: Colors.WHITE,
           }}
         >
@@ -147,24 +153,57 @@ export default function QuizSummary() {
         </Text>
         <View
           style={{
-            marginTop: 20,
+            marginTop: 10,
             backgroundColor: Colors.GRAY,
-            flex: 1,
+            maxHeight: 250,
             borderRadius: 15,
             borderWidth: 1,
+            borderColor: Colors.BG_GRAY,
+            padding: 10,
           }}
         >
           <FlatList
             data={Object.entries(quizResult)}
-            renderItem={({ item, index }) => {
+            keyExtractor={([key]) => key}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => {
               const quizItem = item[1];
               return (
                 <View
                   style={{
-                    padding: 10,
+                    paddingVertical: 8,
+                    borderBottomWidth: 0.5,
+                    borderBottomColor: Colors.BG_GRAY,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  <Text>{quizItem.question}</Text>
+                  <Text
+                    style={{
+                      fontFamily: "outfit-bold",
+                      fontSize: 14,
+                      color: quizItem.isCorrect
+                        ? Colors.GREEN
+                        : Colors.LIGHT_RED,
+                      flex: 1,
+                      marginRight: 10,
+                    }}
+                  >
+                    {quizItem.question}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: quizItem.isCorrect ? Colors.GREEN : "red",
+                    }}
+                  >
+                    {quizItem.isCorrect ? (
+                      <Ionicons name="checkmark-outline" size={24} />
+                    ) : (
+                      <Entypo name="cross" size={24} />
+                    )}
+                  </Text>
                 </View>
               );
             }}

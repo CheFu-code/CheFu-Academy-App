@@ -46,7 +46,8 @@ export default function QuestionAnswer() {
         style={{
           // position: "absolute",
           padding: 20,
-          marginTop: 20,
+          marginTop: 30,
+          marginBottom: 20,
           flex: 1,
         }}
       >
@@ -100,7 +101,7 @@ export default function QuestionAnswer() {
           renderItem={({ item, index }) => (
             <Pressable
               onPress={() => getQuestionAnswer(index)}
-              key={index}
+              // key={index}
               style={styles.card}
             >
               <Text
@@ -120,7 +121,9 @@ export default function QuestionAnswer() {
               )}
             </Pressable>
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) =>
+            item?.id?.toString() || index.toString()
+          }
         />
       </View>
     </View>
