@@ -1,6 +1,8 @@
+import { useFocusEffect } from "@react-navigation/native";
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { FlatList, Image, Text, View } from "react-native";
 import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
 import { db } from "../../config/fireConfig";
@@ -11,9 +13,14 @@ export default function Progress({ enroll = false }) {
   const [courseList, setCourseList] = useState([]);
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
-
   const [loadingId, setLoadingId] = useState(null);
   const router = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      setLoadingId(null);
+    }, [])
+  );
 
   useEffect(() => {
     if (userDetail) GetCourseList();
@@ -42,19 +49,24 @@ export default function Progress({ enroll = false }) {
       .catch(() => {
         setCourseList([]);
         setLoading(false);
+        Sentry.captureException(error);
       });
   };
 
   const handlePress = (item) => {
-    setLoadingId(item.id || item.courseTitle || "");
-    router.push({
-      pathname: "/courseView",
-      params: {
-        courseParams: JSON.stringify(item),
-        enroll: enroll,
-      },
-    });
-    setLoadingId(null); // Immediately reset loadingId after navigation call
+    const id = item.id || item.courseTitle || "";
+    setLoadingId(id);
+
+    // Add a small delay so loading state can show before navigation
+    setTimeout(() => {
+      router.push({
+        pathname: "/courseView",
+        params: {
+          courseParams: JSON.stringify(item),
+          enroll: enroll,
+        },
+      });
+    }, 100);
   };
 
   return (
@@ -86,6 +98,7 @@ export default function Progress({ enroll = false }) {
         >
           Course Progress
         </Text>
+
         {courseList.length > 0 ? (
           <FlatList
             showsVerticalScrollIndicator={false}
@@ -93,14 +106,22 @@ export default function Progress({ enroll = false }) {
             refreshing={loading}
             data={courseList}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => handlePress(item)}>
-                <CourseProgressCard item={item} width={"97%"} />
-              </TouchableOpacity>
-            )}
+            renderItem={({ item }) => {
+              const isLoading =
+                loadingId === (item.id || item.courseTitle || "");
+              return (
+                <CourseProgressCard
+                  item={item}
+                  width={"97%"}
+                  loading={isLoading}
+                  disabled={Boolean(loadingId)} // disables all cards during loading if you want
+                  onPress={() => handlePress(item)}
+                />
+              );
+            }}
           />
         ) : (
-          !loading && <NoCourse /> // ✅ Show only when not loading
+          !loading && <NoCourse />
         )}
       </View>
     </View>

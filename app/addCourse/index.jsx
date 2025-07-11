@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { doc, setDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
@@ -65,7 +66,7 @@ export default function AddCourse() {
           console.error("Failed to parse AI response:", e);
           Alert.alert(
             "Error",
-            "AI response was not valid JSON.\n" + cleanedResponse
+            `Our AI did not respond with valid JSON.\nPlease try again later. If the issue persists, contact support: ${support}`
           );
         }
       }
@@ -95,6 +96,8 @@ export default function AddCourse() {
     return selection ? true : false;
   };
 
+  const support = "kurisanimaluleke77@gmail.com";
+
   const onGenerateCourse = async () => {
     setLoading(true);
     const promptText = selectedTopic + Prompt.COURSE;
@@ -109,7 +112,7 @@ export default function AddCourse() {
       if (!aiResp || aiResp.trim() === "") {
         Alert.alert(
           "No Response",
-          "The AI did not return any course data. Please try again later."
+          "Our AI did not return any course data. Please try again later."
         );
         setLoading(false);
         return;
@@ -121,13 +124,17 @@ export default function AddCourse() {
         console.error("Failed to parse AI response:", e);
         Alert.alert(
           "Error",
-          `AI response was not valid JSON.\nResponse: ${aiResp}`
+          `Our AI did not respond with valid JSON.\nPlease try again later. If the issue persists, contact support: ${support}`
         );
         console.log("AI raw response:", aiResp);
+
+        Sentry.captureException(e, {
+          extra: { aiResponse: aiResp },
+        });
+
         setLoading(false);
         return;
       }
-
       // Handle both array and object with courses property
       const coursesArray = Array.isArray(coursesObj)
         ? coursesObj

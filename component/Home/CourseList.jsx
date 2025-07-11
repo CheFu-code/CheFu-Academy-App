@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -21,23 +22,33 @@ export default function CourseList({
   const router = useRouter();
   const [loadingId, setLoadingId] = useState(null);
 
+  useFocusEffect(
+    useCallback(() => {
+      // Clear loadingId when returning to this screen
+      setLoadingId(null);
+    }, [])
+  );
+
   const handlePress = (item) => {
-    setLoadingId(item.id || item.courseTitle || "");
-    router.push({
-      pathname: "/courseView",
-      params: {
-        courseParams: JSON.stringify(item),
-        enroll: enroll,
-      },
-    });
-    setLoadingId(null); // Immediately reset loadingId after navigation call
+    const id = item.id || item.courseTitle || "";
+    setLoadingId(id);
+
+    setTimeout(() => {
+      router.push({
+        pathname: "/courseView",
+        params: {
+          courseParams: JSON.stringify(item),
+          enroll: enroll,
+        },
+      });
+    }, 10); // 10ms delay to show loading state
   };
 
   return (
     <View
       style={{
         marginTop: 15,
-        // flex: 1
+        pointerEvents: loadingId ? "none" : "auto",
       }}
     >
       <Text
@@ -63,14 +74,14 @@ export default function CourseList({
               // key={item.id || index}
               style={styles.courseContainer}
               onPress={() => handlePress(item)}
-              disabled={isLoading}
+              disabled={Boolean(loadingId)}
             >
               <Image
                 style={{
                   width: 200,
                   height: 110,
                   borderRadius: 15,
-                  opacity: isLoading ? 0.5 : 1,
+                  opacity: loadingId ? 0.5 : 1,
                 }}
                 source={imageAssets[item.banner_image]}
               />
@@ -122,7 +133,11 @@ export default function CourseList({
                     alignItems: "center",
                   }}
                 >
-                  <ActivityIndicator size="large" color={Colors.PRIMARY} />
+                  <ActivityIndicator
+                    style={{ alignItems: "center" }}
+                    size="large"
+                    color={Colors.PRIMARY}
+                  />
                 </View>
               )}
             </TouchableOpacity>

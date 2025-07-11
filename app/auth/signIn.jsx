@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -47,6 +48,7 @@ const SignIn = () => {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      Sentry.captureException(error);
     }
   };
 
@@ -74,7 +76,9 @@ const SignIn = () => {
       ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
       router.replace("/(tabs)/home");
     } catch (e) {
+
       setLoading(false);
+      Sentry.captureException(e);
       const contactSupport = () => Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
       switch (e.code) {
         case "auth/operation-not-allowed":
@@ -151,7 +155,15 @@ const SignIn = () => {
           >
             <Image
               source={require("./../../assets/images/logo.png")}
-              style={{ width: 180, height: 180 }}
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: 100,
+                borderWidth: 2,
+                borderColor: Colors.PRIMARY,
+                marginBottom: 15,
+                // marginTop: 30,
+              }}
             />
             <Text
               style={{

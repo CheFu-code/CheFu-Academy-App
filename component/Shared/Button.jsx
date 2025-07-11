@@ -7,7 +7,7 @@ export default function Button({
   onPress,
   loading,
   disabled,
-  icon, // ✅ Add icon prop
+  icon, 
 }) {
   const isDisabled = loading || disabled;
 
@@ -26,7 +26,7 @@ export default function Button({
         borderWidth: type === "outline" ? 1 : 0,
         borderColor: type === "outline" ? Colors.BG_COLOR : "transparent",
         opacity: isDisabled ? 0.4 : 1,
-        flexDirection: "row", // ✅ Allow icon and text side by side
+        flexDirection: "row", 
         gap: 8, // ✅ Add spacing between icon and text (supported in RN 0.71+)
       }}
     >

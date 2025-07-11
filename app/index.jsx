@@ -1,5 +1,6 @@
 import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -7,6 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -59,6 +61,7 @@ export default function Index() {
               }
             } catch (error) {
               console.error("Error fetching user data:", error);
+              Sentry.captureException(error);
               setLoading(false);
             }
           } else {
@@ -70,6 +73,7 @@ export default function Index() {
         return unsubscribe;
       } catch (error) {
         console.error("Error loading user from AsyncStorage:", error);
+        Sentry.captureException(error);
         setLoading(false);
       }
     }
@@ -93,7 +97,10 @@ export default function Index() {
         resizeMode="contain"
       />
 
-      <View style={styles.bottomSheet}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.bottomSheet}
+      >
         <Text style={styles.title}>
           Welcome to{"\n"}
           <Text style={{ color: Colors.BG_COLOR, fontFamily: "outfit-bold" }}>
@@ -149,7 +156,7 @@ export default function Index() {
             </Text>
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }

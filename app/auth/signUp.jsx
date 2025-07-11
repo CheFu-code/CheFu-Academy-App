@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -46,6 +47,7 @@ const SignUp = () => {
       })
       .catch((e) => {
         console.log("Error in createUserWithEmailAndPassword:", e.message);
+        Sentry.captureException(e);
         if (e.code === "auth/email-already-in-use") {
           alert("This email is already in use. Please use a different email.");
         } else if (e.code === "auth/invalid-email") {
@@ -90,6 +92,7 @@ const SignUp = () => {
       router.push("/home");
     } catch (e) {
       console.log("Error in SaveUser:", e.message);
+      Sentry.captureException(e);
     }
   };
 
@@ -124,7 +127,14 @@ const SignUp = () => {
           >
             <Image
               source={require("./../../assets/images/logo.png")}
-              style={{ width: 180, height: 180 }}
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: 100,
+                borderWidth: 2,
+                borderColor: Colors.PRIMARY,
+                marginBottom: 15,
+              }}
             />
             <Text
               style={{

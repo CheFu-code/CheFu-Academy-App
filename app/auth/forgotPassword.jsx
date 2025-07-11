@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
@@ -49,6 +50,7 @@ const ForgotPassword = () => {
       })
       .catch((error) => {
         setLoading(false);
+        Sentry.captureException(error);
         console.error("Error sending password reset email:", error);
         Alert.alert("Error", error.message);
 

@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Foundation, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
@@ -73,7 +73,7 @@ export default function Header() {
 
       {userDetail && (
         <TouchableOpacity onPress={() => setShowModal(true)}>
-          <Ionicons name="settings-outline" size={32} color={"white"} />
+          <Foundation name="indent-more" size={25} color={"white"} />
         </TouchableOpacity>
       )}
 

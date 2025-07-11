@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
@@ -48,6 +49,7 @@ export default function Profile() {
           } catch (error) {
             console.error("Logout error:", error);
             ToastAndroid.show("Logout failed", ToastAndroid.SHORT);
+            Sentry.captureException(error);
           } finally {
             setLoading(false);
           }
@@ -84,6 +86,7 @@ export default function Profile() {
       setLoading(false);
     } catch (error) {
       console.error("Delete account error:", error);
+      Sentry.captureException(error);
       if (
         error.code === "auth/wrong-password" ||
         error.code === "auth/invalid-credential"
@@ -132,7 +135,8 @@ export default function Profile() {
       label: "Terms of Service",
       icon: "document-text-outline",
       onPress: () => router.push("/terms"),
-    },];
+    },
+  ];
 
   return (
     <View style={styles.container}>
@@ -215,7 +219,7 @@ export default function Profile() {
               color={Colors.GREEN}
               style={styles.icon}
             />
-            <Text style={[styles.menuLabel, { color: Colors.GREEN}]}>
+            <Text style={[styles.menuLabel, { color: Colors.GREEN }]}>
               Check for Updates
             </Text>
           </TouchableOpacity>

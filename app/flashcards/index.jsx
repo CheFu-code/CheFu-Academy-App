@@ -21,9 +21,9 @@ export default function Flashcards() {
   const [currentPage, setCurrentPage] = useState(0);
   const width = Dimensions.get("screen").width;
 
-  const onScroll = (event) => {
+  const onMomentumScrollEnd = (event) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const newIndex = Math.floor(contentOffsetX / width);
+    const newIndex = Math.round(contentOffsetX / width);
     setCurrentPage(newIndex);
   };
 
@@ -41,7 +41,7 @@ export default function Flashcards() {
         style={{
           position: "absolute",
           padding: 25,
-          marginTop: 10,
+          marginTop: 25,
           width: "100%",
         }}
       >
@@ -71,7 +71,7 @@ export default function Flashcards() {
           data={flashcard}
           pagingEnabled={true}
           horizontal={true}
-          onScroll={onScroll}
+          onMomentumScrollEnd={onMomentumScrollEnd}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item, index }) => (
             <View
@@ -129,8 +129,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.BG_GRAY,
     borderRadius: 20,
-    marginHorizontal: Dimensions.get("screen").width * 0.03,
-    // elevation: 1,
+    marginHorizontal: Dimensions.get("screen").width * 0.04,
+    elevation: 1,
+    marginTop: 35,
   },
   flipBack: {
     display: "flex",

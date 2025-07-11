@@ -23,6 +23,8 @@ import { Colors } from "../../constant/Colors";
 export default function ChapterView() {
   const { chapterParams, docId, chapterIndex } = useLocalSearchParams();
   let chapters = { content: [] };
+  const [showFull, setShowFull] = useState(false); // ✅ Move this above
+  const maxLines = showFull ? undefined : 5; // ✅ Use it here after defining `showFull`
 
   if (
     typeof chapterParams === "string" &&
@@ -51,24 +53,35 @@ export default function ChapterView() {
   };
 
   const onChapterComplete = async () => {
+    if (loader) return; // prevent double trigger
     setLoader(true);
-    const courseRef = doc(db, "course", docId);
-    await updateDoc(courseRef, {
-      completedChapter: arrayUnion(chapterIndex),
-    });
-    // Fetch the latest course data
-    const courseSnap = await getDoc(courseRef);
-    const courseObject = courseSnap.exists()
-      ? courseSnap.data()
-      : { chapters: [] };
-    setLoader(false);
-    setCurrentPage(0); // Reset to the first page after completion
-    router.replace({
-      pathname: "/courseView",
-      params: {
-        courseParams: JSON.stringify(courseObject),
-      },
-    });
+
+    try {
+      const courseRef = doc(db, "course", docId);
+      await updateDoc(courseRef, {
+        completedChapter: arrayUnion(chapterIndex),
+      });
+
+      const courseSnap = await getDoc(courseRef);
+      const courseObject = courseSnap.exists()
+        ? courseSnap.data()
+        : { chapters: [] };
+
+      setLoader(false);
+      setCurrentPage(0);
+
+      // Use replace to avoid stacking
+      router.replace({
+        pathname: "/courseView",
+        params: {
+          courseParams: JSON.stringify(courseObject),
+        },
+      });
+      ToastAndroid.show("Chapter completed!", ToastAndroid.SHORT);
+    } catch (error) {
+      console.error("Error completing chapter:", error);
+      setLoader(false);
+    }
   };
 
   const [copied, setCopied] = useState(false);
@@ -80,8 +93,6 @@ export default function ChapterView() {
       await Clipboard.setStringAsync(text);
       setCopied(true);
       setCopying(false);
-      // Optionally, you can show a toast or alert to indicate that the text has been copied
-      // For example, you can use a library like react-native-toast-message or similar
       ToastAndroid.show("Code copied to clipboard!", ToastAndroid.CENTER);
       setTimeout(() => setCopied(false), 1200);
     } catch (error) {
@@ -147,29 +158,73 @@ export default function ChapterView() {
           {chapters?.content[currentPage]?.topic}
         </Text>
 
-        <Text
-          style={{
-            fontFamily: "outfit",
-            fontSize: 16,
-            marginTop: 10,
-            color: "#fff",
-          }}
-        >
-          {chapters?.content[currentPage]?.explain}
-        </Text>
+        <View style={{ marginTop: 10, flexDirection: "row", flexWrap: "wrap" }}>
+          {chapters?.content[currentPage]?.explain
+            ?.split(/(`[^`]+`)/g) // Step 1: Split by inline code
+            .map((part, index) => {
+              const isCode = part.startsWith("`") && part.endsWith("`");
+              const content = isCode ? part.slice(1, -1) : part;
 
-        {/* {chapters?.content[currentPage]?.code && (
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 16,
-              color: Colors.WHITE,
-              marginTop: 20,
-            }}
-          >
-            Code:
-          </Text>
-        )} */}
+              // Step 2: If not code, further split by quotes
+              if (!isCode) {
+                return content
+                  .split(/(["'][^"']+["'])/g)
+                  .map((subPart, subIndex) => {
+                    const isQuoted =
+                      (subPart.startsWith('"') && subPart.endsWith('"')) ||
+                      (subPart.startsWith("'") && subPart.endsWith("'"));
+                    const text = isQuoted ? subPart.slice(1, -1) : subPart;
+
+                    return (
+                      <Text
+                        numberOfLines={maxLines}
+                        key={`${index}-${subIndex}`}
+                        selectable
+                        style={{
+                          fontFamily: isQuoted ? "outfit-bold" : "outfit",
+                          fontSize: 16,
+                          color: "#fff",
+                        }}
+                      >
+                        {text}
+                      </Text>
+                    );
+                  });
+              }
+
+              // If it's inline code
+              return (
+                <Text
+                  key={index}
+                  selectable
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: 16,
+                    color: Colors.YELLOW,
+                    backgroundColor: "#333",
+                    borderRadius: 5,
+                    paddingHorizontal: 4,
+                    paddingVertical: 2,
+                  }}
+                >
+                  {content}
+                </Text>
+              );
+            })}
+
+          {chapters?.content[currentPage]?.explain?.length > 200 && (
+            <TouchableOpacity onPress={() => setShowFull(!showFull)}>
+              <Text
+                style={{
+                  color: showFull ? Colors.YELLOW : Colors.GREEN,
+                  marginTop: 5,
+                }}
+              >
+                {showFull ? "Read less ▲" : "Read more ▼"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {chapters?.content[currentPage]?.code && (
           <View style={styles.codeBlockContainer}>
@@ -231,14 +286,45 @@ export default function ChapterView() {
             Example:
           </Text>
         )}
+
         {chapters?.content[currentPage]?.example && (
-          <Text style={styles.codeExampleText}>
-            {chapters?.content[currentPage]?.example}
-          </Text>
+          <View
+            style={{
+              ...styles.codeExampleText,
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
+          >
+            {chapters?.content[currentPage]?.example
+              ?.split(/(`[^`]+`)/g)
+              .map((part, index) => {
+                const isCode = part.startsWith("`") && part.endsWith("`");
+                const content = isCode ? part.slice(1, -1) : part;
+
+                return (
+                  <Text
+                    key={index}
+                    selectable
+                    style={{
+                      fontFamily: isCode ? "monospace" : "outfit",
+                      fontSize: 14,
+                      color: Colors.WHITE,
+                      backgroundColor: isCode ? "#333" : "transparent",
+                      paddingHorizontal: isCode ? 4 : 0,
+                      paddingVertical: isCode ? 2 : 0,
+                      borderRadius: isCode ? 5 : 0,
+                      marginTop: isCode ? 1.5 : 0,
+                    }}
+                  >
+                    {content}
+                  </Text>
+                );
+              })}
+          </View>
         )}
       </ScrollView>
 
-      <View style={{ marginBottom: 29 }}>
+      <View style={{ marginBottom: 39 }}>
         {chapters?.content?.length - 1 != currentPage ? (
           <Button
             onPress={() => setCurrentPage(currentPage + 1)}

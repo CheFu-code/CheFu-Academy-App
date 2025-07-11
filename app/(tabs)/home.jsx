@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { FlatList, Image, Platform, View } from "react-native";
-import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
@@ -84,11 +83,11 @@ export default function Home() {
             )}
           </View>
 
-          <BannerAd
+          {/* <BannerAd
             unitId="ca-app-pub-8952058057579255/9705798694"
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
             requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-          />
+          /> */}
         </View>
       }
     />
