@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -13,7 +14,7 @@ export default function SuccessScreen({ route }) {
   const [loading, setLoading] = useState(true);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
-  const orderID = route?.params?.orderID || null;
+  const { orderID } = useLocalSearchParams();
   const email = userDetail?.email; // Replace with userDetail.email if available
 
   useEffect(() => {
@@ -94,7 +95,19 @@ export default function SuccessScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, marginTop: 40 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
+  container: {
+    padding: 20,
+    marginTop: 40,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "outfit-bold",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
 });
