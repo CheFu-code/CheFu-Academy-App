@@ -60,8 +60,6 @@ export default function Profile() {
     }
   };
 
-  
-
   const handleLogout = async () => {
     Alert.alert("Logout?", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
@@ -225,7 +223,7 @@ export default function Profile() {
 
           <TouchableOpacity
             style={[styles.menuItem, { marginTop: 5 }]}
-            onPress={() => router.push("/subscription")}
+            onPress={() => router.push("/subscription/success")}
             disabled={loading}
           >
             <FontAwesome5

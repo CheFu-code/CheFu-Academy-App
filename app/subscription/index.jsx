@@ -18,7 +18,7 @@ import { PLANS } from "../../constant/plans";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function SubscriptionWall() {
-  const [selectedPlan, setSelectedPlan] = useState("basic");
+  const [selectedPlan, setSelectedPlan] = useState("pro");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -62,7 +62,7 @@ export default function SubscriptionWall() {
       }
     } catch (err) {
       console.error("Subscription error:", err);
-      Sentry.captureException(err)
+      Sentry.captureException(err);
       ToastAndroid.show("Something went wrong", ToastAndroid.SHORT);
     } finally {
       setLoading(false);
@@ -112,7 +112,7 @@ export default function SubscriptionWall() {
 
       <TouchableOpacity
         disabled={loading}
-        style={styles.subscribeBtn}
+        style={[styles.subscribeBtn, { opacity: loading ? 0.5 : 1 }]}
         onPress={handleSubscribe}
       >
         {loading ? (

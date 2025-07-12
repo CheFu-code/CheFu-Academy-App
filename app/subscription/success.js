@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
@@ -7,13 +8,16 @@ import {
   ToastAndroid,
   View,
 } from "react-native";
+import Button from "../../component/Shared/Button";
+import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function SuccessScreen() {
   const [receipt, setReceipt] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(10);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const [loader, setLoader] = useState(false);
 
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -34,7 +38,11 @@ export default function SuccessScreen() {
         const res = await fetch(`${BASE_URL}/api/paypal/capture-order`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderID, email }),
+          body: JSON.stringify({
+            orderID,
+            email,
+            planType: userDetail.planType,
+          }),
         });
 
         const data = await res.json();
@@ -62,7 +70,7 @@ export default function SuccessScreen() {
   useEffect(() => {
     if (receipt) {
       if (countdown === 0) {
-        router.replace("/profile"); // or your profile screen path
+        router.replace("/(tabs)/profile");
       }
 
       const timer = setTimeout(() => {
@@ -85,29 +93,112 @@ export default function SuccessScreen() {
   if (!receipt) {
     return (
       <View style={styles.center}>
-        <Text>Payment verification failed.</Text>
+        <Text
+          style={{
+            color: "red",
+            fontFamily: "outfit-bold",
+            fontSize: 20,
+          }}
+        >
+          Payment verification failed.
+        </Text>
+        <Text>Please try again later.</Text>
+
+        {loader ? (
+          <ActivityIndicator size={"small"} color={Colors.PRIMARY} />
+        ) : (
+          <Button
+            onPress={() => router.push("/subscription")}
+            text={"Try again"}
+            loading={loader}
+            disabled={loader}
+          />
+        )}
+
+        <Button
+          onPress={() => router.push("/")}
+          text={"Home"}
+          loading={loader}
+          disabled={loader}
+        />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>✅ Payment Receipt</Text>
-      <Text>Order ID: {receipt.id}</Text>
-      <Text>Status: {receipt.status}</Text>
-      <Text>
-        Payer: {receipt?.payer?.name?.given_name || "Unknown"}{" "}
-        {receipt?.payer?.name?.surname || ""}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 10,
+        }}
+      >
+        <Ionicons color={"green"} name="checkmark-circle" size={24} />
+        <Text style={styles.title}>Payment Receipt</Text>
+      </View>
+      <Text style={styles.anyText}>
+        Order ID:{" "}
+        <Text
+          style={{
+            color: Colors.PRIMARY,
+          }}
+        >
+          {receipt.id}
+        </Text>
+      </Text>
+      <Text style={styles.anyText}>
+        Status:{" "}
+        <Text
+          style={{
+            color: Colors.GREEN,
+          }}
+        >
+          {" "}
+          {receipt.status}{" "}
+        </Text>
       </Text>
 
-      <Text>
-        Amount: {receipt.purchase_units[0].payments.captures[0].amount.value}{" "}
-        {receipt.purchase_units[0].payments.captures[0].amount.currency_code}
+      <Text style={styles.anyText}>
+        Payer:{" "}
+        <Text
+          style={{
+            color: Colors.PRIMARY,
+          }}
+        >
+          {receipt?.payer?.name?.given_name || "Unknown"}{" "}
+          {receipt?.payer?.name?.surname || ""}
+        </Text>
       </Text>
 
-      <Text style={styles.redirectText}>
-        You'll be redirected within: {countdown} second{countdown !== 1 ? "s" : ""}. Please don't leave the app.
+      <Text style={styles.anyText}>
+        Amount:{" "}
+        <Text
+          style={{
+            color: Colors.PRIMARY,
+          }}
+        >
+          {receipt.purchase_units[0].payments.captures[0].amount.value}{" "}
+          {receipt.purchase_units[0].payments.captures[0].amount.currency_code}
+        </Text>
       </Text>
+
+      <View style={styles.countdownContainer}>
+        <ActivityIndicator size="small" color="green" />
+        <Text style={styles.redirectText}>
+          You'll be redirected within:{" "}
+          <Text
+            style={{
+              color: Colors.PRIMARY,
+            }}
+          >
+            {countdown} second
+            {countdown !== 1 ? "s" : ""}.
+          </Text>{" "}
+          Please don't leave the app.
+        </Text>
+      </View>
     </View>
   );
 }
@@ -115,7 +206,14 @@ export default function SuccessScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    marginTop: 40,
+    backgroundColor: Colors.BG_COLOR,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  anyText: {
+    fontFamily: "outfit-bold",
+    color: Colors.WHITE,
   },
   center: {
     flex: 1,
@@ -126,11 +224,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 20,
+
+    color: Colors.GREEN,
+  },
+  countdownContainer: {
+    marginTop: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    padding: 20,
+    gap: 10,
   },
   redirectText: {
-    marginTop: 30,
     fontSize: 16,
     fontStyle: "italic",
+    marginLeft: 8,
+    color: "white",
   },
 });

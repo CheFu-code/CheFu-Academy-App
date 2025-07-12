@@ -61,13 +61,12 @@ router.post("/create-order", async (req, res) => {
 // Capture payment AND write to Firestore
 router.post("/capture-order", async (req, res) => {
   try {
-    const { orderID, email } = req.body;
+    const { orderID, email, planType } = req.body;
 
-    if (!orderID) {
-      return res.status(400).json({ error: "Missing orderID" });
-    }
-    if (!email) {
-      return res.status(400).json({ error: "Missing email" });
+    if (!orderID || !email || !planType) {
+      return res
+        .status(400)
+        .json({ error: "Missing orderID, email, or planType" });
     }
 
     const accessToken = await getAccessToken();
@@ -87,13 +86,13 @@ router.post("/capture-order", async (req, res) => {
 
     console.log("✅ PayPal capture successful:", details);
 
-    // Write to Firestore
     const db = admin.firestore();
 
-    console.log("🟢 Writing payment to Firestore...");
+    // Save payment record
     await db.collection("payments").doc(orderID).set({
       email,
       orderID,
+      planType,
       payerID: details.payer.payer_id,
       payerName: details.payer.name,
       amount: details.purchase_units[0].payments.captures[0].amount,
@@ -101,7 +100,25 @@ router.post("/capture-order", async (req, res) => {
       timestamp: new Date().toISOString(),
     });
 
-    console.log("✅ Payment written to Firestore");
+    // Calculate memberUntil based on plan
+    const now = new Date();
+    const memberUntil = new Date(now);
+
+    if (planType === "basic") memberUntil.setDate(now.getDate() + 30);
+    else if (planType === "pro") memberUntil.setDate(now.getDate() + 60);
+    else if (planType === "premium") memberUntil.setDate(now.getDate() + 90);
+    else memberUntil.setDate(now.getDate() + 30); // default fallback
+
+    // Update user membership
+    await db.collection("users").doc(email).set(
+      {
+        member: true,
+        planType,
+        subscribedAt: now.toISOString(),
+        memberUntil: memberUntil.toISOString(),
+      },
+      { merge: true }
+    );
 
     res.json({ message: "Capture successful", details });
   } catch (error) {
