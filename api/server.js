@@ -11,6 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/paypal", paypalRoutes);
+app.get("/ping", (req, res) => {
+  res.status(200).send("pong");
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
@@ -21,18 +24,13 @@ app.listen(PORT, () => {
 console.log("⏱️ Setting up cron job...");
 
 cron.schedule("*/10 * * * *", async () => {
-  const url = "https://chefu-academy-tmzx.onrender.com";
-  console.log("🔁 Pinging to keep server awake...");
+  const url = "https://chefu-academy-tmzx.onrender.com/ping";
+  console.log("🔁 Pinging /ping to keep server awake...");
 
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: "0.01" }),
-    });
-
-    const data = await res.json();
-    console.log("✅ Ping response:", data.status || "OK");
+    const res = await fetch(url);
+    const text = await res.text();
+    console.log("✅ Ping response:", res.status, text);
   } catch (error) {
     console.error("❌ Ping failed:", error.message);
   }
