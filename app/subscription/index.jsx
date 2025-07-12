@@ -24,7 +24,8 @@ export default function SubscriptionWall() {
 
   const subscriptionSkus = ["basic_monthly", "pro_monthly", "premium_monthly"];
 
-  const BASE_URL = "http://172.20.10.2:5000";
+  const BASE_URL = "https://chefu-academy-tmzx.onrender.com";
+  
   const handleSubscribe = async () => {
     try {
       setLoading(true);

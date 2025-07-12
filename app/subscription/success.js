@@ -25,8 +25,11 @@ export default function SuccessScreen({ route }) {
 
     const captureOrder = async () => {
       try {
+        const BASE_URL = "https://chefu-academy-tmzx.onrender.com";
+
         const res = await fetch(
-          "http://172.20.10.2:5000/api/paypal/capture-order",
+          `${BASE_URL}/api/paypal/capture-order`,
+
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
