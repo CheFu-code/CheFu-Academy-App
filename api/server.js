@@ -18,8 +18,10 @@ app.listen(PORT, () => {
 });
 
 // 🟡 CRON JOB: ping every 14 minutes to prevent Render from pausing
+console.log("⏱️ Setting up cron job...");
+
 cron.schedule("*/10 * * * *", async () => {
-  const url = "https://chefu-academy-tmzx.onrender.com/api/paypal/create-order";
+  const url = "https://chefu-academy-tmzx.onrender.com";
   console.log("🔁 Pinging to keep server awake...");
 
   try {
@@ -35,3 +37,5 @@ cron.schedule("*/10 * * * *", async () => {
     console.error("❌ Ping failed:", error.message);
   }
 });
+
+console.log("✅ Cron job initialized to run every 10 minutes.");
