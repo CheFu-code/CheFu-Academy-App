@@ -223,7 +223,7 @@ export default function Profile() {
 
           <TouchableOpacity
             style={[styles.menuItem, { marginTop: 5 }]}
-            onPress={() => router.push("/subscription/success")}
+            onPress={() => router.push("/subscription")}
             disabled={loading}
           >
             <FontAwesome5
