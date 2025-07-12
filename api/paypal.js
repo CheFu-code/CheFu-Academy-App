@@ -64,6 +64,8 @@ router.post("/capture-order", async (req, res) => {
     const { orderID, email, planType } = req.body;
 
     if (!orderID || !email || !planType) {
+      console.log("🔎 Received:", { orderID, email, planType });
+
       return res
         .status(400)
         .json({ error: "Missing orderID, email, or planType" });
@@ -122,7 +124,16 @@ router.post("/capture-order", async (req, res) => {
 
     res.json({ message: "Capture successful", details });
   } catch (error) {
-    console.error("❌ Capture order error:", error.response?.data || error);
+    if (error.response) {
+      console.error("❌ Capture error response:", {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers,
+      });
+    } else {
+      console.error("❌ Capture error:", error.message || error);
+    }
+
     res.status(500).json({ error: "Capture failed" });
   }
 });
