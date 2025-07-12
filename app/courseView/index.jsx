@@ -39,8 +39,7 @@ export default function CourseView() {
       {/* Fixed Image at the Top */}
       <Image
         source={
-          imageAssets[course?.banner_image] ||
-          require("../../assets/images/default_course_banner.png")
+          imageAssets[course?.banner_image]
         }
         style={{
           width: "100%",
