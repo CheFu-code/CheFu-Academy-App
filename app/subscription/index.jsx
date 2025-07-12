@@ -1,89 +1,112 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
+import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
+import * as RNIap from "react-native-iap";
+import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
-
-const PLANS = [
-  {
-    id: "basic",
-    name: "Basic",
-    price: "$4.99 - pay once",
-    features: ["Access to free courses", "Limited quizzes", "Basic support"],
-    popular: false,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: "$9.99/mo",
-    features: [
-      "All Basic features",
-      "Unlimited quizzes",
-      "AI-powered explanations",
-      "Priority support",
-    ],
-    popular: true,
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: "$19.99/mo",
-    features: [
-      "All Pro features",
-      "1-on-1 mentorship",
-      "Early access to new content",
-      "Priority support",
-    ],
-    popular: false,
-  },
-];
+import { PLANS } from "../../constant/plans";
+import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function SubscriptionWall() {
   const [selectedPlan, setSelectedPlan] = useState("basic");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
-  const handleSubscribe = () => {
-    setLoading(true);
-    // Add payment logic here
-    alert(`Subscribed to ${selectedPlan} plan!`);
-    // router.push("/home");
-    setLoading(false);
+  const subscriptionSkus = ["basic_monthly", "pro_monthly", "premium_monthly"];
+
+  const handleSubscribe = async () => {
+    try {
+      console.log("Subscription process started");
+
+      if (userDetail?.member === true) {
+        console.log("User is already a member");
+        ToastAndroid.show("You're already a member", ToastAndroid.SHORT);
+        return;
+      }
+
+      console.log("Selected plan:", selectedPlan);
+      setLoading(true);
+
+      await RNIap.initConnection();
+      await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
+      console.log("IAP connection initialized");
+
+      const subs = await RNIap.getSubscriptions(subscriptionSkus);
+      console.log("Available subscriptions:", subs);
+
+      const selectedSku = subs.find((sub) =>
+        sub.productId.includes(selectedPlan)
+      );
+      console.log("Selected SKU:", selectedSku);
+
+      if (!selectedSku) {
+        ToastAndroid.show("Subscription not found", ToastAndroid.SHORT);
+        return;
+      }
+
+      const purchase = await RNIap.requestSubscription({
+        sku: selectedSku.productId,
+        andDangerouslyFinishTransactionAutomatically: true,
+      });
+
+      console.log("Purchase result:", purchase);
+
+      if (purchase && purchase.transactionId) {
+        console.log("Purchase successful");
+        Sentry.captureMessage(`User subscribed to: ${selectedPlan}`);
+
+        const userDocRef = doc(db, "users", userDetail.email);
+        await setDoc(
+          userDocRef,
+          {
+            member: true,
+            plan: selectedPlan, // track selected plan
+            updatedAt: new Date(),
+          },
+          { merge: true }
+        );
+
+        setUserDetail((prev) => ({ ...prev, member: true }));
+        ToastAndroid.show("Subscription successful!", ToastAndroid.SHORT);
+      } else {
+        console.warn("Purchase failed or canceled");
+        ToastAndroid.show("Payment failed or canceled", ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.error("IAP error:", error);
+      Sentry.captureException(error);
+      ToastAndroid.show("Subscription failed. Try again.", ToastAndroid.SHORT);
+    } finally {
+      setLoading(false);
+      RNIap.endConnection();
+      console.log("IAP connection closed");
+    }
   };
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: 20,
-          gap: 8,
-        }}
-      >
+      <View style={styles.topBar}>
         <Pressable disabled={loading} onPress={() => router.back()}>
-          <Ionicons
-            style={{
-              padding: 3,
-              borderRadius: 10,
-              backgroundColor: Colors.BG_GRAY,
-            }}
-            name="arrow-back"
-            size={24}
-            color={Colors.PRIMARY}
-          />
+          <View style={styles.backButton}>
+            <Ionicons name="arrow-back" size={22} color={Colors.PRIMARY} />
+          </View>
         </Pressable>
         <Text style={styles.header}>Choose Your Plan</Text>
       </View>
+
       <FlatList
         data={PLANS}
         keyExtractor={(item) => item.id}
@@ -113,9 +136,14 @@ export default function SubscriptionWall() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingVertical: 20 }}
       />
-      <TouchableOpacity style={styles.subscribeBtn} onPress={handleSubscribe}>
+
+      <TouchableOpacity
+        disabled={loading}
+        style={styles.subscribeBtn}
+        onPress={handleSubscribe}
+      >
         {loading ? (
-          <ActivityIndicator size={24} color={Colors.WHITE} />
+          <ActivityIndicator size={24} color={Colors.GREEN} />
         ) : (
           <Text style={styles.subscribeText}>Subscribe</Text>
         )}
@@ -131,28 +159,42 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
   },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 30,
+    gap: 10,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: Colors.BG_GRAY,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   header: {
     fontFamily: "outfit-bold",
     fontSize: 28,
     color: Colors.PRIMARY,
-    // marginTop: 30,
-    // marginBottom: 10,
   },
   planCard: {
     backgroundColor: Colors.BG_GRAY,
     borderRadius: 18,
     padding: 24,
     marginHorizontal: 10,
+    marginVertical: 90,
     minWidth: 220,
+    height: 350,
     alignItems: "flex-start",
     borderWidth: 2,
     borderColor: Colors.BG_GRAY,
   },
   selectedCard: {
     borderColor: Colors.PRIMARY,
-    backgroundColor: Colors.WHITE,
+    backgroundColor: Colors.LIGHT_GREEN,
     shadowColor: Colors.PRIMARY,
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.10,
     shadowRadius: 8,
     elevation: 4,
   },
@@ -185,7 +227,7 @@ const styles = StyleSheet.create({
   },
   subscribeBtn: {
     marginTop: 30,
-    marginBottom: 20,
+    marginBottom: 50,
     backgroundColor: Colors.PRIMARY,
     paddingVertical: 13,
     paddingHorizontal: 30,

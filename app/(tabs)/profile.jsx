@@ -1,9 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,6 +13,7 @@ import {
   Linking,
   Modal,
   Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,8 +22,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../../config/fireConfig";
+import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
+import { menuItems, url } from "../../constant/menuItems";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function Profile() {
@@ -31,6 +34,33 @@ export default function Profile() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const renderedMenuItems = menuItems(router, Linking, ToastAndroid, Colors);
+
+  const refreshData = async () => {
+    setRefreshing(true);
+    try {
+      // Fetch updated user data from Firestore
+      const userDocRef = doc(db, "users", userDetail.email);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        setUserDetail(userDocSnap.data());
+        ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show("Your data not found", ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      ToastAndroid.show("Failed to refresh data", ToastAndroid.SHORT);
+      Sentry.captureException(error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  
 
   const handleLogout = async () => {
     Alert.alert("Logout?", "Are you sure you want to log out?", [
@@ -99,73 +129,66 @@ export default function Profile() {
     }
   };
 
-  const url =
-    "https://play.google.com/store/apps/details?id=com.chefu.chefuacademy";
-
-  const menuItems = [
-    {
-      label: "Add Course",
-      icon: "add-circle-outline",
-      onPress: () => router.push("/addCourse"),
-    },
-    {
-      label: "My Courses",
-      icon: "book-outline",
-      onPress: () => router.push("/(tabs)/home"),
-    },
-    {
-      label: "Course Progress",
-      icon: "stats-chart-outline",
-      onPress: () => router.push("/(tabs)/progress"),
-    },
-    {
-      label: "Help & Support",
-      icon: "help-circle-outline",
-      onPress: () =>
-        Linking.openURL(
-          "mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here."
-        ),
-    },
-    {
-      label: "Privacy Policy",
-      icon: "shield-checkmark-outline",
-      onPress: () => router.push("/privacy"),
-    },
-    {
-      label: "Terms of Service",
-      icon: "document-text-outline",
-      onPress: () => router.push("/terms"),
-    },
-  ];
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
           source={require("../../assets/images/logo.png")}
-          style={styles.avatar}
+          style={[
+            styles.avatar,
+            {
+              borderColor:
+                userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
+            },
+          ]}
         />
         {userDetail && (
           <>
-            <Text style={styles.profileName}>{userDetail.fullname}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <Text style={styles.profileName}>{userDetail.fullname}</Text>
+              {userDetail?.member === true && (
+                <Ionicons color={"green"} size={20} name="checkmark-circle" />
+              )}
+            </View>
             <Text style={styles.profileEmail}>{userDetail.email}</Text>
-            <TouchableOpacity style={[styles.planStatus]}>
-              <Text
-                style={{
-                  color: userDetail.member ? Colors.GREEN : Colors.RED,
-                  textDecorationLine:
-                    userDetail?.member === false ? "underline" : "none",
-                }}
-              >
-                {userDetail.member ? "Member Plan" : "Free Plan"}
-              </Text>
+            <TouchableOpacity
+              onPress={() => subscribe()}
+              disabled={loading}
+              style={[styles.planStatus]}
+            >
+              {loading ? (
+                <ActivityIndicator color={"green"} size={"small"} />
+              ) : (
+                <Text
+                  style={{
+                    color: userDetail.member ? Colors.GREEN : Colors.RED,
+                    textDecorationLine:
+                      userDetail?.member === false ? "underline" : "none",
+                  }}
+                >
+                  {userDetail.member ? "Member Plan" : "Free Plan"}
+                </Text>
+              )}
             </TouchableOpacity>
           </>
         )}
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refreshData} />
+        }
+        showsVerticalScrollIndicator={false}
+        style={styles.container}
+      >
         <View style={styles.menuSection}>
-          {menuItems.map((item) => (
+          {renderedMenuItems.map((item) => (
+            // {menuItems.map((item) => (
             <TouchableOpacity
               key={item.label}
               style={styles.menuItem}
@@ -197,6 +220,22 @@ export default function Profile() {
             />
             <Text style={[styles.menuLabel, { color: Colors.PRIMARY }]}>
               About This App
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuItem, { marginTop: 5 }]}
+            onPress={() => router.push("/subscription")}
+            disabled={loading}
+          >
+            <FontAwesome5
+              name="money-bill-wave"
+              size={20}
+              color={Colors.GREEN}
+              style={styles.icon}
+            />
+            <Text style={[styles.menuLabel, { color: Colors.GREEN }]}>
+              Subscribe
             </Text>
           </TouchableOpacity>
 
@@ -352,7 +391,6 @@ const styles = StyleSheet.create({
     height: 140,
     borderRadius: 100,
     borderWidth: 2,
-    borderColor: Colors.PRIMARY,
     marginBottom: 15,
     marginTop: 30,
   },
