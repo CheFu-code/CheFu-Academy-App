@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
@@ -25,7 +26,7 @@ export default function SubscriptionWall() {
   const subscriptionSkus = ["basic_monthly", "pro_monthly", "premium_monthly"];
 
   const BASE_URL = "https://chefu-academy-tmzx.onrender.com";
-  
+
   const handleSubscribe = async () => {
     try {
       setLoading(true);
@@ -56,10 +57,12 @@ export default function SubscriptionWall() {
         }
       } else {
         console.log("PayPal create-order error:", data);
+        Sentry.captureException("PayPal create-order error:", data);
         ToastAndroid.show("Payment init failed", ToastAndroid.SHORT);
       }
     } catch (err) {
       console.error("Subscription error:", err);
+      Sentry.captureException(err)
       ToastAndroid.show("Something went wrong", ToastAndroid.SHORT);
     } finally {
       setLoading(false);

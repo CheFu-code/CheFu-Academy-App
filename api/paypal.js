@@ -42,7 +42,7 @@ router.post("/create-order", async (req, res) => {
         intent: "CAPTURE",
         purchase_units: [{ amount: { currency_code: "USD", value: amount } }],
         application_context: {
-          return_url: "chefu-academy://subscription/success?orderID={order_id}",
+          return_url: "chefu-academy://subscription/success",
           cancel_url: "chefu-academy://subscription/cancel",
         },
       },
