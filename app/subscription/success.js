@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,13 +9,16 @@ import {
 } from "react-native";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
-export default function SuccessScreen({ route }) {
+export default function SuccessScreen() {
   const [receipt, setReceipt] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [countdown, setCountdown] = useState(5);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
-  const { orderID } = useLocalSearchParams();
-  const email = userDetail?.email; // Replace with userDetail.email if available
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const orderID = params.token;
+  const email = userDetail?.email;
 
   useEffect(() => {
     if (!orderID) {
@@ -28,15 +31,11 @@ export default function SuccessScreen({ route }) {
       try {
         const BASE_URL = "https://chefu-academy-tmzx.onrender.com";
 
-        const res = await fetch(
-          `${BASE_URL}/api/paypal/capture-order`,
-
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ orderID, email }),
-          }
-        );
+        const res = await fetch(`${BASE_URL}/api/paypal/capture-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderID, email }),
+        });
 
         const data = await res.json();
 
@@ -58,6 +57,21 @@ export default function SuccessScreen({ route }) {
 
     captureOrder();
   }, []);
+
+  // Countdown and redirect effect
+  useEffect(() => {
+    if (receipt) {
+      if (countdown === 0) {
+        router.replace("/profile"); // or your profile screen path
+      }
+
+      const timer = setTimeout(() => {
+        setCountdown((c) => c - 1);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [countdown, receipt]);
 
   if (loading) {
     return (
@@ -90,6 +104,10 @@ export default function SuccessScreen({ route }) {
         Amount: {receipt.purchase_units[0].payments.captures[0].amount.value}{" "}
         {receipt.purchase_units[0].payments.captures[0].amount.currency_code}
       </Text>
+
+      <Text style={styles.redirectText}>
+        You'll be redirected within: {countdown} second{countdown !== 1 ? "s" : ""}. Please don't leave the app.
+      </Text>
     </View>
   );
 }
@@ -109,5 +127,10 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  redirectText: {
+    marginTop: 30,
+    fontSize: 16,
+    fontStyle: "italic",
   },
 });
