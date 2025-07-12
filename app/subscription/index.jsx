@@ -1,11 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { doc, setDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Linking,
   Pressable,
   StyleSheet,
   Text,
@@ -13,8 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as RNIap from "react-native-iap";
-import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { PLANS } from "../../constant/plans";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -27,72 +24,44 @@ export default function SubscriptionWall() {
 
   const subscriptionSkus = ["basic_monthly", "pro_monthly", "premium_monthly"];
 
+  const BASE_URL = "http://172.20.10.2:5000";
   const handleSubscribe = async () => {
     try {
-      console.log("Subscription process started");
-
-      if (userDetail?.member === true) {
-        console.log("User is already a member");
-        ToastAndroid.show("You're already a member", ToastAndroid.SHORT);
-        return;
-      }
-
-      console.log("Selected plan:", selectedPlan);
       setLoading(true);
 
-      await RNIap.initConnection();
-      await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
-      console.log("IAP connection initialized");
-
-      const subs = await RNIap.getSubscriptions(subscriptionSkus);
-      console.log("Available subscriptions:", subs);
-
-      const selectedSku = subs.find((sub) =>
-        sub.productId.includes(selectedPlan)
-      );
-      console.log("Selected SKU:", selectedSku);
-
-      if (!selectedSku) {
-        ToastAndroid.show("Subscription not found", ToastAndroid.SHORT);
-        return;
-      }
-
-      const purchase = await RNIap.requestSubscription({
-        sku: selectedSku.productId,
-        andDangerouslyFinishTransactionAutomatically: true,
+      const res = await fetch(`${BASE_URL}/api/paypal/create-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount:
+            selectedPlan === "premium"
+              ? "19.99"
+              : selectedPlan === "pro"
+              ? "9.99"
+              : "4.99",
+        }),
       });
 
-      console.log("Purchase result:", purchase);
+      const data = await res.json();
 
-      if (purchase && purchase.transactionId) {
-        console.log("Purchase successful");
-        Sentry.captureMessage(`User subscribed to: ${selectedPlan}`);
-
-        const userDocRef = doc(db, "users", userDetail.email);
-        await setDoc(
-          userDocRef,
-          {
-            member: true,
-            plan: selectedPlan, // track selected plan
-            updatedAt: new Date(),
-          },
-          { merge: true }
-        );
-
-        setUserDetail((prev) => ({ ...prev, member: true }));
-        ToastAndroid.show("Subscription successful!", ToastAndroid.SHORT);
+      if (data?.links) {
+        const approvalUrl = data.links.find(
+          (link) => link.rel === "approve"
+        )?.href;
+        if (approvalUrl) {
+          Linking.openURL(approvalUrl);
+        } else {
+          ToastAndroid.show("Unable to initiate PayPal", ToastAndroid.SHORT);
+        }
       } else {
-        console.warn("Purchase failed or canceled");
-        ToastAndroid.show("Payment failed or canceled", ToastAndroid.SHORT);
+        console.log("PayPal create-order error:", data);
+        ToastAndroid.show("Payment init failed", ToastAndroid.SHORT);
       }
-    } catch (error) {
-      console.error("IAP error:", error);
-      Sentry.captureException(error);
-      ToastAndroid.show("Subscription failed. Try again.", ToastAndroid.SHORT);
+    } catch (err) {
+      console.error("Subscription error:", err);
+      ToastAndroid.show("Something went wrong", ToastAndroid.SHORT);
     } finally {
       setLoading(false);
-      RNIap.endConnection();
-      console.log("IAP connection closed");
     }
   };
 
@@ -194,7 +163,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.PRIMARY,
     backgroundColor: Colors.LIGHT_GREEN,
     shadowColor: Colors.PRIMARY,
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },

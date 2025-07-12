@@ -71,7 +71,7 @@ export default function CourseProgressCard({
 
         await AsyncStorage.setItem(notificationSentKey, "true");
       } else {
-        console.log(`Course "${item.courseTitle}" not completed yet.`);
+        // console.log(`Course "${item.courseTitle}" not completed yet.`);
       }
     }
 
