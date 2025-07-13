@@ -4,7 +4,7 @@
 
 # Android/IntelliJ
 #
-build/
+#build/ i'll uncomment it out later
 .idea
 .gradle
 local.properties
