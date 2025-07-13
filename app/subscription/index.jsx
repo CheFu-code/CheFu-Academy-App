@@ -37,10 +37,10 @@ export default function SubscriptionWall() {
         body: JSON.stringify({
           amount:
             selectedPlan === "premium"
-              ? "19.99"
+              ? "29.99"
               : selectedPlan === "pro"
-              ? "9.99"
-              : "4.99",
+              ? "14.99"
+              : "5.99",
         }),
       });
 
@@ -95,6 +95,8 @@ export default function SubscriptionWall() {
           >
             <Text style={styles.planName}>{item.name}</Text>
             <Text style={styles.planPrice}>{item.price}</Text>
+            <Text style={styles.planValidity}>Valid for {item.validity}</Text>
+
             {item.popular && (
               <Text style={styles.popularLabel}>Most Popular</Text>
             )}
@@ -151,6 +153,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: Colors.PRIMARY,
   },
+  planValidity: {
+    fontFamily: "outfit",
+    fontSize: 14,
+    color: Colors.GRAY,
+    marginBottom: 10,
+  },
+
   planCard: {
     backgroundColor: Colors.BG_GRAY,
     borderRadius: 18,

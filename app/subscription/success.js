@@ -51,7 +51,17 @@ export default function SuccessScreen() {
         if (res.ok) {
           setReceipt(data.details);
           ToastAndroid.show("Payment captured", ToastAndroid.SHORT);
-          setUserDetail((prev) => ({ ...prev, member: true }));
+
+          // Extract membership info from backend response
+          const { member, planType, subscribedAt, memberUntil } = data;
+
+          setUserDetail((prev) => ({
+            ...prev,
+            member: member ?? true, // fallback true if not returned
+            planType: planType || prev.planType,
+            subscribedAt: subscribedAt || prev.subscribedAt,
+            memberUntil: memberUntil || prev.memberUntil,
+          }));
         } else {
           ToastAndroid.show("Capture failed", ToastAndroid.SHORT);
         }
@@ -89,6 +99,14 @@ export default function SuccessScreen() {
         <Text>Verifying payment...</Text>
       </View>
     );
+  }
+
+  const planType = params.planType ?? userDetail?.planType;
+
+  if (!planType) {
+    ToastAndroid.show("Missing plan type", ToastAndroid.SHORT);
+    setLoading(false);
+    return;
   }
 
   if (!receipt) {

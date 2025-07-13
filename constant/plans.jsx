@@ -2,14 +2,16 @@ export const PLANS = [
   {
     id: "basic",
     name: "Basic",
-    price: "$4.99/mo",
+    price: "$5.99",
+    validity: "30 days",
     features: ["Access to free courses", "Limited quizzes", "Basic support"],
     popular: false,
   },
   {
     id: "pro",
     name: "Pro",
-    price: "$9.99/mo",
+    price: "$14.99",
+    validity: "60 days",
     features: [
       "All Basic features",
       "Unlimited quizzes",
@@ -21,7 +23,8 @@ export const PLANS = [
   {
     id: "premium",
     name: "Premium",
-    price: "$19.99/mo",
+    price: "$29.99",
+    validity: "90 days",
     features: [
       "All Pro features",
       "1-on-1 mentorship",

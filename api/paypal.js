@@ -20,6 +20,7 @@ const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 
 // Helper to get access token
 async function getAccessToken() {
+  console.log("🔑 Requesting PayPal access token...");
   const response = await axios({
     url: `${PAYPAL_API}/v1/oauth2/token`,
     method: "post",
@@ -27,6 +28,7 @@ async function getAccessToken() {
     auth: { username: CLIENT_ID, password: CLIENT_SECRET },
     data: "grant_type=client_credentials",
   });
+  console.log("🔑 Access token received.");
   return response.data.access_token;
 }
 
@@ -34,6 +36,8 @@ async function getAccessToken() {
 router.post("/create-order", async (req, res) => {
   try {
     const { amount } = req.body;
+    console.log("🟢 Create order request received:", { amount });
+
     const accessToken = await getAccessToken();
 
     const response = await axios.post(
@@ -51,6 +55,7 @@ router.post("/create-order", async (req, res) => {
       }
     );
 
+    console.log("🟢 Order created:", response.data);
     res.json(response.data);
   } catch (error) {
     console.error("❌ Create order error:", error.response?.data || error);
@@ -62,17 +67,16 @@ router.post("/create-order", async (req, res) => {
 router.post("/capture-order", async (req, res) => {
   try {
     const { orderID, email, planType } = req.body;
+    console.log("🟡 Capture order request received:", { orderID, email, planType });
 
     if (!orderID || !email || !planType) {
-      console.log("🔎 Received:", { orderID, email, planType });
-
-      return res
-        .status(400)
-        .json({ error: "Missing orderID, email, or planType" });
+      console.warn("⚠️ Missing required fields:", { orderID, email, planType });
+      return res.status(400).json({ error: "Missing orderID, email, or planType" });
     }
 
     const accessToken = await getAccessToken();
 
+    console.log(`➡️ Capturing PayPal order: ${orderID}`);
     const captureResponse = await axios.post(
       `${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`,
       {},
@@ -85,12 +89,11 @@ router.post("/capture-order", async (req, res) => {
     );
 
     const details = captureResponse.data;
-
     console.log("✅ PayPal capture successful:", details);
 
     const db = admin.firestore();
 
-    // Save payment record
+    console.log("💾 Saving payment record to Firestore...");
     await db.collection("payments").doc(orderID).set({
       email,
       orderID,
@@ -101,6 +104,7 @@ router.post("/capture-order", async (req, res) => {
       status: details.status,
       timestamp: new Date().toISOString(),
     });
+    console.log("💾 Payment record saved.");
 
     // Calculate memberUntil based on plan
     const now = new Date();
@@ -111,7 +115,9 @@ router.post("/capture-order", async (req, res) => {
     else if (planType === "premium") memberUntil.setDate(now.getDate() + 90);
     else memberUntil.setDate(now.getDate() + 30); // default fallback
 
-    // Update user membership
+    console.log(`⏳ Membership valid until: ${memberUntil.toISOString()}`);
+
+    console.log("💾 Updating user membership info...");
     await db.collection("users").doc(email).set(
       {
         member: true,
@@ -121,8 +127,16 @@ router.post("/capture-order", async (req, res) => {
       },
       { merge: true }
     );
+    console.log("💾 User membership updated.");
 
-    res.json({ message: "Capture successful", details });
+    res.json({
+      message: "Capture successful",
+      details,
+      member: true,
+      planType,
+      subscribedAt: now.toISOString(),
+      memberUntil: memberUntil.toISOString(),
+    });
   } catch (error) {
     if (error.response) {
       console.error("❌ Capture error response:", {
