@@ -29,6 +29,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="chefu-academy"/>
+        <data android:scheme="exp+chefu-academy"/>
       </intent-filter>
     </activity>
   </application>
