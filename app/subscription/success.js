@@ -36,6 +36,10 @@ export default function SuccessScreen() {
         const BASE_URL = "https://chefu-academy-tmzx.onrender.com";
         const planType = params.planType || userDetail?.planType;
 
+        
+        // Add your log here
+        console.log("Capturing order with:", { orderID, email, planType });
+
         const res = await fetch(`${BASE_URL}/api/paypal/capture-order`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

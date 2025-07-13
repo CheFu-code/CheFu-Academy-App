@@ -41,6 +41,7 @@ export default function SubscriptionWall() {
               : selectedPlan === "pro"
               ? "14.99"
               : "5.99",
+          planType: selectedPlan,
         }),
       });
 
