@@ -130,11 +130,26 @@ router.post("/capture-order", async (req, res) => {
         data: error.response.data,
         headers: error.response.headers,
       });
-    } else {
-      console.error("❌ Capture error:", error.message || error);
-    }
 
-    res.status(500).json({ error: "Capture failed" });
+      res.status(500).json({
+        error: "Capture failed",
+        paypalError: error.response.data,
+        status: error.response.status,
+      });
+    } else if (error.request) {
+      console.error("❌ Capture error - no response received:", error.request);
+
+      res.status(500).json({
+        error: "No response received from PayPal",
+      });
+    } else {
+      console.error("❌ Capture error - general:", error.message);
+
+      res.status(500).json({
+        error: "General error",
+        message: error.message,
+      });
+    }
   }
 });
 
