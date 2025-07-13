@@ -8,12 +8,15 @@ import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import ImmersiveMode from "react-native-immersive";
 import { Colors } from "../constant/Colors";
 import { auth, db } from "./../config/fireConfig";
 
@@ -21,6 +24,14 @@ export default function Index() {
   const router = useRouter();
   const [loading, setLoading] = useState(true); // start true to wait for async loading
   const { setUserDetail } = useContext(UserDetailContext);
+
+  useEffect(() => {
+    if (Platform.OS === "android" && ImmersiveMode?.setImmersive) {
+      ImmersiveMode.setImmersive(true);
+    } else {
+      StatusBar.setHidden(true); // fallback for iOS or no immersive module
+    }
+  }, []);
 
   useEffect(() => {
     async function loadUser() {

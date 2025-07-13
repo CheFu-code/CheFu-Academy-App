@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ImmersiveMode from "react-native-immersive";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
@@ -26,11 +25,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const isDev = __DEV__; // true in development
-  useEffect(() => {
-    if (Platform.OS === "android" && ImmersiveMode?.setImmersive) {
-      ImmersiveMode.setImmersive(true);
-    }
-  }, []);
+ 
 
   useEffect(() => {
     if (userDetail) GetCourseList();
