@@ -45,8 +45,8 @@ jobs:
       # - name: Clean Android build
       #   run: cd android && ./gradlew clean
 
-      - name: Build Android release APK
-        run: cd android && ./gradlew assembleRelease
+      - name: Build Android debug APK
+        run: cd android && ./gradlew assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
