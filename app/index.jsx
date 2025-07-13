@@ -29,7 +29,7 @@ export default function Index() {
         const storedUser = await AsyncStorage.getItem("userDetail");
         if (storedUser) {
           const userData = JSON.parse(storedUser);
-          console.log("Loaded user from AsyncStorage:", userData);
+          // console.log("Loaded user from AsyncStorage:", userData);
           setUserDetail(userData);
           setLoading(false);
           router.replace("/(tabs)/home");

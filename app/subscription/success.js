@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -18,36 +18,46 @@ export default function SuccessScreen() {
   const [countdown, setCountdown] = useState(10);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [loader, setLoader] = useState(false);
+  const captureCalled = useRef(false);
 
   const router = useRouter();
   const params = useLocalSearchParams();
   const orderID = params.token;
   const email = userDetail?.email;
+  const planType = params.planType || userDetail?.planType;
+
+  // console.log(
+  //   "SuccessScreen params:",
+  //   params,
+  //   "userDetail.planType:",
+  //   userDetail?.planType
+  // );
 
   useEffect(() => {
-    if (!orderID) {
+    if (captureCalled.current) return;
+
+    if (!orderID || !email || !planType) {
       setLoading(false);
-      ToastAndroid.show("Missing order ID", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "Missing order ID, email, or plan type",
+        ToastAndroid.SHORT
+      );
+      console.log("Missing field(s):", { orderID, email, planType });
       return;
     }
+
+    captureCalled.current = true;
 
     const captureOrder = async () => {
       try {
         const BASE_URL = "https://chefu-academy-tmzx.onrender.com";
-        const planType = params.planType || userDetail?.planType;
 
-        
-        // Add your log here
         console.log("Capturing order with:", { orderID, email, planType });
 
         const res = await fetch(`${BASE_URL}/api/paypal/capture-order`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderID,
-            email,
-            planType,
-          }),
+          body: JSON.stringify({ orderID, email, planType }),
         });
 
         const data = await res.json();
@@ -56,19 +66,60 @@ export default function SuccessScreen() {
           setReceipt(data.details);
           ToastAndroid.show("Payment captured", ToastAndroid.SHORT);
 
-          // Extract membership info from backend response
-          const { member, planType, subscribedAt, memberUntil } = data;
-
+          const { member, subscribedAt, memberUntil } = data;
           setUserDetail((prev) => ({
             ...prev,
-            member: member ?? true, // fallback true if not returned
+            member: member ?? true,
             planType: planType || prev.planType,
             subscribedAt: subscribedAt || prev.subscribedAt,
             memberUntil: memberUntil || prev.memberUntil,
           }));
+        } else if (
+          data.paypalError?.details?.some(
+            (detail) => detail.issue === "ORDER_ALREADY_CAPTURED"
+          )
+        ) {
+          ToastAndroid.showWithGravity(
+            "Order already captured, proceeding...",
+            ToastAndroid.LONG,
+            ToastAndroid.CENTER
+          );
+
+          setReceipt({
+            id: orderID,
+            status: "COMPLETED",
+            payer: {
+              name: {
+                given_name: userDetail?.name || "User",
+                surname: "",
+              },
+            },
+            purchase_units: [
+              {
+                payments: {
+                  captures: [
+                    {
+                      amount: {
+                        value: "N/A",
+                        currency_code: "N/A",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          });
+
+          setUserDetail((prev) => ({
+            ...prev,
+            member: true,
+            planType: planType || prev.planType,
+          }));
         } else {
           ToastAndroid.show("Capture failed", ToastAndroid.SHORT);
+          console.error("Capture failed response:", data);
         }
+
         console.log("Capture response:", JSON.stringify(data, null, 2));
       } catch (error) {
         console.error("Capture error:", error);
@@ -79,19 +130,14 @@ export default function SuccessScreen() {
     };
 
     captureOrder();
-  }, []);
+  }, [orderID, email, planType]);
 
-  // Countdown and redirect effect
   useEffect(() => {
     if (receipt) {
       if (countdown === 0) {
         router.replace("/(tabs)/profile");
       }
-
-      const timer = setTimeout(() => {
-        setCountdown((c) => c - 1);
-      }, 1000);
-
+      const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
       return () => clearTimeout(timer);
     }
   }, [countdown, receipt]);
@@ -105,24 +151,10 @@ export default function SuccessScreen() {
     );
   }
 
-  const planType = params.planType ?? userDetail?.planType;
-
-  if (!planType) {
-    ToastAndroid.show("Missing plan type", ToastAndroid.SHORT);
-    setLoading(false);
-    return;
-  }
-
   if (!receipt) {
     return (
       <View style={styles.center}>
-        <Text
-          style={{
-            color: "red",
-            fontFamily: "outfit-bold",
-            fontSize: 20,
-          }}
-        >
+        <Text style={{ color: "red", fontFamily: "outfit-bold", fontSize: 20 }}>
           Payment verification failed.
         </Text>
         <Text>Please try again later.</Text>
@@ -162,34 +194,15 @@ export default function SuccessScreen() {
         <Text style={styles.title}>Payment Receipt</Text>
       </View>
       <Text style={styles.anyText}>
-        Order ID:{" "}
-        <Text
-          style={{
-            color: Colors.PRIMARY,
-          }}
-        >
-          {receipt.id}
-        </Text>
+        Order ID: <Text style={{ color: Colors.PRIMARY }}>{receipt.id}</Text>
       </Text>
       <Text style={styles.anyText}>
-        Status:{" "}
-        <Text
-          style={{
-            color: Colors.GREEN,
-          }}
-        >
-          {" "}
-          {receipt.status}{" "}
-        </Text>
+        Status: <Text style={{ color: Colors.GREEN }}>{receipt.status}</Text>
       </Text>
 
       <Text style={styles.anyText}>
         Payer:{" "}
-        <Text
-          style={{
-            color: Colors.PRIMARY,
-          }}
-        >
+        <Text style={{ color: Colors.PRIMARY }}>
           {receipt?.payer?.name?.given_name || "Unknown"}{" "}
           {receipt?.payer?.name?.surname || ""}
         </Text>
@@ -197,13 +210,11 @@ export default function SuccessScreen() {
 
       <Text style={styles.anyText}>
         Amount:{" "}
-        <Text
-          style={{
-            color: Colors.PRIMARY,
-          }}
-        >
-          {receipt.purchase_units[0].payments.captures[0].amount.value}{" "}
-          {receipt.purchase_units[0].payments.captures[0].amount.currency_code}
+        <Text style={{ color: Colors.PRIMARY }}>
+          {receipt?.purchase_units?.[0]?.payments?.captures?.[0]?.amount
+            ?.value || "N/A"}{" "}
+          {receipt?.purchase_units?.[0]?.payments?.captures?.[0]?.amount
+            ?.currency_code || ""}
         </Text>
       </Text>
 
@@ -211,13 +222,8 @@ export default function SuccessScreen() {
         <ActivityIndicator size="small" color="green" />
         <Text style={styles.redirectText}>
           You'll be redirected within:{" "}
-          <Text
-            style={{
-              color: Colors.PRIMARY,
-            }}
-          >
-            {countdown} second
-            {countdown !== 1 ? "s" : ""}.
+          <Text style={{ color: Colors.PRIMARY }}>
+            {countdown} second{countdown !== 1 ? "s" : ""}.
           </Text>{" "}
           Please don't leave the app.
         </Text>
@@ -247,7 +253,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
-
     color: Colors.GREEN,
   },
   countdownContainer: {

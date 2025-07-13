@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { FlatList, Image, Platform, View } from "react-native";
 import {
-  BannerAd,
-  BannerAdSize,
-  TestIds,
-} from "react-native-google-mobile-ads";
+    Alert,
+    FlatList,
+    Image,
+    Platform,
+    ToastAndroid,
+    View,
+} from "react-native";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
@@ -29,27 +31,43 @@ export default function Home() {
     setLoading(true);
     if (!userDetail || !userDetail.email) {
       setCourseList([]);
+      setLoading(false);
       return;
     }
-    db.collection("course")
-      .where("createdBy", "==", userDetail.email)
-      .orderBy("createdOn", "desc")
-      .get()
-      .then((querySnapshot) => {
-        if (querySnapshot.empty) {
-          setCourseList([]);
-        } else {
-          const courses = [];
-          querySnapshot.forEach((doc) => {
-            courses.push({ ...doc.data(), id: doc.id });
-          });
-          setCourseList(courses);
-        }
-      })
-      .catch(() => {
+
+    try {
+      const querySnapshot = await db
+        .collection("course")
+        .where("createdBy", "==", userDetail.email)
+        .orderBy("createdOn", "desc")
+        .get();
+
+      if (querySnapshot.empty) {
         setCourseList([]);
-      });
-    setLoading(false);
+      } else {
+        const courses = [];
+        querySnapshot.forEach((doc) => {
+          courses.push({ ...doc.data(), id: doc.id });
+        });
+        setCourseList(courses);
+      }
+
+      ToastAndroid.show("Courses refreshed", ToastAndroid.SHORT);
+    } catch (error) {
+      setCourseList([]);
+
+      if (error?.message?.includes("Could not reach Our backend")) {
+        // ✅ Notify user about offline mode
+        Alert.alert(
+          "Connection Issue",
+          "You're offline or your internet is unstable. Data may not be up to date."
+        );
+      } else {
+        Alert.alert("Error", "Failed to fetch courses. Try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,13 +108,13 @@ export default function Home() {
               </View>
             )}
           </View>
-          <BannerAd
+          {/* <BannerAd
             unitId={
               isDev ? TestIds.BANNER : "ca-app-pub-8952058057579255/9705798694"
             }
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
             requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-          />
+          /> */}
         </View>
       }
     />

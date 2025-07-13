@@ -35,7 +35,8 @@ async function getAccessToken() {
 // Create order
 router.post("/create-order", async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, return_url, cancel_url } = req.body;
+
     console.log("🟢 Create order request received:", { amount });
 
     const accessToken = await getAccessToken();
@@ -46,8 +47,8 @@ router.post("/create-order", async (req, res) => {
         intent: "CAPTURE",
         purchase_units: [{ amount: { currency_code: "USD", value: amount } }],
         application_context: {
-          return_url: "chefu-academy://subscription/success",
-          cancel_url: "chefu-academy://subscription/cancel",
+          return_url: return_url || "chefu-academy://subscription/success", // ✅ fallback
+          cancel_url: cancel_url || "chefu-academy://subscription/cancel", // ✅ fallback
         },
       },
       {
@@ -67,11 +68,17 @@ router.post("/create-order", async (req, res) => {
 router.post("/capture-order", async (req, res) => {
   try {
     const { orderID, email, planType } = req.body;
-    console.log("🟡 Capture order request received:", { orderID, email, planType });
+    console.log("🟡 Capture order request received:", {
+      orderID,
+      email,
+      planType,
+    });
 
     if (!orderID || !email || !planType) {
       console.warn("⚠️ Missing required fields:", { orderID, email, planType });
-      return res.status(400).json({ error: "Missing orderID, email, or planType" });
+      return res
+        .status(400)
+        .json({ error: "Missing orderID, email, or planType" });
     }
 
     const accessToken = await getAccessToken();

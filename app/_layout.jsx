@@ -16,6 +16,8 @@ Sentry.init({
   ],
 });
 
+let lastHandledOrderID = null;
+
 export default Sentry.wrap(function RootLayout() {
   const [userDetail, setUserDetail] = useState();
   const router = useRouter();
@@ -25,65 +27,13 @@ export default Sentry.wrap(function RootLayout() {
     "outfit-bold": require("./../assets/fonts/Outfit-Bold.ttf"),
   });
 
+  // Handle real-time deep links
   useEffect(() => {
     console.log("RootLayout mounted. Waiting for deep links...");
 
     const subscription = Linking.addEventListener("url", ({ url }) => {
       console.log("Deep link received:", url);
-      const parsed = Linking.parse(url);
-      console.log("Parsed deep link:", parsed);
-
-      if (parsed.path === "paypal-success") {
-        const orderID = parsed.queryParams?.token;
-        const planType = parsed.queryParams?.planType || "basic";
-
-        console.log("Initial deep link with:", { orderID, planType });
-
-        router.push({
-          pathname: "/subscription/success",
-          params: {
-            token: orderID,
-            planType,
-          },
-        });
-      } else if (parsed.path === "paypal-cancel") {
-        console.log("Routing to /subscription/cancel");
-        router.push("/subscription/cancel");
-      } else {
-        console.warn("Unknown deep link path:", parsed.path);
-      }
-    });
-
-    // Log initial URL if app was opened from a cold start via deep link
-    Linking.getInitialURL().then((url) => {
-      if (url) {
-        console.log("App launched with deep link:", url);
-        const parsed = Linking.parse(url);
-        if (parsed.path === "paypal-success") {
-          const orderID = parsed.queryParams?.token; // 'token' is passed by PayPal in the redirect
-          const planType = parsed.queryParams?.planType || "basic"; // fallback if not passed
-
-          console.log("Routing to /subscription/success with:", {
-            orderID,
-            planType,
-          });
-
-          router.push({
-            pathname: "/subscription/success",
-            params: {
-              token: orderID,
-              planType,
-            },
-          });
-        } else if (parsed.path === "paypal-cancel") {
-          console.log("Initial URL matched paypal-cancel");
-          router.push("/subscription/cancel");
-        } else {
-          console.warn("Initial deep link path unknown:", parsed.path);
-        }
-      } else {
-        console.log("No initial URL found");
-      }
+      handleDeepLink(url);
     });
 
     return () => {
@@ -92,6 +42,56 @@ export default Sentry.wrap(function RootLayout() {
     };
   }, []);
 
+  // Handle initial deep link on cold start
+  useEffect(() => {
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        console.log("App launched with deep link:", url);
+        handleDeepLink(url);
+      } else {
+        console.log("No initial URL found");
+      }
+    });
+  }, []);
+
+  const handleDeepLink = (url) => {
+    const parsed = Linking.parse(url);
+    if (parsed.path === "success") {
+      const orderID = parsed.queryParams?.token;
+      const planType = parsed.queryParams?.planType || "basic";
+
+      if (!planType) {
+        console.warn(
+          "planType missing from deep link, falling back to 'basic'"
+        );
+      }
+
+      if (orderID && orderID === lastHandledOrderID) {
+        console.log("Ignoring duplicate deep link for orderID:", orderID);
+        return;
+      }
+      lastHandledOrderID = orderID;
+
+      console.log("Routing to /subscription/success with:", {
+        orderID,
+        planType,
+      });
+
+      router.replace({
+        pathname: "/subscription/success",
+        params: {
+          token: orderID,
+          planType,
+        },
+      });
+    } else if (parsed.path === "cancel") {
+      console.log("Routing to /subscription/cancel");
+      router.push("/subscription/cancel");
+    } else {
+      console.warn("Unknown deep link path:", parsed.path);
+    }
+  };
+
   if (!fontsLoaded) {
     console.log("Fonts not loaded yet");
     return null;
@@ -99,11 +99,7 @@ export default Sentry.wrap(function RootLayout() {
 
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
+      <Stack screenOptions={{ headerShown: false }} />
     </UserDetailContext.Provider>
   );
 });

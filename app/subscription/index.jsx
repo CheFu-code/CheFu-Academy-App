@@ -31,6 +31,8 @@ export default function SubscriptionWall() {
     try {
       setLoading(true);
 
+      const returnUrl = `chefu-academy://subscription/success?planType=${selectedPlan}`;
+
       const res = await fetch(`${BASE_URL}/api/paypal/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,6 +44,7 @@ export default function SubscriptionWall() {
               ? "15.00"
               : "6.00",
           planType: selectedPlan,
+          return_url: returnUrl, // ✅ add this
         }),
       });
 
