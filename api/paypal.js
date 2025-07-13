@@ -100,8 +100,9 @@ router.post("/capture-order", async (req, res) => {
 
     const db = admin.firestore();
 
-    console.log("💾 Saving payment record to Firestore...");
-    await db.collection("payments").doc(orderID).set({
+    const id = orderID + email;
+
+    await db.collection("payments").doc(id).set({
       email,
       orderID,
       planType,
@@ -111,7 +112,6 @@ router.post("/capture-order", async (req, res) => {
       status: details.status,
       timestamp: new Date().toISOString(),
     });
-    console.log("💾 Payment record saved.");
 
     // Calculate memberUntil based on plan
     const now = new Date();
@@ -122,9 +122,6 @@ router.post("/capture-order", async (req, res) => {
     else if (planType === "premium") memberUntil.setDate(now.getDate() + 90);
     else memberUntil.setDate(now.getDate() + 30); // default fallback
 
-    console.log(`⏳ Membership valid until: ${memberUntil.toISOString()}`);
-
-    console.log("💾 Updating user membership info...");
     await db.collection("users").doc(email).set(
       {
         member: true,
@@ -134,7 +131,6 @@ router.post("/capture-order", async (req, res) => {
       },
       { merge: true }
     );
-    console.log("💾 User membership updated.");
 
     res.json({
       message: "Capture successful",

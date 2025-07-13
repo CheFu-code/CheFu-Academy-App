@@ -26,25 +26,8 @@ export default function SuccessScreen() {
   const email = userDetail?.email;
   const planType = params.planType || userDetail?.planType;
 
-  // console.log(
-  //   "SuccessScreen params:",
-  //   params,
-  //   "userDetail.planType:",
-  //   userDetail?.planType
-  // );
-
   useEffect(() => {
-    if (captureCalled.current) return;
-
-    if (!orderID || !email || !planType) {
-      setLoading(false);
-      ToastAndroid.show(
-        "Missing order ID, email, or plan type",
-        ToastAndroid.SHORT
-      );
-      console.log("Missing field(s):", { orderID, email, planType });
-      return;
-    }
+    if (captureCalled.current || !orderID || !planType || !email) return;
 
     captureCalled.current = true;
 
@@ -146,7 +129,14 @@ export default function SuccessScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
-        <Text>Verifying payment...</Text>
+        <Text
+          style={{
+            fontFamily: "outfit-bold",
+            fontSize: 20,
+          }}
+        >
+          Verifying payment...
+        </Text>
       </View>
     );
   }
@@ -199,6 +189,11 @@ export default function SuccessScreen() {
       <Text style={styles.anyText}>
         Status: <Text style={{ color: Colors.GREEN }}>{receipt.status}</Text>
       </Text>
+
+      {/* <Text style={styles.anyText}>
+        Plan Type:{" "}
+        <Text style={{ color: Colors.PRIMARY }}>{receipt.planType}</Text>
+      </Text> */}
 
       <Text style={styles.anyText}>
         Payer:{" "}
