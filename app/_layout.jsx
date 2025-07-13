@@ -6,11 +6,14 @@ import { useEffect, useState } from "react";
 import { UserDetailContext } from "../context/UserDetailContext";
 
 Sentry.init({
-  dsn: 'https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840',
+  dsn: "https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840",
   sendDefaultPii: true,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+  integrations: [
+    Sentry.mobileReplayIntegration(),
+    Sentry.feedbackIntegration(),
+  ],
 });
 
 export default Sentry.wrap(function RootLayout() {
@@ -31,8 +34,18 @@ export default Sentry.wrap(function RootLayout() {
       console.log("Parsed deep link:", parsed);
 
       if (parsed.path === "paypal-success") {
-        console.log("Routing to /subscription/success");
-        router.push("/subscription/success");
+        const orderID = parsed.queryParams?.token;
+        const planType = parsed.queryParams?.planType || "basic";
+
+        console.log("Initial deep link with:", { orderID, planType });
+
+        router.push({
+          pathname: "/subscription/success",
+          params: {
+            token: orderID,
+            planType,
+          },
+        });
       } else if (parsed.path === "paypal-cancel") {
         console.log("Routing to /subscription/cancel");
         router.push("/subscription/cancel");
@@ -47,8 +60,21 @@ export default Sentry.wrap(function RootLayout() {
         console.log("App launched with deep link:", url);
         const parsed = Linking.parse(url);
         if (parsed.path === "paypal-success") {
-          console.log("Initial URL matched paypal-success");
-          router.push("/subscription/success");
+          const orderID = parsed.queryParams?.token; // 'token' is passed by PayPal in the redirect
+          const planType = parsed.queryParams?.planType || "basic"; // fallback if not passed
+
+          console.log("Routing to /subscription/success with:", {
+            orderID,
+            planType,
+          });
+
+          router.push({
+            pathname: "/subscription/success",
+            params: {
+              token: orderID,
+              planType,
+            },
+          });
         } else if (parsed.path === "paypal-cancel") {
           console.log("Initial URL matched paypal-cancel");
           router.push("/subscription/cancel");
