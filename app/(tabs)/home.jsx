@@ -1,5 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { FlatList, Image, Platform, View } from "react-native";
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+} from "react-native-google-mobile-ads";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
@@ -13,6 +18,8 @@ export default function Home() {
   const [courseList, setCourseList] = useState([]);
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
+
+  const isDev = __DEV__; // true in development
 
   useEffect(() => {
     if (userDetail) GetCourseList();
@@ -53,6 +60,7 @@ export default function Home() {
       }}
       onRefresh={() => GetCourseList()}
       refreshing={loading}
+      showsVerticalScrollIndicator={false}
       ListHeaderComponent={
         <View>
           <Image
@@ -82,12 +90,13 @@ export default function Home() {
               </View>
             )}
           </View>
-
-          {/* <BannerAd
-            unitId="ca-app-pub-8952058057579255/9705798694"
+          <BannerAd
+            unitId={
+              isDev ? TestIds.BANNER : "ca-app-pub-8952058057579255/9705798694"
+            }
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
             requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-          /> */}
+          />
         </View>
       }
     />

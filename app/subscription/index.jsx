@@ -37,10 +37,10 @@ export default function SubscriptionWall() {
         body: JSON.stringify({
           amount:
             selectedPlan === "premium"
-              ? "29.99"
+              ? "30.00"
               : selectedPlan === "pro"
-              ? "14.99"
-              : "5.99",
+              ? "15.00"
+              : "6.00",
           planType: selectedPlan,
         }),
       });

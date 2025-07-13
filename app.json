@@ -12,14 +12,21 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.chefu.chefuacademy",
+      "permissions": ["NOTIFICATIONS"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.chefu.chefuacademy",
-      "permissions": [
-        "NOTIFICATIONS"
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "chefu-academy"
+          },
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ]
     },
     "web": {
