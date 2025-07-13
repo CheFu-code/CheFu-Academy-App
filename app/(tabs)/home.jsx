@@ -1,18 +1,22 @@
+import { sendEmailVerification } from "firebase/auth";
 import { useContext, useEffect, useState } from "react";
 import {
-    Alert,
-    FlatList,
-    Image,
-    Platform,
-    ToastAndroid,
-    View,
+  Alert,
+  FlatList,
+  Image,
+  Platform,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import ImmersiveMode from "react-native-immersive";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
 import NoCourse from "../../component/Home/NoCourse";
 import PracticeSection from "../../component/Home/PracticeSection";
-import { db } from "../../config/fireConfig";
+import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
@@ -22,6 +26,11 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const isDev = __DEV__; // true in development
+  useEffect(() => {
+    if (Platform.OS === "android" && ImmersiveMode?.setImmersive) {
+      ImmersiveMode.setImmersive(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (userDetail) GetCourseList();
@@ -29,16 +38,21 @@ export default function Home() {
 
   const GetCourseList = async () => {
     setLoading(true);
-    if (!userDetail || !userDetail.email) {
-      setCourseList([]);
-      setLoading(false);
-      return;
-    }
 
     try {
+      // 🔄 Refresh user data
+      await auth.currentUser?.reload();
+
+      const refreshedUser = auth.currentUser;
+
+      if (!refreshedUser || !refreshedUser.email) {
+        setCourseList([]);
+        return;
+      }
+
       const querySnapshot = await db
         .collection("course")
-        .where("createdBy", "==", userDetail.email)
+        .where("createdBy", "==", refreshedUser.email)
         .orderBy("createdOn", "desc")
         .get();
 
@@ -55,9 +69,7 @@ export default function Home() {
       ToastAndroid.show("Courses refreshed", ToastAndroid.SHORT);
     } catch (error) {
       setCourseList([]);
-
       if (error?.message?.includes("Could not reach Our backend")) {
-        // ✅ Notify user about offline mode
         Alert.alert(
           "Connection Issue",
           "You're offline or your internet is unstable. Data may not be up to date."
@@ -70,53 +82,104 @@ export default function Home() {
     }
   };
 
+  const verify = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await sendEmailVerification(auth.currentUser);
+        alert(
+          `We've sent a verification email to ${user?.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
+        );
+      } catch (error) {
+        console.error("Failed to send verification email:", error);
+        alert("Failed to send verification email. Try again later.");
+      }
+    } else {
+      alert("No user is currently signed in.");
+    }
+  };
+
   return (
-    <FlatList
-      data={[]}
-      style={{
-        backgroundColor: Colors.BG_COLOR,
-      }}
-      onRefresh={() => GetCourseList()}
-      refreshing={loading}
-      showsVerticalScrollIndicator={false}
-      ListHeaderComponent={
-        <View>
-          <Image
+    <>
+      {auth.currentUser && !auth.currentUser.emailVerified && (
+        <View
+          style={{
+            backgroundColor: Colors.BG_COLOR,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => verify()}
             style={{
-              position: "absolute",
-              width: "100%",
-              height: 500,
-            }}
-            source={require("../../assets/images/graph.png")}
-          />
-          <View
-            style={{
-              paddingTop: Platform.OS === "ios" && 45,
-              padding: 25,
-              // flex: 1,
+              backgroundColor: "#FFD700",
+              padding: 10,
+              marginTop: 35,
+              borderTopEndRadius: 15,
+              borderTopStartRadius: 15,
+              borderBottomEndRadius: 15,
+              borderBottomStartRadius: 15,
+              opacity: 0.8,
             }}
           >
-            <Header />
+            <Text
+              style={{
+                color: "#000",
+                textAlign: "center",
+                textDecorationLine: "underline",
+              }}
+            >
+              Please verify your email address to access all features.
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <FlatList
+        data={[]}
+        style={{
+          backgroundColor: Colors.BG_COLOR,
+        }}
+        onRefresh={() => GetCourseList()}
+        refreshing={loading}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <View>
+            <Image
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: 500,
+              }}
+              source={require("../../assets/images/graph.png")}
+            />
 
-            {courseList?.length === 0 ? (
-              <NoCourse />
-            ) : (
-              <View>
-                <CourseProgress courseList={courseList} />
-                <PracticeSection />
-                <CourseList courseList={courseList} />
-              </View>
-            )}
-          </View>
-          {/* <BannerAd
+            <View
+              style={{
+                paddingTop: Platform.OS === "ios" && 45,
+                padding: 25,
+                // flex: 1,
+              }}
+            >
+              <Header />
+
+              {courseList?.length === 0 ? (
+                <NoCourse />
+              ) : (
+                <View>
+                  <CourseProgress courseList={courseList} />
+                  <PracticeSection />
+                  <CourseList courseList={courseList} />
+                </View>
+              )}
+            </View>
+            {/* <BannerAd
             unitId={
               isDev ? TestIds.BANNER : "ca-app-pub-8952058057579255/9705798694"
             }
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
             requestOptions={{ requestNonPersonalizedAdsOnly: true }}
           /> */}
-        </View>
-      }
-    />
+          </View>
+        }
+      />
+    </>
   );
 }

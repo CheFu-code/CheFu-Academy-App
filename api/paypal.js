@@ -100,7 +100,7 @@ router.post("/capture-order", async (req, res) => {
 
     const db = admin.firestore();
 
-    const id = orderID + email;
+    const id = email + orderID;
 
     await db.collection("payments").doc(id).set({
       email,

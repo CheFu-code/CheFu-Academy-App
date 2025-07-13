@@ -1,19 +1,35 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from "../../constant/Colors";
 
 const TabLayout = () => {
+  // useEffect(() => {
+  //   NavigationBar.hide();
+  // }, []);
+
   const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarStyle: {
           paddingBottom: insets.bottom,
           backgroundColor: "black",
-          // borderTopLeftRadius: 20,
-          // borderTopRightRadius: 20,
+          borderTopLeftRadius: 50,
+          borderTopRightRadius: 50,
+          borderBottomLeftRadius: 50,
+          borderBottomRightRadius: 50,
+          marginHorizontal: 20,
+          height: 60,
+          position: "absolute",
+          bottom: 50,
+          shadowColor: Colors.PRIMARY,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 5,
         },
       }}
     >
@@ -21,7 +37,15 @@ const TabLayout = () => {
         name="home"
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
+            <Ionicons
+              style={{
+                marginTop: 20,
+                height: "100%",
+              }}
+              name="home-outline"
+              size={size}
+              color={color}
+            />
           ),
           tabBarLabel: "Home",
         }}
@@ -30,7 +54,15 @@ const TabLayout = () => {
         name="explore"
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search-outline" size={size} color={color} />
+            <Ionicons
+              style={{
+                marginTop: 20,
+                height: "100%",
+              }}
+              name="search-outline"
+              size={size}
+              color={color}
+            />
           ),
           tabBarLabel: "Explore",
         }}
@@ -39,7 +71,15 @@ const TabLayout = () => {
         name="progress"
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bar-chart-outline" size={size} color={color} />
+            <Ionicons
+              style={{
+                marginTop: 20,
+                height: "100%",
+              }}
+              name="bar-chart-outline"
+              size={size}
+              color={color}
+            />
           ),
           tabBarLabel: "Progress",
         }}
@@ -48,7 +88,15 @@ const TabLayout = () => {
         name="profile"
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
+            <Ionicons
+              style={{
+                marginTop: 20,
+                height: "100%",
+              }}
+              name="person-outline"
+              size={size}
+              color={color}
+            />
           ),
           tabBarLabel: "Profile",
         }}
@@ -58,5 +106,3 @@ const TabLayout = () => {
 };
 
 export default TabLayout;
-
-const styles = StyleSheet.create({});

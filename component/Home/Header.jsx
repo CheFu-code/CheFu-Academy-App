@@ -65,9 +65,27 @@ export default function Header() {
   return (
     <View style={styles.headerContainer}>
       <View>
-        <Text style={styles.greeting}>
-          Hello{userDetail && `, ${userDetail?.fullname}`}
-        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 5,
+          }}
+        >
+          <Text numberOfLines={1} style={styles.greeting}>
+            Hello{userDetail && `, ${userDetail?.fullname}`}
+          </Text>
+          {userDetail?.member === true && (
+            <Ionicons
+              style={{
+                marginTop: 25,
+              }}
+              color={Colors.PRIMARY}
+              size={20}
+              name="checkmark-circle"
+            />
+          )}
+        </View>
         <Text style={styles.subText}>Expand Your Knowledge</Text>
       </View>
 

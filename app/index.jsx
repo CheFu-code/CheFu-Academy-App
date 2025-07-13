@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -41,10 +41,25 @@ export default function Index() {
           if (user) {
             try {
               console.log("User signed in (Firebase):", user.email);
-              const result = await getDoc(doc(db, "users", user.email));
+
+              await user.reload(); // 🔄 Make sure we get the latest verification status
+
+              const userRef = doc(db, "users", user.email);
+
+              const result = await getDoc(userRef);
+
               if (result.exists()) {
                 const userData = result.data();
                 console.log("Fetched user data from Firestore:", userData);
+
+                if (user.emailVerified && !userData.isVerified) {
+                  await updateDoc(userRef, {
+                    isVerified: true,
+                    updatedAt: new Date(),
+                  });
+                  console.log("✅ Firestore updated: Email is now verified.");
+                  userData.isVerified = true; // also update local object
+                }
                 setUserDetail(userData);
 
                 // Save to AsyncStorage

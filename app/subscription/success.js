@@ -49,6 +49,12 @@ export default function SuccessScreen() {
           setReceipt(data.details);
           ToastAndroid.show("Payment captured", ToastAndroid.SHORT);
 
+          // const userRef = doc(db, "users", email);
+          // const userSnap = await getDoc(userRef);
+          // if (userSnap.exists()) {
+          //   setUserDetail(userSnap.data());
+          // }
+
           const { member, subscribedAt, memberUntil } = data;
           setUserDetail((prev) => ({
             ...prev,

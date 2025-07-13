@@ -1,11 +1,16 @@
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
-import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import {
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  sendEmailVerification,
+} from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,6 +19,7 @@ import {
   Modal,
   Platform,
   RefreshControl,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -37,6 +43,13 @@ export default function Profile() {
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const renderedMenuItems = menuItems(router, Linking, ToastAndroid, Colors);
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshData(); // Call your existing function
+    }, [])
+  );
 
   const refreshData = async () => {
     setRefreshing(true);
@@ -127,8 +140,43 @@ export default function Profile() {
     }
   };
 
+  const subscribe = () => {
+    if (userDetail.member === true) {
+      ToastAndroid.show("You're already on member plan", ToastAndroid.SHORT);
+      return;
+    } else {
+      router.push("/subscription");
+    }
+  };
+
+  const verify = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await sendEmailVerification(user);
+        alert(
+          `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
+        );
+      } catch (error) {
+        console.error("Failed to send verification email:", error);
+        if (
+          error.code === "auth/too-many-requests" ||
+          error.message.includes("too-many-requests")
+        ) {
+          alert(
+            "You've tried too many times. We’ve temporarily blocked requests from this device due to unusual activity. Please try again later."
+          );
+        } else {
+          alert("Failed to send verification email. Please try again later.");
+        }
+      }
+    } else {
+      alert("No user is currently signed in.");
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Image
           source={require("../../assets/images/logo.png")}
@@ -154,7 +202,31 @@ export default function Profile() {
                 <Ionicons color={"green"} size={20} name="checkmark-circle" />
               )}
             </View>
-            <Text style={styles.profileEmail}>{userDetail.email}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <Text style={styles.profileEmail}>{userDetail.email}</Text>
+              {auth.currentUser && !auth.currentUser.emailVerified && (
+                <TouchableOpacity onPress={() => verify()}>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.profileEmail,
+                      {
+                        color: Colors.LIGHT_RED,
+                        textDecorationLine: "underline",
+                      },
+                    ]}
+                  >
+                    - email not verified
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <TouchableOpacity
               onPress={() => subscribe()}
               disabled={loading}
@@ -168,12 +240,29 @@ export default function Profile() {
                     color: userDetail.member ? Colors.GREEN : Colors.RED,
                     textDecorationLine:
                       userDetail?.member === false ? "underline" : "none",
+                    fontFamily: "outfit-bold",
                   }}
                 >
-                  {userDetail.member ? "Member Plan" : "Free Plan"}
+                  {userDetail?.planType && (
+                    <Text>{`${capitalize(userDetail.planType)} Plan`}</Text>
+                  )}
+                  {userDetail?.member === false && <Text>Free Plan</Text>}
                 </Text>
               )}
             </TouchableOpacity>
+            {userDetail.planType && (
+              <Text
+                style={{
+                  fontFamily: "outfit",
+                  fontSize: 15,
+                  marginTop: 5,
+                  color: "#ccc",
+                }}
+              >
+                Your plan will expire on{" "}
+                {new Date(userDetail.memberUntil).toLocaleDateString()}
+              </Text>
+            )}
           </>
         )}
       </View>
@@ -260,6 +349,23 @@ export default function Profile() {
               Check for Updates
             </Text>
           </TouchableOpacity>
+
+          {userDetail?.member === true && (
+            <TouchableOpacity
+              style={[styles.menuItem, { marginTop: 5 }]}
+              onPress={() => router.push("/certificate")}
+            >
+              <Ionicons
+                name="document-text-outline"
+                size={26}
+                color={Colors.GREEN}
+                style={styles.icon}
+              />
+              <Text style={[styles.menuLabel, { color: Colors.GREEN }]}>
+                Download Certificate
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <View style={styles.divider} />
 
@@ -370,7 +476,7 @@ export default function Profile() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 

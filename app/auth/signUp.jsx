@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
@@ -38,11 +38,20 @@ const SignUp = () => {
       return;
     }
     setLoading(true);
+
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (resp) => {
         const user = resp.user;
-        // console.log("User created:", user);
+
+        // ✅ Send verification email
+        await sendEmailVerification(user);
+
         await SaveUser(user);
+
+        alert(
+          "Account created! Please check your email to verify your address."
+        );
+
         setLoading(false);
       })
       .catch((e) => {
@@ -81,6 +90,7 @@ const SignUp = () => {
         fullname: fullName,
         email: email,
         member: false,
+        isVerified: user.emailVerified,
         createdAt: new Date(),
         updatedAt: new Date(),
         uid: user.uid,
@@ -88,7 +98,6 @@ const SignUp = () => {
       await setDoc(doc(db, "users", email), data);
 
       setUserDetail(data);
-      // console.log("User saved successfully");
       router.push("/home");
     } catch (e) {
       console.log("Error in SaveUser:", e.message);
