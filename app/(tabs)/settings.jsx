@@ -1,189 +1,137 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import Constants from "expo-constants";
+import { router } from "expo-router";
+import { useState } from "react";
 import {
   Alert,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 
 export default function SettingsScreen() {
-  const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [useBiometrics, setUseBiometrics] = useState(false);
-  const [mobileDataDownload, setMobileDataDownload] = useState(false);
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const router = useRouter();
+  const [showVersion, setShowVersion] = useState(false);
 
   const toggleSetting = (name, stateSetter, current) => {
-    console.log(`Toggling ${name} from ${current} to ${!current}`);
     stateSetter(!current);
     Alert.alert(`${name} turned ${!current ? "on" : "off"}`);
   };
 
   return (
-    <>
-      <ScrollView style={styles.container}>
-        <Text style={styles.heading}>{"general"}</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.heading}>General</Text>
 
-        <SettingItem
-          label={"editProfile"}
-          icon="person"
-          onPress={() => Alert.alert("editProfile")}
-        />
-        <SettingItem
-          label={"changePassword"}
-          icon="lock-closed"
-          onPress={() => Alert.alert("changePassword")}
-        />
-        <SettingItem
-          label={"darkMode"}
-          icon="moon"
-          toggle
-          value={darkMode}
-          onToggle={() => toggleSetting("darkMode", setDarkMode, darkMode)}
-        />
+      <SettingItem
+        label="Edit Profile"
+        icon="person"
+        onPress={() => Alert.alert("Edit Profile Pressed")}
+      />
+      <SettingItem
+        label="Change Password"
+        icon="lock-closed"
+        onPress={() => Alert.alert("Change Password Pressed")}
+      />
 
-        <Text style={styles.heading}>{"notifications"}</Text>
-        <SettingItem
-          label={"pushNotifications"}
-          icon="notifications"
-          toggle
-          value={notifications}
-          onToggle={() =>
-            toggleSetting(
-              "pushNotifications",
-              setNotifications,
-              notifications
-            )
-          }
-        />
-        <SettingItem
-          label={"emailAlerts"}
-          icon="mail"
-          onPress={() => Alert.alert("emailAlerts")}
-        />
-        <SettingItem
-          label={"courseReminders"}
-          icon="alarm"
-          onPress={() => Alert.alert("courseReminders")}
-        />
+      <Text style={styles.heading}>Notifications</Text>
 
-        <Text style={styles.heading}>{"downloads"}</Text>
-        <SettingItem
-          label={"useMobileData"}
-          icon="cellular"
-          toggle
-          value={mobileDataDownload}
-          onToggle={() =>
-            toggleSetting(
-              "useMobileData",
-              setMobileDataDownload,
-              mobileDataDownload
-            )
-          }
-        />
-        <SettingItem
-          label={"manageStorage"}
-          icon="cloud"
-          onPress={() => Alert.alert("manageStorage")}
-        />
+      <SettingItem
+        label="Push Notifications"
+        icon="notifications"
+        toggle
+        value={notifications}
+        onToggle={() =>
+          toggleSetting("Notifications", setNotifications, notifications)
+        }
+      />
+      <SettingItem
+        label="Email Alerts"
+        icon="mail"
+        onPress={() => Alert.alert("Email Settings Pressed")}
+      />
 
-        <Text style={styles.heading}>{"learningPreferences"}</Text>
-        <SettingItem
-          label={"fontSize"}
-          icon="text"
-          onPress={() => Alert.alert("fontSize")}
-        />
-        <SettingItem
-          label={"readingMode"}
-          icon="book"
-          onPress={() => Alert.alert("readingMode")}
-        />
-        <SettingItem
-          label={"videoPlaybackSpeed"}
-          icon="play"
-          onPress={() => Alert.alert("videoPlaybackSpeed")}
-        />
+      <Text style={styles.heading}>Privacy & Security</Text>
 
-        <Text style={styles.heading}>{"privacySecurity"}</Text>
-        <SettingItem
-          label={"privacyPolicy"}
-          icon="shield-checkmark"
-          onPress={() => router.push("/privacy")}
-        />
-        <SettingItem
-          label={"enableBiometricLock"}
-          icon="finger-print"
-          toggle
-          value={useBiometrics}
-          onToggle={() =>
-            toggleSetting(
-              "enableBiometricLock",
-              setUseBiometrics,
-              useBiometrics
-            )
-          }
-        />
-        <SettingItem
-          label={"permissions"}
-          icon="lock-open"
-          onPress={() => Alert.alert("permissions")}
-        />
+      <SettingItem
+        label="Privacy Policy"
+        icon="shield-checkmark"
+        onPress={() => router.push("/privacy")}
+      />
+      <SettingItem
+        label="Enable Biometric Lock"
+        icon="finger-print"
+        toggle
+        value={useBiometrics}
+        onToggle={() =>
+          toggleSetting("Biometric Lock", setUseBiometrics, useBiometrics)
+        }
+      />
+      <SettingItem
+        label="Permissions"
+        icon="lock-open"
+        onPress={() => router.push("/permissions")}
+      />
 
-        <Text style={styles.heading}>{"about"}</Text>
-        <SettingItem
-          label={"appVersion"}
-          icon="information-circle"
-          onPress={() => Alert.alert("Version 1.0.0")}
-        />
-        <SettingItem
-          label={"whatsNew"}
-          icon="sparkles"
-          onPress={() => Alert.alert("whatsNew")}
-        />
-        <SettingItem
-          label={"rateTheApp"}
-          icon="star"
-          onPress={() => Alert.alert("rateTheApp")}
-        />
-        <SettingItem
-          label={"shareApp"}
-          icon="share-social"
-          onPress={() => Alert.alert("shareApp")}
-        />
+      <Text style={styles.heading}>About</Text>
 
-        <Text style={styles.heading}>{"account"}</Text>
-        <SettingItem
-          label={"switchAccount"}
-          icon="repeat"
-          onPress={() => Alert.alert("switchAccount")}
-        />
-        <SettingItem
-          label={"exportMyData"}
-          icon="download"
-          onPress={() => Alert.alert("exportMyData")}
-        />
-        <SettingItem
-          label={"deleteAccount"}
-          icon="trash"
-          onPress={() => Alert.alert("deleteAccount")}
-        />
-        <SettingItem
-          label="logOut"
-          icon="exit"
-          onPress={() => Alert.alert("logOut")}
-        />
-      </ScrollView>
-    </>
+      <SettingItem
+        label="App Version"
+        icon="information-circle"
+        onPress={() => setShowVersion(!showVersion)}
+      />
+      {showVersion && (
+        <View style={styles.codeBlock}>
+          <Text style={styles.codeLabel}>version:</Text>
+          <Text style={styles.codeText}>
+            {Constants.expoConfig?.version ?? "N/A"}
+          </Text>
+        </View>
+      )}
+      <SettingItem
+        label="What's New"
+        icon="sparkles"
+        onPress={() => Alert.alert("Release Notes Pressed")}
+      />
+      <SettingItem
+        label="Rate the App"
+        icon="star"
+        onPress={() => Alert.alert("Rate Us Pressed")}
+      />
+      <SettingItem
+        label="Share CheFu Academy"
+        icon="share-social"
+        onPress={() => Alert.alert("Share Pressed")}
+      />
+
+      <Text style={styles.heading}>Account</Text>
+
+      <SettingItem
+        label="Switch Account"
+        icon="repeat"
+        onPress={() => Alert.alert("Switch Account Pressed")}
+      />
+      <SettingItem
+        label="Export My Data"
+        icon="download"
+        onPress={() => Alert.alert("Export Data Pressed")}
+      />
+      <SettingItem
+        label="Delete Account"
+        icon="trash"
+        onPress={() => Alert.alert("Delete Account Pressed")}
+      />
+      <SettingItem
+        label="Log Out"
+        icon="exit"
+        onPress={() => Alert.alert("Log Out Pressed")}
+      />
+    </ScrollView>
   );
 }
 
@@ -195,32 +143,16 @@ const SettingItem = ({
   onToggle,
   onPress,
 }) => (
-  <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+  <TouchableOpacity onPress={onPress}>
     <View style={styles.itemRow}>
       <View style={styles.itemLeft}>
         <Ionicons
           name={icon}
           size={20}
-          color={
-            label === "Log Out" || label === "Delete Account"
-              ? Colors.RED
-              : Colors.PRIMARY
-          }
+          color={Colors.PRIMARY}
           style={{ marginRight: 12 }}
         />
-        <Text
-          style={[
-            styles.label,
-            {
-              color:
-                label === "Log Out" || label === "Delete Account"
-                  ? Colors.RED
-                  : Colors.PRIMARY,
-            },
-          ]}
-        >
-          {label}
-        </Text>
+        <Text style={styles.label}>{label}</Text>
       </View>
       {toggle ? (
         <Switch value={value} onValueChange={onToggle} />
@@ -264,33 +196,41 @@ const styles = StyleSheet.create({
     fontFamily: "outfit",
     color: Colors.WHITE,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+  codeBlock: {
+    backgroundColor: Colors.CARD,
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  modalContainer: {
-    backgroundColor: Colors.BG_COLOR,
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-  },
-  modalTitle: {
-    fontSize: 18,
+  codeLabel: {
+    color: Colors.GRAY,
     fontFamily: "outfit-bold",
+    marginBottom: 4,
+  },
+  codeText: {
     color: Colors.WHITE,
-    marginBottom: 10,
-  },
-  languageOption: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.BORDER,
-  },
-  languageText: {
-    fontSize: 16,
     fontFamily: "outfit",
-    color: Colors.WHITE,
+  },
+  codeBlock: {
+    backgroundColor: "#1e1e1e", // like VS Code dark theme
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  codeLabel: {
+    color: Colors.PRIMARY,
+    fontFamily: "outfit-bold",
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  codeText: {
+    color: "#d4d4d4",
+    fontFamily: "outfit", // or any monospace font you have
+    fontSize: 13,
+    letterSpacing: 1.8,
   },
 });
