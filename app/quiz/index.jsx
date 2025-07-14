@@ -11,10 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 import * as Progress from "react-native-progress";
 import Button from "../../component/Shared/Button";
 import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
+
+const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
 
 export default function Quiz() {
   const { courseParams } = useLocalSearchParams();
@@ -50,17 +53,34 @@ export default function Quiz() {
       await updateDoc(doc(db, "course", course?.docId), {
         quizResult: result,
       });
-      setLoading(false);
 
-      router.replace({
-        pathname: "/quiz/summary",
-        params: {
-          quizResultParam: JSON.stringify(result),
-        },
+      // Create interstitial ad instance
+      const interstitial = InterstitialAd.createForAdRequest(
+        INTERSTITIAL_AD_UNIT_ID,
+        { requestNonPersonalizedAdsOnly: true }
+      );
+
+      const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
+        if (type === AdEventType.LOADED) {
+          interstitial.show();
+        }
+        if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
+          unsubscribe();
+          // After ad closes/errors, navigate to summary
+          router.replace({
+            pathname: "/quiz/summary",
+            params: {
+              quizResultParam: JSON.stringify(result),
+            },
+          });
+          setLoading(false);
+        }
       });
+
+      interstitial.load();
     } catch (e) {
       setLoading(false);
-      console.log(e);
+      console.error(e);
     }
   };
 

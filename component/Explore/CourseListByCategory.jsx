@@ -16,16 +16,13 @@ export default function CourseListByCategory({ category }) {
   const GetCourseListByCategory = async () => {
     setCourseList([]);
     setLoading(true);
-    
-    const q = query(
-      collection(db, "course"),
-      orderBy("createdOn", "desc")
-    );
+
+    const q = query(collection(db, "course"), orderBy("createdOn", "desc"));
     const querySnapshot = await getDocs(q);
     const data = [];
     querySnapshot.forEach((doc) => {
       const docData = doc.data();
-      
+
       if (docData.category === category) {
         data.push({ id: doc.id, ...docData });
       }
@@ -34,9 +31,16 @@ export default function CourseListByCategory({ category }) {
     setLoading(false);
   };
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       {loading ? (
-        <View style={{ padding: 20, alignItems: "center" }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
           <ActivityIndicator size={32} color={Colors.GREEN} />
         </View>
       ) : courseList?.length > 0 ? (

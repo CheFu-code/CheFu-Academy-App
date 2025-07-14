@@ -47,7 +47,7 @@ export default function CourseList({
   return (
     <View
       style={{
-        marginTop: 15,
+        // marginTop: 15,
         pointerEvents: loadingId ? "none" : "auto",
       }}
     >

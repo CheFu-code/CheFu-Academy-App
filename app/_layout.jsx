@@ -99,7 +99,19 @@ export default Sentry.wrap(function RootLayout() {
 
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack
+        screenOptions={{
+          headerShown: false, // Hide header
+          statusBarStyle: "light", // "light" or "dark" for status bar text/icons color
+          statusBarAnimation: "slide", // Animate status bar style changes
+          gestureEnabled: true, // Enable swipe back gestures on iOS/Android
+          animation: "slide_from_right", // Screen transition animation
+          contentStyle: {
+            // Style for the whole screen content container
+            backgroundColor: "#1B263B", // Or any background color you want
+          },
+        }}
+      />
     </UserDetailContext.Provider>
   );
 });

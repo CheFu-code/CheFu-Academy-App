@@ -15,10 +15,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 import * as Progress from "react-native-progress";
 import Button from "../../component/Shared/Button";
 import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
+
+const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
 
 export default function ChapterView() {
   const { chapterParams, docId, chapterIndex } = useLocalSearchParams();
@@ -67,17 +70,30 @@ export default function ChapterView() {
         ? courseSnap.data()
         : { chapters: [] };
 
-      setLoader(false);
-      setCurrentPage(0);
-
-      // Use replace to avoid stacking
-      router.replace({
-        pathname: "/courseView",
-        params: {
-          courseParams: JSON.stringify(courseObject),
-        },
-      });
       ToastAndroid.show("Chapter completed!", ToastAndroid.SHORT);
+
+      const interstitial = InterstitialAd.createForAdRequest(
+        INTERSTITIAL_AD_UNIT_ID,
+        { requestNonPersonalizedAdsOnly: true }
+      );
+
+      const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
+        if (type === AdEventType.LOADED) {
+          interstitial.show();
+        }
+        if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
+          unsubscribe();
+          router.replace({
+            pathname: "/courseView",
+            params: {
+              courseParams: JSON.stringify(courseObject),
+            },
+          });
+          setLoader(false);
+        }
+      });
+
+      interstitial.load();
     } catch (error) {
       console.error("Error completing chapter:", error);
       setLoader(false);

@@ -78,7 +78,7 @@ export default function Header() {
           {userDetail?.member === true && (
             <Ionicons
               style={{
-                marginTop: 25,
+                marginTop: 35,
               }}
               color={Colors.PRIMARY}
               size={20}
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-bold",
     fontSize: 24,
     color: "#fff",
-    marginTop: 25,
+    marginTop: 35,
   },
   subText: {
     fontFamily: "outfit",

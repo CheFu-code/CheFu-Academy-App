@@ -222,7 +222,7 @@ export default function Profile() {
                       },
                     ]}
                   >
-                    - email not verified
+                    email not verified
                   </Text>
                 </TouchableOpacity>
               )}
@@ -312,7 +312,7 @@ export default function Profile() {
 
           <TouchableOpacity
             style={[styles.menuItem, { marginTop: 5 }]}
-            onPress={() => router.push("/subscription")}
+            onPress={() => subscribe()}
             disabled={loading}
           >
             <FontAwesome5

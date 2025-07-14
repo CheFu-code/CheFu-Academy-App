@@ -148,9 +148,8 @@ export default function Home() {
 
             <View
               style={{
-                paddingTop: Platform.OS === "ios" && 45,
-                padding: 25,
-                // flex: 1,
+                paddingTop: Platform.OS === "ios" && 40,
+                padding: 15,
               }}
             >
               <Header />
