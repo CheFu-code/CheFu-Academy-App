@@ -1,6 +1,9 @@
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
@@ -30,6 +33,13 @@ const SignUp = () => {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const DEFAULT_PREFS = {
+    general: false,
+    marketing: false,
+    activity: false,
+    security: true,
+  };
 
   const CreateNewAccount = () => {
     if (!fullName.trim() || !email || !password) {
@@ -94,6 +104,7 @@ const SignUp = () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         uid: user.uid,
+        emailPreferences: DEFAULT_PREFS,
       };
       await setDoc(doc(db, "users", email), data);
 

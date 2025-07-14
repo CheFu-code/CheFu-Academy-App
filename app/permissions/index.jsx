@@ -1,19 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Camera from "expo-camera";
+
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 import * as Notifications from "expo-notifications";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Linking,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 
 export default function Permissions() {
+  // Use the Camera hook for permissions and request function
+  const [cameraPermission, requestCameraPermission] =
+    Camera.useCameraPermissions();
+
   const [permissions, setPermissions] = useState({
     camera: null,
     mediaLibrary: null,
@@ -21,17 +28,29 @@ export default function Permissions() {
     notifications: null,
   });
 
+  const permissionDisplayNames = {
+    camera: "Camera",
+    mediaLibrary: "Media Library",
+    location: "Location",
+    notifications: "Notifications",
+  };
+
   const checkPermissions = async () => {
-    const { status: camera } = await Camera.getCameraPermissionsAsync();
-    const { status: mediaLibrary } = await MediaLibrary.getPermissionsAsync();
-    const { status: location } = await Location.getForegroundPermissionsAsync();
-    const { status: notifications } = await Notifications.getPermissionsAsync();
+    // cameraPermission may be undefined initially, so fallback to status
+    const cameraStatus = cameraPermission?.status ?? "undetermined";
+
+    const { status: mediaLibraryStatus } =
+      await MediaLibrary.getPermissionsAsync();
+    const { status: locationStatus } =
+      await Location.getForegroundPermissionsAsync();
+    const { status: notificationsStatus } =
+      await Notifications.getPermissionsAsync();
 
     setPermissions({
-      camera: camera === "granted",
-      mediaLibrary: mediaLibrary === "granted",
-      location: location === "granted",
-      notifications: notifications === "granted",
+      camera: cameraStatus === "granted",
+      mediaLibrary: mediaLibraryStatus === "granted",
+      location: locationStatus === "granted",
+      notifications: notificationsStatus === "granted",
     });
   };
 
@@ -39,7 +58,7 @@ export default function Permissions() {
     let result;
     switch (type) {
       case "camera":
-        result = await Camera.requestCameraPermissionsAsync();
+        result = await requestCameraPermission();
         break;
       case "mediaLibrary":
         result = await MediaLibrary.requestPermissionsAsync();
@@ -54,20 +73,43 @@ export default function Permissions() {
     if (result?.status) checkPermissions();
   };
 
+  useEffect(() => {
+    checkPermissions();
+  }, [cameraPermission]);
+
   const openSettings = () => {
     Linking.openSettings();
   };
 
-  useEffect(() => {
-    checkPermissions();
-  }, []);
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>App Permissions</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <Pressable onPress={() => router.back()}>
+          <Ionicons
+            style={{
+              backgroundColor: "gray",
+              borderRadius: 20,
+              padding: 8,
+              marginTop: 30,
+            }}
+            size={24}
+            name="arrow-back"
+            color={"white"}
+          />
+        </Pressable>
+        <Text style={styles.title}>App Permissions</Text>
+      </View>
+
       {Object.entries(permissions).map(([key, granted]) => (
         <View key={key} style={styles.item}>
-          <Text style={styles.label}>{key.replace(/([A-Z])/g, " $1")}</Text>
+          <Text style={styles.label}>{permissionDisplayNames[key]}</Text>
+
           <TouchableOpacity
             onPress={() => requestPermission(key)}
             style={[styles.button, granted ? styles.granted : styles.denied]}
@@ -103,6 +145,7 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-bold",
     color: Colors.WHITE,
     marginBottom: 20,
+    marginTop: 45,
   },
   item: {
     flexDirection: "row",

@@ -1,9 +1,14 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
+import * as FileSystem from "expo-file-system";
 import { router } from "expo-router";
+import * as Sharing from "expo-sharing";
+import { doc, getDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,126 +17,217 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [useBiometrics, setUseBiometrics] = useState(false);
   const [showVersion, setShowVersion] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  const options = ["Report a bug"];
 
   const toggleSetting = (name, stateSetter, current) => {
     stateSetter(!current);
     Alert.alert(`${name} turned ${!current ? "on" : "off"}`);
   };
 
+  async function exportUserData() {
+    try {
+      setLoading(true);
+      const user = auth.currentUser;
+      if (!user?.email) {
+        Alert.alert("Error", "User not logged in");
+        setLoading(false);
+        return;
+      }
+
+      const docRef = doc(db, "users", user.email);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        Alert.alert("Error", "No user data found to export");
+        setLoading(false);
+        return;
+      }
+
+      const userData = docSnap.data();
+      const json = JSON.stringify(userData, null, 2);
+      const filename = `${FileSystem.documentDirectory}userdata_${user.email}.json`;
+
+      await FileSystem.writeAsStringAsync(filename, json, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      await Sharing.shareAsync(filename, {
+        mimeType: "application/json",
+        dialogTitle: "Export User Data",
+        UTI: "public.json",
+      });
+    } catch (error) {
+      console.error("Export failed", error);
+      Alert.alert("Error", "Failed to export data");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.heading}>General</Text>
+    <View style={[styles.container, { paddingTop: 50 }]}>
+      {/* Header + Dropdown Button */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Settings</Text>
+        <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
+          <MaterialIcons
+            name="unfold-more"
+            size={24}
+            style={styles.icon}
+            color="#fff"
+          />
+        </TouchableOpacity>
+      </View>
 
-      <SettingItem
-        label="Edit Profile"
-        icon="person"
-        onPress={() => Alert.alert("Edit Profile Pressed")}
-      />
-      <SettingItem
-        label="Change Password"
-        icon="lock-closed"
-        onPress={() => Alert.alert("Change Password Pressed")}
-      />
-
-      <Text style={styles.heading}>Notifications</Text>
-
-      <SettingItem
-        label="Push Notifications"
-        icon="notifications"
-        toggle
-        value={notifications}
-        onToggle={() =>
-          toggleSetting("Notifications", setNotifications, notifications)
-        }
-      />
-      <SettingItem
-        label="Email Alerts"
-        icon="mail"
-        onPress={() => Alert.alert("Email Settings Pressed")}
-      />
-
-      <Text style={styles.heading}>Privacy & Security</Text>
-
-      <SettingItem
-        label="Privacy Policy"
-        icon="shield-checkmark"
-        onPress={() => router.push("/privacy")}
-      />
-      <SettingItem
-        label="Enable Biometric Lock"
-        icon="finger-print"
-        toggle
-        value={useBiometrics}
-        onToggle={() =>
-          toggleSetting("Biometric Lock", setUseBiometrics, useBiometrics)
-        }
-      />
-      <SettingItem
-        label="Permissions"
-        icon="lock-open"
-        onPress={() => router.push("/permissions")}
-      />
-
-      <Text style={styles.heading}>About</Text>
-
-      <SettingItem
-        label="App Version"
-        icon="information-circle"
-        onPress={() => setShowVersion(!showVersion)}
-      />
-      {showVersion && (
-        <View style={styles.codeBlock}>
-          <Text style={styles.codeLabel}>version:</Text>
-          <Text style={styles.codeText}>
-            {Constants.expoConfig?.version ?? "N/A"}
-          </Text>
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <View style={styles.dropdown}>
+          {options.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => {
+                setSelected(item);
+                Linking.openURL("mailto:kurisanimaluleke77@gmail.com");
+                setIsOpen(false);
+              }}
+              style={styles.option}
+            >
+              <Text style={styles.optionText}>{item}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
       )}
-      <SettingItem
-        label="What's New"
-        icon="sparkles"
-        onPress={() => Alert.alert("Release Notes Pressed")}
-      />
-      <SettingItem
-        label="Rate the App"
-        icon="star"
-        onPress={() => Alert.alert("Rate Us Pressed")}
-      />
-      <SettingItem
-        label="Share CheFu Academy"
-        icon="share-social"
-        onPress={() => Alert.alert("Share Pressed")}
-      />
 
-      <Text style={styles.heading}>Account</Text>
+      {/* Selected option (optional)
+      {selected && (
+        <Text style={{ color: "white", marginTop: 10 }}>
+          Selected: {selected}
+        </Text>
+      )} */}
 
-      <SettingItem
-        label="Switch Account"
-        icon="repeat"
-        onPress={() => Alert.alert("Switch Account Pressed")}
-      />
-      <SettingItem
-        label="Export My Data"
-        icon="download"
-        onPress={() => Alert.alert("Export Data Pressed")}
-      />
-      <SettingItem
-        label="Delete Account"
-        icon="trash"
-        onPress={() => Alert.alert("Delete Account Pressed")}
-      />
-      <SettingItem
-        label="Log Out"
-        icon="exit"
-        onPress={() => Alert.alert("Log Out Pressed")}
-      />
-    </ScrollView>
+      {/* Settings List */}
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+        <Text style={styles.heading}>General</Text>
+        <SettingItem
+          label="Edit Profile"
+          icon="person"
+          onPress={() => router.push("/editProfile")}
+        />
+        <SettingItem
+          label="Change Password"
+          icon="lock-closed"
+          onPress={() => router.push("/changePassword")}
+        />
+        <SettingItem
+          label="Export My Data"
+          icon="download"
+          onPress={exportUserData}
+          disabled={loading}
+        />
+        {loading && (
+          <ActivityIndicator
+            size="small"
+            color={Colors.PRIMARY}
+            style={{ marginBottom: 10 }}
+          />
+        )}
+
+        <Text style={styles.heading}>Notifications</Text>
+        <SettingItem
+          label="Push Notifications"
+          icon="notifications"
+          toggle
+          value={notifications}
+          onToggle={() =>
+            toggleSetting("Notifications", setNotifications, notifications)
+          }
+        />
+        <SettingItem
+          label="Email Alerts"
+          icon="mail"
+          onPress={() => router.push("/emailAlerts")}
+        />
+
+        <Text style={styles.heading}>Privacy & Security</Text>
+        <SettingItem
+          label="Privacy Policy"
+          icon="shield-checkmark"
+          onPress={() => router.push("/privacy")}
+        />
+        <SettingItem
+          label="Enable Biometric Lock"
+          icon="finger-print"
+          toggle
+          value={useBiometrics}
+          onToggle={() =>
+            toggleSetting("Biometric Lock", setUseBiometrics, useBiometrics)
+          }
+        />
+        <SettingItem
+          label="Permissions"
+          icon="lock-open"
+          onPress={() => router.push("/permissions")}
+        />
+
+        <Text style={styles.heading}>About</Text>
+        <SettingItem
+          label="App Version"
+          icon="information-circle"
+          onPress={() => setShowVersion(!showVersion)}
+        />
+        {showVersion && (
+          <View style={styles.codeBlock}>
+            <Text style={styles.codeLabel}>version:</Text>
+            <Text style={styles.codeText}>
+              {Constants.expoConfig?.version ?? "N/A"}
+            </Text>
+          </View>
+        )}
+        <SettingItem
+          label="What's New"
+          icon="sparkles"
+          onPress={() => Alert.alert("Release Notes Pressed")}
+        />
+        <SettingItem
+          label="Rate the App"
+          icon="star"
+          onPress={() => Alert.alert("Rate Us Pressed")}
+        />
+        <SettingItem
+          label="Share CheFu Academy"
+          icon="share-social"
+          onPress={() => Alert.alert("Share Pressed")}
+        />
+
+        <Text style={styles.heading}>Account</Text>
+        <SettingItem
+          label="Switch Account"
+          icon="repeat"
+          onPress={() => Alert.alert("Switch Account Pressed")}
+        />
+        <SettingItem
+          label="Delete Account"
+          icon="trash"
+          onPress={() => Alert.alert("Delete Account Pressed")}
+        />
+        <SettingItem
+          label="Log Out"
+          icon="exit"
+          onPress={() => Alert.alert("Log Out Pressed")}
+        />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -142,8 +238,9 @@ const SettingItem = ({
   value,
   onToggle,
   onPress,
+  disabled,
 }) => (
-  <TouchableOpacity onPress={onPress}>
+  <TouchableOpacity onPress={onPress} disabled={disabled}>
     <View style={styles.itemRow}>
       <View style={styles.itemLeft}>
         <Ionicons
@@ -157,7 +254,7 @@ const SettingItem = ({
       {toggle ? (
         <Switch value={value} onValueChange={onToggle} />
       ) : (
-        <Pressable onPress={onPress}>
+        <Pressable onPress={onPress} disabled={disabled}>
           <MaterialIcons name="chevron-right" size={24} color={Colors.GRAY} />
         </Pressable>
       )}
@@ -169,8 +266,48 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.BG_COLOR,
-    paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingHorizontal: 15,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  title: {
+    fontFamily: "outfit-bold",
+    fontSize: 22,
+    color: "white",
+  },
+  icon: {
+    backgroundColor: "gray",
+    padding: 5,
+    borderRadius: 20,
+  },
+  dropdown: {
+    position: "absolute",
+    right: 20,
+    top: 95,
+    backgroundColor: "#333",
+    borderRadius: 8,
+    zIndex: 100,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    width: 130,
+    paddingLeft: 8,
+  },
+  option: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#444",
+    textAlign: "center",
+  },
+  optionText: {
+    color: "#fff",
+    fontFamily: "outfit",
   },
   heading: {
     fontSize: 18,
@@ -197,24 +334,7 @@ const styles = StyleSheet.create({
     color: Colors.WHITE,
   },
   codeBlock: {
-    backgroundColor: Colors.CARD,
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  codeLabel: {
-    color: Colors.GRAY,
-    fontFamily: "outfit-bold",
-    marginBottom: 4,
-  },
-  codeText: {
-    color: Colors.WHITE,
-    fontFamily: "outfit",
-  },
-  codeBlock: {
-    backgroundColor: "#1e1e1e", // like VS Code dark theme
+    backgroundColor: "#1e1e1e",
     borderRadius: 8,
     padding: 10,
     marginTop: 8,
@@ -229,7 +349,7 @@ const styles = StyleSheet.create({
   },
   codeText: {
     color: "#d4d4d4",
-    fontFamily: "outfit", // or any monospace font you have
+    fontFamily: "outfit",
     fontSize: 13,
     letterSpacing: 1.8,
   },
