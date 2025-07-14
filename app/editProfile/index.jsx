@@ -1,17 +1,18 @@
-import * as ImagePicker from "expo-image-picker";
-import { useEffect, useState } from "react";
+// import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
+import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function EditProfile() {
@@ -29,35 +30,35 @@ export default function EditProfile() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Request image library permissions on mount
-  useEffect(() => {
-    (async () => {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission required",
-          "Permission to access photos is required to upload profile picture."
-        );
-      }
-    })();
-  }, []);
+  //   useEffect(() => {
+  //     (async () => {
+  //       const { status } =
+  //         await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //       if (status !== "granted") {
+  //         Alert.alert(
+  //           "Permission required",
+  //           "Permission to access photos is required to upload profile picture."
+  //         );
+  //       }
+  //     })();
+  //   }, []);
 
   // Pick profile image
-  const pickImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.7,
-        allowsEditing: true,
-        aspect: [1, 1],
-      });
-      if (!result.cancelled) {
-        setProfileImage(result.uri);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Could not pick the image.");
-    }
-  };
+  // const pickImage = async () => {
+  //   try {
+  //     const result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //       quality: 0.7,
+  //       allowsEditing: true,
+  //       aspect: [1, 1],
+  //     });
+  //     if (!result.cancelled) {
+  //       setProfileImage(result.uri);
+  //     }
+  //   } catch (error) {
+  //     Alert.alert("Error", "Could not pick the image.");
+  //   }
+  // };
 
   // Validate inputs
   const validate = () => {
@@ -105,7 +106,7 @@ export default function EditProfile() {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Edit Profile</Text>
 
-        <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+        <TouchableOpacity style={styles.imagePicker} onPress={() => {}}>
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profileImage} />
           ) : (
@@ -164,7 +165,10 @@ export default function EditProfile() {
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={[styles.button, styles.cancelButton]}
-            onPress={resetForm}
+            onPress={() => {
+              resetForm();
+              router.back();
+            }}
             disabled={isSaving}
           >
             <Text style={styles.cancelButtonText}>Cancel</Text>
