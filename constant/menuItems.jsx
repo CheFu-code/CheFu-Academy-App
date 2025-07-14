@@ -23,11 +23,7 @@ export const menuItems = (router, Linking, ToastAndroid, Colors) => [
         "mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here."
       ),
   },
-  {
-    label: "Privacy Policy",
-    icon: "shield-checkmark-outline",
-    onPress: () => router.push("/privacy"),
-  },
+
   {
     label: "Terms of Service",
     icon: "document-text-outline",

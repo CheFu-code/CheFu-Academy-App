@@ -5,6 +5,7 @@ import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { UserDetailContext } from "../context/UserDetailContext";
 
+
 Sentry.init({
   dsn: "https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840",
   sendDefaultPii: true,
