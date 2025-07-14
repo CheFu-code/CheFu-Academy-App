@@ -1,4 +1,4 @@
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
@@ -60,7 +60,6 @@ export default function Profile() {
 
       if (userDocSnap.exists()) {
         setUserDetail(userDocSnap.data());
-        ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
       } else {
         ToastAndroid.show("Your data not found", ToastAndroid.SHORT);
       }
@@ -353,16 +352,16 @@ export default function Profile() {
           {userDetail?.member === true && (
             <TouchableOpacity
               style={[styles.menuItem, { marginTop: 5 }]}
-              onPress={() => router.push("/certificate")}
+              onPress={() => router.push("/download")}
             >
-              <Ionicons
-                name="document-text-outline"
-                size={26}
+              <FontAwesome6
+                name="download"
+                size={24}
                 color={Colors.GREEN}
                 style={styles.icon}
               />
               <Text style={[styles.menuLabel, { color: Colors.GREEN }]}>
-                Download Certificate
+                Downloaded Courses
               </Text>
             </TouchableOpacity>
           )}

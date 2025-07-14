@@ -187,8 +187,8 @@ export default function ChapterView() {
                   .split(/(["'][^"']+["'])/g)
                   .map((subPart, subIndex) => {
                     const isQuoted =
-                      (subPart.startsWith('"') && subPart.endsWith('"')) ||
-                      (subPart.startsWith("'") && subPart.endsWith("'"));
+                      subPart.startsWith('"') && subPart.endsWith('"');
+
                     const text = isQuoted ? subPart.slice(1, -1) : subPart;
 
                     return (
