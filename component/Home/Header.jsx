@@ -12,8 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-// import { auth } from "../../config/fireConfig";
-import auth from "@react-native-firebase/auth";
+import { auth } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 

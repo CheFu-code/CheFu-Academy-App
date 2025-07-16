@@ -1,9 +1,16 @@
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import CourseList from "../Home/CourseList";
+
+// ✅ Modular Firestore API (React Native Firebase)
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+} from "@react-native-firebase/firestore";
 
 export default function CourseListByCategory({ category }) {
   const [courseList, setCourseList] = useState([]);
@@ -14,22 +21,25 @@ export default function CourseListByCategory({ category }) {
   }, [category]);
 
   const GetCourseListByCategory = async () => {
-    setCourseList([]);
     setLoading(true);
+    setCourseList([]);
+    try {
+      const db = getFirestore(); // ✅ Get Firestore instance
+      const q = query(collection(db, "course"), orderBy("createdOn", "desc"));
+      const snapshot = await getDocs(q);
 
-    const q = query(collection(db, "course"), orderBy("createdOn", "desc"));
-    const querySnapshot = await getDocs(q);
-    const data = [];
-    querySnapshot.forEach((doc) => {
-      const docData = doc.data();
+      const data = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((docData) => docData.category === category);
 
-      if (docData.category === category) {
-        data.push({ id: doc.id, ...docData });
-      }
-    });
-    setCourseList(data);
-    setLoading(false);
+      setCourseList(data);
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <View style={{ flex: 1 }}>
       {loading ? (

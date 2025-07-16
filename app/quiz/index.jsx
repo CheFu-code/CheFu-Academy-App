@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
+import firestore from "@react-native-firebase/firestore";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
   Dimensions,
@@ -14,7 +14,6 @@ import {
 import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 import * as Progress from "react-native-progress";
 import Button from "../../component/Shared/Button";
-import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 
 const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
@@ -26,7 +25,7 @@ export default function Quiz() {
   const [selectedOption, setSelectedOption] = useState();
   const quiz = course?.quiz;
   const router = useRouter();
-  const [result, setResult] = useState([]);
+  const [result, setResult] = useState({});
   const [loading, setLoading] = useState(false);
 
   const GetProgress = (currentPage) => {
@@ -48,9 +47,10 @@ export default function Quiz() {
   };
 
   const onQuizFinish = async () => {
+    const db = firestore();
     setLoading(true);
     try {
-      await updateDoc(doc(db, "course", course?.docId), {
+      await firestore().collection("course").doc(course?.docId).update({
         quizResult: result,
       });
 
@@ -169,7 +169,9 @@ export default function Quiz() {
               style={{
                 padding: 5,
                 borderWidth: 0.6,
-                borderColor: selectedOption == index ? Colors.GREEN : null,
+                borderColor:
+                  selectedOption == index ? Colors.GREEN : "transparent",
+
                 borderRadius: 15,
                 marginTop: 8,
                 backgroundColor:

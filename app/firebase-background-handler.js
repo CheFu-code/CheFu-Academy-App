@@ -1,9 +1,11 @@
-import messaging from "@react-native-firebase/messaging";
-import "../config/fireConfig"; // Make sure this initializes firebase (if needed)
+// app/firebase-background-handler.js
+import { getMessaging, setBackgroundMessageHandler } from '@react-native-firebase/messaging';
+import '../config/fireConfig'; // Optional if using compat SDK for auth/firestore
 
 console.log("🟢 Background handler loaded");
 
-messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+setBackgroundMessageHandler(getMessaging(), async (remoteMessage) => {
   console.log("🔕 Background notification:", remoteMessage);
-  // You can integrate expo-notifications or local push here if needed
+
+  // Optional: show local notification here using expo-notifications if needed
 });

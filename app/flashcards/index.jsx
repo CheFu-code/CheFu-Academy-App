@@ -77,12 +77,9 @@ export default function Flashcards() {
             <View
               key={index}
               style={{
-                // width: width * 0.9,
                 height: 500,
                 marginTop: 20,
                 display: "flex",
-                // backgroundColor: Colors.BG_COLOR,
-                // marginHorizontal: width * 0.05,
               }}
             >
               <FlipCard style={styles.flipCard}>

@@ -1,4 +1,5 @@
-import messaging from "@react-native-firebase/messaging";
+import { getMessaging, onMessage } from "@react-native-firebase/messaging";
+
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
@@ -37,14 +38,11 @@ export default Sentry.wrap(function RootLayout() {
   useEffect(() => {
     requestUserPermission().then((token) => {
       if (token) {
-        console.log("✅ Device ready for push notifications:", token);
-        // TODO: Save token to backend if needed
+        // Save token to backend if needed
       }
     });
 
-    console.log("📲 Setting up foreground FCM listener");
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      console.log("🔔 Foreground notification received:", remoteMessage);
+    const unsubscribe = onMessage(getMessaging(), async (remoteMessage) => {
       Alert.alert(
         remoteMessage.notification?.title ?? "Notification",
         remoteMessage.notification?.body ?? ""
@@ -52,7 +50,6 @@ export default Sentry.wrap(function RootLayout() {
     });
 
     return () => {
-      console.log("📴 Cleaning up FCM listener");
       unsubscribe();
     };
   }, []);
@@ -60,12 +57,10 @@ export default Sentry.wrap(function RootLayout() {
   // 🔗 Deep Link Listeners
   useEffect(() => {
     const subscription = Linking.addEventListener("url", ({ url }) => {
-      console.log("🔗 Deep link triggered:", url);
       handleDeepLink(url);
     });
 
     return () => {
-      console.log("🧹 Removing deep link listener");
       subscription.remove();
     };
   }, []);
@@ -73,10 +68,8 @@ export default Sentry.wrap(function RootLayout() {
   useEffect(() => {
     Linking.getInitialURL().then((url) => {
       if (url) {
-        console.log("🚀 App opened with initial deep link:", url);
         handleDeepLink(url);
       } else {
-        console.log("ℹ️ No initial deep link found");
       }
     });
   }, []);
@@ -90,22 +83,17 @@ export default Sentry.wrap(function RootLayout() {
       if (orderID && orderID === lastHandledOrderID) return;
       lastHandledOrderID = orderID;
 
-      console.log("✅ Navigating to success page:", { orderID, planType });
-
       router.replace({
         pathname: "/subscription/success",
         params: { token: orderID, planType },
       });
     } else if (parsed.path === "cancel") {
-      console.log("⚠️ Navigating to cancel page");
       router.push("/subscription/cancel");
     } else {
-      console.warn("❓ Unknown deep link path:", parsed.path);
     }
   };
 
   if (!fontsLoaded) {
-    console.log("⏳ Fonts not loaded yet...");
     return null;
   }
 

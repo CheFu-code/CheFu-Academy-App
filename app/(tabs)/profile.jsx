@@ -4,12 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  sendEmailVerification,
-} from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+
 import { useCallback, useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -54,12 +49,14 @@ export default function Profile() {
   const refreshData = async () => {
     setRefreshing(true);
     try {
-      // Fetch updated user data from Firestore
-      const userDocRef = doc(db, "users", userDetail.email);
-      const userDocSnap = await getDoc(userDocRef);
+      const userDocSnap = await db
+        .collection("users")
+        .doc(userDetail.email)
+        .get();
 
-      if (userDocSnap.exists()) {
+      if (userDocSnap.exists) {
         setUserDetail(userDocSnap.data());
+         ToastAndroid.show("Profile refreshed", ToastAndroid.SHORT);
       } else {
         ToastAndroid.show("Your data not found", ToastAndroid.SHORT);
       }
@@ -81,7 +78,7 @@ export default function Profile() {
         onPress: async () => {
           setLoading(true);
           try {
-            await auth.signOut();
+            await auth().signOut();
             await AsyncStorage.removeItem("userDetail");
             setUserDetail(null);
             router.replace("/auth/signIn");
@@ -106,7 +103,7 @@ export default function Profile() {
     if (!password) return;
 
     try {
-      const user = auth.currentUser;
+      const user = auth().currentUser;
       if (!user || !user.email) {
         ToastAndroid.show("No user is logged in", ToastAndroid.SHORT);
         return;
@@ -149,7 +146,7 @@ export default function Profile() {
   };
 
   const verify = async () => {
-    const user = auth.currentUser;
+    const user = auth().currentUser;
     if (user) {
       try {
         await sendEmailVerification(user);

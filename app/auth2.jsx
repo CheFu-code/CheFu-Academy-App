@@ -2,7 +2,6 @@ import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import {
@@ -48,7 +47,7 @@ export default function Index() {
         }
 
         // 2. Else listen to Firebase Auth state change
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = auth().onAuthStateChanged(async (user) => {
           if (user) {
             try {
               console.log("User signed in (Firebase):", user.email);

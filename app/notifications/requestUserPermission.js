@@ -1,22 +1,31 @@
 // notifications/requestUserPermission.js
-import messaging from "@react-native-firebase/messaging";
+import {
+  AuthorizationStatus,
+  getMessaging,
+  getToken,
+  requestPermission,
+} from "@react-native-firebase/messaging";
 import { Alert } from "react-native";
 
 export async function requestUserPermission() {
-  console.log("🔔 Requesting notification permissions...");
 
-  const authStatus = await messaging().requestPermission();
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  try {
+    const authStatus = await requestPermission(getMessaging());
 
-  if (enabled) {
-    console.log("✅ Notification permission granted.");
-    const token = await messaging().getToken();
-    console.log("📲 FCM Token:", token);
-    return token;
-  } else {
-    console.warn("❌ Notification permission denied.");
-    Alert.alert("Permission Denied", "Enable notifications in settings.");
+    const enabled =
+      authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      const token = await getToken(getMessaging());
+      console.log("📲 FCM Token:", token);
+      return token;
+    } else {
+      console.warn("❌ Notification permission denied.");
+      Alert.alert("Permission Denied", "Enable notifications in settings.");
+    }
+  } catch (error) {
+    console.error("❌ Failed to request notification permission:", error);
+    Alert.alert("Error", "Failed to request notification permission.");
   }
 }

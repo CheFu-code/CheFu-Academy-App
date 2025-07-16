@@ -1,9 +1,8 @@
 import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import firestore from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,7 +16,7 @@ import {
   View,
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
-import { auth, db } from "../config/fireConfig";
+import { auth } from "../config/fireConfig";
 import { Colors } from "../constant/Colors";
 
 export default function Index() {
@@ -48,32 +47,30 @@ export default function Index() {
         }
 
         // 2. Else listen to Firebase Auth state change
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = auth().onAuthStateChanged(async (user) => {
           if (user) {
             try {
               console.log("User signed in (Firebase):", user.email);
 
-              await user.reload(); // 🔄 Make sure we get the latest verification status
+              await user.reload();
 
-              const userRef = doc(db, "users", user.email);
+              const userRef = firestore().collection("users").doc(user.email);
+              const result = await userRef.get();
 
-              const result = await getDoc(userRef);
-
-              if (result.exists()) {
+              if (result.exists) {
                 const userData = result.data();
                 console.log("Fetched user data from Firestore:", userData);
 
                 if (user.emailVerified && !userData.isVerified) {
-                  await updateDoc(userRef, {
+                  await userRef.update({
                     isVerified: true,
                     updatedAt: new Date(),
                   });
                   console.log("✅ Firestore updated: Email is now verified.");
-                  userData.isVerified = true; // also update local object
+                  userData.isVerified = true;
                 }
-                setUserDetail(userData);
 
-                // Save to AsyncStorage
+                setUserDetail(userData);
                 await AsyncStorage.setItem(
                   "userDetail",
                   JSON.stringify(userData)

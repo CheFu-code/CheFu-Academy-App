@@ -2,12 +2,19 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { FlatList, Image, Text, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  Text,
+  View,
+} from "react-native";
 import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
-import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
+
+// ✅ Modular Firestore API (React Native Firebase)
+import { collection, getDocs, getFirestore, orderBy, query, where } from "@react-native-firebase/firestore";
 
 export default function Progress({ enroll = false }) {
   const [courseList, setCourseList] = useState([]);
@@ -28,36 +35,40 @@ export default function Progress({ enroll = false }) {
 
   const GetCourseList = async () => {
     setLoading(true);
+    setCourseList([]);
     if (!userDetail?.email) {
-      setCourseList([]);
       setLoading(false);
       return;
     }
 
-    db.collection("course")
-      .where("createdBy", "==", userDetail.email)
-      .orderBy("createdOn", "desc")
-      .get()
-      .then((querySnapshot) => {
-        const courses = [];
-        querySnapshot.forEach((doc) => {
-          courses.push({ ...doc.data(), id: doc.id });
-        });
-        setCourseList(courses);
-        setLoading(false);
-      })
-      .catch(() => {
-        setCourseList([]);
-        setLoading(false);
-        Sentry.captureException(error);
-      });
+    try {
+      const db = getFirestore();
+      const courseRef = collection(db, "course");
+      const q = query(
+        courseRef,
+        where("createdBy", "==", userDetail.email),
+        orderBy("createdOn", "desc")
+      );
+      const querySnapshot = await getDocs(q);
+
+      const courses = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      setCourseList(courses);
+    } catch (error) {
+      console.error(error);
+      Sentry.captureException(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePress = (item) => {
     const id = item.id || item.courseTitle || "";
     setLoadingId(id);
 
-    // Add a small delay so loading state can show before navigation
     setTimeout(() => {
       router.push({
         pathname: "/courseView",
@@ -72,20 +83,10 @@ export default function Progress({ enroll = false }) {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
       <Image
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: 500,
-        }}
         source={require("../../assets/images/graph.png")}
+        style={{ position: "absolute", width: "100%", height: 500 }}
       />
-
-      <View
-        style={{
-          flex: 1,
-          padding: 25,
-        }}
-      >
+      <View style={{ flex: 1, padding: 25 }}>
         <Text
           style={{
             fontFamily: "outfit-bold",
@@ -102,19 +103,18 @@ export default function Progress({ enroll = false }) {
         {courseList.length > 0 ? (
           <FlatList
             showsVerticalScrollIndicator={false}
-            onRefresh={() => GetCourseList()}
+            onRefresh={GetCourseList}
             refreshing={loading}
             data={courseList}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
-              const isLoading =
-                loadingId === (item.id || item.courseTitle || "");
+              const isLoading = loadingId === (item.id || item.courseTitle || "");
               return (
                 <CourseProgressCard
                   item={item}
                   width={"97%"}
                   loading={isLoading}
-                  disabled={Boolean(loadingId)} // disables all cards during loading if you want
+                  disabled={Boolean(loadingId)}
                   onPress={() => handlePress(item)}
                 />
               );

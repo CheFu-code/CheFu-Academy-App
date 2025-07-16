@@ -2,7 +2,6 @@ import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import {
@@ -40,20 +39,22 @@ export default function Index() {
         const storedUser = await AsyncStorage.getItem("userDetail");
         if (storedUser) {
           const userData = JSON.parse(storedUser);
-          // console.log("Loaded user from AsyncStorage:", userData);
-          setUserDetail(userData);
-          setLoading(false);
-          router.replace("/(tabs)/home");
-          return; // stop here, user loaded locally
+          if (userData) {
+            // <-- Add this check
+            setUserDetail(userData);
+            setLoading(false);
+            router.replace("/(tabs)/home");
+            return; // stop here, user loaded locally
+          }
         }
 
         // 2. Else listen to Firebase Auth state change
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = auth().onAuthStateChanged(async (user) => {
           if (user) {
             try {
               console.log("User signed in (Firebase):", user.email);
 
-              await user.reload(); // 🔄 Make sure we get the latest verification status
+              await user.reload(); // refresh user data
 
               const userRef = doc(db, "users", user.email);
 
@@ -61,23 +62,32 @@ export default function Index() {
 
               if (result.exists()) {
                 const userData = result.data();
-                console.log("Fetched user data from Firestore:", userData);
 
-                if (user.emailVerified && !userData.isVerified) {
-                  await updateDoc(userRef, {
-                    isVerified: true,
-                    updatedAt: new Date(),
-                  });
-                  console.log("✅ Firestore updated: Email is now verified.");
-                  userData.isVerified = true; // also update local object
+                if (userData) {
+                  // <-- Add this check
+                  console.log("Fetched user data from Firestore:", userData);
+
+                  if (user.emailVerified && !userData.isVerified) {
+                    await updateDoc(userRef, {
+                      isVerified: true,
+                      updatedAt: new Date(),
+                    });
+                    console.log("✅ Firestore updated: Email is now verified.");
+                    userData.isVerified = true; // also update local object
+                  }
+
+                  setUserDetail(userData);
+
+                  // Save to AsyncStorage
+                  await AsyncStorage.setItem(
+                    "userDetail",
+                    JSON.stringify(userData)
+                  );
+                } else {
+                  console.warn(
+                    "User data from Firestore is undefined or null."
+                  );
                 }
-                setUserDetail(userData);
-
-                // Save to AsyncStorage
-                await AsyncStorage.setItem(
-                  "userDetail",
-                  JSON.stringify(userData)
-                );
 
                 setLoading(false);
                 router.replace("/(tabs)/home");
@@ -93,6 +103,10 @@ export default function Index() {
           } else {
             console.log("No user is currently signed in.");
             setLoading(false);
+
+            // Also clear AsyncStorage and context if no user
+            await AsyncStorage.removeItem("userDetail");
+            setUserDetail(null);
           }
         });
 

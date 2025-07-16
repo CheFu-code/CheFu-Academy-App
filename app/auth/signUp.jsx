@@ -1,10 +1,5 @@
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -27,10 +22,9 @@ import { UserDetailContext } from "../../context/UserDetailContext";
 const SignUp = () => {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  // const [error, setError] = useState("");
-  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { setUserDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -41,64 +35,71 @@ const SignUp = () => {
     security: true,
   };
 
-  const CreateNewAccount = () => {
-    if (!fullName.trim() || !email || !password) {
-      // Show an alert or set an error state
+  const CreateNewAccount = async () => {
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
       alert("All fields are required.");
       return;
     }
     setLoading(true);
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (resp) => {
-        const user = resp.user;
+    try {
+      const resp = await auth().createUserWithEmailAndPassword(
+        email.trim(),
+        password
+      );
+      const user = resp.user;
 
-        // ✅ Send verification email
-        await sendEmailVerification(user);
+      await user.sendEmailVerification();
 
-        await SaveUser(user);
+      await SaveUser(user);
 
-        alert(
-          "Account created! Please check your email to verify your address."
-        );
-
-        setLoading(false);
-      })
-      .catch((e) => {
-        console.log("Error in createUserWithEmailAndPassword:", e.message);
-        Sentry.captureException(e);
-        if (e.code === "auth/email-already-in-use") {
+      alert("Account created! Please check your email to verify your address.");
+    } catch (e) {
+      Sentry.captureException(e);
+      console.log("Error in createUserWithEmailAndPassword:", e.message);
+      switch (e.code) {
+        case "auth/email-already-in-use":
           alert("This email is already in use. Please use a different email.");
-        } else if (e.code === "auth/invalid-email") {
+          break;
+        case "auth/invalid-email":
           alert("The email address is not valid.");
-        } else if (e.code === "auth/weak-password") {
+          break;
+        case "auth/weak-password":
           alert("Password should be at least 6 characters.");
-        } else if (e.code === "auth/operation-not-allowed") {
+          break;
+        case "auth/operation-not-allowed":
           alert(
             "Email/password accounts are not enabled. Please contact support."
           );
-        } else if (e.code === "auth/missing-email") {
+          break;
+        case "auth/missing-email":
           alert("Please enter your email address.");
-        } else if (e.code === "auth/too-many-requests") {
+          break;
+        case "auth/too-many-requests":
           alert("Too many attempts. Please try again later.");
-        } else if (e.code === "auth/internal-error") {
+          break;
+        case "auth/internal-error":
           alert("Internal error. Please try again later.");
-        } else if (e.message && e.message.includes("network")) {
-          alert(
-            "Network error: Please check your internet connection and try again."
-          );
-        } else {
-          alert(e.message);
-        }
-        setLoading(false);
-      });
+          break;
+        default:
+          if (e.message && e.message.includes("network")) {
+            alert(
+              "Network error: Please check your internet connection and try again."
+            );
+          } else {
+            alert(e.message);
+          }
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const SaveUser = async (user) => {
     try {
       const data = {
         fullname: fullName,
-        email: email,
+        email: email.trim(),
         member: false,
         isVerified: user.emailVerified,
         createdAt: new Date(),
@@ -106,45 +107,30 @@ const SignUp = () => {
         uid: user.uid,
         emailPreferences: DEFAULT_PREFS,
       };
-      await setDoc(doc(db, "users", email), data);
+      await db.collection("users").doc(email.trim()).set(data);
 
       setUserDetail(data);
       router.push("/home");
     } catch (e) {
-      console.log("Error in SaveUser:", e.message);
       Sentry.captureException(e);
+      console.log("Error in SaveUser:", e.message);
+      alert("Failed to save your data. Please try again later.");
     }
   };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={30}
       >
         <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: "center",
-            // paddingBottom: 40,
-          }}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View
-            style={{
-              display: "flex",
-              alignItems: "center",
-              // paddingTop: 30,
-              padding: 10,
-            }}
-          >
+          <View style={{ alignItems: "center", padding: 10 }}>
             <Image
               source={require("./../../assets/images/logo.png")}
               style={{
@@ -170,26 +156,28 @@ const SignUp = () => {
               placeholder="Fullname"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
-              onChangeText={(value) => setFullName(value)}
+              onChangeText={setFullName}
               maxLength={50}
+              value={fullName}
             />
             <TextInput
               placeholder="Email"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
-              onChangeText={(value) => setEmail(value)}
-              require={true}
+              onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
               maxLength={100}
+              value={email}
             />
             <TextInput
               placeholder="Password"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
               secureTextEntry={!showPassword}
-              onChangeText={(value) => setPassword(value)}
+              onChangeText={setPassword}
               maxLength={50}
+              value={password}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Text style={{ color: Colors.PRIMARY }}>
@@ -226,17 +214,12 @@ const SignUp = () => {
 
             <View
               style={{
-                display: "flex",
                 flexDirection: "row",
                 gap: 3,
                 marginTop: 20,
               }}
             >
-              <Text
-                style={{
-                  color: Colors.WHITE,
-                }}
-              >
+              <Text style={{ color: Colors.WHITE }}>
                 Already have an account?{" "}
               </Text>
               <Pressable onPress={() => router.push("/auth/signIn")}>

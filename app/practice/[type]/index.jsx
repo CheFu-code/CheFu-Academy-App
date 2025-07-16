@@ -1,6 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
+import { getApp } from "@react-native-firebase/app";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  where,
+} from "@react-native-firebase/firestore";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,28 +19,32 @@ import {
   View,
 } from "react-native";
 import CourseListGrid from "../../../component/PracticeScreen/CourseListGrid";
-import { db } from "../../../config/fireConfig";
 import { Colors } from "../../../constant/Colors";
 import { PracticeOption } from "../../../constant/Option";
 import { UserDetailContext } from "../../../context/UserDetailContext";
 
 export default function PracticeTypeHomeScreen() {
   const { type } = useLocalSearchParams();
-  const option = PracticeOption.find((item) => item.name == type);
-  const [loading, setLoading] = useState(false);
-  // console.log(option);
+  const option = PracticeOption.find((item) => item.name === type);
+  const { userDetail } = useContext(UserDetailContext);
+  const router = useRouter();
 
-  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const [loading, setLoading] = useState(false);
   const [courseList, setCourseList] = useState([]);
 
   useEffect(() => {
-    userDetail && GetCourseList();
+    if (userDetail) {
+      GetCourseList();
+    }
   }, [userDetail]);
 
   const GetCourseList = async () => {
     setLoading(true);
     setCourseList([]);
+
     try {
+      const db = getFirestore(getApp());
+
       const q = query(
         collection(db, "course"),
         where("createdBy", "==", userDetail?.email),
@@ -40,17 +52,20 @@ export default function PracticeTypeHomeScreen() {
       );
 
       const querySnapshot = await getDocs(q);
+      const courses = [];
+
       querySnapshot.forEach((doc) => {
-        // console.log(doc.data());
-        setCourseList((prev) => [...prev, doc.data()]);
+        courses.push({ id: doc.id, ...doc.data() });
       });
-      setLoading(false);
+
+      setCourseList(courses);
     } catch (e) {
-      console.log(e);
+      console.error(e);
+    } finally {
       setLoading(false);
     }
   };
-  const router = useRouter();
+
   return (
     <FlatList
       showsVerticalScrollIndicator={false}

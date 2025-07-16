@@ -1,8 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -40,9 +38,9 @@ const SignIn = () => {
   // UPDATED: changed param from uid to email to match firestore doc key usage
   const getUserDetail = async (email) => {
     try {
-      const result = await getDoc(doc(db, "users", email));
-      if (result.exists()) {
-        setUserDetail(result.data());
+      const userDoc = await db.collection("users").doc(email).get();
+      if (userDoc.exists) {
+        setUserDetail(userDoc.data());
       } else {
         console.warn("User data not found in Firestore.");
       }
@@ -71,14 +69,18 @@ const SignIn = () => {
 
     setLoading(true);
     try {
-      const resp = await signInWithEmailAndPassword(auth, cleanEmail, password);
+      const resp = await auth().signInWithEmailAndPassword(
+        cleanEmail,
+        password
+      );
+
       await getUserDetail(resp.user.email); // Using email as Firestore doc key
       ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
       router.replace("/(tabs)/home");
     } catch (e) {
-
       setLoading(false);
       Sentry.captureException(e);
+      console.log("error signing in:", e);
       const contactSupport = () => Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
       switch (e.code) {
         case "auth/operation-not-allowed":

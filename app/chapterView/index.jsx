@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard"; // Add this import at the top
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore"; // Assuming you have a function to update the document
 import { useState } from "react";
 import {
   ActivityIndicator,
