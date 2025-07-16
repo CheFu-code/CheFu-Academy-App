@@ -44,13 +44,11 @@ export default function PracticeTypeHomeScreen() {
 
     try {
       const db = getFirestore(getApp());
-
       const q = query(
         collection(db, "course"),
-        where("createdBy", "==", userDetail?.email),
+        where("createdBy", "==", userDetail.email),
         orderBy("createdOn", "desc")
       );
-
       const querySnapshot = await getDocs(q);
       const courses = [];
 
@@ -60,7 +58,7 @@ export default function PracticeTypeHomeScreen() {
 
       setCourseList(courses);
     } catch (e) {
-      console.error(e);
+      console.error("❌ Error fetching course list:", e);
     } finally {
       setLoading(false);
     }

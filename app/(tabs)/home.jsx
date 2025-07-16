@@ -9,11 +9,7 @@ import {
   View,
 } from "react-native";
 
-import {
-  BannerAd,
-  BannerAdSize,
-  TestIds,
-} from "react-native-google-mobile-ads";
+import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
@@ -42,12 +38,13 @@ import {
   query,
   where,
 } from "@react-native-firebase/firestore";
+import { useRouter } from "expo-router";
 
 export default function Home() {
   const [courseList, setCourseList] = useState([]);
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
-  const isDev = __DEV__;
+  const router = useRouter();
 
   // Initialize modular auth/firestore instances
   const auth = getAuth(authModule.app);
@@ -59,7 +56,8 @@ export default function Home() {
         GetCourseList(user);
       } else {
         setCourseList([]);
-        console.log("🚫 No authenticated user");
+        console.log("🚫 No authenticated user. Redirecting to sign-in...");
+        router.replace("/auth/signIn");
       }
     });
 
@@ -195,9 +193,7 @@ export default function Home() {
       />
 
       <BannerAd
-        unitId={
-          isDev ? TestIds.BANNER : "ca-app-pub-8952058057579255/9705798694"
-        }
+        unitId={"ca-app-pub-8952058057579255/9705798694"}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
         requestOptions={{ requestNonPersonalizedAdsOnly: true }}
       />

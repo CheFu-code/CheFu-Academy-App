@@ -1,15 +1,15 @@
+import notifee from "@notifee/react-native";
+import auth from "@react-native-firebase/auth"; // 🔺 you forgot to import this
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
-
-import notifee from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import "../app/firebase-background-handler";
-import { requestUserPermission } from "../app/notifications/requestUserPermission"; // ✅ this path is fine
+import { requestUserPermission } from "../app/notifications/requestUserPermission";
+import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNotification";
 import { UserDetailContext } from "../context/UserDetailContext";
-
 
 // ✅ Sentry Init
 Sentry.init({
@@ -35,7 +35,19 @@ export default Sentry.wrap(function RootLayout() {
     michroma: require("../assets/fonts/Michroma-Regular.ttf"),
   });
 
-  // 🔔 FCM Setup
+  // 🔐 Global Auth Check
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged((user) => {
+      if (!user) {
+        console.warn("⚠️ No authenticated user. Redirecting to sign-in...");
+        router.replace("/auth/signIn"); // 👈 Adjust to your actual sign-in route
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // 🔔 Notifications Setup
   useEffect(() => {
     requestUserPermission().then((token) => {
       if (token) {
@@ -43,17 +55,20 @@ export default Sentry.wrap(function RootLayout() {
       }
     });
 
-    // Create Android channel on mount (required for Android)
     async function createChannel() {
       await notifee.createChannel({
         id: "default",
         name: "Default Channel",
+        sound: "default",
+        importance: 4,
       });
+
+      await scheduleDailyNotification();
     }
+
     createChannel();
 
     const unsubscribe = onMessage(getMessaging(), async (remoteMessage) => {
-      // Show a system notification instead of alert
       await notifee.displayNotification({
         title: remoteMessage.notification?.title || "Notification",
         body: remoteMessage.notification?.body || "",
@@ -68,7 +83,7 @@ export default Sentry.wrap(function RootLayout() {
     };
   }, []);
 
-  // 🔗 Deep Link Listeners
+  // 🔗 Deep Links
   useEffect(() => {
     const subscription = Linking.addEventListener("url", ({ url }) => {
       handleDeepLink(url);
@@ -81,9 +96,7 @@ export default Sentry.wrap(function RootLayout() {
 
   useEffect(() => {
     Linking.getInitialURL().then((url) => {
-      if (url) {
-        handleDeepLink(url);
-      }
+      if (url) handleDeepLink(url);
     });
   }, []);
 
@@ -102,13 +115,10 @@ export default Sentry.wrap(function RootLayout() {
       });
     } else if (parsed.path === "cancel") {
       router.push("/subscription/cancel");
-    } else {
     }
   };
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>

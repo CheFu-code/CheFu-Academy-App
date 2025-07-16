@@ -17,7 +17,6 @@ export async function requestUserPermission() {
 
     if (enabled) {
       const token = await getToken(getMessaging());
-      console.log("📲 FCM Token:", token);
 
       // Send token to backend here
       await sendTokenToBackend(token);
@@ -37,28 +36,31 @@ async function sendTokenToBackend(token) {
   try {
     const user = auth().currentUser;
     if (!user?.email) {
-      console.warn("User not logged in, cannot send FCM token");
+      console.warn("⚠️ User not logged in, cannot send FCM token");
       return;
     }
 
-    // Replace this with your backend API URL
-    const response = await fetch("https://chefu-academy-tmzx.onrender.com/api/save-fcm-token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: user.email,
-        fcmToken: token,
-      }),
-    });
+    const response = await fetch(
+      "http://10.35.176.122:5000/api/save-fcm-token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          fcmToken: token,
+        }),
+      }
+    );
 
     if (!response.ok) {
-      console.warn("Failed to save FCM token on backend");
+      const errorText = await response.text();
+      console.warn("⚠️ Failed to save FCM token on backend:", errorText);
     } else {
-      console.log("FCM token saved on backend successfully");
+      console.log("✅ FCM token saved on backend successfully");
     }
   } catch (error) {
-    console.error("Error sending FCM token to backend:", error);
+    console.error("❌ Error sending FCM token to backend:", error);
   }
 }

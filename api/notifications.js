@@ -1,39 +1,80 @@
-// notifications.js
 const express = require("express");
 const admin = require("firebase-admin");
 const router = express.Router();
 
 const serviceAccount = require("./firebase/serviceAccountKey.json");
 
+// Initialize Firebase Admin SDK
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
+} else {
 }
+
+const firestore = admin.firestore();
+
+router.post("/save-fcm-token", async (req, res) => {
+  console.log("🔔 Save FCM token request received with body:", req.body);
+
+  const { email, fcmToken } = req.body;
+
+  if (!email || !fcmToken) {
+    console.warn("⚠️ Missing email or FCM token in request");
+    return res.status(400).send("Missing email or FCM token");
+  }
+
+  try {
+    await firestore
+      .collection("users")
+      .doc(email)
+      .set({ fcmToken }, { merge: true });
+
+    res.status(200).json({ success: true, message: "FCM token saved" });
+  } catch (error) {
+    console.error("❌ Error saving FCM token:", error);
+    res.status(500).send("Failed to save FCM token");
+  }
+});
 
 router.post("/sendToUser", async (req, res) => {
   const { userEmail, title, body } = req.body;
+
   if (!userEmail || !title || !body) {
+    console.warn("⚠️ Missing required fields in request");
     return res.status(400).send("Missing fields");
   }
 
-  // Fetch token from your database by userEmail
-  const userDoc = await firestore.collection("users").doc(userEmail).get();
-  if (!userDoc.exists) return res.status(404).send("User not found");
-
-  const token = userDoc.data().fcmToken;
-  if (!token) return res.status(400).send("User has no FCM token saved");
-
-  const message = {
-    token,
-    notification: { title, body },
-    android: { notification: { channelId: "default" } },
-  };
-
   try {
+    const userDoc = await firestore.collection("users").doc(userEmail).get();
+
+    if (!userDoc.exists) {
+      console.warn("❌ User not found in Firestore:", userEmail);
+      return res.status(404).send("User not found");
+    }
+
+    const token = userDoc.data().fcmToken;
+
+    if (!token) {
+      console.warn("❌ User has no FCM token saved:", userEmail);
+      return res.status(400).send("User has no FCM token saved");
+    }
+
+    const message = {
+      token,
+      notification: { title, body },
+      android: {
+        notification: {
+          channelId: "default", // Ensure this matches the one in your app
+        },
+      },
+    };
+
     const response = await admin.messaging().send(message);
-    res.send({ success: true, response });
+
+    res.json({ success: true, response });
   } catch (error) {
+    console.error("❌ Error sending notification:", error);
     res.status(500).send(error.message);
   }
 });

@@ -4,7 +4,7 @@ import {
   collection,
   doc,
   getDoc,
-  getFirestore
+  getFirestore,
 } from "@react-native-firebase/firestore";
 
 import Constants from "expo-constants";
@@ -21,6 +21,7 @@ import {
   StyleSheet,
   Switch,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -121,6 +122,12 @@ export default function SettingsScreen() {
       setLoading(false);
     }
   }
+
+  const logOut = async () => {
+    await auth.signOut();
+    ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
+    return;
+  };
 
   return (
     <View style={[styles.container, { paddingTop: 50 }]}>
@@ -261,11 +268,7 @@ export default function SettingsScreen() {
           icon="trash"
           onPress={() => Alert.alert("Delete Account Pressed")}
         />
-        <SettingItem
-          label="Log Out"
-          icon="exit"
-          onPress={() => Alert.alert("Log Out Pressed")}
-        />
+        <SettingItem label="Log Out" icon="exit" onPress={() => logOut()} />
       </ScrollView>
     </View>
   );

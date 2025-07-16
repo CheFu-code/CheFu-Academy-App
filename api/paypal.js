@@ -4,13 +4,9 @@ require("dotenv").config();
 const admin = require("firebase-admin");
 const serviceAccount = require("../key.json");
 
-console.log("🟡 Initializing Firebase Admin...");
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-
-console.log("✅ Firebase Admin initialized.");
 
 const router = express.Router();
 
@@ -20,7 +16,6 @@ const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 
 // Helper to get access token
 async function getAccessToken() {
-  console.log("🔑 Requesting PayPal access token...");
   const response = await axios({
     url: `${PAYPAL_API}/v1/oauth2/token`,
     method: "post",
@@ -28,7 +23,6 @@ async function getAccessToken() {
     auth: { username: CLIENT_ID, password: CLIENT_SECRET },
     data: "grant_type=client_credentials",
   });
-  console.log("🔑 Access token received.");
   return response.data.access_token;
 }
 
@@ -36,8 +30,6 @@ async function getAccessToken() {
 router.post("/create-order", async (req, res) => {
   try {
     const { amount, return_url, cancel_url } = req.body;
-
-    console.log("🟢 Create order request received:", { amount });
 
     const accessToken = await getAccessToken();
 
@@ -56,7 +48,6 @@ router.post("/create-order", async (req, res) => {
       }
     );
 
-    console.log("🟢 Order created:", response.data);
     res.json(response.data);
   } catch (error) {
     console.error("❌ Create order error:", error.response?.data || error);
@@ -68,11 +59,6 @@ router.post("/create-order", async (req, res) => {
 router.post("/capture-order", async (req, res) => {
   try {
     const { orderID, email, planType } = req.body;
-    console.log("🟡 Capture order request received:", {
-      orderID,
-      email,
-      planType,
-    });
 
     if (!orderID || !email || !planType) {
       console.warn("⚠️ Missing required fields:", { orderID, email, planType });
@@ -83,7 +69,6 @@ router.post("/capture-order", async (req, res) => {
 
     const accessToken = await getAccessToken();
 
-    console.log(`➡️ Capturing PayPal order: ${orderID}`);
     const captureResponse = await axios.post(
       `${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`,
       {},
