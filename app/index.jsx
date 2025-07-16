@@ -17,7 +17,6 @@ import {
   View,
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
-import "../app/firebase-background-handler";
 import { auth, db } from "../config/fireConfig";
 import { Colors } from "../constant/Colors";
 

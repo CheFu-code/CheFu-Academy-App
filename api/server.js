@@ -5,14 +5,14 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 
 const paypalRoutes = require("./paypal");
-const notificationRoutes = require("./notifications");
+// const notificationRoutes = require("./notifications");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/paypal", paypalRoutes);
-app.use("./notifications", notificationRoutes);
+// app.use("./notifications", notificationRoutes);
 
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
