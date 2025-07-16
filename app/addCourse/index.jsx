@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import firestore, { doc, setDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { doc, setDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   Alert,
@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Button from "../../component/Shared/Button";
 import { generateCourse, generateTopics } from "../../config/AiModel";
-import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import Prompt from "../../constant/Prompt";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -26,6 +25,7 @@ export default function AddCourse() {
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState([]);
   const router = useRouter();
+  const db=firestore()
 
   const generateTopic = async () => {
     setLoading(true);

@@ -1,3 +1,5 @@
+import auth from "@react-native-firebase/auth";
+import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
@@ -15,7 +17,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
@@ -97,6 +98,7 @@ const SignUp = () => {
 
   const SaveUser = async (user) => {
     try {
+      const db = getFirestore();
       const data = {
         fullname: fullName,
         email: email.trim(),
@@ -107,7 +109,8 @@ const SignUp = () => {
         uid: user.uid,
         emailPreferences: DEFAULT_PREFS,
       };
-      await db.collection("users").doc(email.trim()).set(data);
+
+      await setDoc(doc(db, "users", email.trim()), data);
 
       setUserDetail(data);
       router.push("/home");

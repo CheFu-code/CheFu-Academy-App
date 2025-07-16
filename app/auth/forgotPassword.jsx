@@ -1,6 +1,6 @@
+import auth from "@react-native-firebase/auth";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 
 const ForgotPassword = () => {
@@ -22,26 +21,19 @@ const ForgotPassword = () => {
   const handleReset = () => {
     const cleanEmail = email.trim().toLowerCase();
 
-    console.log("[DEBUG] Attempting to reset password for:", cleanEmail);
-
     if (!cleanEmail) {
       Alert.alert("Enter Email", "Please enter your email address.");
-      console.warn("[DEBUG] No email entered.");
       return;
     }
 
-    if (loading) {
-      console.log("[DEBUG] Already loading, skipping duplicate request.");
-      return;
-    }
+    if (loading) return;
 
     setLoading(true);
-    console.log("[DEBUG] Sending reset email...");
 
-    sendPasswordResetEmail(auth, cleanEmail)
+    auth()
+      .sendPasswordResetEmail(cleanEmail)
       .then(() => {
         setLoading(false);
-        console.log("[DEBUG] Password reset email sent successfully.");
         Alert.alert(
           "Check Your Email",
           `Password reset link sent to ${cleanEmail}.`
@@ -51,31 +43,25 @@ const ForgotPassword = () => {
       .catch((error) => {
         setLoading(false);
         Sentry.captureException(error);
-        console.error("Error sending password reset email:", error);
-        Alert.alert("Error", error.message);
 
         switch (error.code) {
           case "auth/user-not-found":
-            console.warn("[DEBUG] No user found with this email.");
             Alert.alert("User Not Found", "No user found with this email.");
             break;
           case "auth/invalid-email":
-            console.warn("[DEBUG] Invalid email format.");
             Alert.alert("Invalid Email", "The email address is not valid.");
             break;
           case "auth/missing-email":
-            console.warn("[DEBUG] Missing email.");
             Alert.alert("Missing Email", "Please enter your email address.");
             break;
           case "auth/network-request-failed":
-            console.warn("[DEBUG] Network error occurred.");
             Alert.alert(
               "Network Error",
               "Please check your internet connection."
             );
             break;
           default:
-            console.warn("[DEBUG] Unhandled error:", error.code);
+            Alert.alert("Error", error.message);
         }
       });
   };
@@ -94,23 +80,17 @@ const ForgotPassword = () => {
         autoCapitalize="none"
       />
       <TouchableOpacity
-        disabled={loading || !email}
+        disabled={loading || !email.trim()}
         onPress={handleReset}
-        style={styles.button}
+        style={[styles.button, { opacity: loading || !email.trim() ? 0.5 : 1 }]}
       >
         {loading ? (
           <ActivityIndicator color={"white"} />
         ) : (
-          <Text
-            style={[
-              styles.buttonText,
-              { opacity: loading || !email ? 0.5 : 1 },
-            ]}
-          >
-            Send Reset Link
-          </Text>
+          <Text style={styles.buttonText}>Send Reset Link</Text>
         )}
       </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => {
           console.log("[DEBUG] Cancel button pressed, navigating back.");

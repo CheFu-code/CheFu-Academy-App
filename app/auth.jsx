@@ -1,8 +1,9 @@
 import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,7 +17,6 @@ import {
   View,
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
-import { auth, db } from "../config/fireConfig";
 import { Colors } from "../constant/Colors";
 
 export default function Index() {
@@ -40,7 +40,6 @@ export default function Index() {
         if (storedUser) {
           const userData = JSON.parse(storedUser);
           if (userData) {
-            // <-- Add this check
             setUserDetail(userData);
             setLoading(false);
             router.replace("/(tabs)/home");
@@ -56,19 +55,17 @@ export default function Index() {
 
               await user.reload(); // refresh user data
 
-              const userRef = doc(db, "users", user.email);
+              const userRef = firestore().collection("users").doc(user.email);
+              const result = await userRef.get();
 
-              const result = await getDoc(userRef);
-
-              if (result.exists()) {
+              if (result.exists) {
                 const userData = result.data();
 
                 if (userData) {
-                  // <-- Add this check
                   console.log("Fetched user data from Firestore:", userData);
 
                   if (user.emailVerified && !userData.isVerified) {
-                    await updateDoc(userRef, {
+                    await userRef.update({
                       isVerified: true,
                       updatedAt: new Date(),
                     });
@@ -84,9 +81,7 @@ export default function Index() {
                     JSON.stringify(userData)
                   );
                 } else {
-                  console.warn(
-                    "User data from Firestore is undefined or null."
-                  );
+                  console.warn("User data from Firestore is undefined or null.");
                 }
 
                 setLoading(false);

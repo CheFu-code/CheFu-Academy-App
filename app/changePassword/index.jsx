@@ -1,13 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
+import auth from "@react-native-firebase/auth";
+import * as Sentry from "@sentry/react-native";
 import { router } from "expo-router";
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updatePassword,
-} from "firebase/auth";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -15,11 +14,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 
 export default function ChangePassword() {
-  const user = auth.currentUser;
+  const user = auth().currentUser;
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -33,7 +31,6 @@ export default function ChangePassword() {
 
   const validatePasswordStrength = (password) => {
     const regex = /^.{6,}$/;
-
     return regex.test(password);
   };
 
@@ -53,15 +50,24 @@ export default function ChangePassword() {
       );
     }
 
+    if (!user) {
+      return ToastAndroid.show(
+        "Session expired. Please sign in again.",
+        ToastAndroid.SHORT
+      );
+    }
+
     setLoading(true);
 
     try {
-      const credential = EmailAuthProvider.credential(
+      const credential = auth.EmailAuthProvider.credential(
         user.email,
         currentPassword
       );
-      await reauthenticateWithCredential(user, credential);
-      await updatePassword(user, newPassword);
+
+      await user.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+
       ToastAndroid.show("Password updated!", ToastAndroid.SHORT);
       setCurrentPassword("");
       setNewPassword("");
@@ -69,8 +75,8 @@ export default function ChangePassword() {
       router.back();
     } catch (err) {
       console.error(err);
+      Sentry.captureException(err);
 
-      // Specific error handling
       if (err?.code === "auth/invalid-credential") {
         ToastAndroid.show(
           "Incorrect password. Please try again.",
@@ -111,35 +117,40 @@ export default function ChangePassword() {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Change Password</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <View style={styles.container}>
+        <Text style={styles.heading}>Change Password</Text>
 
-      {renderInput(
-        "Current Password",
-        currentPassword,
-        setCurrentPassword,
-        "current"
-      )}
-      {renderInput("New Password", newPassword, setNewPassword, "new")}
-      {renderInput(
-        "Confirm New Password",
-        confirmPassword,
-        setConfirmPassword,
-        "confirm"
-      )}
-
-      <TouchableOpacity
-        style={[styles.button, { opacity: loading ? 0.5 : 1 }]}
-        onPress={handleChangePassword}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Update Password</Text>
+        {renderInput(
+          "Current Password",
+          currentPassword,
+          setCurrentPassword,
+          "current"
         )}
-      </TouchableOpacity>
-    </View>
+        {renderInput("New Password", newPassword, setNewPassword, "new")}
+        {renderInput(
+          "Confirm New Password",
+          confirmPassword,
+          setConfirmPassword,
+          "confirm"
+        )}
+
+        <TouchableOpacity
+          style={[styles.button, { opacity: loading ? 0.5 : 1 }]}
+          onPress={handleChangePassword}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Update Password</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 

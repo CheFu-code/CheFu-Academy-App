@@ -1,9 +1,14 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { getAuth } from "@react-native-firebase/auth";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+} from "@react-native-firebase/firestore";
 import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
-import { doc, getDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -17,7 +22,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 
 export default function SettingsScreen() {
@@ -27,6 +31,10 @@ export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState(null);
+
+  const db = getFirestore();
+  const auth = getAuth();
+  const router = useRouter();
 
   const options = ["Report a bug"];
 
@@ -56,7 +64,8 @@ export default function SettingsScreen() {
 
       const userData = docSnap.data();
       const json = JSON.stringify(userData, null, 2);
-      const filename = `${FileSystem.documentDirectory}userdata_${user.email}.json`;
+      const safeEmail = user.email.replace(/[^a-zA-Z0-9]/g, "_");
+      const filename = `${FileSystem.documentDirectory}userdata_${safeEmail}.json`;
 
       await FileSystem.writeAsStringAsync(filename, json, {
         encoding: FileSystem.EncodingType.UTF8,
@@ -108,13 +117,6 @@ export default function SettingsScreen() {
           ))}
         </View>
       )}
-
-      {/* Selected option (optional)
-      {selected && (
-        <Text style={{ color: "white", marginTop: 10 }}>
-          Selected: {selected}
-        </Text>
-      )} */}
 
       {/* Settings List */}
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
