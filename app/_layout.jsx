@@ -5,6 +5,7 @@ import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
+import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission"; // ✅ this path is fine
 import { UserDetailContext } from "../context/UserDetailContext";
 
@@ -29,6 +30,7 @@ export default Sentry.wrap(function RootLayout() {
   const [fontsLoaded] = useFonts({
     outfit: require("../assets/fonts/Outfit-Regular.ttf"),
     "outfit-bold": require("../assets/fonts/Outfit-Bold.ttf"),
+    michroma: require("../assets/fonts/Michroma-Regular.ttf"),
   });
 
   // 🔔 FCM Setup

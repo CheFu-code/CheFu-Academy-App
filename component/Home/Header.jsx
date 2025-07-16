@@ -12,7 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../../config/fireConfig";
+// import { auth } from "../../config/fireConfig";
+import auth from "@react-native-firebase/auth";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
@@ -26,7 +27,7 @@ export default function Header() {
 
     if (option === "Logout") {
       try {
-        await auth.signOut();
+        await auth().signOut();
         await AsyncStorage.removeItem("userDetail");
         setUserDetail(null);
         ToastAndroid.show("Logged out successfully", ToastAndroid.SHORT);
