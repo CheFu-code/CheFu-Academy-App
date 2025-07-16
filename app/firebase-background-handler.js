@@ -1,11 +1,18 @@
 // app/firebase-background-handler.js
-import { getMessaging, setBackgroundMessageHandler } from '@react-native-firebase/messaging';
-import '../config/fireConfig'; // Optional if using compat SDK for auth/firestore
+import notifee from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
 
 console.log("🟢 Background handler loaded");
 
-setBackgroundMessageHandler(getMessaging(), async (remoteMessage) => {
+messaging().setBackgroundMessageHandler(async (remoteMessage) => {
   console.log("🔕 Background notification:", remoteMessage);
 
-  // Optional: show local notification here using expo-notifications if needed
+  // Show a local notification when a message arrives in background
+  await notifee.displayNotification({
+    title: remoteMessage.notification?.title || 'Background Notification',
+    body: remoteMessage.notification?.body || '',
+    android: {
+      channelId: 'default', // ensure you created this channel already
+    },
+  });
 });

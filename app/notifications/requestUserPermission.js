@@ -1,4 +1,4 @@
-// notifications/requestUserPermission.js
+import auth from "@react-native-firebase/auth";
 import {
   AuthorizationStatus,
   getMessaging,
@@ -8,7 +8,6 @@ import {
 import { Alert } from "react-native";
 
 export async function requestUserPermission() {
-
   try {
     const authStatus = await requestPermission(getMessaging());
 
@@ -19,6 +18,10 @@ export async function requestUserPermission() {
     if (enabled) {
       const token = await getToken(getMessaging());
       console.log("📲 FCM Token:", token);
+
+      // Send token to backend here
+      await sendTokenToBackend(token);
+
       return token;
     } else {
       console.warn("❌ Notification permission denied.");
@@ -27,5 +30,35 @@ export async function requestUserPermission() {
   } catch (error) {
     console.error("❌ Failed to request notification permission:", error);
     Alert.alert("Error", "Failed to request notification permission.");
+  }
+}
+
+async function sendTokenToBackend(token) {
+  try {
+    const user = auth().currentUser;
+    if (!user?.email) {
+      console.warn("User not logged in, cannot send FCM token");
+      return;
+    }
+
+    // Replace this with your backend API URL
+    const response = await fetch("https://chefu-academy-tmzx.onrender.com/api/save-fcm-token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: user.email,
+        fcmToken: token,
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("Failed to save FCM token on backend");
+    } else {
+      console.log("FCM token saved on backend successfully");
+    }
+  } catch (error) {
+    console.error("Error sending FCM token to backend:", error);
   }
 }

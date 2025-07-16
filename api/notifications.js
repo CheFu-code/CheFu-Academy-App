@@ -1,26 +1,41 @@
+// notifications.js
+const express = require("express");
 const admin = require("firebase-admin");
+const router = express.Router();
 
 const serviceAccount = require("./firebase/serviceAccountKey.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+
+router.post("/sendToUser", async (req, res) => {
+  const { userEmail, title, body } = req.body;
+  if (!userEmail || !title || !body) {
+    return res.status(400).send("Missing fields");
+  }
+
+  // Fetch token from your database by userEmail
+  const userDoc = await firestore.collection("users").doc(userEmail).get();
+  if (!userDoc.exists) return res.status(404).send("User not found");
+
+  const token = userDoc.data().fcmToken;
+  if (!token) return res.status(400).send("User has no FCM token saved");
+
+  const message = {
+    token,
+    notification: { title, body },
+    android: { notification: { channelId: "default" } },
+  };
+
+  try {
+    const response = await admin.messaging().send(message);
+    res.send({ success: true, response });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
-const message = {
-  token:
-    "cKe2PSr3QMWV3E2GMQJfle:APA91bFBReLkwcyXIfLNKCGrfdmqYWW9fw60QmQBkG-rTnjfSk82y3Cia_Mgzw9okvMKrakFX4dyudoUAVhyV7BBHKOuhAmOrMbFF1f19KwuYvqenonS3zQ",
-  notification: {
-    title: "Hello!",
-    body: "This is a test notification from FCM v1 API.",
-  },
-};
-
-admin
-  .messaging()
-  .send(message)
-  .then((response) => {
-    console.log("Successfully sent message:", response);
-  })
-  .catch((error) => {
-    console.log("Error sending message:", error);
-  });
+module.exports = router;
