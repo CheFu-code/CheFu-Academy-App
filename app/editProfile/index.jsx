@@ -18,8 +18,8 @@ import CountryPicker from "react-native-country-picker-modal";
 import { Colors } from "../../constant/Colors";
 
 // Firebase
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../config/fireConfig";
+import auth from "@react-native-firebase/auth";
+import { doc, getDoc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
 
 export default function EditProfile() {
   const [fullname, setFullname] = useState("");
@@ -29,6 +29,7 @@ export default function EditProfile() {
 
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+  const db =getFirestore()
 
   useEffect(() => {
     const fetchData = async () => {

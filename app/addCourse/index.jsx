@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import firestore, { doc, setDoc } from "@react-native-firebase/firestore";
+import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
@@ -25,7 +25,7 @@ export default function AddCourse() {
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState([]);
   const router = useRouter();
-  const db=firestore()
+  const db = getFirestore();
 
   const generateTopic = async () => {
     setLoading(true);
@@ -38,6 +38,7 @@ export default function AddCourse() {
           "API Key Missing",
           "Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file and restart Expo."
         );
+        setLoading(false);
         return;
       }
       const promptText = userInput + Prompt.IDEA;
@@ -70,7 +71,6 @@ export default function AddCourse() {
           );
         }
       }
-      // console.log(topicIdea);
     } catch (error) {
       console.error("Error generating topic:", error);
       Alert.alert("Error", error.message || "Failed to generate topic.");
@@ -146,15 +146,19 @@ export default function AddCourse() {
         return;
       }
 
-      coursesArray.forEach(async (course) => {
-        const docId = Date.now().toString();
-        await setDoc(doc(db, "course", docId), {
-          ...course,
-          createdOn: new Date(),
-          createdBy: userDetail?.email,
-          docId: docId,
-        });
-      });
+      // Await all course writes before continuing
+      await Promise.all(
+        coursesArray.map(async (course) => {
+          const docId = Date.now().toString();
+          await setDoc(doc(db, "course", docId), {
+            ...course,
+            createdOn: new Date(),
+            createdBy: userDetail?.email,
+            docId: docId,
+          });
+        })
+      );
+
       router.push("/(tabs)/home");
       setLoading(false);
     } catch (e) {
