@@ -13,6 +13,7 @@
     "ellipsize",
     "firebaseapp",
     "firestore",
+    "genai",
     "gradlew",
     "HCCPEMB",
     "IZOYY",
@@ -20,6 +21,7 @@
     "prebuild",
     "Pressable",
     "rgba",
+    "scikit",
     "Skus"
   ]
 }

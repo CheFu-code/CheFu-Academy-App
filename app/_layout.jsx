@@ -1,10 +1,11 @@
+import messaging from '@react-native-firebase/messaging';
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import { UserDetailContext } from "../context/UserDetailContext";
-
 
 Sentry.init({
   dsn: "https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840",
@@ -27,6 +28,14 @@ export default Sentry.wrap(function RootLayout() {
     outfit: require("./../assets/fonts/Outfit-Regular.ttf"),
     "outfit-bold": require("./../assets/fonts/Outfit-Bold.ttf"),
   });
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      Alert.alert("New Notification", remoteMessage.notification?.body);
+    });
+
+    return unsubscribe;
+  }, []);
 
   // Handle real-time deep links
   useEffect(() => {
