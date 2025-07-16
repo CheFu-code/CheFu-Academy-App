@@ -6,14 +6,14 @@ require("dotenv").config();
 
 const paypalRoutes = require("./paypal");
 const notificationRoutes = require("./notifications");
-app.use("./notifications", notificationRoutes);
-
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/paypal", paypalRoutes);
+app.use("./notifications", notificationRoutes);
+
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });
