@@ -1,42 +1,26 @@
-// const express = require("express");
-// const admin = require("firebase-admin");
-// const router = express.Router();
-// const path = require("path");
+const admin = require("firebase-admin");
 
-// // Initialize Firebase Admin only once
-// if (!admin.apps.length) {
-//   const serviceAccount = require("../firebase/serviceAccountKey.json");
+const serviceAccount = require("./firebase/serviceAccountKey.json");
 
-//   admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-//   });
-// }
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
-// // POST /api/notifications
-// router.post("/", async (req, res) => {
-//   const { token, title, body, data } = req.body;
+const message = {
+  token:
+    "cKe2PSr3QMWV3E2GMQJfle:APA91bFBReLkwcyXIfLNKCGrfdmqYWW9fw60QmQBkG-rTnjfSk82y3Cia_Mgzw9okvMKrakFX4dyudoUAVhyV7BBHKOuhAmOrMbFF1f19KwuYvqenonS3zQ",
+  notification: {
+    title: "Hello!",
+    body: "This is a test notification from FCM v1 API.",
+  },
+};
 
-//   if (!token || !title || !body) {
-//     return res.status(400).json({ error: "Missing required fields" });
-//   }
-
-//   const message = {
-//     token,
-//     notification: {
-//       title,
-//       body,
-//     },
-//     data: data || {}, // Optional payload
-//   };
-
-//   try {
-//     const response = await admin.messaging().send(message);
-//     console.log("✅ Notification sent:", response);
-//     res.json({ success: true, response });
-//   } catch (error) {
-//     console.error("❌ FCM send error:", error);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
-
-// module.exports = router;
+admin
+  .messaging()
+  .send(message)
+  .then((response) => {
+    console.log("Successfully sent message:", response);
+  })
+  .catch((error) => {
+    console.log("Error sending message:", error);
+  });

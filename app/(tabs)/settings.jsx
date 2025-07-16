@@ -1,15 +1,17 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import {
+  collection,
   doc,
   getDoc,
-  getFirestore,
+  getFirestore
 } from "@react-native-firebase/firestore";
+
 import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -38,9 +40,45 @@ export default function SettingsScreen() {
 
   const options = ["Report a bug"];
 
-  const toggleSetting = (name, stateSetter, current) => {
-    stateSetter(!current);
-    Alert.alert(`${name} turned ${!current ? "on" : "off"}`);
+  useEffect(() => {
+    const fetchNotificationSetting = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const docSnap = await db.collection("users").doc(user.email).get();
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          if (typeof data.notifications === "boolean") {
+            setNotifications(data.notifications);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch notification setting", error);
+      }
+    };
+
+    fetchNotificationSetting();
+  }, []);
+
+  const toggleSetting = async (name, stateSetter, current) => {
+    const newValue = !current;
+    stateSetter(newValue);
+    Alert.alert(`${name} turned ${newValue ? "on" : "off"}`);
+
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userRef = doc(collection(db, "users"), user.email); // ✅
+
+      await userRef.update({
+        notifications: newValue,
+      });
+    } catch (error) {
+      console.error("Failed to update setting:", error);
+      Alert.alert("Error", "Failed to save setting.");
+    }
   };
 
   async function exportUserData() {

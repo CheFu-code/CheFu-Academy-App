@@ -1,14 +1,15 @@
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
 
+import notifee from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
 import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission"; // ✅ this path is fine
 import { UserDetailContext } from "../context/UserDetailContext";
+
 
 // ✅ Sentry Init
 Sentry.init({
@@ -42,11 +43,24 @@ export default Sentry.wrap(function RootLayout() {
       }
     });
 
+    // Create Android channel on mount (required for Android)
+    async function createChannel() {
+      await notifee.createChannel({
+        id: "default",
+        name: "Default Channel",
+      });
+    }
+    createChannel();
+
     const unsubscribe = onMessage(getMessaging(), async (remoteMessage) => {
-      Alert.alert(
-        remoteMessage.notification?.title ?? "Notification",
-        remoteMessage.notification?.body ?? ""
-      );
+      // Show a system notification instead of alert
+      await notifee.displayNotification({
+        title: remoteMessage.notification?.title || "Notification",
+        body: remoteMessage.notification?.body || "",
+        android: {
+          channelId: "default",
+        },
+      });
     });
 
     return () => {
@@ -69,7 +83,6 @@ export default Sentry.wrap(function RootLayout() {
     Linking.getInitialURL().then((url) => {
       if (url) {
         handleDeepLink(url);
-      } else {
       }
     });
   }, []);
