@@ -5,6 +5,9 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 
 const paypalRoutes = require("./paypal");
+const notificationRoutes = require("./notifications");
+app.use("./notifications", notificationRoutes);
+
 
 const app = express();
 app.use(cors());
