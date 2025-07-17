@@ -34,15 +34,17 @@ router.post("/send-welcome", async (req, res) => {
     </p>
 
     <p style="font-size: 16px; line-height: 1.6;">
-      Open the CheFu Academy app on your device to explore your personalized dashboard, access curated courses, track your progress, and connect with a thriving learning community.
+      To get started, open the CheFu Academy app on your device. Your personalized dashboard, curated courses, and progress tracker are waiting for you!
     </p>
 
-    <p style="font-size: 16px; line-height: 1.6; text-align: center; margin: 30px 0;">
-      🚀 Launch the app and start learning today!
-    </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="chefuacademy://home" style="padding: 14px 24px; background: #1a73e8; color: white; font-size: 16px; border-radius: 6px; text-decoration: none; display: inline-block;">
+        🚀 Start Learning
+      </a>
+    </div>
 
     <p style="font-size: 16px; line-height: 1.6;">
-      Need help or have questions? We're here for you. Just reply to this email or visit our 
+      If you ever need help, our support team is just a tap away. Reply to this email or visit our 
       <a href="https://chefu-academy.com/support" style="color: #1a73e8; text-decoration: none;">Support Center</a>.
     </p>
 
@@ -50,7 +52,7 @@ router.post("/send-welcome", async (req, res) => {
 
     <p style="font-size: 14px; color: #888;">
       Welcome again, and happy learning!<br />
-      — The CheFu Inc. Team
+      — CheFu Inc. Team
     </p>
   </div>
 `,
