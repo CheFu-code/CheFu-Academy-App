@@ -1,5 +1,6 @@
 const express = require("express");
 const axios = require("axios");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 const admin = require("firebase-admin");
 const serviceAccount = require("../key.json");
@@ -13,6 +14,15 @@ const router = express.Router();
 const PAYPAL_API = "https://api-m.sandbox.paypal.com"; // Sandbox
 const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
+
+// Nodemailer transporter setup
+const transporter = nodemailer.createTransport({
+  service: "gmail", // or another SMTP service
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 // Helper to get access token
 async function getAccessToken() {
@@ -39,8 +49,8 @@ router.post("/create-order", async (req, res) => {
         intent: "CAPTURE",
         purchase_units: [{ amount: { currency_code: "USD", value: amount } }],
         application_context: {
-          return_url: return_url || "chefu-academy://subscription/success", // ✅ fallback
-          cancel_url: cancel_url || "chefu-academy://subscription/cancel", // ✅ fallback
+          return_url: return_url || "chefu-academy://subscription/success", // fallback
+          cancel_url: cancel_url || "chefu-academy://subscription/cancel", // fallback
         },
       },
       {
@@ -55,7 +65,7 @@ router.post("/create-order", async (req, res) => {
   }
 });
 
-// Capture payment AND write to Firestore
+// Capture payment AND write to Firestore + send confirmation email
 router.post("/capture-order", async (req, res) => {
   try {
     const { orderID, email, planType } = req.body;
@@ -117,8 +127,23 @@ router.post("/capture-order", async (req, res) => {
       { merge: true }
     );
 
+    // Send confirmation email
+    const mailOptions = {
+      from: `"CheFu Academy" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: `Subscription Confirmed - ${planType} Plan`,
+      html: `
+        <h1>Thank you for subscribing to CheFu Academy!</h1>
+        <p>Your subscription to the <b>${planType}</b> plan has been successfully processed.</p>
+        <p>Member Until: ${memberUntil.toDateString()}</p>
+        <p>Happy learning!</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
     res.json({
-      message: "Capture successful",
+      message: "Capture successful and confirmation email sent",
       details,
       member: true,
       planType,
