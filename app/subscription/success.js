@@ -124,7 +124,7 @@ export default function SuccessScreen() {
   useEffect(() => {
     if (receipt) {
       if (countdown === 0) {
-        router.replace("/(tabs)/profile");
+        router.replace("/subscriptionAndBilling");
       }
       const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
       return () => clearTimeout(timer);

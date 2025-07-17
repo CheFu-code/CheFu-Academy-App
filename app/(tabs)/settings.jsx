@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -29,6 +29,7 @@ import {
   View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
+import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
@@ -36,6 +37,7 @@ export default function SettingsScreen() {
   const [showVersion, setShowVersion] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { userDetail } = useContext(UserDetailContext);
 
   const db = getFirestore();
   const auth = getAuth();
@@ -321,11 +323,13 @@ export default function SettingsScreen() {
         />
 
         <Text style={styles.heading}>Account</Text>
-        <SettingItem
-          label="Subscription & Billing"
-          icon="card-outline"
-          onPress={() => router.push("/subscriptionAndBilling")}
-        />
+        {userDetail?.member === true && (
+          <SettingItem
+            label="Subscription & Billing"
+            icon="card-outline"
+            onPress={() => router.push("/subscriptionAndBilling")}
+          />
+        )}
 
         <SettingItem label="Log Out" icon="exit" onPress={() => logOut()} />
       </ScrollView>

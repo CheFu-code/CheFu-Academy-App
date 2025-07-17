@@ -61,6 +61,7 @@
     "react-native": "^0.79.5",
     "react-native-country-picker-modal": "^2.0.0",
     "react-native-flip-card": "^3.5.7",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-google-mobile-ads": "^15.4.0",
     "react-native-immersive": "^2.0.0",
