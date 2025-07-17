@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
   icon: {
     marginTop: 30,
     backgroundColor: Colors.GRAY,
-    padding: 5,
+    padding: 4,
     borderRadius: 20,
     color: "white",
   },

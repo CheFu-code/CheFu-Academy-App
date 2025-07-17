@@ -1,7 +1,8 @@
+globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
+globalThis.RNFB_MODULAR_DEPRECATION_STRICT_MODE = true;
+
 import notifee from "@notifee/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
-import { getMessaging, onMessage } from "@react-native-firebase/messaging";
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
@@ -12,6 +13,10 @@ import { ActivityIndicator, Alert, Text, View } from "react-native";
 import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission";
 import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNotification";
+
+import { getApp } from "@react-native-firebase/app";
+import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
+import { getMessaging, onMessage } from "@react-native-firebase/messaging";
 import { UserDetailContext } from "../context/UserDetailContext";
 
 // ✅ Sentry Init
@@ -27,13 +32,13 @@ Sentry.init({
 });
 
 let lastHandledOrderID = null;
+let alreadyRedirected = false;
 
 export default Sentry.wrap(function RootLayout() {
   const [userDetail, setUserDetail] = useState();
   const [authChecked, setAuthChecked] = useState(false);
   const [authSuccess, setAuthSuccess] = useState(false);
   const router = useRouter();
-  const auth = getAuth();
 
   const [fontsLoaded] = useFonts({
     outfit: require("../assets/fonts/Outfit-Regular.ttf"),
@@ -82,14 +87,16 @@ export default Sentry.wrap(function RootLayout() {
 
   // ✅ Global Auth Redirect
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
+    const unsubscribe = onAuthStateChanged(getAuth(getApp()), (user) => {
+      console.log("AuthState:", user?.uid || "none");
+      if (authChecked && authSuccess && !user && !alreadyRedirected) {
+        alreadyRedirected = true;
         console.warn("⚠️ No authenticated user. Redirecting to sign-in...");
         router.replace("/auth/signIn");
       }
     });
     return unsubscribe;
-  }, []);
+  }, [authChecked, authSuccess]);
 
   // ✅ Notifications Setup
   useEffect(() => {
@@ -115,13 +122,16 @@ export default Sentry.wrap(function RootLayout() {
 
     createNotificationSetup();
 
-    const unsubscribe = onMessage(getMessaging(), async (remoteMessage) => {
-      await notifee.displayNotification({
-        title: remoteMessage.notification?.title || "Notification",
-        body: remoteMessage.notification?.body || "",
-        android: { channelId: "default" },
-      });
-    });
+    const unsubscribe = onMessage(
+      getMessaging(getApp()),
+      async (remoteMessage) => {
+        await notifee.displayNotification({
+          title: remoteMessage.notification?.title || "Notification",
+          body: remoteMessage.notification?.body || "",
+          android: { channelId: "default" },
+        });
+      }
+    );
 
     return () => unsubscribe();
   }, []);

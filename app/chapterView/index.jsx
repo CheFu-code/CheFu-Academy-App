@@ -1,5 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard"; // Add this import at the top
+import {
+  arrayUnion, doc,
+  getDoc, getFirestore, updateDoc
+} from "@react-native-firebase/firestore";
+import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -17,7 +21,6 @@ import {
 import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 import * as Progress from "react-native-progress";
 import Button from "../../component/Shared/Button";
-import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 
 const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
@@ -25,8 +28,9 @@ const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
 export default function ChapterView() {
   const { chapterParams, docId, chapterIndex } = useLocalSearchParams();
   let chapters = { content: [] };
-  const [showFull, setShowFull] = useState(false); // ✅ Move this above
-  const maxLines = showFull ? undefined : 5; // ✅ Use it here after defining `showFull`
+  const [showFull, setShowFull] = useState(false);
+  const maxLines = showFull ? undefined : 5;
+  const db = getFirestore();
 
   if (
     typeof chapterParams === "string" &&
@@ -49,7 +53,7 @@ export default function ChapterView() {
   const router = useRouter();
 
   const [currentPage, setCurrentPage] = useState(0);
-  const GetProgress = (currentPage) => {
+  const getProgress = (currentPage) => {
     const percentage = currentPage / chapters?.content?.length;
     return percentage;
   };
@@ -153,7 +157,7 @@ export default function ChapterView() {
             // backgroundColor: Colors.GREEN,
             marginTop: 25,
           }}
-          progress={GetProgress(currentPage)}
+          progress={getProgress(currentPage)}
           width={Dimensions.get("screen").width * 0.7}
         />
       </View>

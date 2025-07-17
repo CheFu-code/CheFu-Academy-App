@@ -1,8 +1,12 @@
-import auth from "@react-native-firebase/auth";
-import firestore from "@react-native-firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+} from "@react-native-firebase/auth";
 
+import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
+
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -37,22 +41,25 @@ const SignUp = () => {
     security: true,
   };
 
+  const auth = getAuth();
+
   const CreateNewAccount = async () => {
     if (!fullName.trim() || !email.trim() || !password.trim()) {
       alert("All fields are required.");
       return;
     }
+
     setLoading(true);
 
     try {
-      const resp = await auth().createUserWithEmailAndPassword(
+      const resp = await createUserWithEmailAndPassword(
+        auth,
         email.trim(),
         password
       );
       const user = resp.user;
 
       await user.sendEmailVerification();
-
       await SaveUser(user);
 
       alert("Account created! Please check your email to verify your address.");
@@ -99,6 +106,7 @@ const SignUp = () => {
 
   const SaveUser = async (user) => {
     try {
+      const firestore = getFirestore();
       const data = {
         fullname: fullName,
         email: email.trim(),
@@ -110,7 +118,7 @@ const SignUp = () => {
         emailPreferences: DEFAULT_PREFS,
       };
 
-      await firestore().collection("users").doc(email.trim()).set(data);
+      await setDoc(doc(firestore, "users", email.trim()), data);
 
       setUserDetail(data);
 

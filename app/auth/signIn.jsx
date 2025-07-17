@@ -1,4 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
+import { getAuth } from "@react-native-firebase/auth";
+import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
@@ -19,7 +21,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
@@ -33,13 +34,17 @@ const SignIn = () => {
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const auth = getAuth();
+  const db = getFirestore();
+
   const SUPPORT_EMAIL = "kurisanimaluleke77@gmail.com";
 
   // UPDATED: changed param from uid to email to match firestore doc key usage
   const getUserDetail = async (email) => {
     try {
-      const userDoc = await db.collection("users").doc(email).get();
-      if (userDoc.exists) {
+      const userDocRef = doc(db, "users", email);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
         setUserDetail(userDoc.data());
       } else {
         console.warn("User data not found in Firestore.");
@@ -69,10 +74,7 @@ const SignIn = () => {
 
     setLoading(true);
     try {
-      const resp = await auth().signInWithEmailAndPassword(
-        cleanEmail,
-        password
-      );
+      const resp = await auth.signInWithEmailAndPassword(cleanEmail, password);
 
       await getUserDetail(resp.user.email); // Using email as Firestore doc key
       ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);

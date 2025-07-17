@@ -1,6 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import {
+  doc,
+  getFirestore,
+  setDoc,
+} from "@react-native-firebase/firestore"; // use RN Firebase consistently
 import { useRouter } from "expo-router";
-import { doc, setDoc } from "firebase/firestore";
 import { useContext, useState } from "react";
 import {
   ScrollView,
@@ -9,16 +13,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import Button from "../Shared/Button";
 
 export default function Intro({ course, enroll }) {
-  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [showFull, setShowFull] = useState(false);
   const maxLines = showFull ? undefined : 4;
+  const db = getFirestore();
+  const router = useRouter();
+
+  // Moved this here for clarity; no need to access course before definition
+  const isCourseCompleted =
+    Array.isArray(course?.completedChapter) &&
+    course?.completedChapter.length === course?.chapters?.length;
 
   const onEnrollCourse = async () => {
     // Check course completion and subscription status first
@@ -59,12 +69,6 @@ export default function Intro({ course, enroll }) {
       setLoading(false);
     }
   };
-
-  const isCourseCompleted =
-    Array.isArray(course?.completedChapter) &&
-    course?.completedChapter.length === course?.chapters?.length;
-
-  const router = useRouter();
   return (
     <View>
       <View
@@ -94,7 +98,7 @@ export default function Intro({ course, enroll }) {
           <Text
             style={{
               fontFamily: "outfit",
-              textDecoration: "underline",
+              textDecorationLine: "underline",
               fontSize: 18,
               color: Colors.WHITE,
             }}

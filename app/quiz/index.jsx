@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import firestore from "@react-native-firebase/firestore";
+import { doc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
+
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -47,14 +48,15 @@ export default function Quiz() {
   };
 
   const onQuizFinish = async () => {
-    const db = firestore();
+    const db = getFirestore(); // ✅ Modular usage
     setLoading(true);
+
     try {
-      await firestore().collection("course").doc(course?.docId).update({
+      const courseRef = doc(db, "course", course?.docId);
+      await updateDoc(courseRef, {
         quizResult: result,
       });
 
-      // Create interstitial ad instance
       const interstitial = InterstitialAd.createForAdRequest(
         INTERSTITIAL_AD_UNIT_ID,
         { requestNonPersonalizedAdsOnly: true }
@@ -66,7 +68,6 @@ export default function Quiz() {
         }
         if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
           unsubscribe();
-          // After ad closes/errors, navigate to summary
           router.replace({
             pathname: "/quiz/summary",
             params: {

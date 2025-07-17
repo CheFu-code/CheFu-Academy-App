@@ -1,3 +1,7 @@
+globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
+globalThis.RNFB_MODULAR_DEPRECATION_STRICT_MODE = true;
+
+
 import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {

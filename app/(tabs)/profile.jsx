@@ -5,7 +5,22 @@ import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 
-import firestore from "@react-native-firebase/firestore";
+import {
+  deleteUser,
+  EmailAuthProvider,
+  getAuth,
+  reauthenticateWithCredential,
+  sendEmailVerification,
+  signOut,
+} from "@react-native-firebase/auth";
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+} from "@react-native-firebase/firestore";
+
 import { useCallback, useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -24,7 +39,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { menuItems, url } from "../../constant/menuItems";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -40,6 +54,7 @@ export default function Profile() {
   const [refreshing, setRefreshing] = useState(false);
   const renderedMenuItems = menuItems(router, Linking, ToastAndroid, Colors);
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const auth = getAuth();
 
   useFocusEffect(
     useCallback(() => {
@@ -50,12 +65,12 @@ export default function Profile() {
   const refreshData = async () => {
     setRefreshing(true);
     try {
-      const userDocSnap = await db
-        .collection("users")
-        .doc(userDetail.email)
-        .get();
+      const firestore = getFirestore();
+      const userDocSnap = await getDoc(
+        doc(firestore, "users", userDetail.email)
+      );
 
-      if (userDocSnap.exists) {
+      if (userDocSnap.exists()) {
         setUserDetail(userDocSnap.data());
         ToastAndroid.show("Profile refreshed", ToastAndroid.SHORT);
       } else {
@@ -79,7 +94,7 @@ export default function Profile() {
         onPress: async () => {
           setLoading(true);
           try {
-            await auth().signOut();
+            await signOut(getAuth());
             await AsyncStorage.removeItem("userDetail");
             setUserDetail(null);
             router.replace("/auth/signIn");
@@ -104,7 +119,10 @@ export default function Profile() {
     if (!password) return;
 
     try {
-      const user = auth().currentUser;
+      const auth = getAuth();
+      const firestore = getFirestore();
+      const user = auth.currentUser;
+
       if (!user || !user.email) {
         ToastAndroid.show("No user is logged in", ToastAndroid.SHORT);
         return;
@@ -112,37 +130,31 @@ export default function Profile() {
 
       setLoading(true);
 
-      const credential = auth.EmailAuthProvider.credential(
-        user.email,
-        password
-      );
+      const credential = EmailAuthProvider.credential(user.email, password);
+      await reauthenticateWithCredential(user, credential);
 
-      await user.reauthenticateWithCredential(credential);
+      const userDocRef = doc(firestore, "users", user.email);
+      const userDocSnap = await getDoc(userDocRef);
 
-      const userDoc = await firestore()
-        .collection("users")
-        .doc(user.email)
-        .get();
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const deletedRef = doc(
+          firestore,
+          "deletedAccounts",
+          user.email + user.uid
+        );
+        await setDoc(deletedRef, {
+          ...userData,
+          email: user.email,
+          deletedAt: new Date(),
+        });
 
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-
-        const coll = user.email + user.uid;
-        await firestore()
-          .collection("deletedAccounts")
-          .doc(coll) // use UID here, not email
-          .set({
-            ...userData,
-            email: user.email, // keep email inside the data for reference
-            deletedAt: new Date(),
-          });
-
-        await firestore().collection("users").doc(user.email).delete();
+        await deleteDoc(userDocRef);
       } else {
         console.warn("⚠️ No user document found in Firestore for", user.email);
       }
 
-      await user.delete();
+      await deleteUser(user);
 
       await AsyncStorage.removeItem("userDetail");
       setUserDetail(null);
@@ -176,7 +188,7 @@ export default function Profile() {
   };
 
   const verify = async () => {
-    const user = auth().currentUser;
+    const user = getAuth().currentUser;
     if (user) {
       try {
         await sendEmailVerification(user);
