@@ -12,14 +12,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
-import * as Sharing from "expo-sharing";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Switch,
   Text,
@@ -161,6 +162,36 @@ export default function SettingsScreen() {
     return;
   };
 
+  const SHARE_MESSAGE = "Check out CheFu Academy App!";
+  const SHARE_URL = "https://chefu.academy";
+
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        title: SHARE_MESSAGE,
+        message:
+          Platform.OS === "ios"
+            ? `${SHARE_MESSAGE} ${SHARE_URL}`
+            : SHARE_MESSAGE,
+        url: Platform.OS === "ios" ? SHARE_URL : undefined,
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+          console.log("Shared with activity type:", result.activityType);
+        } else {
+          // shared
+          console.log("Shared successfully!");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+        console.log("Share dismissed");
+      }
+    } catch (error) {
+      Alert.alert("Sharing failed", error.message);
+    }
+  };
   return (
     <View style={[styles.container, { paddingTop: 50 }]}>
       {/* Header + Dropdown Button */}
@@ -286,20 +317,16 @@ export default function SettingsScreen() {
         <SettingItem
           label="Share CheFu Academy"
           icon="share-social"
-          onPress={() => Alert.alert("Share Pressed")}
+          onPress={() => handleShare()}
         />
 
         <Text style={styles.heading}>Account</Text>
         <SettingItem
-          label="Switch Account"
-          icon="repeat"
-          onPress={() => Alert.alert("Switch Account Pressed")}
+          label="Subscription & Billing"
+          icon="card-outline"
+          onPress={() => router.push("/subscriptionAndBilling")}
         />
-        <SettingItem
-          label="Delete Account"
-          icon="trash"
-          onPress={() => Alert.alert("Delete Account Pressed")}
-        />
+
         <SettingItem label="Log Out" icon="exit" onPress={() => logOut()} />
       </ScrollView>
     </View>
@@ -321,10 +348,19 @@ const SettingItem = ({
         <Ionicons
           name={icon}
           size={20}
-          color={Colors.PRIMARY}
+          color={label === "Log Out" ? "red" : Colors.PRIMARY}
           style={{ marginRight: 12 }}
         />
-        <Text style={styles.label}>{label}</Text>
+        <Text
+          style={[
+            styles.label,
+            label === "Log Out"
+              ? { color: "red", fontFamily: "outfit-bold" }
+              : null,
+          ]}
+        >
+          {label}
+        </Text>
       </View>
       {toggle ? (
         <Switch value={value} onValueChange={onToggle} />
