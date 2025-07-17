@@ -153,7 +153,16 @@ export default function SuccessScreen() {
         <Text style={{ color: "red", fontFamily: "outfit-bold", fontSize: 20 }}>
           Payment verification failed.
         </Text>
-        <Text>Please try again later.</Text>
+        <Text
+          style={{
+            color: "#fff",
+            marginBottom: 30,
+            fontFamily: "outfit",
+            fontSize: 18,
+          }}
+        >
+          Please try again later.
+        </Text>
 
         {loader ? (
           <ActivityIndicator size={"small"} color={Colors.PRIMARY} />
