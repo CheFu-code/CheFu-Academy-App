@@ -1,7 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuth } from "@react-native-firebase/auth";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+} from "@react-native-firebase/firestore";
 import { router } from "expo-router";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,7 +18,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, db } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 
 const PREF_KEY = "email_preferences";
@@ -25,22 +30,23 @@ const DEFAULT_PREFS = {
 };
 
 export default function EmailAlerts() {
-  const user = auth.currentUser;
   const [preferences, setPreferences] = useState(DEFAULT_PREFS);
   const [loading, setLoading] = useState(false);
 
-  // Load from AsyncStorage then Firestore
+  const auth = getAuth();
+  const db = getFirestore();
+
   useEffect(() => {
     const loadPreferences = async () => {
       try {
         const local = await AsyncStorage.getItem(PREF_KEY);
         if (local) {
           setPreferences(JSON.parse(local));
-        } else {
         }
 
+        const user = auth.currentUser;
         if (user && user.email) {
-          const ref = doc(db, "users", user.email); // Use email here as doc id
+          const ref = doc(db, "users", user.email);
           const snap = await getDoc(ref);
           if (snap.exists() && snap.data().emailPreferences) {
             setPreferences(snap.data().emailPreferences);
@@ -66,11 +72,11 @@ export default function EmailAlerts() {
 
     try {
       await AsyncStorage.setItem(PREF_KEY, JSON.stringify(updated));
-
+      const user = auth.currentUser;
       if (user && user.email) {
         const ref = doc(db, "users", user.email);
         await setDoc(ref, { emailPreferences: updated }, { merge: true });
-        console.log("Firestore update successful.");
+        console.log("Firestore update successful...");
       }
     } catch (err) {
       console.error("Save failed", err);
@@ -78,22 +84,21 @@ export default function EmailAlerts() {
     }
   };
 
-  // Reset preferences to default
   const resetToDefault = async () => {
     setPreferences(DEFAULT_PREFS);
     try {
       setLoading(true);
       await AsyncStorage.setItem(PREF_KEY, JSON.stringify(DEFAULT_PREFS));
+      const user = auth.currentUser;
       if (user && user.email) {
         const ref = doc(db, "users", user.email);
         await setDoc(ref, { emailPreferences: DEFAULT_PREFS }, { merge: true });
-
-        Alert.alert("Reset", "Preferences have been reset to default.");
+        Alert.alert("Success", "Preferences have been reset to default.");
       }
-      setLoading(false);
     } catch (err) {
       console.error("Reset failed", err);
       Alert.alert("Error", "Failed to reset preferences.");
+    } finally {
       setLoading(false);
     }
   };

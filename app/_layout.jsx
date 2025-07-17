@@ -1,6 +1,6 @@
 import notifee from "@notifee/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import auth from "@react-native-firebase/auth";
+import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
@@ -33,6 +33,7 @@ export default Sentry.wrap(function RootLayout() {
   const [authChecked, setAuthChecked] = useState(false);
   const [authSuccess, setAuthSuccess] = useState(false);
   const router = useRouter();
+  const auth = getAuth();
 
   const [fontsLoaded] = useFonts({
     outfit: require("../assets/fonts/Outfit-Regular.ttf"),
@@ -81,7 +82,7 @@ export default Sentry.wrap(function RootLayout() {
 
   // ✅ Global Auth Redirect
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         console.warn("⚠️ No authenticated user. Redirecting to sign-in...");
         router.replace("/auth/signIn");

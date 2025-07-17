@@ -10,6 +10,8 @@ import * as LocalAuthentication from "expo-local-authentication";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
+import * as Sharing from "expo-sharing";
+
 import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -139,7 +141,7 @@ export default function SettingsScreen() {
       const userData = docSnap.data();
       const json = JSON.stringify(userData, null, 2);
       const safeEmail = user.email.replace(/[^a-zA-Z0-9]/g, "_");
-      const filename = `${FileSystem.documentDirectory}userdata_${safeEmail}.json`;
+      const filename = `${FileSystem.documentDirectory}my_chefu_academy_data_${safeEmail}.json`;
 
       await FileSystem.writeAsStringAsync(filename, json, {
         encoding: FileSystem.EncodingType.UTF8,

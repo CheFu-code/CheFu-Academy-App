@@ -1,5 +1,6 @@
 import { Foundation, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuth } from "@react-native-firebase/auth";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../../config/fireConfig";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
@@ -20,6 +20,7 @@ export default function Header() {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
+  const auth = getAuth();
 
   const handleOption = async (option) => {
     setShowModal(false);

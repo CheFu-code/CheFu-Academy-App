@@ -16,6 +16,8 @@ import RNFS from "react-native-fs";
 import {
   ActivityIndicator,
   Alert,
+  PermissionsAndroid,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -30,12 +32,12 @@ export default function SubscriptionAndBilling() {
   const { userDetail } = useContext(UserDetailContext);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
 
-  const db = getFirestore(); // NEW
+  const db = getFirestore();
 
   const getUserPayments = async (email) => {
     const q = query(collection(db, "payments"), where("email", "==", email));
-
     const snapshot = await getDocs(q);
     const payments = [];
     snapshot.forEach((doc) => {
@@ -46,18 +48,43 @@ export default function SubscriptionAndBilling() {
 
   useEffect(() => {
     const fetchPayments = async () => {
-      const data = await getUserPayments(userDetail.email); // from context
+      const data = await getUserPayments(userDetail.email);
       setPaymentHistory(data);
     };
-
     fetchPayments();
   }, []);
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
+  async function requestStoragePermission() {
+    if (Platform.OS === "android" && Platform.Version < 33) {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: "Storage Permission Required",
+          message: "This app needs access to your storage to save receipts",
+          buttonPositive: "OK",
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    // For Android 13+ and iOS, permission is not required or handled differently
+    return true;
+  }
+
   const downloadTransaction = async (payment, userDetail) => {
-    setLoading(true);
+    setLoading2(true);
     try {
+      const hasPermission = await requestStoragePermission();
+      if (!hasPermission) {
+        Alert.alert(
+          "Permission Denied",
+          "Cannot save receipt without storage permission."
+        );
+        setLoading2(false);
+        return;
+      }
+
       const html = `
       <html>
         <head>
@@ -187,26 +214,34 @@ export default function SubscriptionAndBilling() {
       </html>
     `;
 
-      // Generate the PDF (temporary uri)
       const { uri } = await Print.printToFileAsync({ html });
 
-      // Construct destination path in Downloads folder (Android)
-      const fileName = `chefu_receipt_${payment.orderID || Date.now()}.pdf`;
-      const downloadPath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
+      if (Platform.OS === "android") {
+        const fileName = `CheFu_Academy_subscription_receipt_${
+          payment.orderID || Date.now()
+        }.pdf`;
+        const downloadPath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
+        await RNFS.copyFile(uri.replace("file://", ""), downloadPath);
 
-      // Copy from temp uri to Downloads folder
-      // Android requires file:// prefix for RNFS paths
-      await RNFS.copyFile(uri.replace("file://", ""), downloadPath);
-
-      Alert.alert(
-        "Success",
-        `Receipt saved to Downloads folder:\n${downloadPath}`
-      );
+        Alert.alert(
+          "Success",
+          `Receipt saved to Downloads folder:\n${downloadPath}`
+        );
+      } else {
+        // iOS fallback: share instead of saving to Downloads
+        if (!(await Sharing.isAvailableAsync())) {
+          Alert.alert("Error", "Sharing is not available on this device");
+          setLoading2(false);
+          return;
+        }
+        await Sharing.shareAsync(uri);
+      }
     } catch (error) {
       console.error("Download failed", error);
       Alert.alert("Error", "Failed to save receipt.");
+    } finally {
+      setLoading2(false);
     }
-    setLoading(false);
   };
 
   const shareTransaction = async (payment) => {
@@ -344,15 +379,16 @@ export default function SubscriptionAndBilling() {
       const { uri } = await Print.printToFileAsync({ html });
 
       if (!(await Sharing.isAvailableAsync())) {
-        alert("Error", "Sharing is not available on this device");
+        Alert.alert("Error", "Sharing is not available on this device");
+        setLoading(false);
         return;
       }
 
       await Sharing.shareAsync(uri);
-      setLoading(false);
     } catch (err) {
       console.error("Download failed", err);
-      alert("Error", "Failed to download transaction");
+      Alert.alert("Error", "Failed to download transaction");
+    } finally {
       setLoading(false);
     }
   };
@@ -384,11 +420,11 @@ export default function SubscriptionAndBilling() {
 
             <View style={{ flexDirection: "row", gap: 10 }}>
               <TouchableOpacity
-                disabled={loading}
+                disabled={loading || loading2}
                 onPress={() =>
                   paymentHistory.length > 0
                     ? shareTransaction(paymentHistory[0])
-                    : alert("No payment available")
+                    : Alert.alert("No payment available")
                 }
               >
                 {loading ? (
@@ -408,22 +444,27 @@ export default function SubscriptionAndBilling() {
               </TouchableOpacity>
 
               <TouchableOpacity
+                disabled={loading2 || loading}
                 onPress={() =>
                   paymentHistory.length > 0
                     ? downloadTransaction(paymentHistory[0], userDetail)
-                    : alert("No receipt available")
+                    : Alert.alert("No receipt available")
                 }
               >
-                <MaterialIcons
-                  name="receipt"
-                  size={24}
-                  style={{
-                    color: "green",
-                    padding: 5,
-                    backgroundColor: Colors.LIGHT_GREEN,
-                    borderRadius: 15,
-                  }}
-                />
+                {loading2 ? (
+                  <ActivityIndicator color="green" />
+                ) : (
+                  <MaterialIcons
+                    name="receipt"
+                    size={24}
+                    style={{
+                      color: "green",
+                      padding: 5,
+                      backgroundColor: Colors.LIGHT_GREEN,
+                      borderRadius: 15,
+                    }}
+                  />
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -437,10 +478,11 @@ export default function SubscriptionAndBilling() {
           </Text>
 
           <TouchableOpacity
-            style={styles.button}
+            disabled={loading}
+            style={[styles.button, { opacity: loading ? 0.5 : 1 }]}
             onPress={() => {
               // Replace with real cancellation logic
-              alert("Cancel Subscription pressed");
+              Alert.alert("Cancel Subscription pressed");
             }}
           >
             <Text style={styles.buttonText}>Cancel Subscription</Text>

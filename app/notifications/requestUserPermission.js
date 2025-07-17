@@ -41,7 +41,7 @@ async function sendTokenToBackend(token) {
     }
 
     const response = await fetch(
-      "http://10.35.176.122:5000/api/save-fcm-token",
+      "https://chefu-academy-tmzx.onrender.com/api/save-fcm-token",
       {
         method: "POST",
         headers: {

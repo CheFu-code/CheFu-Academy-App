@@ -1,6 +1,15 @@
 import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import firestore from "@react-native-firebase/firestore";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "@react-native-firebase/auth";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+} from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -16,46 +25,45 @@ import {
   View,
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
-import { auth } from "../config/fireConfig";
 import { Colors } from "../constant/Colors";
 
 export default function Index() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true); // start true to wait for async loading
+  const [loading, setLoading] = useState(true);
   const { setUserDetail } = useContext(UserDetailContext);
+  const auth = getAuth();
+  const firestore = getFirestore();
 
   useEffect(() => {
     if (Platform.OS === "android" && ImmersiveMode?.setImmersive) {
       ImmersiveMode.setImmersive(true);
     } else {
-      StatusBar.setHidden(true); // fallback for iOS or no immersive module
+      StatusBar.setHidden(true);
     }
   }, []);
 
   useEffect(() => {
     async function loadUser() {
       try {
-        // 1. Try load user from AsyncStorage first
+        // 1. Load user from AsyncStorage
         const storedUser = await AsyncStorage.getItem("userDetail");
         if (storedUser) {
           const userData = JSON.parse(storedUser);
-          // console.log("Loaded user from AsyncStorage:", userData);
           setUserDetail(userData);
           setLoading(false);
           router.replace("/(tabs)/home");
-          return; // stop here, user loaded locally
+          return;
         }
 
-        // 2. Else listen to Firebase Auth state change
-        const unsubscribe = auth().onAuthStateChanged(async (user) => {
+        // 2. Use modular auth state listener
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
             try {
               console.log("User signed in (Firebase):", user.email);
-
               await user.reload();
 
-              const userRef = firestore().collection("users").doc(user.email);
-              const result = await userRef.get();
+              const userRef = doc(firestore, "users", user.email);
+              const result = await getDoc(userRef);
 
               if (result.exists) {
                 const userData = result.data();
@@ -69,7 +77,7 @@ export default function Index() {
                 console.log("Fetched user data from Firestore:", userData);
 
                 if (user.emailVerified && !userData.isVerified) {
-                  await userRef.update({
+                  await updateDoc(userRef, {
                     isVerified: true,
                     updatedAt: new Date(),
                   });
@@ -90,10 +98,7 @@ export default function Index() {
                 setLoading(false);
               }
             } catch (error) {
-              console.error(
-                "Error fetching user data from home(index):",
-                error
-              );
+              console.error("Error fetching user data:", error);
               Sentry.captureException(error);
               setLoading(false);
             }

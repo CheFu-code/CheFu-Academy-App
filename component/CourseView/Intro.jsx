@@ -66,22 +66,7 @@ export default function Intro({ course, enroll }) {
 
   const router = useRouter();
   return (
-    <View
-      style={
-        {
-          // backgroundColor: Colors.BG_COLOR,
-        }
-      }
-    >
-      {/* <Image
-        style={{
-          width: "100%",
-          height: 260,
-          borderBottomRightRadius: 20,
-          borderBottomLeftRadius: 20,
-        }}
-        source={imageAssets[course?.banner_image]}
-      /> */}
+    <View>
       <View
         style={{
           padding: 20,
@@ -171,17 +156,6 @@ export default function Intro({ course, enroll }) {
           />
         ) : null}
       </View>
-
-      {/* <Pressable
-        onPress={() => router.back()}
-        style={{
-          position: "absolute",
-          padding: 20,
-          marginTop: 25,
-        }}
-      >
-        <Ionicons size={24} color={Colors.BLACK} name="arrow-back" />
-      </Pressable> */}
     </View>
   );
 }
