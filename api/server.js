@@ -13,7 +13,9 @@ app.use(express.json());
 
 app.use("/api/paypal", paypalRoutes);
 app.use("/api", notificationRoutes); // <-- fix here
-app.use("/api/email", require("./email"));
+app.use("/api/paypal-email", require("./email"));
+app.use("/api/email", require("./routes/email"));
+
 
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");

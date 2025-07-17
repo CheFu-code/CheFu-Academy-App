@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // 📬 POST /api/email
-router.post("/", async (req, res) => {
+router.post("/paypal-email", async (req, res) => {
   const { to, subject, text, html } = req.body;
 
   const mailOptions = {

@@ -113,6 +113,15 @@ const SignUp = () => {
       await setDoc(doc(db, "users", email.trim()), data);
 
       setUserDetail(data);
+      await fetch("hhttps://chefu-academy-tmzx.onrender.com/api/email/send-welcome", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          name: fullName,
+        }),
+      });
+
       router.push("/home");
     } catch (e) {
       Sentry.captureException(e);
