@@ -139,6 +139,7 @@ export default function SuccessScreen() {
           style={{
             fontFamily: "outfit-bold",
             fontSize: 20,
+            color: "#fff",
           }}
         >
           Verifying payment...
