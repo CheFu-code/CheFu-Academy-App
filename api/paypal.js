@@ -58,6 +58,8 @@ router.post("/create-order", async (req, res) => {
       }
     );
 
+    console.log("🟢 Create order response:", response.data);
+
     res.json(response.data);
   } catch (error) {
     console.error("❌ Create order error:", error.response?.data || error);
@@ -67,14 +69,12 @@ router.post("/create-order", async (req, res) => {
 
 // Check order status before capture
 async function checkOrderStatus(orderID, accessToken) {
-  const response = await axios.get(
-    `${PAYPAL_API}/v2/checkout/orders/${orderID}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+  const response = await axios.get(`${PAYPAL_API}/v2/checkout/orders/${orderID}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  console.log("ℹ️ Order details:", JSON.stringify(response.data, null, 2));
   return response.data.status;
 }
 
@@ -84,24 +84,28 @@ router.post("/capture-order", async (req, res) => {
     const { orderID, email, planType } = req.body;
 
     if (!orderID || !email || !planType) {
-      return res
-        .status(400)
-        .json({ error: "Missing orderID, email, or planType" });
+      console.warn("⚠️ Missing required fields:", { orderID, email, planType });
+      return res.status(400).json({ error: "Missing orderID, email, or planType" });
     }
 
     const accessToken = await getAccessToken();
 
     // Check status first
     const orderStatus = await checkOrderStatus(orderID, accessToken);
+    console.log(`ℹ️ Current order status for ${orderID}:`, orderStatus);
+
     if (orderStatus !== "APPROVED") {
+      console.warn(`⚠️ Cannot capture order ${orderID}, status is ${orderStatus}`);
       return res.status(422).json({
         error: `Order status is ${orderStatus}, cannot capture.`,
       });
     }
 
+    console.log(`🚀 Attempting to capture order: ${orderID}`);
+
     const captureResponse = await axios.post(
       `${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`,
-      {},
+      {}, // empty body is valid
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -111,7 +115,7 @@ router.post("/capture-order", async (req, res) => {
     );
 
     const details = captureResponse.data;
-    console.log("✅ PayPal capture successful:", details);
+    console.log("✅ PayPal capture successful:", JSON.stringify(details, null, 2));
 
     const db = admin.firestore();
 
@@ -162,9 +166,7 @@ router.post("/capture-order", async (req, res) => {
         Hi <strong>${details.payer.name?.given_name || "Learner"}</strong>,
       </p>
       <p style="font-size: 16px; line-height: 1.5;">
-        Thank you for subscribing to the <strong style="color: #1a73e8;">${
-          planType.charAt(0).toUpperCase() + planType.slice(1)
-        } Plan</strong>. We’re excited to have you join our community of passionate learners!
+        Thank you for subscribing to the <strong style="color: #1a73e8;">${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan</strong>. We’re excited to have you join our community of passionate learners!
       </p>
 
       <h2 style="color: #1a73e8; margin-top: 40px; margin-bottom: 10px;">Subscription Details</h2>
@@ -172,42 +174,27 @@ router.post("/capture-order", async (req, res) => {
         <tbody>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Plan Name:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-              planType.charAt(0).toUpperCase() + planType.slice(1)
-            }</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${planType.charAt(0).toUpperCase() + planType.slice(1)}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Duration:</td>
             <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-              planType === "basic"
-                ? "30 days"
-                : planType === "pro"
-                ? "60 days"
-                : planType === "premium"
-                ? "90 days"
-                : "30 days"
+              planType === "basic" ? "30 days" :
+              planType === "pro" ? "60 days" :
+              planType === "premium" ? "90 days" : "30 days"
             }</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Amount Paid:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-              details.purchase_units[0].payments.captures[0].amount
-                .currency_code
-            } ${
-        details.purchase_units[0].payments.captures[0].amount.value
-      }</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${details.purchase_units[0].payments.captures[0].amount.currency_code} ${details.purchase_units[0].payments.captures[0].amount.value}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Payment Status:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-              details.status
-            }</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${details.status}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Payment Date:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${new Date(
-              details.update_time || details.create_time
-            ).toLocaleString()}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${new Date(details.update_time || details.create_time).toLocaleString()}</td>
           </tr>
         </tbody>
       </table>
@@ -224,9 +211,7 @@ router.post("/capture-order", async (req, res) => {
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Email:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-              details.payer.email_address
-            }</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${details.payer.email_address}</td>
           </tr>
           <tr>
             <td style="padding: 8px; font-weight: bold;">Member Until:</td>
@@ -250,7 +235,7 @@ router.post("/capture-order", async (req, res) => {
       </p>
     </div>
   </div>
-`,
+  `,
     };
 
     await transporter.sendMail(mailOptions);
