@@ -145,8 +145,8 @@ export default function Quiz() {
           style={{
             padding: 20,
             backgroundColor: Colors.BG_GRAY,
-            marginTop: 30,
-            height: Dimensions.get("screen").height * 0.65,
+            marginTop: 50,
+            height: Dimensions.get("screen").height * 0.55,
             elevation: 1,
             borderRadius: 20,
           }}
@@ -170,11 +170,11 @@ export default function Quiz() {
               style={{
                 padding: 5,
                 borderWidth: 0.6,
-                borderColor:
-                  selectedOption == index ? Colors.GREEN : "transparent",
+                borderColor: selectedOption == index ? Colors.GREEN : "#ccc",
 
                 borderRadius: 15,
                 marginTop: 8,
+                borderWidth: 1,
                 backgroundColor:
                   selectedOption == index ? Colors.LIGHT_GREEN : null,
               }}
@@ -184,6 +184,7 @@ export default function Quiz() {
                 style={{
                   fontFamily: "outfit",
                   fontSize: 15,
+                  textAlign: "center",
                 }}
               >
                 {item}
