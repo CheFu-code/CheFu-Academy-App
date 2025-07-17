@@ -72,7 +72,7 @@ export default function Header() {
             gap: 5,
           }}
         >
-          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.greeting}>
+          <Text numberOfLines={1} style={styles.greeting}>
             Hello{userDetail && `, ${userDetail?.fullname}`}
           </Text>
           {userDetail?.member === true && (
@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#fff",
     marginTop: 35,
-    maxWidth: "73%", // or a fixed width like 250
-    overflow: "hidden",
+    maxWidth: "80%", // or a fixed width like 250
+    // overflow: "hidden",
   },
   subText: {
     fontFamily: "outfit",

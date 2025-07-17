@@ -111,7 +111,6 @@ export default function Profile() {
       }
 
       setLoading(true);
-      console.log("🔐 Reauthenticating user...");
 
       const credential = auth.EmailAuthProvider.credential(
         user.email,
@@ -119,9 +118,7 @@ export default function Profile() {
       );
 
       await user.reauthenticateWithCredential(credential);
-      console.log("✅ Reauthentication successful");
 
-      console.log("📄 Fetching user data from Firestore...");
       const userDoc = await firestore()
         .collection("users")
         .doc(user.email)
@@ -129,31 +126,23 @@ export default function Profile() {
 
       if (userDoc.exists) {
         const userData = userDoc.data();
-        console.log("📦 User data fetched:", userData);
 
-        console.log(
-          "📁 Moving user data to 'deletedAccounts' collection using UID..."
-        );
+        const coll = user.email + user.uid;
         await firestore()
           .collection("deletedAccounts")
-          .doc(user.uid) // use UID here, not email
+          .doc(coll) // use UID here, not email
           .set({
             ...userData,
             email: user.email, // keep email inside the data for reference
             deletedAt: new Date(),
           });
-        console.log("✅ User data moved to 'deletedAccounts'");
 
-        console.log("🗑️ Deleting user document from 'users' collection...");
         await firestore().collection("users").doc(user.email).delete();
-        console.log("✅ User document deleted from 'users'");
       } else {
         console.warn("⚠️ No user document found in Firestore for", user.email);
       }
 
-      console.log("🧨 Deleting user from Firebase Auth...");
       await user.delete();
-      console.log("✅ Firebase Auth user deleted");
 
       await AsyncStorage.removeItem("userDetail");
       setUserDetail(null);
