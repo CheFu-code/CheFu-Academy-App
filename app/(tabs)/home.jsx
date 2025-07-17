@@ -56,8 +56,8 @@ export default function Home() {
         GetCourseList(user);
       } else {
         setCourseList([]);
-        console.log("🚫 No authenticated user. Redirecting to sign-in...");
-        router.replace("/auth/signIn");
+        // console.log("🚫 No authenticated user. Redirecting to sign-in...");
+        // router.replace("/auth/signIn");
       }
     });
 
@@ -95,7 +95,7 @@ export default function Home() {
       });
 
       setCourseList(courses);
-      ToastAndroid.show("Courses refreshed", ToastAndroid.SHORT);
+      ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
     } catch (error) {
       console.error("🔥 Error fetching courses:", error);
       setCourseList([]);

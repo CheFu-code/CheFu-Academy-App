@@ -5,6 +5,7 @@ import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 
+import firestore from "@react-native-firebase/firestore";
 import { useCallback, useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -56,7 +57,7 @@ export default function Profile() {
 
       if (userDocSnap.exists) {
         setUserDetail(userDocSnap.data());
-         ToastAndroid.show("Profile refreshed", ToastAndroid.SHORT);
+        ToastAndroid.show("Profile refreshed", ToastAndroid.SHORT);
       } else {
         ToastAndroid.show("Your data not found", ToastAndroid.SHORT);
       }
@@ -110,19 +111,58 @@ export default function Profile() {
       }
 
       setLoading(true);
-      const credential = EmailAuthProvider.credential(user.email, password);
-      await reauthenticateWithCredential(user, credential);
+      console.log("🔐 Reauthenticating user...");
+
+      const credential = auth.EmailAuthProvider.credential(
+        user.email,
+        password
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      console.log("✅ Reauthentication successful");
+
+      console.log("📄 Fetching user data from Firestore...");
+      const userDoc = await firestore()
+        .collection("users")
+        .doc(user.email)
+        .get();
+
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        console.log("📦 User data fetched:", userData);
+
+        console.log(
+          "📁 Moving user data to 'deletedAccounts' collection using UID..."
+        );
+        await firestore()
+          .collection("deletedAccounts")
+          .doc(user.uid) // use UID here, not email
+          .set({
+            ...userData,
+            email: user.email, // keep email inside the data for reference
+            deletedAt: new Date(),
+          });
+        console.log("✅ User data moved to 'deletedAccounts'");
+
+        console.log("🗑️ Deleting user document from 'users' collection...");
+        await firestore().collection("users").doc(user.email).delete();
+        console.log("✅ User document deleted from 'users'");
+      } else {
+        console.warn("⚠️ No user document found in Firestore for", user.email);
+      }
+
+      console.log("🧨 Deleting user from Firebase Auth...");
       await user.delete();
+      console.log("✅ Firebase Auth user deleted");
 
       await AsyncStorage.removeItem("userDetail");
       setUserDetail(null);
       setShowPasswordModal(false);
       setPassword("");
       ToastAndroid.show("Account deleted successfully", ToastAndroid.SHORT);
-      router.replace("/auth/signIn");
-      setLoading(false);
+      router.replace("/");
     } catch (error) {
-      console.error("Delete account error:", error);
+      console.error("❌ Delete account error:", error);
       Sentry.captureException(error);
       if (
         error.code === "auth/wrong-password" ||
@@ -132,6 +172,7 @@ export default function Profile() {
       } else {
         ToastAndroid.show("Failed to delete account", ToastAndroid.SHORT);
       }
+    } finally {
       setLoading(false);
     }
   };

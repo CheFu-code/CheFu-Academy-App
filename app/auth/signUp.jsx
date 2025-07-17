@@ -1,5 +1,6 @@
 import auth from "@react-native-firebase/auth";
-import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
+import firestore from "@react-native-firebase/firestore";
+
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
@@ -98,7 +99,6 @@ const SignUp = () => {
 
   const SaveUser = async (user) => {
     try {
-      const db = getFirestore();
       const data = {
         fullname: fullName,
         email: email.trim(),
@@ -110,17 +110,21 @@ const SignUp = () => {
         emailPreferences: DEFAULT_PREFS,
       };
 
-      await setDoc(doc(db, "users", email.trim()), data);
+      await firestore().collection("users").doc(email.trim()).set(data);
 
       setUserDetail(data);
-      await fetch("hhttps://chefu-academy-tmzx.onrender.com/api/email/send-welcome", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.trim(),
-          name: fullName,
-        }),
-      });
+
+      await fetch(
+        "https://chefu-academy-tmzx.onrender.com/api/email/send-welcome",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email.trim(),
+            name: fullName,
+          }),
+        }
+      );
 
       router.push("/home");
     } catch (e) {

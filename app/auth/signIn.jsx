@@ -45,7 +45,7 @@ const SignIn = () => {
         console.warn("User data not found in Firestore.");
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching user data from sign in:", error);
       Sentry.captureException(error);
     }
   };

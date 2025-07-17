@@ -39,7 +39,7 @@ export default Sentry.wrap(function RootLayout() {
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((user) => {
       if (!user) {
-        console.warn("⚠️ No authenticated user. Redirecting to sign-in...");
+        console.warn("⚠️ No authenticated user from root. Redirecting to sign-in...");
         router.replace("/auth/signIn"); // 👈 Adjust to your actual sign-in route
       }
     });

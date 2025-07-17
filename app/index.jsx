@@ -59,6 +59,13 @@ export default function Index() {
 
               if (result.exists) {
                 const userData = result.data();
+
+                if (!userData) {
+                  console.warn("User document exists but has no data.");
+                  setLoading(false);
+                  return;
+                }
+
                 console.log("Fetched user data from Firestore:", userData);
 
                 if (user.emailVerified && !userData.isVerified) {
@@ -83,7 +90,10 @@ export default function Index() {
                 setLoading(false);
               }
             } catch (error) {
-              console.error("Error fetching user data:", error);
+              console.error(
+                "Error fetching user data from home(index):",
+                error
+              );
               Sentry.captureException(error);
               setLoading(false);
             }
