@@ -1,11 +1,14 @@
 import notifee from "@notifee/react-native";
-import auth from "@react-native-firebase/auth"; // 🔺 you forgot to import this
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import auth from "@react-native-firebase/auth";
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
+import * as LocalAuthentication from "expo-local-authentication";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
 import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission";
 import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNotification";
@@ -27,6 +30,8 @@ let lastHandledOrderID = null;
 
 export default Sentry.wrap(function RootLayout() {
   const [userDetail, setUserDetail] = useState();
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authSuccess, setAuthSuccess] = useState(false);
   const router = useRouter();
 
   const [fontsLoaded] = useFonts({
@@ -35,27 +40,61 @@ export default Sentry.wrap(function RootLayout() {
     michroma: require("../assets/fonts/Michroma-Regular.ttf"),
   });
 
-  // 🔐 Global Auth Check
+  // ✅ Biometric Authentication on App Launch
+  useEffect(() => {
+    const checkBiometrics = async () => {
+      try {
+        const biometricEnabled = await AsyncStorage.getItem("useBiometrics");
+        if (biometricEnabled === "true") {
+          const hasHardware = await LocalAuthentication.hasHardwareAsync();
+          const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+          if (!hasHardware || !isEnrolled) {
+            Alert.alert(
+              "Biometric unavailable",
+              "Your device does not support biometric authentication."
+            );
+            setAuthSuccess(true);
+            return;
+          }
+
+          const result = await LocalAuthentication.authenticateAsync({
+            promptMessage: "Unlock CheFu Academy",
+            fallbackLabel: "Use device PIN",
+            cancelLabel: "Cancel",
+          });
+
+          setAuthSuccess(result.success);
+        } else {
+          setAuthSuccess(true); // Biometric disabled, allow in
+        }
+      } catch (error) {
+        console.error("Biometric error:", error);
+        setAuthSuccess(true);
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+
+    checkBiometrics();
+  }, []);
+
+  // ✅ Global Auth Redirect
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((user) => {
       if (!user) {
-        console.warn("⚠️ No authenticated user from root. Redirecting to sign-in...");
-        router.replace("/auth/signIn"); // 👈 Adjust to your actual sign-in route
+        console.warn("⚠️ No authenticated user. Redirecting to sign-in...");
+        router.replace("/auth/signIn");
       }
     });
-
     return unsubscribe;
   }, []);
 
-  // 🔔 Notifications Setup
+  // ✅ Notifications Setup
   useEffect(() => {
-    requestUserPermission().then((token) => {
-      if (token) {
-        // Save token to backend if needed
-      }
-    });
+    requestUserPermission();
 
-    async function createChannel() {
+    async function createNotificationSetup() {
       await notifee.createChannel({
         id: "default",
         name: "Default Channel",
@@ -63,35 +102,35 @@ export default Sentry.wrap(function RootLayout() {
         importance: 4,
       });
 
-      await scheduleDailyNotification();
+      const alreadyScheduled = await AsyncStorage.getItem(
+        "dailyNotificationScheduled"
+      );
+
+      if (!alreadyScheduled) {
+        await scheduleDailyNotification();
+        await AsyncStorage.setItem("dailyNotificationScheduled", "true");
+      }
     }
 
-    createChannel();
+    createNotificationSetup();
 
     const unsubscribe = onMessage(getMessaging(), async (remoteMessage) => {
       await notifee.displayNotification({
         title: remoteMessage.notification?.title || "Notification",
         body: remoteMessage.notification?.body || "",
-        android: {
-          channelId: "default",
-        },
+        android: { channelId: "default" },
       });
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
-  // 🔗 Deep Links
+  // ✅ Deep Link Setup
   useEffect(() => {
     const subscription = Linking.addEventListener("url", ({ url }) => {
       handleDeepLink(url);
     });
-
-    return () => {
-      subscription.remove();
-    };
+    return () => subscription.remove();
   }, []);
 
   useEffect(() => {
@@ -118,7 +157,45 @@ export default Sentry.wrap(function RootLayout() {
     }
   };
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded || !authChecked || !authSuccess) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1B263B",
+          paddingHorizontal: 24,
+        }}
+      >
+        <ActivityIndicator size="large" color="#00BFFF" />
+
+        <Text
+          style={{
+            marginTop: 20,
+            fontSize: 16,
+            color: "#E0E0E0",
+            fontFamily: "outfit-bold",
+            textAlign: "center",
+          }}
+        >
+          Please wait while we unlock CheFu Academy for you...
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 8,
+            fontSize: 14,
+            color: "#9CA3AF",
+            fontFamily: "outfit",
+            textAlign: "center",
+          }}
+        >
+          We help you learn with confidence and privacy.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
@@ -129,9 +206,7 @@ export default Sentry.wrap(function RootLayout() {
           statusBarAnimation: "slide",
           gestureEnabled: true,
           animation: "slide_from_right",
-          contentStyle: {
-            backgroundColor: "#1B263B",
-          },
+          contentStyle: { backgroundColor: "#1B263B" },
         }}
       />
     </UserDetailContext.Provider>

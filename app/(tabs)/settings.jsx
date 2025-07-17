@@ -1,12 +1,14 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import {
-  collection,
   doc,
   getDoc,
   getFirestore,
+  updateDoc,
 } from "@react-native-firebase/firestore";
+import * as LocalAuthentication from "expo-local-authentication";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
@@ -33,7 +35,6 @@ export default function SettingsScreen() {
   const [showVersion, setShowVersion] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState(null);
 
   const db = getFirestore();
   const auth = getAuth();
@@ -42,40 +43,71 @@ export default function SettingsScreen() {
   const options = ["Report a bug"];
 
   useEffect(() => {
-    const fetchNotificationSetting = async () => {
+    async function fetchSettings() {
       try {
         const user = auth.currentUser;
-        if (!user) return;
+        if (!user?.email) return;
 
-        const docSnap = await db.collection("users").doc(user.email).get();
-        if (docSnap.exists) {
+        const docRef = doc(db, "users", user.email);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
           const data = docSnap.data();
+
           if (typeof data.notifications === "boolean") {
             setNotifications(data.notifications);
           }
+
+          if (typeof data.useBiometrics === "boolean") {
+            setUseBiometrics(data.useBiometrics);
+            await AsyncStorage.setItem(
+              "useBiometrics",
+              data.useBiometrics.toString()
+            );
+          }
         }
       } catch (error) {
-        console.error("Failed to fetch notification setting", error);
+        console.error("Failed to fetch settings", error);
       }
-    };
+    }
 
-    fetchNotificationSetting();
+    fetchSettings();
   }, []);
 
   const toggleSetting = async (name, stateSetter, current) => {
     const newValue = !current;
+
+    if (name === "Biometric Lock") {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+
+      if (!compatible || !enrolled) {
+        Alert.alert(
+          "Biometric Unavailable",
+          "Biometric authentication is not available or not set up on this device."
+        );
+        return;
+      }
+    }
+
     stateSetter(newValue);
-    Alert.alert(`${name} turned ${newValue ? "on" : "off"}`);
+    Alert.alert("Success", `${name} turned ${newValue ? "on" : "off"}`);
 
     try {
       const user = auth.currentUser;
-      if (!user) return;
+      if (!user?.email) return;
 
-      const userRef = doc(collection(db, "users"), user.email); // ✅
+      const userRef = doc(db, "users", user.email);
 
-      await userRef.update({
-        notifications: newValue,
+      await updateDoc(userRef, {
+        [name === "Biometric Lock" ? "useBiometrics" : "notifications"]:
+          newValue,
       });
+
+      // 👇 Add this immediately after
+      if (name === "Biometric Lock") {
+        await AsyncStorage.setItem("useBiometrics", newValue.toString());
+      }
     } catch (error) {
       console.error("Failed to update setting:", error);
       Alert.alert("Error", "Failed to save setting.");
