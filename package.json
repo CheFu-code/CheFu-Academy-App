@@ -65,7 +65,6 @@
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-google-mobile-ads": "^15.4.0",
-    "react-native-google-signin": "^2.1.1",
     "react-native-immersive": "^2.0.0",
     "react-native-localize": "^3.5.1",
     "react-native-navigation-bar-color": "^2.0.2",
