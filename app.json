@@ -19,7 +19,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFF9C4"
       },
       "edgeToEdgeEnabled": true,
       "intentFilters": [
@@ -48,7 +48,7 @@
           "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ccc"
+          "backgroundColor": "#FFF9C4"
         }
       ],
       [
