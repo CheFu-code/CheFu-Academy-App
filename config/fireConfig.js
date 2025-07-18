@@ -1,12 +1,10 @@
+import { getApp } from '@react-native-firebase/app';
+import { getAuth } from '@react-native-firebase/auth';
+import { getFirestore } from '@react-native-firebase/firestore';
 
-import { getApps, initializeApp } from "@react-native-firebase/app";
-import auth from "@react-native-firebase/auth";
-import firestore from "@react-native-firebase/firestore";
+const app = getApp(); // gets the default native Firebase app
 
-if (!getApps().length) {
-  initializeApp(); // uses native config automatically
-}
-
-const db = firestore();
+const auth = getAuth(app);       // auth instance tied to that app
+const db = getFirestore(app);    // firestore tied to that app
 
 export { auth, db };
