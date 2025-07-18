@@ -21,6 +21,7 @@
     "@react-native-firebase/firestore": "^22.4.0",
     "@react-native-firebase/in-app-messaging": "^22.4.0",
     "@react-native-firebase/messaging": "^22.4.0",
+    "@react-native-google-signin/google-signin": "^15.0.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
@@ -64,6 +65,7 @@
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-google-mobile-ads": "^15.4.0",
+    "react-native-google-signin": "^2.1.1",
     "react-native-immersive": "^2.0.0",
     "react-native-localize": "^3.5.1",
     "react-native-navigation-bar-color": "^2.0.2",
@@ -72,6 +74,7 @@
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
+    "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5"
   },

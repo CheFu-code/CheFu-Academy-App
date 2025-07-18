@@ -29,7 +29,10 @@ import {
   View,
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from "../constant/Colors";
+
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 export default function Index() {
   const router = useRouter();
@@ -37,6 +40,39 @@ export default function Index() {
   const { setUserDetail } = useContext(UserDetailContext);
   const auth = getAuth();
   const firestore = getFirestore();
+
+  // Google Sign-In config
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // Replace with your actual web client ID
+      offlineAccess: true,
+    });
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const { idToken } = userInfo;
+      // Authenticate with Firebase using the Google idToken
+      const { GoogleAuthProvider, signInWithCredential } = await import('@react-native-firebase/auth');
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+      await signInWithCredential(auth, googleCredential);
+      // User is now signed in, onAuthStateChanged will handle the rest
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        // some other error
+        console.error('Google Sign-In error:', error);
+        Sentry.captureException(error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (Platform.OS === "android" && ImmersiveMode?.setImmersive) {
@@ -149,11 +185,20 @@ export default function Index() {
 
         <Text style={styles.subtitle}>Smart Learning Starts Here</Text>
 
+
         <TouchableOpacity
           style={styles.button}
           onPress={() => router.push("/auth/signUp")}
         >
           <Text style={styles.buttonText}>Get Started</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: '#4285F4' }]}
+          onPress={handleGoogleSignIn}
+        >
+          <MaterialCommunityIcons name="google" size={24} color="#4285F4" style={{ marginRight: 10 }} />
+          <Text style={[styles.buttonText, { color: '#4285F4' }]}>Continue with Google</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -232,6 +277,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10,
     marginBottom: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   button2: {
     marginTop: 10,
