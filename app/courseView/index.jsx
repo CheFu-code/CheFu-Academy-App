@@ -30,6 +30,7 @@ export default function CourseView() {
   const { courseParams, enroll } = useLocalSearchParams();
   // let course = { chapters: [] };
   const router = useRouter();
+  // (No navigation button found in first 80 lines, skipping UI navigation patch)
   const [course, setCourse] = useState({ chapters: [] });
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
@@ -57,11 +58,12 @@ export default function CourseView() {
   }, [courseParams]);
 
   const downloadCourse = async (course) => {
-    if (!course) {
+    if (!course || loading) {
       ToastAndroid.show("No course data to download", ToastAndroid.SHORT);
       return;
     }
 
+    setLoading(true);
     try {
       if (!userDetail?.member) {
         ToastAndroid.show(
@@ -71,36 +73,61 @@ export default function CourseView() {
         return;
       }
 
-      setLoading(true);
+      // Check if already downloaded
+      let existing = await AsyncStorage.getItem("offlineDownloads");
+      let parsed = [];
+      try {
+        parsed = existing ? JSON.parse(existing) : [];
+      } catch (e) {
+        parsed = [];
+      }
+      if (parsed.some((d) => d.title === course.courseTitle)) {
+        ToastAndroid.show("Course already downloaded", ToastAndroid.SHORT);
+        setDownloaded(true);
+        setLoading(false);
+        return;
+      }
+
       ToastAndroid.show("Downloading...", ToastAndroid.SHORT);
-
       const html = generateCourseHTML(course);
-
-      const { uri } = await Print.printToFileAsync({ html, base64: false });
-
+      let uri;
+      try {
+        ({ uri } = await Print.printToFileAsync({ html, base64: false }));
+      } catch (err) {
+        ToastAndroid.show("Failed to generate PDF file", ToastAndroid.SHORT);
+        setLoading(false);
+        return;
+      }
       if (!(await Sharing.isAvailableAsync())) {
         ToastAndroid.show(
           "Sharing is not available on this device",
           ToastAndroid.SHORT
         );
+        setLoading(false);
         return;
       }
-
-      await Sharing.shareAsync(uri, {
-        mimeType: "application/pdf",
-        dialogTitle: "Download Course PDF",
-      });
-
+      try {
+        await Sharing.shareAsync(uri, {
+          mimeType: "application/pdf",
+          dialogTitle: "Download Course PDF",
+        });
+      } catch (err) {
+        ToastAndroid.show("Failed to share PDF", ToastAndroid.SHORT);
+        setLoading(false);
+        return;
+      }
       const fileName = `${
         course.courseTitle?.replace(/[^a-z0-9]/gi, "_") || "course"
       }.pdf`;
       const destPath = `${FileSystem.documentDirectory}${fileName}`;
-
-      await FileSystem.copyAsync({ from: uri, to: destPath });
-
-      // 🔥 Save metadata to AsyncStorage
-      const existing = await AsyncStorage.getItem("offlineDownloads");
-      const parsed = existing ? JSON.parse(existing) : [];
+      try {
+        await FileSystem.copyAsync({ from: uri, to: destPath });
+      } catch (err) {
+        ToastAndroid.show("Failed to save PDF locally", ToastAndroid.SHORT);
+        setLoading(false);
+        return;
+      }
+      // Save metadata to AsyncStorage, avoid duplicates
       const updated = [
         ...parsed,
         {
@@ -110,13 +137,20 @@ export default function CourseView() {
           uri: destPath,
         },
       ];
-      await AsyncStorage.setItem("offlineDownloads", JSON.stringify(updated));
-
+      try {
+        await AsyncStorage.setItem("offlineDownloads", JSON.stringify(updated));
+      } catch (err) {
+        ToastAndroid.show("Failed to save download info", ToastAndroid.SHORT);
+        setLoading(false);
+        return;
+      }
       ToastAndroid.show("Downloaded", ToastAndroid.SHORT);
+      setDownloaded(true);
       router.push("/download");
     } catch (err) {
-      console.error("Error sharing PDF:", err);
-      ToastAndroid.show("Failed to generate PDF", ToastAndroid.SHORT);
+      ToastAndroid.show("Unexpected error during download", ToastAndroid.SHORT);
+      // Optionally log error to Sentry or console
+      if (typeof console !== 'undefined') console.error(err);
     } finally {
       setLoading(false);
     }

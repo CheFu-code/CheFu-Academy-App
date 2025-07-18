@@ -4,13 +4,13 @@ import { doc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Dimensions,
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    Image,
+    Pressable,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 import * as Progress from "react-native-progress";

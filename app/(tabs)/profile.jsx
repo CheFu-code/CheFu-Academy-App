@@ -6,38 +6,38 @@ import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 
 import {
-  deleteUser,
-  EmailAuthProvider,
-  getAuth,
-  reauthenticateWithCredential,
-  sendEmailVerification,
-  signOut,
+    deleteUser,
+    EmailAuthProvider,
+    getAuth,
+    reauthenticateWithCredential,
+    sendEmailVerification,
+    signOut,
 } from "@react-native-firebase/auth";
 import {
-  deleteDoc,
-  doc,
-  getDoc,
-  getFirestore,
-  setDoc,
+    deleteDoc,
+    doc,
+    getDoc,
+    getFirestore,
+    setDoc,
 } from "@react-native-firebase/firestore";
 
 import { useCallback, useContext, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Linking,
-  Modal,
-  Platform,
-  RefreshControl,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Linking,
+    Modal,
+    Platform,
+    RefreshControl,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    ToastAndroid,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { menuItems, url } from "../../constant/menuItems";
@@ -56,14 +56,12 @@ export default function Profile() {
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
   const auth = getAuth();
 
-  useFocusEffect(
-    useCallback(() => {
-      refreshData(); // Call your existing function
-    }, [])
-  );
+  const [fetching, setFetching] = useState(false); // Prevent duplicate refresh
 
   const refreshData = async () => {
+    if (fetching) return;
     setRefreshing(true);
+    setFetching(true);
     try {
       const firestore = getFirestore();
       const userDocSnap = await getDoc(
@@ -78,12 +76,23 @@ export default function Profile() {
       }
     } catch (error) {
       console.error("Error refreshing data:", error);
-      ToastAndroid.show("Failed to refresh data", ToastAndroid.SHORT);
-      Sentry.captureException(error);
+      if (typeof ToastAndroid !== 'undefined') {
+        ToastAndroid.show("Failed to refresh profile", ToastAndroid.SHORT);
+      }
+      if (typeof Sentry !== 'undefined') {
+        Sentry.captureException(error);
+      }
     } finally {
       setRefreshing(false);
+      setFetching(false);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshData();
+    }, [])
+  );
 
   const handleLogout = async () => {
     Alert.alert("Logout?", "Are you sure you want to log out?", [

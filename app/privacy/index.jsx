@@ -16,7 +16,14 @@ export default function Privacy() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => {
+          if (router && typeof router.back === 'function') router.back();
+        }}
+        accessible={true}
+        accessibilityLabel="Go back"
+      >
         <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
         <Text style={styles.backText}>Back</Text>
       </TouchableOpacity>

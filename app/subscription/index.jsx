@@ -76,7 +76,14 @@ export default function SubscriptionWall() {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Pressable disabled={loading} onPress={() => router.back()}>
+        <Pressable
+          disabled={loading}
+          onPress={() => {
+            if (router && typeof router.back === 'function') router.back();
+          }}
+          accessible={true}
+          accessibilityLabel="Go back"
+        >
           <View style={styles.backButton}>
             <Ionicons name="arrow-back" size={22} color={Colors.PRIMARY} />
           </View>

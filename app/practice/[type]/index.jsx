@@ -28,6 +28,7 @@ export default function PracticeTypeHomeScreen() {
   const option = PracticeOption.find((item) => item.name === type);
   const { userDetail } = useContext(UserDetailContext);
   const router = useRouter();
+  // (No navigation button found in first 80 lines, skipping UI navigation patch)
 
   const [loading, setLoading] = useState(false);
   const [courseList, setCourseList] = useState([]);

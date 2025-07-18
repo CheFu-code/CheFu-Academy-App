@@ -53,7 +53,13 @@ export default function Flashcards() {
             alignItems: "center",
           }}
         >
-          <Pressable onPress={() => router.back()}>
+          <Pressable
+            onPress={() => {
+              if (router && typeof router.back === 'function') router.back();
+            }}
+            accessible={true}
+            accessibilityLabel="Go back"
+          >
             <Ionicons name="arrow-back" size={22} color={"white"} />
           </Pressable>
           <Text

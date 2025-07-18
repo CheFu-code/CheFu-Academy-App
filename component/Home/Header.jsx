@@ -27,13 +27,13 @@ export default function Header() {
 
     if (option === "Logout") {
       try {
-        await auth().signOut();
+        await auth.signOut();
         await AsyncStorage.removeItem("userDetail");
         setUserDetail(null);
         ToastAndroid.show("Logged out successfully", ToastAndroid.SHORT);
         router.replace("/auth/signIn");
       } catch (error) {
-        console.error("Logout error:", error);
+        console.error("Logout error on header:", error);
         ToastAndroid.show("Logout failed", ToastAndroid.SHORT);
       }
     } else if (option === "Rate our app") {

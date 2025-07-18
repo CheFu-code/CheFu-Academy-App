@@ -37,22 +37,30 @@ export default function SubscriptionAndBilling() {
   const db = getFirestore();
 
   const getUserPayments = async (email) => {
-    const q = query(collection(db, "payments"), where("email", "==", email));
-    const snapshot = await getDocs(q);
-    const payments = [];
-    snapshot.forEach((doc) => {
-      payments.push({ id: doc.id, ...doc.data() });
-    });
-    return payments;
+    if (!email) return [];
+    try {
+      const q = query(collection(db, "payments"), where("email", "==", email));
+      const snapshot = await getDocs(q);
+      const payments = [];
+      snapshot.forEach((doc) => {
+        payments.push({ id: doc.id, ...doc.data() });
+      });
+      return payments;
+    } catch (err) {
+      Alert.alert("Error", "Failed to fetch payment history.");
+      return [];
+    }
   };
 
   useEffect(() => {
     const fetchPayments = async () => {
-      const data = await getUserPayments(userDetail.email);
+      setLoading(true);
+      const data = await getUserPayments(userDetail?.email);
       setPaymentHistory(data);
+      setLoading(false);
     };
     fetchPayments();
-  }, []);
+  }, [userDetail?.email]);
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 

@@ -48,15 +48,13 @@ export default function EmailAlerts() {
         if (user && user.email) {
           const ref = doc(db, "users", user.email);
           const snap = await getDoc(ref);
-          if (snap.exists() && snap.data().emailPreferences) {
-            setPreferences(snap.data().emailPreferences);
-            await AsyncStorage.setItem(
-              PREF_KEY,
-              JSON.stringify(snap.data().emailPreferences)
-            );
-          } else {
-            console.log("No Firestore preferences found for user.");
-          }
+        if (snap.exists() && snap.data().emailPreferences) {
+          setPreferences(snap.data().emailPreferences);
+          await AsyncStorage.setItem(
+            PREF_KEY,
+            JSON.stringify(snap.data().emailPreferences)
+          );
+        }
         }
       } catch (err) {
         console.error("Load failed", err);

@@ -18,16 +18,19 @@ export default function Explore() {
   const [refreshKey, setRefreshKey] = useState(0); // 🔑 used to re-render
 
   const onRefresh = useCallback(() => {
+    if (refreshing) return; // Prevent double refresh
     setRefreshing(true);
-
-    // Trigger reload in child components
-    setRefreshKey((prev) => prev + 1);
-
-    setTimeout(() => {
-      ToastAndroid.show("Courses refreshed", ToastAndroid.SHORT);
+    try {
+      setRefreshKey((prev) => prev + 1);
+      setTimeout(() => {
+        ToastAndroid.show("Courses refreshed", ToastAndroid.SHORT);
+        setRefreshing(false);
+      }, 1000);
+    } catch (err) {
+      ToastAndroid.show("Failed to refresh", ToastAndroid.SHORT);
       setRefreshing(false);
-    }, 1000);
-  }, []);
+    }
+  }, [refreshing]);
 
   return (
     <View style={styles.container}>

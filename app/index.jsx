@@ -63,7 +63,7 @@ export default function Index() {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
             try {
-              console.log("User signed in (Firebase):", user.email);
+              // Removed console.log for production
               await user.reload();
 
               const userRef = doc(firestore, "users", user.email);
@@ -73,12 +73,9 @@ export default function Index() {
                 const userData = result.data();
 
                 if (!userData) {
-                  console.warn("User document exists but has no data.");
                   setLoading(false);
                   return;
                 }
-
-                console.log("Fetched user data from Firestore:", userData);
 
                 if (user.emailVerified && !userData.isVerified) {
                   await updateDoc(userRef, {

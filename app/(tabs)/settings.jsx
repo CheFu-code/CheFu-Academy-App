@@ -18,7 +18,6 @@ import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -33,12 +32,15 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
+
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [useBiometrics, setUseBiometrics] = useState(false);
   const [showVersion, setShowVersion] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
+  const [fatalError, setFatalError] = useState(null);
   const { userDetail } = useContext(UserDetailContext);
 
   const db = getFirestore();
@@ -49,6 +51,8 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     async function fetchSettings() {
+      if (fetching) return;
+      setFetching(true);
       try {
         const user = auth.currentUser;
         if (!user?.email) return;
@@ -72,50 +76,66 @@ export default function SettingsScreen() {
           }
         }
       } catch (error) {
+        setFatalError(error);
         console.error("Failed to fetch settings", error);
+        if (typeof ToastAndroid !== 'undefined') {
+          ToastAndroid.show("Failed to fetch settings", ToastAndroid.SHORT);
+        }
+      } finally {
+        setFetching(false);
       }
     }
 
-    fetchSettings();
+    try {
+      fetchSettings();
+    } catch (err) {
+      setFatalError(err);
+    }
   }, []);
 
   const toggleSetting = async (name, stateSetter, current) => {
-    const newValue = !current;
-
-    if (name === "Biometric Lock") {
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      const enrolled = await LocalAuthentication.isEnrolledAsync();
-
-      if (!compatible || !enrolled) {
-        Alert.alert(
-          "Biometric Unavailable",
-          "Biometric authentication is not available or not set up on this device."
-        );
-        return;
-      }
-    }
-
-    stateSetter(newValue);
-    Alert.alert("Success", `${name} turned ${newValue ? "on" : "off"}`);
-
     try {
-      const user = auth.currentUser;
-      if (!user?.email) return;
+      const newValue = !current;
 
-      const userRef = doc(db, "users", user.email);
-
-      await updateDoc(userRef, {
-        [name === "Biometric Lock" ? "useBiometrics" : "notifications"]:
-          newValue,
-      });
-
-      // 👇 Add this immediately after
       if (name === "Biometric Lock") {
-        await AsyncStorage.setItem("useBiometrics", newValue.toString());
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        const enrolled = await LocalAuthentication.isEnrolledAsync();
+
+        if (!compatible || !enrolled) {
+          Alert.alert(
+            "Biometric Unavailable",
+            "Biometric authentication is not available or not set up on this device."
+          );
+          return;
+        }
       }
-    } catch (error) {
-      console.error("Failed to update setting:", error);
-      Alert.alert("Error", "Failed to save setting.");
+
+      stateSetter(newValue);
+      Alert.alert("Success", `${name} turned ${newValue ? "on" : "off"}`);
+
+      try {
+        const user = auth.currentUser;
+        if (!user?.email) return;
+
+        const userRef = doc(db, "users", user.email);
+
+        await updateDoc(userRef, {
+          [name === "Biometric Lock" ? "useBiometrics" : "notifications"]:
+            newValue,
+        });
+
+        // 👇 Add this immediately after
+        if (name === "Biometric Lock") {
+          await AsyncStorage.setItem("useBiometrics", newValue.toString());
+        }
+      } catch (error) {
+        setFatalError(error);
+        console.error("Failed to update setting:", error);
+        Alert.alert("Error", "Failed to save setting.");
+      }
+    } catch (err) {
+      setFatalError(err);
+      Alert.alert("Error", "A fatal error occurred in toggleSetting.");
     }
   };
 
@@ -153,6 +173,7 @@ export default function SettingsScreen() {
         UTI: "public.json",
       });
     } catch (error) {
+      setFatalError(error);
       console.error("Export failed", error);
       Alert.alert("Error", "Failed to export data");
     } finally {
@@ -161,8 +182,13 @@ export default function SettingsScreen() {
   }
 
   const logOut = async () => {
-    await auth.signOut();
-    ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
+    try {
+      await auth.signOut();
+      ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
+    } catch (err) {
+      setFatalError(err);
+      Alert.alert("Error", "Failed to log out.");
+    }
     return;
   };
 
@@ -193,150 +219,177 @@ export default function SettingsScreen() {
         console.log("Share dismissed");
       }
     } catch (error) {
+      setFatalError(error);
       Alert.alert("Sharing failed", error.message);
     }
   };
-  return (
-    <View style={[styles.container, { paddingTop: 50 }]}>
-      {/* Header + Dropdown Button */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
-        <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
-          <MaterialIcons
-            name="unfold-more"
-            size={24}
-            style={styles.icon}
-            color="#fff"
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <View style={styles.dropdown}>
-          {options.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                setSelected(item);
-                Linking.openURL("mailto:kurisanimaluleke77@gmail.com");
-                setIsOpen(false);
-              }}
-              style={styles.option}
-            >
-              <Text style={styles.optionText}>{item}</Text>
-            </TouchableOpacity>
-          ))}
+  let content;
+  try {
+    if (fatalError) {
+      content = (
+        <View style={[styles.container, { paddingTop: 50, justifyContent: 'center', alignItems: 'center' }]}> 
+          <Text style={{ color: 'red', fontSize: 18, marginBottom: 20 }}>Something went wrong in Settings.</Text>
+          <Text style={{ color: 'red', fontSize: 14, marginBottom: 20 }}>{fatalError?.message || String(fatalError)}</Text>
+          <TouchableOpacity onPress={() => { setFatalError(null); }} style={{ backgroundColor: Colors.PRIMARY, padding: 12, borderRadius: 8 }}>
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
+          </TouchableOpacity>
         </View>
-      )}
-
-      {/* Settings List */}
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
-        <Text style={styles.heading}>General</Text>
-        <SettingItem
-          label="Edit Profile"
-          icon="person"
-          onPress={() => router.push("/editProfile")}
-        />
-        <SettingItem
-          label="Change Password"
-          icon="lock-closed"
-          onPress={() => router.push("/changePassword")}
-        />
-        <SettingItem
-          label="Export My Data"
-          icon="download"
-          onPress={exportUserData}
-          disabled={loading}
-        />
-        {loading && (
-          <ActivityIndicator
-            size="small"
-            color={Colors.PRIMARY}
-            style={{ marginBottom: 10 }}
-          />
-        )}
-
-        <Text style={styles.heading}>Notifications</Text>
-        <SettingItem
-          label="Push Notifications"
-          icon="notifications"
-          toggle
-          value={notifications}
-          onToggle={() =>
-            toggleSetting("Notifications", setNotifications, notifications)
-          }
-        />
-        <SettingItem
-          label="Email Alerts"
-          icon="mail"
-          onPress={() => router.push("/emailAlerts")}
-        />
-
-        <Text style={styles.heading}>Privacy & Security</Text>
-        <SettingItem
-          label="Privacy Policy"
-          icon="shield-checkmark"
-          onPress={() => router.push("/privacy")}
-        />
-        <SettingItem
-          label="Enable Biometric Lock"
-          icon="finger-print"
-          toggle
-          value={useBiometrics}
-          onToggle={() =>
-            toggleSetting("Biometric Lock", setUseBiometrics, useBiometrics)
-          }
-        />
-        <SettingItem
-          label="Permissions"
-          icon="lock-open"
-          onPress={() => router.push("/permissions")}
-        />
-
-        <Text style={styles.heading}>About</Text>
-        <SettingItem
-          label="App Version"
-          icon="information-circle"
-          onPress={() => setShowVersion(!showVersion)}
-        />
-        {showVersion && (
-          <View style={styles.codeBlock}>
-            <Text style={styles.codeLabel}>version:</Text>
-            <Text style={styles.codeText}>
-              {Constants.expoConfig?.version ?? "N/A"}
-            </Text>
+      );
+    } else {
+      content = (
+        <View style={[styles.container, { paddingTop: 50 }]}> 
+          {/* Header + Dropdown Button */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Settings</Text>
+            <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
+              <MaterialIcons
+                name="unfold-more"
+                size={24}
+                style={styles.icon}
+                color="#fff"
+              />
+            </TouchableOpacity>
           </View>
-        )}
-        <SettingItem
-          label="What's New"
-          icon="sparkles"
-          onPress={() => Alert.alert("Release Notes Pressed")}
-        />
-        <SettingItem
-          label="Rate the App"
-          icon="star"
-          onPress={() => Alert.alert("Rate Us Pressed")}
-        />
-        <SettingItem
-          label="Share CheFu Academy"
-          icon="share-social"
-          onPress={() => handleShare()}
-        />
 
-        <Text style={styles.heading}>Account</Text>
-        {userDetail?.member === true && (
-          <SettingItem
-            label="Subscription & Billing"
-            icon="card-outline"
-            onPress={() => router.push("/subscriptionAndBilling")}
-          />
-        )}
+          {/* Dropdown Menu */}
+          {isOpen && (
+            <View style={styles.dropdown}>
+              {options.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    setSelected(item);
+                    Linking.openURL("mailto:kurisanimaluleke77@gmail.com");
+                    setIsOpen(false);
+                  }}
+                  style={styles.option}
+                >
+                  <Text style={styles.optionText}>{item}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
-        <SettingItem label="Log Out" icon="exit" onPress={() => logOut()} />
-      </ScrollView>
-    </View>
-  );
+          {/* Settings List */}
+          <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+            <Text style={styles.heading}>General</Text>
+            <SettingItem
+              label="Edit Profile"
+              icon="person"
+              onPress={() => router.push("/editProfile")}
+            />
+            <SettingItem
+              label="Change Password"
+              icon="lock-closed"
+              onPress={() => router.push("/changePassword")}
+            />
+            <SettingItem
+              label="Export My Data"
+              icon="download"
+              onPress={exportUserData}
+              disabled={loading}
+            />
+            {loading && (
+              <ActivityIndicator
+                size="small"
+                color={Colors.PRIMARY}
+                style={{ marginBottom: 10 }}
+              />
+            )}
+
+            <Text style={styles.heading}>Notifications</Text>
+            <SettingItem
+              label="Push Notifications"
+              icon="notifications"
+              toggle
+              value={notifications}
+              onToggle={() =>
+                toggleSetting("Notifications", setNotifications, notifications)
+              }
+            />
+            <SettingItem
+              label="Email Alerts"
+              icon="mail"
+              onPress={() => router.push("/emailAlerts")}
+            />
+
+            <Text style={styles.heading}>Privacy & Security</Text>
+            <SettingItem
+              label="Privacy Policy"
+              icon="shield-checkmark"
+              onPress={() => router.push("/privacy")}
+            />
+            <SettingItem
+              label="Enable Biometric Lock"
+              icon="finger-print"
+              toggle
+              value={useBiometrics}
+              onToggle={() =>
+                toggleSetting("Biometric Lock", setUseBiometrics, useBiometrics)
+              }
+            />
+            <SettingItem
+              label="Permissions"
+              icon="lock-open"
+              onPress={() => router.push("/permissions")}
+            />
+
+            <Text style={styles.heading}>About</Text>
+            <SettingItem
+              label="App Version"
+              icon="information-circle"
+              onPress={() => setShowVersion(!showVersion)}
+            />
+            {showVersion && (
+              <View style={styles.codeBlock}>
+                <Text style={styles.codeLabel}>version:</Text>
+                <Text style={styles.codeText}>
+                  {Constants.expoConfig?.version ?? "N/A"}
+                </Text>
+              </View>
+            )}
+            {/* <SettingItem
+              label="What's New"
+              icon="sparkles"
+              onPress={() => Alert.alert("Release Notes Pressed")}
+            />
+            <SettingItem
+              label="Rate the App"
+              icon="star"
+              onPress={() => Alert.alert("Rate Us Pressed")}
+            /> */}
+            <SettingItem
+              label="Share CheFu Academy"
+              icon="share-social"
+              onPress={() => handleShare()}
+            />
+
+            <Text style={styles.heading}>Account</Text>
+            {userDetail?.member === true && (
+              <SettingItem
+                label="Subscription & Billing"
+                icon="card-outline"
+                onPress={() => router.push("/subscriptionAndBilling")}
+              />
+            )}
+
+            <SettingItem label="Log Out" icon="exit" onPress={async () => {
+              await logOut();
+              router.replace("/auth/signIn");
+            }} />
+          </ScrollView>
+        </View>
+      );
+    }
+  } catch (err) {
+    content = (
+      <View style={[styles.container, { paddingTop: 50, justifyContent: 'center', alignItems: 'center' }]}> 
+        <Text style={{ color: 'red', fontSize: 18, marginBottom: 20 }}>A fatal error occurred in Settings.</Text>
+        <Text style={{ color: 'red', fontSize: 14, marginBottom: 20 }}>{err?.message || String(err)}</Text>
+      </View>
+    );
+        }
+  return content;
 }
 
 const SettingItem = ({
@@ -348,7 +401,12 @@ const SettingItem = ({
   onPress,
   disabled,
 }) => (
-  <TouchableOpacity onPress={onPress} disabled={disabled}>
+  <View
+    accessible={true}
+    accessibilityRole={toggle ? "switch" : "button"}
+    accessibilityLabel={label}
+    style={{ opacity: disabled ? 0.5 : 1 }}
+  >
     <View style={styles.itemRow}>
       <View style={styles.itemLeft}>
         <Ionicons
@@ -369,14 +427,14 @@ const SettingItem = ({
         </Text>
       </View>
       {toggle ? (
-        <Switch value={value} onValueChange={onToggle} />
+        <Switch value={value} onValueChange={disabled ? undefined : onToggle} />
       ) : (
-        <Pressable onPress={onPress} disabled={disabled}>
+        <Pressable onPress={disabled ? undefined : onPress} disabled={disabled}>
           <MaterialIcons name="chevron-right" size={24} color={Colors.GRAY} />
         </Pressable>
       )}
     </View>
-  </TouchableOpacity>
+  </View>
 );
 
 const styles = StyleSheet.create({

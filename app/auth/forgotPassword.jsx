@@ -19,14 +19,13 @@ const ForgotPassword = () => {
   const router = useRouter();
 
   const handleReset = () => {
+    if (loading) return; // Prevent double submission
     const cleanEmail = email.trim().toLowerCase();
 
     if (!cleanEmail) {
       Alert.alert("Enter Email", "Please enter your email address.");
       return;
     }
-
-    if (loading) return;
 
     setLoading(true);
 
@@ -44,6 +43,10 @@ const ForgotPassword = () => {
         setLoading(false);
         Sentry.captureException(error);
 
+        if (!error || !error.code) {
+          Alert.alert("Error", "An unknown error occurred. Please try again.");
+          return;
+        }
         switch (error.code) {
           case "auth/user-not-found":
             Alert.alert("User Not Found", "No user found with this email.");

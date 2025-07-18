@@ -3,10 +3,10 @@ import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
-  FlatList,
-  Image,
-  Text,
-  View,
+    FlatList,
+    Image,
+    Text,
+    View,
 } from "react-native";
 import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
@@ -21,6 +21,7 @@ export default function Progress({ enroll = false }) {
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [loadingId, setLoadingId] = useState(null);
+  const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
   const router = useRouter();
 
   useFocusEffect(
@@ -34,10 +35,13 @@ export default function Progress({ enroll = false }) {
   }, [userDetail]);
 
   const GetCourseList = async () => {
+    if (fetching) return;
     setLoading(true);
+    setFetching(true);
     setCourseList([]);
     if (!userDetail?.email) {
       setLoading(false);
+      setFetching(false);
       return;
     }
 
@@ -60,8 +64,12 @@ export default function Progress({ enroll = false }) {
     } catch (error) {
       console.error(error);
       Sentry.captureException(error);
+      if (typeof ToastAndroid !== 'undefined') {
+        ToastAndroid.show("Failed to load progress", ToastAndroid.SHORT);
+      }
     } finally {
       setLoading(false);
+      setFetching(false);
     }
   };
 

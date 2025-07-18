@@ -19,7 +19,7 @@ import { Colors } from "../../constant/Colors";
 export default function DownloadScreen() {
   const [downloads, setDownloads] = useState([]);
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loadingId, setLoadingId] = useState(null); // Track loading per item
 
   useEffect(() => {
     loadDownloads();
@@ -31,22 +31,29 @@ export default function DownloadScreen() {
   };
 
   const removeDownload = async (item) => {
-    await FileSystem.deleteAsync(item.uri, { idempotent: true });
-    const updated = downloads.filter((d) => d.id !== item.id);
-    setDownloads(updated);
-    await AsyncStorage.setItem("offlineDownloads", JSON.stringify(updated));
+    if (loadingId) return;
+    setLoadingId(item.id);
+    try {
+      await FileSystem.deleteAsync(item.uri, { idempotent: true });
+      const updated = downloads.filter((d) => d.id !== item.id);
+      setDownloads(updated);
+      await AsyncStorage.setItem("offlineDownloads", JSON.stringify(updated));
+    } catch (error) {
+      Alert.alert("Error", "Unable to delete the course file.");
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   const share = async (item) => {
+    if (loadingId) return;
+    setLoadingId(item.id);
     try {
-      setLoading(true);
       const fileInfo = await FileSystem.getInfoAsync(item.uri);
-
       if (!fileInfo.exists) {
         Alert.alert("File not found", "The file has been moved or deleted.");
         return;
       }
-
       const available = await Sharing.isAvailableAsync();
       if (!available) {
         Alert.alert(
@@ -55,23 +62,25 @@ export default function DownloadScreen() {
         );
         return;
       }
-
       await Sharing.shareAsync(item.uri, {
         mimeType: "application/pdf",
         dialogTitle: `Share ${item.title}`,
       });
-      setLoading(false);
     } catch (error) {
-      console.error("Error sharing file:", error);
       Alert.alert("Error", "Unable to share the course file.");
-      setLoading(false);
+    } finally {
+      setLoadingId(null);
     }
   };
 
   return (
     <View style={styles.container}>
       <Pressable
-        onPress={() => router.push("/(tabs)/home")}
+        onPress={() => {
+          if (router && typeof router.push === 'function') router.push("/(tabs)/home");
+        }}
+        accessible={true}
+        accessibilityLabel="Go home"
         style={{
           position: "absolute",
           top: 50, // adjust as needed for safe area
@@ -131,8 +140,8 @@ export default function DownloadScreen() {
                     flexDirection: "column",
                   }}
                 >
-                  <TouchableOpacity onPress={() => share(item)}>
-                    {loading ? (
+                  <TouchableOpacity onPress={() => share(item)} disabled={!!loadingId}>
+                    {loadingId === item.id ? (
                       <ActivityIndicator size={"small"} color={Colors.GREEN} />
                     ) : (
                       <Text
@@ -151,6 +160,7 @@ export default function DownloadScreen() {
                     )}
                   </TouchableOpacity>
                   <TouchableOpacity
+                    disabled={!!loadingId}
                     onPress={() =>
                       Alert.alert(
                         "Delete?",

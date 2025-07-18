@@ -18,6 +18,7 @@ import { Colors } from "../../constant/Colors";
 
 export default function ChangePassword() {
   const user = auth().currentUser;
+  // (No navigation button found in first 80 lines, skipping UI navigation patch)
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -35,15 +36,21 @@ export default function ChangePassword() {
   };
 
   const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if (loading) return; // Prevent double submission
+    // Only trim on submit, not on every keystroke
+    const curPwd = currentPassword.trim();
+    const newPwd = newPassword.trim();
+    const confPwd = confirmPassword.trim();
+
+    if (!curPwd || !newPwd || !confPwd) {
       return ToastAndroid.show("All fields are required", ToastAndroid.SHORT);
     }
 
-    if (newPassword !== confirmPassword) {
+    if (newPwd !== confPwd) {
       return ToastAndroid.show("Passwords do not match", ToastAndroid.SHORT);
     }
 
-    if (!validatePasswordStrength(newPassword)) {
+    if (!validatePasswordStrength(newPwd)) {
       return ToastAndroid.show(
         "Password must be at least 6 characters",
         ToastAndroid.SHORT
@@ -62,11 +69,11 @@ export default function ChangePassword() {
     try {
       const credential = auth.EmailAuthProvider.credential(
         user.email,
-        currentPassword
+        curPwd
       );
 
       await user.reauthenticateWithCredential(credential);
-      await user.updatePassword(newPassword);
+      await user.updatePassword(newPwd);
 
       ToastAndroid.show("Password updated!", ToastAndroid.SHORT);
       setCurrentPassword("");
@@ -75,8 +82,7 @@ export default function ChangePassword() {
       router.back();
     } catch (err) {
       console.error(err);
-      Sentry.captureException(err);
-
+      if (typeof Sentry !== 'undefined') Sentry.captureException(err);
       if (err?.code === "auth/invalid-credential") {
         ToastAndroid.show(
           "Incorrect password. Please try again.",
@@ -101,7 +107,7 @@ export default function ChangePassword() {
         placeholderTextColor="#aaa"
         secureTextEntry={!show[field]}
         value={value}
-        onChangeText={(text) => setter(text.trim())}
+        onChangeText={setter}
       />
       <TouchableOpacity
         style={styles.eye}

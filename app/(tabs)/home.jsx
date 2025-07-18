@@ -45,6 +45,7 @@ export default function Home() {
   const [courseList, setCourseList] = useState([]);
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
   const router = useRouter();
 
   // Initialize modular auth/firestore instances
@@ -57,7 +58,6 @@ export default function Home() {
         GetCourseList(user);
       } else {
         setCourseList([]);
-        // console.log("🚫 No authenticated user. Redirecting to sign-in...");
         // router.replace("/auth/signIn");
       }
     });
@@ -66,16 +66,14 @@ export default function Home() {
   }, []);
 
   const GetCourseList = async (user) => {
+    if (fetching) return;
     setLoading(true);
-
+    setFetching(true);
     try {
       await reload(user);
-
-      // After reload, get updated currentUser from auth
       const refreshedUser = auth.currentUser;
-
       if (!refreshedUser?.email) {
-        console.log("⚠️ No email on refreshedUser");
+        ToastAndroid.show("No user email found", ToastAndroid.SHORT);
         setCourseList([]);
         return;
       }
@@ -155,6 +153,7 @@ export default function Home() {
         onRefresh={() => {
           const user = auth.currentUser;
           if (user) {
+            setFetching(false); // Allow repeated manual refresh
             GetCourseList(user);
           }
         }}

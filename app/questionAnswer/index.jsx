@@ -59,7 +59,13 @@ export default function QuestionAnswer() {
             gap: 10,
           }}
         >
-          <Pressable onPress={() => router.back()}>
+          <Pressable
+            onPress={() => {
+              if (router && typeof router.back === 'function') router.back();
+            }}
+            accessible={true}
+            accessibilityLabel="Go back"
+          >
             <Ionicons
               style={{
                 padding: 3,

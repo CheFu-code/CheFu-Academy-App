@@ -23,38 +23,37 @@ export default function SuccessScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const orderID = params.token;
-  const email = userDetail?.email;
-  const planType = params.planType || userDetail?.planType;
+  // Defensive: fallback to empty string if userDetail is not loaded
+  const email = userDetail?.email || "";
+  const planType = params.planType || userDetail?.planType || "basic";
 
   useEffect(() => {
-    if (captureCalled.current || !orderID || !planType || !email) return;
+    if (captureCalled.current || !orderID || !planType || !email) {
+      setLoading(false);
+      return;
+    }
 
     captureCalled.current = true;
 
     const captureOrder = async () => {
       try {
         const BASE_URL = "https://chefu-academy-tmzx.onrender.com";
-
-        console.log("Capturing order with:", { orderID, email, planType });
-
         const res = await fetch(`${BASE_URL}/api/paypal/capture-order`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderID, email, planType }),
         });
-
-        const data = await res.json();
-
+        let data = {};
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          ToastAndroid.show("Invalid server response", ToastAndroid.SHORT);
+          setLoading(false);
+          return;
+        }
         if (res.ok) {
           setReceipt(data.details);
           ToastAndroid.show("Payment captured", ToastAndroid.SHORT);
-
-          // const userRef = doc(db, "users", email);
-          // const userSnap = await getDoc(userRef);
-          // if (userSnap.exists()) {
-          //   setUserDetail(userSnap.data());
-          // }
-
           const { member, subscribedAt, memberUntil } = data;
           setUserDetail((prev) => ({
             ...prev,
@@ -73,7 +72,6 @@ export default function SuccessScreen() {
             ToastAndroid.LONG,
             ToastAndroid.CENTER
           );
-
           setReceipt({
             id: orderID,
             status: "COMPLETED",
@@ -98,7 +96,6 @@ export default function SuccessScreen() {
               },
             ],
           });
-
           setUserDetail((prev) => ({
             ...prev,
             member: true,
@@ -106,12 +103,8 @@ export default function SuccessScreen() {
           }));
         } else {
           ToastAndroid.show("Capture failed", ToastAndroid.SHORT);
-          console.error("Capture failed response:", data);
         }
-
-        console.log("Capture response:", JSON.stringify(data, null, 2));
       } catch (error) {
-        console.error("Capture error:", error);
         ToastAndroid.show("Network error", ToastAndroid.SHORT);
       } finally {
         setLoading(false);

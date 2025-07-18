@@ -12,6 +12,7 @@ import {
   Linking,
   Platform,
   Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,9 +21,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
+import Colors from "../../constant/Colors"; // Make sure this path is correct
+import { UserDetailContext } from "../../context/UserDetailContext"; // Adjust if needed
 
 const SignIn = () => {
   const router = useRouter();
@@ -33,16 +33,18 @@ const SignIn = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [fatalError, setFatalError] = useState(null);
 
   const auth = getAuth();
   const db = getFirestore();
 
   const SUPPORT_EMAIL = "kurisanimaluleke77@gmail.com";
 
-  // UPDATED: changed param from uid to email to match firestore doc key usage
   const getUserDetail = async (email) => {
     try {
       const userDocRef = doc(db, "users", email);
+      // Update lastLogin to now
+      await userDocRef.update({ lastLogin: new Date() });
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
         setUserDetail(userDoc.data());
@@ -55,16 +57,21 @@ const SignIn = () => {
     }
   };
 
-  // UPDATED: use async/await and removed shouldNavigate state
-  const handleSignIn = async () => {
-    const cleanEmail = email.trim().toLowerCase();
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    // Clear errors before validation
+  const handleSignIn = async () => {
+    if (loading) return;
+
+    const cleanEmail = email.trim().toLowerCase();
     setEmailError("");
     setPasswordError("");
 
     if (!cleanEmail) {
       setEmailError("Please enter your email");
+      return;
+    }
+    if (!validateEmail(cleanEmail)) {
+      setEmailError("Please enter a valid email address");
       return;
     }
     if (!password) {
@@ -75,14 +82,11 @@ const SignIn = () => {
     setLoading(true);
     try {
       const resp = await auth.signInWithEmailAndPassword(cleanEmail, password);
-
-      await getUserDetail(resp.user.email); // Using email as Firestore doc key
+      await getUserDetail(resp.user.email);
       ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
       router.replace("/(tabs)/home");
     } catch (e) {
-      setLoading(false);
       Sentry.captureException(e);
-      console.log("error signing in:", e);
       const contactSupport = () => Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
       switch (e.code) {
         case "auth/operation-not-allowed":
@@ -96,25 +100,13 @@ const SignIn = () => {
           );
           break;
         case "auth/invalid-credential":
-          ToastAndroid.show(
-            "Invalid credentials. Please try again.",
-            ToastAndroid.SHORT
-          );
+          ToastAndroid.show("Invalid credentials. Please try again.", ToastAndroid.SHORT);
           break;
         case "auth/internal-error":
-          Alert.alert(
-            "Internal Error",
-            "Something went wrong. Please try again later or contact support.",
-            [
-              { text: "Cancel", style: "cancel" },
-              { text: "Contact", onPress: contactSupport },
-            ]
-          );
-          break;
         case "auth/network-request-failed":
           Alert.alert(
-            "Network Error",
-            "Please check your internet connection and try again. Contact support if the problem persists.",
+            "Error",
+            e.message || "Please try again or contact support.",
             [
               { text: "Cancel", style: "cancel" },
               { text: "Contact", onPress: contactSupport },
@@ -123,40 +115,30 @@ const SignIn = () => {
           break;
         default:
           Alert.alert("Error", e.message);
+          break;
       }
     } finally {
       setLoading(false);
     }
   };
 
+  if (fatalError) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: "red", fontSize: 18, marginBottom: 20 }}>A fatal error occurred.</Text>
+        <Text style={{ color: "red", fontSize: 14, marginBottom: 20 }}>{fatalError?.message || String(fatalError)}</Text>
+        <TouchableOpacity onPress={() => setFatalError(null)} style={{ backgroundColor: Colors.PRIMARY, padding: 12, borderRadius: 8, marginTop: 10 }}>
+          <Text style={{ color: "white", fontWeight: "bold" }}>Try Again</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-      }}
-    >
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={30}
-      >
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: "center",
-            paddingBottom: 40,
-          }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View
-            style={{
-              display: "flex",
-              alignItems: "center",
-              paddingTop: 30,
-              padding: 25,
-            }}
-          >
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={30}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+          <View style={{ alignItems: "center", paddingTop: 30, padding: 25 }}>
             <Image
               source={require("./../../assets/images/logo.png")}
               style={{
@@ -166,35 +148,22 @@ const SignIn = () => {
                 borderWidth: 2,
                 borderColor: Colors.PRIMARY,
                 marginBottom: 15,
-                // marginTop: 30,
               }}
             />
-            <Text
-              style={{
-                fontSize: 28,
-                fontFamily: "outfit-bold",
-                color: Colors.PRIMARY,
-              }}
-            >
-              Welcome back
-            </Text>
+            <Text style={{ fontSize: 28, fontFamily: "outfit-bold", color: Colors.PRIMARY }}>Welcome back</Text>
 
             <TextInput
               placeholder="Email"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
               onChangeText={(value) => {
-                setEmail(value);
+                setEmail(value.trim());
                 if (emailError) setEmailError("");
               }}
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            {emailError ? (
-              <Text style={{ color: "red", alignSelf: "flex-start" }}>
-                {emailError}
-              </Text>
-            ) : null}
+            {emailError ? <Text style={{ color: "red", alignSelf: "flex-start" }}>{emailError}</Text> : null}
 
             <View style={styles.passwordContainer}>
               <TextInput
@@ -206,34 +175,17 @@ const SignIn = () => {
                   if (passwordError) setPasswordError("");
                 }}
                 autoCapitalize="none"
-                style={{
-                  flex: 1,
-                  fontSize: 18,
-                  paddingVertical: 15,
-                  color: Colors.WHITE,
-                }}
+                style={{ flex: 1, fontSize: 18, paddingVertical: 15, color: "#ffffff" }}
+                onSubmitEditing={() => { if (!loading) handleSignIn(); }}
               />
               <Pressable onPress={() => setShowPassword((prev) => !prev)}>
-                <Ionicons
-                  name={showPassword ? "eye-off" : "eye"}
-                  size={24}
-                  color={Colors.PRIMARY}
-                />
+                <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color={Colors.PRIMARY} />
               </Pressable>
             </View>
-            {passwordError ? (
-              <Text style={{ color: "red", alignSelf: "flex-start" }}>
-                {passwordError}
-              </Text>
-            ) : null}
+            {passwordError ? <Text style={{ color: "red", alignSelf: "flex-start" }}>{passwordError}</Text> : null}
 
-            <Pressable
-              onPress={() => router.push("/auth/forgotPassword")}
-              style={{ alignSelf: "flex-end", marginTop: 10 }}
-            >
-              <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>
-                Forgot Password?
-              </Text>
+            <Pressable onPress={() => router.push("/auth/forgotPassword")} style={{ alignSelf: "flex-end", marginTop: 10 }}>
+              <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>Forgot Password?</Text>
             </Pressable>
 
             <TouchableOpacity
@@ -249,36 +201,16 @@ const SignIn = () => {
               disabled={loading || !email || !password}
             >
               {!loading ? (
-                <Text
-                  style={{
-                    fontFamily: "outfit", // FIXED typo from "out-fit"
-                    fontSize: 20,
-                    textAlign: "center",
-                    color: Colors.WHITE,
-                  }}
-                >
-                  Sign In
-                </Text>
+                <Text style={{ fontFamily: "outfit", fontSize: 20, textAlign: "center", color: Colors.WHITE }}>Sign In</Text>
               ) : (
-                <ActivityIndicator color={"white"} size={"large"} />
+                <ActivityIndicator color="white" size="large" />
               )}
             </TouchableOpacity>
 
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 3,
-                marginTop: 20,
-              }}
-            >
-              <Text style={{ color: Colors.WHITE }}>
-                Don't have an account?{" "}
-              </Text>
+            <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <Text style={{ color: Colors.WHITE }}>Don't have an account? </Text>
               <Pressable onPress={() => router.push("/auth/signUp")}>
-                <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>
-                  Sign Up
-                </Text>
+                <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>Sign Up</Text>
               </Pressable>
             </View>
           </View>
@@ -298,18 +230,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 20,
     borderRadius: 8,
-    color: Colors.WHITE,
-    borderColor: Colors.PRIMARY,
+    color: "#ffffff",
+    borderColor: Colors.GRAY,
   },
   passwordContainer: {
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: Colors.PRIMARY,
+    paddingHorizontal: 15,
     borderRadius: 8,
+    borderColor: Colors.GRAY,
     marginTop: 20,
-    paddingHorizontal: 10,
-    width: "100%",
-    backgroundColor: "transparent",
   },
 });

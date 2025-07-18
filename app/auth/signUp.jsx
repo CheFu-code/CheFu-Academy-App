@@ -21,6 +21,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as RNLocalize from "react-native-localize";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -33,6 +34,7 @@ const SignUp = () => {
   const { setUserDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const DEFAULT_PREFS = {
     general: false,
@@ -43,9 +45,23 @@ const SignUp = () => {
 
   const auth = getAuth();
 
+  // Email and password validation
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (pw) => pw.length >= 6;
+
   const CreateNewAccount = async () => {
+    if (loading) return; // Prevent double submission
+    setErrorMsg("");
     if (!fullName.trim() || !email.trim() || !password.trim()) {
-      alert("All fields are required.");
+      setErrorMsg("All fields are required.");
+      return;
+    }
+    if (!validateEmail(email.trim())) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+    if (!validatePassword(password)) {
+      setErrorMsg("Password should be at least 6 characters.");
       return;
     }
 
@@ -62,41 +78,42 @@ const SignUp = () => {
       await user.sendEmailVerification();
       await SaveUser(user);
 
+      setErrorMsg("");
       alert("Account created! Please check your email to verify your address.");
     } catch (e) {
       Sentry.captureException(e);
-      console.log("Error in createUserWithEmailAndPassword:", e.message);
+      if (!e || !e.code) {
+        setErrorMsg("An unknown error occurred. Please try again.");
+        setLoading(false);
+        return;
+      }
       switch (e.code) {
         case "auth/email-already-in-use":
-          alert("This email is already in use. Please use a different email.");
+          setErrorMsg("This email is already in use. Please use a different email.");
           break;
         case "auth/invalid-email":
-          alert("The email address is not valid.");
+          setErrorMsg("The email address is not valid.");
           break;
         case "auth/weak-password":
-          alert("Password should be at least 6 characters.");
+          setErrorMsg("Password should be at least 6 characters.");
           break;
         case "auth/operation-not-allowed":
-          alert(
-            "Email/password accounts are not enabled. Please contact support."
-          );
+          setErrorMsg("Email/password accounts are not enabled. Please contact support.");
           break;
         case "auth/missing-email":
-          alert("Please enter your email address.");
+          setErrorMsg("Please enter your email address.");
           break;
         case "auth/too-many-requests":
-          alert("Too many attempts. Please try again later.");
+          setErrorMsg("Too many attempts. Please try again later.");
           break;
         case "auth/internal-error":
-          alert("Internal error. Please try again later.");
+          setErrorMsg("Internal error. Please try again later.");
           break;
         default:
           if (e.message && e.message.includes("network")) {
-            alert(
-              "Network error: Please check your internet connection and try again."
-            );
+            setErrorMsg("Network error: Please check your internet connection and try again.");
           } else {
-            alert(e.message);
+            setErrorMsg(e.message);
           }
       }
     } finally {
@@ -107,6 +124,18 @@ const SignUp = () => {
   const SaveUser = async (user) => {
     try {
       const firestore = getFirestore();
+      // Get device info
+      const { Platform, Dimensions } = require("react-native");
+      const { width, height } = Dimensions.get("window");
+      const deviceInfo = {
+        os: Platform.OS,
+        osVersion: Platform.Version,
+        screenWidth: width,
+        screenHeight: height,
+        isTablet: width >= 600,
+      };
+
+      const country = RNLocalize.getCountry();
       const data = {
         fullname: fullName,
         email: email.trim(),
@@ -116,6 +145,16 @@ const SignUp = () => {
         updatedAt: new Date(),
         uid: user.uid,
         emailPreferences: DEFAULT_PREFS,
+        profilePicture: null, // Placeholder for future profile image
+        lastLogin: null, // Can be updated on login
+        provider: user.providerId || "email", // Track sign up method
+        onboardingComplete: false, // For onboarding flow
+        roles: ["user"], // For future role management
+        bio: "", // User profile bio
+        language: "en", // Default language
+        country,
+        subscriptionStatus: "free", // Default subscription
+        deviceInfo,
       };
 
       await setDoc(doc(firestore, "users", email.trim()), data);
@@ -180,34 +219,57 @@ const SignUp = () => {
               placeholder="Fullname"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
-              onChangeText={setFullName}
+              onChangeText={v => setFullName(v.trimStart())}
               maxLength={50}
               value={fullName}
+              accessibilityLabel="Full Name"
+              autoCapitalize="words"
+              returnKeyType="next"
             />
             <TextInput
               placeholder="Email"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
-              onChangeText={setEmail}
+              onChangeText={v => setEmail(v.trim())}
               keyboardType="email-address"
               autoCapitalize="none"
               maxLength={100}
               value={email}
+              accessibilityLabel="Email Address"
+              returnKeyType="next"
             />
-            <TextInput
-              placeholder="Password"
-              style={styles.textInput}
-              placeholderTextColor={Colors.GRAY}
-              secureTextEntry={!showPassword}
-              onChangeText={setPassword}
-              maxLength={50}
-              value={password}
-            />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <View style={{ width: '100%', position: 'relative' }}>
+              <TextInput
+                placeholder="Password"
+                style={styles.textInput}
+                placeholderTextColor={Colors.GRAY}
+                secureTextEntry={!showPassword}
+                onChangeText={v => setPassword(v)}
+                maxLength={50}
+                value={password}
+                accessibilityLabel="Password"
+                returnKeyType="done"
+                onSubmitEditing={() => { if (!loading) CreateNewAccount(); }}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: 15, top: 32 }}
+                accessibilityLabel={showPassword ? "Hide Password" : "Show Password"}
+                accessibilityRole="button"
+              >
+                <Text style={{ color: Colors.PRIMARY, fontSize: 14 }}>
+                  {showPassword ? "Hide" : "Show"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {errorMsg ? (
+              <Text style={{ color: 'red', marginTop: 10, textAlign: 'center' }} accessibilityLiveRegion="polite">{errorMsg}</Text>
+            ) : null}
+            {/* <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Text style={{ color: Colors.PRIMARY }}>
                 {showPassword ? "Hide Password" : "Show Password"}
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               onPress={CreateNewAccount}
               style={{

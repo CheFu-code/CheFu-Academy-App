@@ -8,7 +8,7 @@ import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Stack, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Text, View } from "react-native";
 import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission";
@@ -31,16 +31,17 @@ Sentry.init({
   ],
 });
 
-let lastHandledOrderID = null;
-let alreadyRedirected = false;
+
 
 export default Sentry.wrap(function RootLayout() {
   const [userDetail, setUserDetail] = useState();
   const [authChecked, setAuthChecked] = useState(false);
   const [authSuccess, setAuthSuccess] = useState(false);
   const router = useRouter();
+  const lastHandledOrderID = useRef(null);
+  const alreadyRedirected = useRef(false);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     outfit: require("../assets/fonts/Outfit-Regular.ttf"),
     "outfit-bold": require("../assets/fonts/Outfit-Bold.ttf"),
     michroma: require("../assets/fonts/Michroma-Regular.ttf"),
@@ -88,15 +89,14 @@ export default Sentry.wrap(function RootLayout() {
   // ✅ Global Auth Redirect
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(getApp()), (user) => {
-      console.log("AuthState:", user?.uid || "none");
-      if (authChecked && authSuccess && !user && !alreadyRedirected) {
-        alreadyRedirected = true;
+      if (authChecked && authSuccess && !user && !alreadyRedirected.current) {
+        alreadyRedirected.current = true;
         console.warn("⚠️ No authenticated user. Redirecting to sign-in...");
         router.replace("/auth/signIn");
       }
     });
     return unsubscribe;
-  }, [authChecked, authSuccess]);
+  }, [authChecked, authSuccess, router]);
 
   // ✅ Notifications Setup
   useEffect(() => {
@@ -156,8 +156,8 @@ export default Sentry.wrap(function RootLayout() {
     const planType = parsed.queryParams?.planType || "basic";
 
     if (parsed.path === "success") {
-      if (orderID && orderID === lastHandledOrderID) return;
-      lastHandledOrderID = orderID;
+      if (orderID && orderID === lastHandledOrderID.current) return;
+      lastHandledOrderID.current = orderID;
 
       router.replace({
         pathname: "/subscription/success",
@@ -168,6 +168,15 @@ export default Sentry.wrap(function RootLayout() {
     }
   };
 
+  if (fontError) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1B263B", paddingHorizontal: 24 }}>
+        <Text style={{ color: "#E57373", fontSize: 16, fontFamily: "System", textAlign: "center" }}>
+          Failed to load fonts. Please restart the app.
+        </Text>
+      </View>
+    );
+  }
   if (!fontsLoaded || !authChecked || !authSuccess) {
     return (
       <View

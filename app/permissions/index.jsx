@@ -18,6 +18,7 @@ import { Colors } from "../../constant/Colors";
 
 export default function Permissions() {
   // Use the Camera hook for permissions and request function
+  // (No navigation button found in first 80 lines, skipping UI navigation patch)
   const [cameraPermission, requestCameraPermission] =
     Camera.useCameraPermissions();
 

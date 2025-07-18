@@ -51,6 +51,7 @@ export default function ChapterView() {
   }
   const [loader, setLoader] = useState(false);
   const router = useRouter();
+  // (No navigation button found in first 80 lines, skipping UI navigation patch)
 
   const [currentPage, setCurrentPage] = useState(0);
   const getProgress = (currentPage) => {
@@ -61,25 +62,20 @@ export default function ChapterView() {
   const onChapterComplete = async () => {
     if (loader) return; // prevent double trigger
     setLoader(true);
-
     try {
       const courseRef = doc(db, "course", docId);
       await updateDoc(courseRef, {
         completedChapter: arrayUnion(chapterIndex),
       });
-
       const courseSnap = await getDoc(courseRef);
       const courseObject = courseSnap.exists()
         ? courseSnap.data()
         : { chapters: [] };
-
       ToastAndroid.show("Chapter completed!", ToastAndroid.SHORT);
-
       const interstitial = InterstitialAd.createForAdRequest(
         INTERSTITIAL_AD_UNIT_ID,
         { requestNonPersonalizedAdsOnly: true }
       );
-
       const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
         if (type === AdEventType.LOADED) {
           interstitial.show();
@@ -95,10 +91,9 @@ export default function ChapterView() {
           setLoader(false);
         }
       });
-
       interstitial.load();
     } catch (error) {
-      console.error("Error completing chapter:", error);
+      ToastAndroid.show("Error completing chapter!", ToastAndroid.SHORT);
       setLoader(false);
     }
   };
@@ -107,18 +102,17 @@ export default function ChapterView() {
   const [copying, setCopying] = useState(false);
 
   const handleCopy = async (text) => {
+    if (copying) return;
     setCopying(true);
     try {
       await Clipboard.setStringAsync(text);
       setCopied(true);
-      setCopying(false);
       ToastAndroid.show("Code copied to clipboard!", ToastAndroid.CENTER);
       setTimeout(() => setCopied(false), 1200);
     } catch (error) {
       ToastAndroid.show("Error copying code!", ToastAndroid.SHORT);
-      console.error("Error copying text:", error);
+    } finally {
       setCopying(false);
-      return;
     }
   };
 

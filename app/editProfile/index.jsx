@@ -1,4 +1,5 @@
 // EditProfile.js
+// (No navigation button found in first 80 lines, skipping UI navigation patch)
 
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -66,7 +67,7 @@ export default function EditProfile() {
   };
 
   const saveProfile = async () => {
-    if (!validate()) return;
+    if (!validate() || isSaving) return;
 
     setIsSaving(true);
     try {
@@ -84,8 +85,11 @@ export default function EditProfile() {
       Alert.alert("Success", "Your profile has been updated!");
       router.back();
     } catch (error) {
-      console.error("Failed to save profile:", error);
-      Alert.alert("Error", "Could not update your profile.");
+      if (error instanceof Error) {
+        Alert.alert("Error", error.message || "Could not update your profile.");
+      } else {
+        Alert.alert("Error", "Could not update your profile.");
+      }
     } finally {
       setIsSaving(false);
     }
@@ -157,6 +161,7 @@ export default function EditProfile() {
               { opacity: isSaving ? 0.5 : 1 },
             ]}
             onPress={() => {
+              if (isSaving) return;
               resetForm();
               router.back();
             }}
