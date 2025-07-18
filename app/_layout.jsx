@@ -92,7 +92,7 @@ export default Sentry.wrap(function RootLayout() {
       if (authChecked && authSuccess && !user && !alreadyRedirected.current) {
         alreadyRedirected.current = true;
         console.warn("⚠️ No authenticated user. Redirecting to sign-in...");
-        router.replace("/auth/signIn");
+        router.replace("/");
       }
     });
     return unsubscribe;

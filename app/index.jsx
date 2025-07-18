@@ -24,6 +24,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { authorize } from "react-native-app-auth";
 import ImmersiveMode from "react-native-immersive";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors } from "../constant/Colors";
@@ -40,6 +41,28 @@ export default function Index() {
   const { setUserDetail } = useContext(UserDetailContext);
   const auth = getAuth();
   const firestore = getFirestore();
+
+  const githubAuthConfig = {
+    clientId: "Ov23ligAlqOw7DlnHPxS",
+    clientSecret: "69afb862358b38965e9ca00cc24eac296c22da48",
+    redirectUrl: "chefu-academy://oauthredirect", // Must match your GitHub OAuth app settings
+    scopes: ["identity", "user:email"],
+    serviceConfiguration: {
+      authorizationEndpoint: "https://github.com/login/oauth/authorize",
+      tokenEndpoint: "https://github.com/login/oauth/access_token",
+    },
+  };
+
+  async function getGithubAccessToken() {
+    try {
+      const result = await authorize(githubAuthConfig);
+      // result.accessToken is what you need for Firebase
+      return result.accessToken;
+    } catch (error) {
+      console.error("GitHub OAuth error:", error);
+      throw error;
+    }
+  }
 
   // Google Sign-In config
   useEffect(() => {
@@ -168,21 +191,66 @@ export default function Index() {
     );
   }
 
+  const handleGithubSignIn = async () => {
+    try {
+      // Sign in with GitHub using Firebase Auth
+      const { GithubAuthProvider, signInWithCredential } = await import(
+        "@react-native-firebase/auth"
+      );
+      // You need to obtain the GitHub OAuth access token from your OAuth flow
+      // For demonstration, let's assume you have it as `githubAccessToken`
+      const githubAccessToken = await getGithubAccessToken(); // Implement this function to get the token
+
+      const githubCredential = GithubAuthProvider.credential(githubAccessToken);
+      const userCredential = await signInWithCredential(auth, githubCredential);
+
+      // Save or update user in Firestore
+      await SaveUser(userCredential.user);
+
+      // Fetch user data from Firestore
+      const userRef = doc(firestore, "users", userCredential.user.email);
+      const docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        setUserDetail(userData);
+        await AsyncStorage.setItem("userDetail", JSON.stringify(userData));
+        router.replace("/(tabs)/home");
+      } else {
+        console.warn("User data not found in Firestore.");
+      }
+    } catch (error) {
+      console.error("Error signing in with GitHub:", error);
+      Sentry.captureException(error);
+    }
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Colors.BG_COLOR,
+      }}
+    >
       <Image
         source={require("./../assets/images/landing.png")}
-        style={{ width: "100%", height: 400, marginTop: 20 }}
+        style={{ width: "100%", height: 360, marginTop: 20 }}
         resizeMode="contain"
       />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles.bottomSheet}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
         <Text style={styles.title}>
           Welcome to{"\n"}
-          <Text style={{ color: Colors.BG_COLOR, fontFamily: "outfit-bold" }}>
+          <Text
+            style={{
+              color: Colors.BG_COLOR,
+              fontFamily: "outfit-bold",
+            }}
+          >
             CheFu Academy
           </Text>
         </Text>
@@ -196,30 +264,57 @@ export default function Index() {
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            {
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            style={{
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "#fff",
-              borderWidth: 1,
-              borderColor: "#4285F4",
-            },
-          ]}
-          onPress={handleGoogleSignIn}
-        >
-          <MaterialCommunityIcons
-            name="google"
-            size={24}
-            color="#4285F4"
-            style={{ marginRight: 10 }}
-          />
-          <Text style={[styles.buttonText, { color: "#4285F4" }]}>
-            Continue with Google
-          </Text>
-        </TouchableOpacity>
+              padding: 10,
+            }}
+            onPress={handleGoogleSignIn}
+          >
+            <MaterialCommunityIcons
+              name="google"
+              size={24}
+              color="white"
+              style={{
+                marginRight: 10,
+                padding: 8,
+                backgroundColor: Colors.GOOGLE.GRADIENT[0],
+                borderRadius: 10,
+              }}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 15,
+            }}
+            onPress={handleGithubSignIn}
+          >
+            <MaterialCommunityIcons
+              name="github"
+              size={24}
+              color="white"
+              style={{
+                marginRight: 10,
+                padding: 8,
+                backgroundColor: Colors.BLACK,
+                borderRadius: 10,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           onPress={() => router.push("/auth/signIn")}
@@ -242,6 +337,7 @@ export default function Index() {
               color: Colors.WHITE,
               marginTop: 30,
               fontSize: 14,
+              marginBottom: 75,
             }}
           >
             By signing up, you agree to our{" "}
@@ -275,7 +371,6 @@ const styles = StyleSheet.create({
   bottomSheet: {
     padding: 25,
     backgroundColor: Colors.PRIMARY,
-    height: "100%",
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
   },
@@ -307,5 +402,6 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: "center",
     fontSize: 17,
+    fontFamily: "outfit-bold",
   },
 });

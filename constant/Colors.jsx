@@ -11,4 +11,18 @@ export const Colors = {
   BG_COLOR: "#1B263B",
   YELLOW: "#FFD700",
   LIGHT_YELLOW: "#FFF9C4",
+
+  GOOGLE: {
+    BLUE: "#4285F4",
+    RED: "#EA4335",
+    YELLOW: "#FBBC05",
+    GREEN: "#34A853",
+
+    GRADIENT: [
+      "#4285F4", // blue
+      "#EA4335", // red
+      "#FBBC05", // yellow
+      "#34A853", // green
+    ],
+  },
 };
