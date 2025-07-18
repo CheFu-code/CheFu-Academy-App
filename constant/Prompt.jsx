@@ -8,7 +8,7 @@ export default {
     - Output will be ARRAY of String in JSON FORMAT only
     - Do not add any plain text in output,
     `,
-  // - Chapter Explain in HTML Form, (Code example if required), add line break if required
+  // - Chapter Explain in HTML Form, (Code example if required), add line break if required!
   COURSE: dedent`: As you are coaching teacher
     - User want to learn about all topics
     - Create 2 Courses With Course Name, Description, and 5/8 Chapters in each course
