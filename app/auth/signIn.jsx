@@ -21,7 +21,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Colors from "../../constant/Colors"; // Make sure this path is correct
+import { Colors } from "../../constant/Colors"; // Make sure this path is correct
 import { UserDetailContext } from "../../context/UserDetailContext"; // Adjust if needed
 
 const SignIn = () => {
@@ -100,7 +100,10 @@ const SignIn = () => {
           );
           break;
         case "auth/invalid-credential":
-          ToastAndroid.show("Invalid credentials. Please try again.", ToastAndroid.SHORT);
+          ToastAndroid.show(
+            "Invalid credentials. Please try again.",
+            ToastAndroid.SHORT
+          );
           break;
         case "auth/internal-error":
         case "auth/network-request-failed":
@@ -124,10 +127,29 @@ const SignIn = () => {
 
   if (fatalError) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: "red", fontSize: 18, marginBottom: 20 }}>A fatal error occurred.</Text>
-        <Text style={{ color: "red", fontSize: 14, marginBottom: 20 }}>{fatalError?.message || String(fatalError)}</Text>
-        <TouchableOpacity onPress={() => setFatalError(null)} style={{ backgroundColor: Colors.PRIMARY, padding: 12, borderRadius: 8, marginTop: 10 }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: Colors.BG_COLOR,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: "red", fontSize: 18, marginBottom: 20 }}>
+          A fatal error occurred.
+        </Text>
+        <Text style={{ color: "red", fontSize: 14, marginBottom: 20 }}>
+          {fatalError?.message || String(fatalError)}
+        </Text>
+        <TouchableOpacity
+          onPress={() => setFatalError(null)}
+          style={{
+            backgroundColor: Colors.PRIMARY,
+            padding: 12,
+            borderRadius: 8,
+            marginTop: 10,
+          }}
+        >
           <Text style={{ color: "white", fontWeight: "bold" }}>Try Again</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -136,8 +158,19 @@ const SignIn = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={30}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={30}
+      >
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingBottom: 40,
+          }}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={{ alignItems: "center", paddingTop: 30, padding: 25 }}>
             <Image
               source={require("./../../assets/images/logo.png")}
@@ -150,7 +183,15 @@ const SignIn = () => {
                 marginBottom: 15,
               }}
             />
-            <Text style={{ fontSize: 28, fontFamily: "outfit-bold", color: Colors.PRIMARY }}>Welcome back</Text>
+            <Text
+              style={{
+                fontSize: 28,
+                fontFamily: "outfit-bold",
+                color: Colors.PRIMARY,
+              }}
+            >
+              Welcome back
+            </Text>
 
             <TextInput
               placeholder="Email"
@@ -163,7 +204,11 @@ const SignIn = () => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            {emailError ? <Text style={{ color: "red", alignSelf: "flex-start" }}>{emailError}</Text> : null}
+            {emailError ? (
+              <Text style={{ color: "red", alignSelf: "flex-start" }}>
+                {emailError}
+              </Text>
+            ) : null}
 
             <View style={styles.passwordContainer}>
               <TextInput
@@ -175,17 +220,37 @@ const SignIn = () => {
                   if (passwordError) setPasswordError("");
                 }}
                 autoCapitalize="none"
-                style={{ flex: 1, fontSize: 18, paddingVertical: 15, color: "#ffffff" }}
-                onSubmitEditing={() => { if (!loading) handleSignIn(); }}
+                style={{
+                  flex: 1,
+                  fontSize: 18,
+                  paddingVertical: 15,
+                  color: "#ffffff",
+                }}
+                onSubmitEditing={() => {
+                  if (!loading) handleSignIn();
+                }}
               />
               <Pressable onPress={() => setShowPassword((prev) => !prev)}>
-                <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color={Colors.PRIMARY} />
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={24}
+                  color={Colors.PRIMARY}
+                />
               </Pressable>
             </View>
-            {passwordError ? <Text style={{ color: "red", alignSelf: "flex-start" }}>{passwordError}</Text> : null}
+            {passwordError ? (
+              <Text style={{ color: "red", alignSelf: "flex-start" }}>
+                {passwordError}
+              </Text>
+            ) : null}
 
-            <Pressable onPress={() => router.push("/auth/forgotPassword")} style={{ alignSelf: "flex-end", marginTop: 10 }}>
-              <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>Forgot Password?</Text>
+            <Pressable
+              onPress={() => router.push("/auth/forgotPassword")}
+              style={{ alignSelf: "flex-end", marginTop: 10 }}
+            >
+              <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>
+                Forgot Password?
+              </Text>
             </Pressable>
 
             <TouchableOpacity
@@ -201,16 +266,29 @@ const SignIn = () => {
               disabled={loading || !email || !password}
             >
               {!loading ? (
-                <Text style={{ fontFamily: "outfit", fontSize: 20, textAlign: "center", color: Colors.WHITE }}>Sign In</Text>
+                <Text
+                  style={{
+                    fontFamily: "outfit",
+                    fontSize: 20,
+                    textAlign: "center",
+                    color: Colors.WHITE,
+                  }}
+                >
+                  Sign In
+                </Text>
               ) : (
                 <ActivityIndicator color="white" size="large" />
               )}
             </TouchableOpacity>
 
             <View style={{ flexDirection: "row", marginTop: 20 }}>
-              <Text style={{ color: Colors.WHITE }}>Don't have an account? </Text>
+              <Text style={{ color: Colors.WHITE }}>
+                Don't have an account?{" "}
+              </Text>
               <Pressable onPress={() => router.push("/auth/signUp")}>
-                <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>Sign Up</Text>
+                <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>
+                  Sign Up
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -231,7 +309,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 8,
     color: "#ffffff",
-    borderColor: Colors.GRAY,
+    borderColor: "#858585",
   },
   passwordContainer: {
     width: "100%",
@@ -240,7 +318,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 15,
     borderRadius: 8,
-    borderColor: Colors.GRAY,
+    borderColor: "#858585",
     marginTop: 20,
   },
 });

@@ -32,6 +32,7 @@ import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { SaveUser } from "./auth/signUp";
 
 export default function Index() {
   const router = useRouter();
@@ -43,8 +44,8 @@ export default function Index() {
   // Google Sign-In config
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com", // Required for Firebase
-      androidClientId: "441077080510-h23esadokkt2j56qr3tjkgo9qtefsujt.apps.googleusercontent.com", // Optional, for native Android
+      webClientId:
+        "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com", // Required for Firebase
       offlineAccess: true,
     });
   }, []);
@@ -58,7 +59,9 @@ export default function Index() {
         "@react-native-firebase/auth"
       );
       const googleCredential = GoogleAuthProvider.credential(idToken);
-      await signInWithCredential(auth, googleCredential);
+      const userCredential = await signInWithCredential(auth, googleCredential);
+      // Save or update user in Firestore
+      await SaveUser(userCredential.user);
       // User is now signed in, onAuthStateChanged will handle the rest
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {

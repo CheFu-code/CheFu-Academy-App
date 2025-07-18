@@ -124,7 +124,6 @@ const SignUp = () => {
   const SaveUser = async (user) => {
     try {
       const firestore = getFirestore();
-      // Get device info
       const { Platform, Dimensions } = require("react-native");
       const { width, height } = Dimensions.get("window");
       const deviceInfo = {
@@ -136,42 +135,65 @@ const SignUp = () => {
       };
 
       const country = RNLocalize.getCountry();
-      const data = {
-        fullname: fullName,
-        email: email.trim(),
-        member: false,
-        isVerified: user.emailVerified,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        uid: user.uid,
-        emailPreferences: DEFAULT_PREFS,
-        profilePicture: null, // Placeholder for future profile image
-        lastLogin: null, // Can be updated on login
-        provider: user.providerId || "email", // Track sign up method
-        onboardingComplete: false, // For onboarding flow
-        roles: ["user"], // For future role management
-        bio: "", // User profile bio
-        language: "en", // Default language
-        country,
-        subscriptionStatus: "free", // Default subscription
-        deviceInfo,
-      };
+      // Use user.displayName and user.email if available (Google sign-in)
+      const userEmail = user.email || email.trim();
+      const userFullName = user.displayName || fullName;
+      const userPhoto = user.photoURL || null;
+      const userProvider = (user.providerData && user.providerData[0]?.providerId) || user.providerId || "email";
 
-      await setDoc(doc(firestore, "users", email.trim()), data);
+      // Check if user already exists
+      const userDocRef = doc(firestore, "users", userEmail);
+      const userDoc = await getDoc(userDocRef);
 
-      setUserDetail(data);
+      if (userDoc.exists()) {
+        // User exists, update lastLogin and any new info
+        await setDoc(userDocRef, {
+          ...userDoc.data(),
+          lastLogin: new Date(),
+          updatedAt: new Date(),
+          fullname: userFullName,
+          profilePicture: userPhoto,
+          provider: userProvider,
+        }, { merge: true });
+        setUserDetail({ ...userDoc.data(), fullname: userFullName, profilePicture: userPhoto, provider: userProvider });
+      } else {
+        // New user, create document
+        const data = {
+          fullname: userFullName,
+          email: userEmail,
+          member: false,
+          isVerified: user.emailVerified,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          uid: user.uid,
+          emailPreferences: DEFAULT_PREFS,
+          profilePicture: userPhoto,
+          lastLogin: new Date(),
+          provider: userProvider,
+          onboardingComplete: false,
+          roles: ["user"],
+          bio: "",
+          language: "en",
+          country,
+          subscriptionStatus: "free",
+          deviceInfo,
+        };
+        await setDoc(userDocRef, data);
+        setUserDetail(data);
 
-      await fetch(
-        "https://chefu-academy-tmzx.onrender.com/api/email/send-welcome",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: email.trim(),
-            name: fullName,
-          }),
-        }
-      );
+        // Only send welcome email for new users
+        await fetch(
+          "https://chefu-academy-tmzx.onrender.com/api/email/send-welcome",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: userEmail,
+              name: userFullName,
+            }),
+          }
+        );
+      }
 
       router.push("/home");
     } catch (e) {
