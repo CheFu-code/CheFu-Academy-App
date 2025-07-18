@@ -45,7 +45,7 @@ export default function Index() {
   const githubAuthConfig = {
     clientId: "Ov23ligAlqOw7DlnHPxS",
     clientSecret: "69afb862358b38965e9ca00cc24eac296c22da48",
-    redirectUrl: "chefu-academy://oauthredirect", // Must match your GitHub OAuth app settings
+    redirectUrl: "chefu-academy://oauthredirect",
     scopes: ["identity", "user:email"],
     serviceConfiguration: {
       authorizationEndpoint: "https://github.com/login/oauth/authorize",

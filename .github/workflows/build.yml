@@ -42,21 +42,11 @@ jobs:
       - name: Build Android debug APK
         run: cd android && ./gradlew assembleDebug
 
-      - name: Set up rclone
-        run: |
-          curl https://rclone.org/install.sh | sudo bash
-          mkdir -p ~/.config/rclone
-          echo "$RCLONE_CONF_BASE64" | base64 -d > ~/.config/rclone/rclone.conf
-        env:
-          RCLONE_CONF_BASE64: ${{ secrets.RCLONE_CONF_BASE64 }}
-
-      - name: Upload APK to Google Drive
-        run: |
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          rclone copyto android/app/build/outputs/apk/debug/app-debug.apk remote:chefu-academy-artifacts/chefuacademy-debug-${TIMESTAMP}.apk
-
-      - name: List files in remote folder
-        run: rclone ls remote:chefu-academy-artifacts
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chefuacademy-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Sentry Info
         run: npx sentry-cli info
