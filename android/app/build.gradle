@@ -96,6 +96,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.2025.1"
+
+        manifestPlaceholders = [
+            appAuthRedirectScheme: "chefu-academy" 
+        ]
     }
     signingConfigs {
         debug {
