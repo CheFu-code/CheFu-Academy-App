@@ -1,13 +1,9 @@
 globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 globalThis.RNFB_MODULAR_DEPRECATION_STRICT_MODE = true;
 
-
 import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  getAuth,
-  onAuthStateChanged,
-} from "@react-native-firebase/auth";
+import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import {
   doc,
   getDoc,
@@ -29,10 +25,13 @@ import {
   View,
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors } from "../constant/Colors";
 
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 
 export default function Index() {
   const router = useRouter();
@@ -44,18 +43,20 @@ export default function Index() {
   // Google Sign-In config
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // Replace with your actual web client ID
+      webClientId: "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com", // Required for Firebase
+      androidClientId: "441077080510-h23esadokkt2j56qr3tjkgo9qtefsujt.apps.googleusercontent.com", // Optional, for native Android
       offlineAccess: true,
     });
   }, []);
-
   const handleGoogleSignIn = async () => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const { idToken } = userInfo;
       // Authenticate with Firebase using the Google idToken
-      const { GoogleAuthProvider, signInWithCredential } = await import('@react-native-firebase/auth');
+      const { GoogleAuthProvider, signInWithCredential } = await import(
+        "@react-native-firebase/auth"
+      );
       const googleCredential = GoogleAuthProvider.credential(idToken);
       await signInWithCredential(auth, googleCredential);
       // User is now signed in, onAuthStateChanged will handle the rest
@@ -68,7 +69,7 @@ export default function Index() {
         // play services not available or outdated
       } else {
         // some other error
-        console.error('Google Sign-In error:', error);
+        console.error("Google Sign-In error:", error);
         Sentry.captureException(error);
       }
     }
@@ -185,7 +186,6 @@ export default function Index() {
 
         <Text style={styles.subtitle}>Smart Learning Starts Here</Text>
 
-
         <TouchableOpacity
           style={styles.button}
           onPress={() => router.push("/auth/signUp")}
@@ -194,11 +194,28 @@ export default function Index() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: '#4285F4' }]}
+          style={[
+            styles.button,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#fff",
+              borderWidth: 1,
+              borderColor: "#4285F4",
+            },
+          ]}
           onPress={handleGoogleSignIn}
         >
-          <MaterialCommunityIcons name="google" size={24} color="#4285F4" style={{ marginRight: 10 }} />
-          <Text style={[styles.buttonText, { color: '#4285F4' }]}>Continue with Google</Text>
+          <MaterialCommunityIcons
+            name="google"
+            size={24}
+            color="#4285F4"
+            style={{ marginRight: 10 }}
+          />
+          <Text style={[styles.buttonText, { color: "#4285F4" }]}>
+            Continue with Google
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -277,9 +294,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10,
     marginBottom: 7,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   button2: {
     marginTop: 10,
