@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "441077080510-h23esadokkt2j56qr3tjkgo9qtefsujt.apps.googleusercontent.com",
+          "client_id": "441077080510-5pdqs069qerlm8sfplboc803h4gnnn0p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.chefu.chefuacademy",
-            "certificate_hash": "e06d399b1d46687059403c54fe0eb6201676cf28"
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {

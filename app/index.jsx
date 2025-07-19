@@ -68,44 +68,80 @@ export default function Index() {
 
   // Google Sign-In config
   useEffect(() => {
-    GoogleSignin.configure({
+    const config = {
       webClientId:
-        "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com", // Required for Firebase
+        "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com",
       offlineAccess: true,
-    });
+    };
+
+    GoogleSignin.configure(config);
+    console.log("✅ GoogleSignin configured:", config);
   }, []);
+
   const handleGoogleSignIn = async () => {
+    console.log("🔄 Starting Google Sign-In...");
     setLoading(true);
+
     try {
-      await GoogleSignin.hasPlayServices();
+      const playServicesAvailable = await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+      console.log("✅ Play Services available:", playServicesAvailable);
+
+      console.log("🔍 Attempting GoogleSignin.signIn()...");
       const userInfo = await GoogleSignin.signIn();
+      console.log("👤 Google user info:", JSON.stringify(userInfo, null, 2));
+
       const { idToken } = userInfo;
-      // Authenticate with Firebase using the Google idToken
+      if (!idToken) {
+        console.error("❌ No ID Token returned from Google Sign-In!");
+        throw new Error("Google Sign-In failed: Missing ID token");
+      }
+
+      console.log("🔑 ID Token received:", idToken);
+
       const { GoogleAuthProvider, signInWithCredential } = await import(
         "@react-native-firebase/auth"
       );
+
+      console.log("🛠️ Creating Firebase Google Credential...");
       const googleCredential = GoogleAuthProvider.credential(idToken);
+
+      console.log("🚪 Signing in with Firebase using credential...");
       const userCredential = await signInWithCredential(auth, googleCredential);
-      // Save or update user in Firestore
+      console.log(
+        "✅ Firebase signInWithCredential success:",
+        JSON.stringify(userCredential, null, 2)
+      );
+
+      console.log("💾 Saving user to Firestore...");
       await SaveUser(userCredential.user);
+      console.log("📁 User saved successfully.");
+
       setLoading(false);
-      // User is now signed in, onAuthStateChanged will handle the rest
     } catch (error) {
+      console.log("❌ Google Sign-In error object:", error);
       setLoading(false);
+
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         ToastAndroid.show("You cancelled the flow", ToastAndroid.SHORT);
-        // user cancelled the login flow
+        console.warn("⚠️ User cancelled Google Sign-In");
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
         ToastAndroid.show("Sign in is in progress", ToastAndroid.SHORT);
+        console.warn("⚠️ Sign-in already in progress");
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
         ToastAndroid.show("Play services not available", ToastAndroid.SHORT);
+        console.warn("⚠️ Google Play Services not available");
       } else {
-        // some other error
-        console.error("Google Sign-In error:", error);
-        Sentry.captureException(error);
+        ToastAndroid.show("Google sign-in failed", ToastAndroid.SHORT);
+        console.error(
+          "🔥 Unexpected Google Sign-In Error:",
+          error.message,
+          error.code
+        );
       }
+
+      Sentry.captureException(error);
     }
   };
 
@@ -133,11 +169,15 @@ export default function Index() {
         // 2. Use modular auth state listener
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
+            console.log("👤 Firebase user signed in:", user.email);
+
             try {
               // Removed console.log for production
               await user.reload();
 
               const userRef = doc(firestore, "users", user.email);
+              console.log("🔍 Fetching user data from Firestore for:", user.email);
+
               const result = await getDoc(userRef);
 
               if (result.exists) {
