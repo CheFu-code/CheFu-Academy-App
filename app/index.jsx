@@ -17,10 +17,12 @@ import {
   ActivityIndicator,
   Image,
   Platform,
+  Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -73,6 +75,7 @@ export default function Index() {
     });
   }, []);
   const handleGoogleSignIn = async () => {
+    setLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
@@ -85,14 +88,19 @@ export default function Index() {
       const userCredential = await signInWithCredential(auth, googleCredential);
       // Save or update user in Firestore
       await SaveUser(userCredential.user);
+      setLoading(false);
       // User is now signed in, onAuthStateChanged will handle the rest
     } catch (error) {
+      setLoading(false);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        ToastAndroid.show("You cancelled the flow", ToastAndroid.SHORT);
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
         // operation (e.g. sign in) is in progress already
+        ToastAndroid.show("Sign in is in progress", ToastAndroid.SHORT);
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         // play services not available or outdated
+        ToastAndroid.show("Play services not available", ToastAndroid.SHORT);
       } else {
         // some other error
         console.error("Google Sign-In error:", error);
@@ -192,6 +200,7 @@ export default function Index() {
   }
 
   const handleGithubSignIn = async () => {
+    setLoading(true);
     try {
       // Sign in with GitHub using Firebase Auth
       const { GithubAuthProvider, signInWithCredential } = await import(
@@ -199,7 +208,7 @@ export default function Index() {
       );
       // You need to obtain the GitHub OAuth access token from your OAuth flow
       // For demonstration, let's assume you have it as `githubAccessToken`
-      const githubAccessToken = await getGithubAccessToken(); // Implement this function to get the token
+      const githubAccessToken = await getGithubAccessToken();
 
       const githubCredential = GithubAuthProvider.credential(githubAccessToken);
       const userCredential = await signInWithCredential(auth, githubCredential);
@@ -219,7 +228,26 @@ export default function Index() {
       } else {
         console.warn("User data not found in Firestore.");
       }
+      setLoading(false);
     } catch (error) {
+      if (
+        error.code ===
+        "net.openid.appauth.AuthorizationException: User cancelled flow"
+      ) {
+        ToastAndroid.show("You cancelled the flow", ToastAndroid.SHORT);
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+        ToastAndroid.show("Sign in is in progress", ToastAndroid.SHORT);
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+        ToastAndroid.show("Play services not available", ToastAndroid.SHORT);
+      } else {
+        // some other error
+        console.error("Google Sign-In error:", error);
+        Sentry.captureException(error);
+      }
+      setLoading(false);
       console.error("Error signing in with GitHub:", error);
       Sentry.captureException(error);
     }
@@ -258,8 +286,10 @@ export default function Index() {
         <Text style={styles.subtitle}>Smart Learning Starts Here</Text>
 
         <TouchableOpacity
+          disabled={loading}
           style={styles.button}
           onPress={() => router.push("/auth/signUp")}
+          // onPress={() => router.push("/oauthredirect")}
         >
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
@@ -279,21 +309,27 @@ export default function Index() {
               padding: 10,
             }}
             onPress={handleGoogleSignIn}
+            disabled={loading}
           >
-            <MaterialCommunityIcons
-              name="google"
-              size={24}
-              color="white"
-              style={{
-                marginRight: 10,
-                padding: 8,
-                backgroundColor: Colors.GOOGLE.GRADIENT[0],
-                borderRadius: 10,
-              }}
-            />
+            {loading ? (
+              <ActivityIndicator color={Colors.LIGHT_GREEN} size={"small"} />
+            ) : (
+              <MaterialCommunityIcons
+                name="google"
+                size={24}
+                color="green"
+                style={{
+                  marginRight: 10,
+                  padding: 8,
+                  backgroundColor: Colors.BG_GRAY,
+                  borderRadius: 10,
+                }}
+              />
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
+            disabled={loading}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -302,21 +338,26 @@ export default function Index() {
             }}
             onPress={handleGithubSignIn}
           >
-            <MaterialCommunityIcons
-              name="github"
-              size={24}
-              color="white"
-              style={{
-                marginRight: 10,
-                padding: 8,
-                backgroundColor: Colors.BLACK,
-                borderRadius: 10,
-              }}
-            />
+            {loading ? (
+              <ActivityIndicator color={Colors.GREEN} size={"small"} />
+            ) : (
+              <MaterialCommunityIcons
+                name="github"
+                size={24}
+                color="white"
+                style={{
+                  marginRight: 10,
+                  padding: 8,
+                  backgroundColor: Colors.BLACK,
+                  borderRadius: 10,
+                }}
+              />
+            )}
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity
+          disabled={loading}
           onPress={() => router.push("/auth/signIn")}
           style={[styles.button2, { backgroundColor: Colors.PRIMARY }]}
         >
@@ -330,7 +371,7 @@ export default function Index() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <Pressable disabled={loading}>
           <Text
             style={{
               textAlign: "center",
@@ -355,7 +396,7 @@ export default function Index() {
               Privacy Policy
             </Text>
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </View>
   );
@@ -385,6 +426,7 @@ const styles = StyleSheet.create({
     color: Colors.WHITE,
     marginTop: 20,
     textAlign: "center",
+    fontFamily: "outfit",
   },
   button: {
     padding: 15,
@@ -398,6 +440,11 @@ const styles = StyleSheet.create({
   },
   button2: {
     marginTop: 10,
+    borderWidth: 0.4,
+    borderColor: Colors.BG_GRAY,
+    borderRadius: 30,
+    padding: 8,
+    marginHorizontal: 40,
   },
   buttonText: {
     textAlign: "center",

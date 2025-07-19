@@ -89,7 +89,9 @@ const SignUp = () => {
       }
       switch (e.code) {
         case "auth/email-already-in-use":
-          setErrorMsg("This email is already in use. Please use a different email.");
+          setErrorMsg(
+            "This email is already in use. Please use a different email."
+          );
           break;
         case "auth/invalid-email":
           setErrorMsg("The email address is not valid.");
@@ -98,7 +100,9 @@ const SignUp = () => {
           setErrorMsg("Password should be at least 6 characters.");
           break;
         case "auth/operation-not-allowed":
-          setErrorMsg("Email/password accounts are not enabled. Please contact support.");
+          setErrorMsg(
+            "Email/password accounts are not enabled. Please contact support."
+          );
           break;
         case "auth/missing-email":
           setErrorMsg("Please enter your email address.");
@@ -111,7 +115,9 @@ const SignUp = () => {
           break;
         default:
           if (e.message && e.message.includes("network")) {
-            setErrorMsg("Network error: Please check your internet connection and try again.");
+            setErrorMsg(
+              "Network error: Please check your internet connection and try again."
+            );
           } else {
             setErrorMsg(e.message);
           }
@@ -139,7 +145,10 @@ const SignUp = () => {
       const userEmail = user.email || email.trim();
       const userFullName = user.displayName || fullName;
       const userPhoto = user.photoURL || null;
-      const userProvider = (user.providerData && user.providerData[0]?.providerId) || user.providerId || "email";
+      const userProvider =
+        (user.providerData && user.providerData[0]?.providerId) ||
+        user.providerId ||
+        "email";
 
       // Check if user already exists
       const userDocRef = doc(firestore, "users", userEmail);
@@ -147,15 +156,24 @@ const SignUp = () => {
 
       if (userDoc.exists()) {
         // User exists, update lastLogin and any new info
-        await setDoc(userDocRef, {
+        await setDoc(
+          userDocRef,
+          {
+            ...userDoc.data(),
+            lastLogin: new Date(),
+            updatedAt: new Date(),
+            fullname: userFullName,
+            profilePicture: userPhoto,
+            provider: userProvider,
+          },
+          { merge: true }
+        );
+        setUserDetail({
           ...userDoc.data(),
-          lastLogin: new Date(),
-          updatedAt: new Date(),
           fullname: userFullName,
           profilePicture: userPhoto,
           provider: userProvider,
-        }, { merge: true });
-        setUserDetail({ ...userDoc.data(), fullname: userFullName, profilePicture: userPhoto, provider: userProvider });
+        });
       } else {
         // New user, create document
         const data = {
@@ -195,7 +213,7 @@ const SignUp = () => {
         );
       }
 
-      router.push("/home");
+      router.replace("/home");
     } catch (e) {
       Sentry.captureException(e);
       console.log("Error in SaveUser:", e.message);
@@ -241,7 +259,7 @@ const SignUp = () => {
               placeholder="Fullname"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
-              onChangeText={v => setFullName(v.trimStart())}
+              onChangeText={(v) => setFullName(v.trimStart())}
               maxLength={50}
               value={fullName}
               accessibilityLabel="Full Name"
@@ -252,7 +270,7 @@ const SignUp = () => {
               placeholder="Email"
               style={styles.textInput}
               placeholderTextColor={Colors.GRAY}
-              onChangeText={v => setEmail(v.trim())}
+              onChangeText={(v) => setEmail(v.trim())}
               keyboardType="email-address"
               autoCapitalize="none"
               maxLength={100}
@@ -260,38 +278,55 @@ const SignUp = () => {
               accessibilityLabel="Email Address"
               returnKeyType="next"
             />
-            <View style={{ width: '100%', position: 'relative' }}>
+            <View style={{ width: "100%", position: "relative" }}>
               <TextInput
                 placeholder="Password"
                 style={styles.textInput}
                 placeholderTextColor={Colors.GRAY}
                 secureTextEntry={!showPassword}
-                onChangeText={v => setPassword(v)}
+                onChangeText={(v) => setPassword(v)}
                 maxLength={50}
                 value={password}
                 accessibilityLabel="Password"
                 returnKeyType="done"
-                onSubmitEditing={() => { if (!loading) CreateNewAccount(); }}
+                onSubmitEditing={() => {
+                  if (!loading) CreateNewAccount();
+                }}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
-                style={{ position: 'absolute', right: 15, top: 32 }}
-                accessibilityLabel={showPassword ? "Hide Password" : "Show Password"}
+                style={{ position: "absolute", right: 15, top: 32 }}
+                accessibilityLabel={
+                  showPassword ? "Hide Password" : "Show Password"
+                }
                 accessibilityRole="button"
               >
-                <Text style={{ color: Colors.PRIMARY, fontSize: 14 }}>
+                <Text
+                  style={{
+                    color:
+                      showPassword === true ? Colors.GREEN : Colors.PRIMARY,
+                    fontSize: 14,
+                    paddingTop: 6,
+                    backgroundColor: Colors.BG_GRAY,
+                    padding: 8,
+                    borderRadius: 10,
+                    fontFamily: "outfit",
+                    textAlign: "center",
+                  }}
+                >
                   {showPassword ? "Hide" : "Show"}
                 </Text>
               </TouchableOpacity>
             </View>
             {errorMsg ? (
-              <Text style={{ color: 'red', marginTop: 10, textAlign: 'center' }} accessibilityLiveRegion="polite">{errorMsg}</Text>
-            ) : null}
-            {/* <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Text style={{ color: Colors.PRIMARY }}>
-                {showPassword ? "Hide Password" : "Show Password"}
+              <Text
+                style={{ color: "red", marginTop: 10, textAlign: "center" }}
+                accessibilityLiveRegion="polite"
+              >
+                {errorMsg}
               </Text>
-            </TouchableOpacity> */}
+            ) : null}
+
             <TouchableOpacity
               onPress={CreateNewAccount}
               style={{
@@ -330,7 +365,7 @@ const SignUp = () => {
               <Text style={{ color: Colors.WHITE }}>
                 Already have an account?{" "}
               </Text>
-              <Pressable onPress={() => router.push("/auth/signIn")}>
+              <Pressable onPress={() => router.replace("/auth/signIn")}>
                 <Text
                   style={{
                     color: Colors.PRIMARY,

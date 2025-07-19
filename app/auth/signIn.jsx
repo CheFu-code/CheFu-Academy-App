@@ -285,7 +285,7 @@ const SignIn = () => {
               <Text style={{ color: Colors.WHITE }}>
                 Don't have an account?{" "}
               </Text>
-              <Pressable onPress={() => router.push("/auth/signUp")}>
+              <Pressable onPress={() => router.replace("/auth/signUp")}>
                 <Text style={{ color: Colors.PRIMARY, fontWeight: "bold" }}>
                   Sign Up
                 </Text>
