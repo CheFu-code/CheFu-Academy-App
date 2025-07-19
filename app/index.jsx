@@ -75,7 +75,6 @@ export default function Index() {
     };
 
     GoogleSignin.configure(config);
-    console.log("✅ GoogleSignin configured:", config);
   }, []);
 
   const handleGoogleSignIn = async () => {
@@ -284,7 +283,7 @@ export default function Index() {
         ToastAndroid.show("Play services not available", ToastAndroid.SHORT);
       } else {
         // some other error
-        console.error("Google Sign-In error:", error);
+        console.error("GitHub Sign-In error:", error);
         Sentry.captureException(error);
       }
       setLoading(false);

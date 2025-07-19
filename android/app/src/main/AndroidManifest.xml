@@ -34,7 +34,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="chefu-academy"/>
+        <data android:scheme="chefu-academy" android:host="oauthredirect"/>
         <data android:scheme="exp+chefu-academy"/>
       </intent-filter>
       <intent-filter data-generated="true">
