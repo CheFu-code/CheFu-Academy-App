@@ -14,7 +14,6 @@ import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   Platform,
   Pressable,
@@ -22,20 +21,15 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  ToastAndroid,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import { authorize } from "react-native-app-auth";
 import ImmersiveMode from "react-native-immersive";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors } from "../constant/Colors";
 
 import {
-  GoogleSignin,
-  statusCodes,
+  GoogleSignin
 } from "@react-native-google-signin/google-signin";
-import { SaveUser } from "./auth/signUp";
 
 export default function Index() {
   const router = useRouter();
@@ -43,28 +37,6 @@ export default function Index() {
   const { setUserDetail } = useContext(UserDetailContext);
   const auth = getAuth();
   const firestore = getFirestore();
-
-  const githubAuthConfig = {
-    clientId: "Ov23ligAlqOw7DlnHPxS",
-    clientSecret: "69afb862358b38965e9ca00cc24eac296c22da48",
-    redirectUrl: "chefu-academy://oauthredirect",
-    scopes: ["identity", "user:email"],
-    serviceConfiguration: {
-      authorizationEndpoint: "https://github.com/login/oauth/authorize",
-      tokenEndpoint: "https://github.com/login/oauth/access_token",
-    },
-  };
-
-  async function getGithubAccessToken() {
-    try {
-      const result = await authorize(githubAuthConfig);
-      // result.accessToken is what you need for Firebase
-      return result.accessToken;
-    } catch (error) {
-      console.error("GitHub OAuth error:", error);
-      throw error;
-    }
-  }
 
   // Google Sign-In config
   useEffect(() => {
@@ -76,73 +48,6 @@ export default function Index() {
 
     GoogleSignin.configure(config);
   }, []);
-
-  const handleGoogleSignIn = async () => {
-    console.log("🔄 Starting Google Sign-In...");
-    setLoading(true);
-
-    try {
-      const playServicesAvailable = await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
-      });
-      console.log("✅ Play Services available:", playServicesAvailable);
-
-      console.log("🔍 Attempting GoogleSignin.signIn()...");
-      const userInfo = await GoogleSignin.signIn();
-      console.log("👤 Google user info:", JSON.stringify(userInfo, null, 2));
-
-      const { idToken } = userInfo;
-      if (!idToken) {
-        console.error("❌ No ID Token returned from Google Sign-In!");
-        throw new Error("Google Sign-In failed: Missing ID token");
-      }
-
-      console.log("🔑 ID Token received:", idToken);
-
-      const { GoogleAuthProvider, signInWithCredential } = await import(
-        "@react-native-firebase/auth"
-      );
-
-      console.log("🛠️ Creating Firebase Google Credential...");
-      const googleCredential = GoogleAuthProvider.credential(idToken);
-
-      console.log("🚪 Signing in with Firebase using credential...");
-      const userCredential = await signInWithCredential(auth, googleCredential);
-      console.log(
-        "✅ Firebase signInWithCredential success:",
-        JSON.stringify(userCredential, null, 2)
-      );
-
-      console.log("💾 Saving user to Firestore...");
-      await SaveUser(userCredential.user);
-      console.log("📁 User saved successfully.");
-
-      setLoading(false);
-    } catch (error) {
-      console.log("❌ Google Sign-In error object:", error);
-      setLoading(false);
-
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        ToastAndroid.show("You cancelled the flow", ToastAndroid.SHORT);
-        console.warn("⚠️ User cancelled Google Sign-In");
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        ToastAndroid.show("Sign in is in progress", ToastAndroid.SHORT);
-        console.warn("⚠️ Sign-in already in progress");
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        ToastAndroid.show("Play services not available", ToastAndroid.SHORT);
-        console.warn("⚠️ Google Play Services not available");
-      } else {
-        ToastAndroid.show("Google sign-in failed", ToastAndroid.SHORT);
-        console.error(
-          "🔥 Unexpected Google Sign-In Error:",
-          error.message,
-          error.code
-        );
-      }
-
-      Sentry.captureException(error);
-    }
-  };
 
   useEffect(() => {
     if (Platform.OS === "android" && ImmersiveMode?.setImmersive) {
@@ -168,14 +73,10 @@ export default function Index() {
         // 2. Use modular auth state listener
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
-            console.log("👤 Firebase user signed in:", user.email);
-
             try {
-              // Removed console.log for production
               await user.reload();
 
               const userRef = doc(firestore, "users", user.email);
-              console.log("🔍 Fetching user data from Firestore for:", user.email);
 
               const result = await getDoc(userRef);
 
@@ -192,7 +93,6 @@ export default function Index() {
                     isVerified: true,
                     updatedAt: new Date(),
                   });
-                  console.log("✅ Firestore updated: Email is now verified.");
                   userData.isVerified = true;
                 }
 
@@ -229,68 +129,6 @@ export default function Index() {
 
     loadUser();
   }, []);
-
-  if (loading) {
-    return (
-      <View style={styles.centeredContainer}>
-        <ActivityIndicator color={Colors.PRIMARY} size="large" />
-      </View>
-    );
-  }
-
-  const handleGithubSignIn = async () => {
-    setLoading(true);
-    try {
-      // Sign in with GitHub using Firebase Auth
-      const { GithubAuthProvider, signInWithCredential } = await import(
-        "@react-native-firebase/auth"
-      );
-      // You need to obtain the GitHub OAuth access token from your OAuth flow
-      // For demonstration, let's assume you have it as `githubAccessToken`
-      const githubAccessToken = await getGithubAccessToken();
-
-      const githubCredential = GithubAuthProvider.credential(githubAccessToken);
-      const userCredential = await signInWithCredential(auth, githubCredential);
-
-      // Save or update user in Firestore
-      await SaveUser(userCredential.user);
-
-      // Fetch user data from Firestore
-      const userRef = doc(firestore, "users", userCredential.user.email);
-      const docSnap = await getDoc(userRef);
-
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        setUserDetail(userData);
-        await AsyncStorage.setItem("userDetail", JSON.stringify(userData));
-        router.replace("/(tabs)/home");
-      } else {
-        console.warn("User data not found in Firestore.");
-      }
-      setLoading(false);
-    } catch (error) {
-      if (
-        error.code ===
-        "net.openid.appauth.AuthorizationException: User cancelled flow"
-      ) {
-        ToastAndroid.show("You cancelled the flow", ToastAndroid.SHORT);
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-        ToastAndroid.show("Sign in is in progress", ToastAndroid.SHORT);
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-        ToastAndroid.show("Play services not available", ToastAndroid.SHORT);
-      } else {
-        // some other error
-        console.error("GitHub Sign-In error:", error);
-        Sentry.captureException(error);
-      }
-      setLoading(false);
-      console.error("Error signing in with GitHub:", error);
-      Sentry.captureException(error);
-    }
-  };
 
   return (
     <View
@@ -333,67 +171,7 @@ export default function Index() {
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 10,
-            }}
-            onPress={handleGoogleSignIn}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={Colors.LIGHT_GREEN} size={"small"} />
-            ) : (
-              <MaterialCommunityIcons
-                name="google"
-                size={24}
-                color="green"
-                style={{
-                  marginRight: 10,
-                  padding: 8,
-                  backgroundColor: Colors.BG_GRAY,
-                  borderRadius: 10,
-                }}
-              />
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            disabled={loading}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 15,
-            }}
-            onPress={handleGithubSignIn}
-          >
-            {loading ? (
-              <ActivityIndicator color={Colors.GREEN} size={"small"} />
-            ) : (
-              <MaterialCommunityIcons
-                name="github"
-                size={24}
-                color="white"
-                style={{
-                  marginRight: 10,
-                  padding: 8,
-                  backgroundColor: Colors.BLACK,
-                  borderRadius: 10,
-                }}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
+       
 
         <TouchableOpacity
           disabled={loading}

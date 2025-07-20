@@ -10,8 +10,10 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   View,
 } from "react-native";
+import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 import Button from "../../component/Shared/Button";
 import { generateCourse, generateTopics } from "../../config/AiModel";
 import { Colors } from "../../constant/Colors";
@@ -25,8 +27,8 @@ export default function AddCourse() {
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState([]);
   const router = useRouter();
-  // (No navigation button found in first 80 lines, skipping UI navigation patch)
   const db = getFirestore();
+  const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
 
   const generateTopic = async () => {
     if (loading) return; // Prevent double submission
@@ -71,7 +73,7 @@ export default function AddCourse() {
           console.error("Failed to parse AI response:", e);
           Alert.alert(
             "Error",
-            `Our AI did not respond with valid JSON.\nPlease try again later. If the issue persists, contact support: ${support}`
+            `Our AI did not respond with supported data.\nPlease try again later. If the issue persists, contact support: ${support}`
           );
         }
       }
@@ -132,7 +134,7 @@ export default function AddCourse() {
         console.error("Failed to parse AI response:", e);
         Alert.alert(
           "Error",
-          `Our AI did not respond with valid JSON.\nPlease try again later. If the issue persists, contact support: ${support}`
+          `Our AI did not respond with supported data.\nPlease try again later. If the issue persists, contact support: ${support}`
         );
         if (typeof Sentry !== "undefined") {
           Sentry.captureException(e, {
@@ -164,7 +166,23 @@ export default function AddCourse() {
         })
       );
 
-      router.push("/(tabs)/home");
+      const interstitial = InterstitialAd.createForAdRequest(
+        INTERSTITIAL_AD_UNIT_ID,
+        { requestNonPersonalizedAdsOnly: true }
+      );
+
+      const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
+        if (type === AdEventType.LOADED) {
+          interstitial.show();
+        }
+        if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
+          unsubscribe();
+          router.push("/(tabs)/home");
+          ToastAndroid.show("Course created successfully!", ToastAndroid.SHORT);
+        }
+      });
+
+      interstitial.load();
     } catch (e) {
       console.log("failed course", e.message);
       Alert.alert("Error", "Failed to generate course.");
@@ -174,148 +192,160 @@ export default function AddCourse() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        padding: 30,
-        flexGrow: 1,
-        backgroundColor: Colors.BG_COLOR,
-      }}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={{ flex: 1 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-            marginBottom: 20,
-            marginTop: 30,
+    <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+          paddingHorizontal: 30,
+          paddingTop: 40, // adjust for status bar
+          backgroundColor: Colors.BG_COLOR,
+          zIndex: 10,
+        }}
+      >
+        <Pressable
+          onPress={() => {
+            if (!loading) router.back();
           }}
         >
-          <Pressable
-            onPress={() => {
-              if (!loading) router.back();
+          <Ionicons
+            style={{
+              padding: 3,
+              borderRadius: 10,
+              backgroundColor: Colors.BG_GRAY,
             }}
-          >
-            <Ionicons
-              style={{
-                padding: 3,
-                borderRadius: 10,
-                backgroundColor: Colors.BG_GRAY,
-              }}
-              name="arrow-back"
-              size={24}
-              color={Colors.PRIMARY}
-            />
-          </Pressable>
+            name="arrow-back"
+            size={24}
+            color={Colors.PRIMARY}
+          />
+        </Pressable>
+        <Text
+          style={{
+            fontFamily: "outfit-bold",
+            fontSize: 24,
+            color: Colors.PRIMARY,
+          }}
+        >
+          Create new course
+        </Text>
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          padding: 30,
+          flexGrow: 1,
+          backgroundColor: Colors.BG_COLOR,
+        }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={{ flex: 1 }}>
           <Text
             style={{
-              fontFamily: "outfit-bold",
-              fontSize: 24,
-              color: Colors.PRIMARY,
+              fontFamily: "outfit",
+              fontSize: 16,
+              color: "#fff",
+              marginTop: 5,
             }}
           >
-            Create new course
+            What do you want to learn today?
           </Text>
-        </View>
-        <Text
-          style={{
-            fontFamily: "outfit",
-            fontSize: 16,
-            color: "#fff",
-            marginTop: 5,
-          }}
-        >
-          What do you want to learn today?
-        </Text>
-        <Text
-          style={{
-            fontFamily: "outfit",
-            fontSize: 14,
-            color: "#666",
-            marginTop: 10,
-          }}
-        >
-          What course do you want to create? (Example: Learn JavaScript, Machine
-          Learning, History, Business studies, etc)
-        </Text>
+          <Text
+            style={{
+              fontFamily: "outfit",
+              fontSize: 14,
+              color: "#666",
+              marginTop: 10,
+            }}
+          >
+            What course do you want to create? (Example: Learn JavaScript,
+            Machine Learning, History, Business studies, etc)
+          </Text>
 
-        <TextInput
-          onChangeText={(value) => setUserInput(value)}
-          value={userInput}
-          style={styles.textInput}
-          numberOfLines={3}
-          multiline={true}
-          placeholder="Example: Learn Biology"
-        />
+          <TextInput
+            onChangeText={(value) => setUserInput(value)}
+            value={userInput}
+            style={styles.textInput}
+            numberOfLines={3}
+            multiline={true}
+            placeholder="Example: Learn Biology"
+            color={Colors.GREEN}
+            placeholderTextColor={Colors.GRAY}
+          />
 
-        <Button
-          text={"Generate Topic"}
-          type="fill"
-          onPress={generateTopic}
-          loading={loading}
-          disabled={loading || !userInput.trim()}
-          opacity={loading || !userInput.trim() ? 0.4 : 1}
-        />
+          <Button
+            text={"Generate Topic"}
+            type="fill"
+            onPress={generateTopic}
+            loading={loading}
+            disabled={loading || !userInput.trim()}
+            opacity={loading || !userInput.trim() ? 0.4 : 1}
+          />
 
-        <View
-          style={{
-            marginTop: 15,
-            marginBottom: 15,
-          }}
-        >
-          {topics.length > 0 && (
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 17,
-                color: "#fff",
-              }}
-            >
-              Select all topics which you want to add in this course
-            </Text>
-          )}
           <View
             style={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: 10,
-              marginTop: 6,
+              marginTop: 15,
+              marginBottom: 15,
             }}
           >
-            {topics.map((item, index) => (
-              <Pressable key={index} onPress={() => onTopicSelect(item)}>
-                <Text
-                  style={{
-                    padding: 7,
-                    borderWidth: 0.4,
-                    borderColor: Colors.WHITE,
-                    borderRadius: 99,
-                    paddingHorizontal: 15,
-                    backgroundColor: isTopicSelected(item)
-                      ? Colors.PRIMARY
-                      : null,
-                    color: isTopicSelected(item) ? Colors.WHITE : Colors.GREEN,
-                  }}
-                >
-                  {item.replace(/^"|"$/g, "")}
-                </Text>
-              </Pressable>
-            ))}
+            {topics.length > 0 && (
+              <Text
+                style={{
+                  fontFamily: "outfit",
+                  fontSize: 17,
+                  color: "#fff",
+                }}
+              >
+                Select all topics which you want to add in this course
+              </Text>
+            )}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 10,
+                marginTop: 6,
+              }}
+            >
+              {topics.map((item, index) => (
+                <Pressable key={index} onPress={() => onTopicSelect(item)}>
+                  <Text
+                    style={{
+                      padding: 7,
+                      borderWidth: 0.4,
+                      borderColor: Colors.WHITE,
+                      borderRadius: 99,
+                      paddingHorizontal: 15,
+                      backgroundColor: isTopicSelected(item)
+                        ? Colors.PRIMARY
+                        : null,
+                      color: isTopicSelected(item)
+                        ? Colors.WHITE
+                        : Colors.GREEN,
+                    }}
+                  >
+                    {item.replace(/^"|"$/g, "")}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
           </View>
-        </View>
 
-        {selectedTopic.length > 0 && (
-          <Button
-            loading={loading}
-            onPress={() => onGenerateCourse()}
-            text="Generate Course"
-            disabled={loading}
-          />
-        )}
-      </View>
-    </ScrollView>
+          {selectedTopic.length > 0 && (
+            <View style={{ marginBottom: 50 }}>
+              <Button
+                loading={loading}
+                onPress={() => onGenerateCourse()}
+                text="Generate Course"
+                disabled={loading}
+              />
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -326,7 +356,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 10,
     marginTop: 20,
-    color: "black", // Assuming a dark text color for input
+    color: "green", // Assuming a dark text color for input
     height: 90,
     alignItems: "flex-start",
     fontSize: 16,

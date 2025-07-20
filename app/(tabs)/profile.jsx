@@ -6,38 +6,38 @@ import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 
 import {
-    deleteUser,
-    EmailAuthProvider,
-    getAuth,
-    reauthenticateWithCredential,
-    sendEmailVerification,
-    signOut,
+  deleteUser,
+  EmailAuthProvider,
+  getAuth,
+  reauthenticateWithCredential,
+  sendEmailVerification,
+  signOut,
 } from "@react-native-firebase/auth";
 import {
-    deleteDoc,
-    doc,
-    getDoc,
-    getFirestore,
-    setDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
 } from "@react-native-firebase/firestore";
 
 import { useCallback, useContext, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Linking,
-    Modal,
-    Platform,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    ToastAndroid,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Linking,
+  Modal,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { menuItems, url } from "../../constant/menuItems";
@@ -76,10 +76,10 @@ export default function Profile() {
       }
     } catch (error) {
       console.error("Error refreshing data:", error);
-      if (typeof ToastAndroid !== 'undefined') {
+      if (typeof ToastAndroid !== "undefined") {
         ToastAndroid.show("Failed to refresh profile", ToastAndroid.SHORT);
       }
-      if (typeof Sentry !== 'undefined') {
+      if (typeof Sentry !== "undefined") {
         Sentry.captureException(error);
       }
     } finally {
@@ -235,6 +235,8 @@ export default function Profile() {
             },
           ]}
         />
+
+        
         {userDetail && (
           <>
             <View
@@ -244,7 +246,9 @@ export default function Profile() {
                 gap: 5,
               }}
             >
-              <Text style={styles.profileName}>{userDetail.fullname}</Text>
+              <Text numberOfLines={1} style={styles.profileName}>
+                {userDetail.fullname}
+              </Text>
               {userDetail?.member === true && (
                 <Ionicons color={"green"} size={20} name="checkmark-circle" />
               )}

@@ -33,8 +33,29 @@ export default function Header() {
         ToastAndroid.show("Logged out successfully", ToastAndroid.SHORT);
         router.replace("/auth/signIn");
       } catch (error) {
-        console.error("Logout error on header:", error);
-        ToastAndroid.show("Logout failed", ToastAndroid.SHORT);
+        if (error.code === "auth/no-current-user") {
+          ToastAndroid.show("You're not logged in", ToastAndroid.SHORT);
+        } else if (error.code === "auth/user-not-found") {
+          ToastAndroid.show("User not found", ToastAndroid.SHORT);
+        } else if (error.code === "auth/network-request-failed") {
+          ToastAndroid.show(
+            "Network error, please try again",
+            ToastAndroid.SHORT
+          );
+        } else if (error.code === "auth/too-many-requests") {
+          ToastAndroid.show(
+            "Too many requests, please try again later",
+            ToastAndroid.SHORT
+          );
+        } else if (error.code === "auth/operation-not-allowed") {
+          ToastAndroid.show("Operation not allowed", ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show(
+            "An error occurred, please try again",
+            ToastAndroid.SHORT
+          );
+          console.error("Logout error on header:", error);
+        }
       }
     } else if (option === "Rate our app") {
       // Handle rate our app action
@@ -53,10 +74,13 @@ export default function Header() {
       Linking.openURL(
         "mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here."
       );
+    } else if (option === "Add Course") {
+      router.push("/addCourse");
     }
   };
 
   const modalOptions = [
+    { label: "Add Course", icon: "add-circle-outline" },
     { label: "View Profile", icon: "person-outline" },
     { label: "Contact Support", icon: "mail-outline" },
     { label: "Rate our app", icon: "star-outline", color: Colors.YELLOW },
@@ -92,7 +116,13 @@ export default function Header() {
 
       {userDetail && (
         <TouchableOpacity onPress={() => setShowModal(true)}>
-          <Foundation name="indent-more" size={25} color={"white"} />
+          <Foundation style={{
+            padding: 10,
+            backgroundColor: Colors.GRAY,
+            borderRadius: 100,
+            elevation: 5,
+            marginTop: 10,
+          }} name="indent-more" size={27} color={"white"} />
         </TouchableOpacity>
       )}
 
@@ -138,14 +168,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: 10,
   },
   greeting: {
     fontFamily: "outfit-bold",
     fontSize: 24,
     color: "#fff",
     marginTop: 35,
-    maxWidth: "80%", // or a fixed width like 250
-    // overflow: "hidden",
+    maxWidth: 200,
   },
   subText: {
     fontFamily: "outfit",

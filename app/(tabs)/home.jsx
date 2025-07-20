@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -39,6 +39,7 @@ import {
   where,
 } from "@react-native-firebase/firestore";
 
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 
 export default function Home() {
@@ -46,6 +47,8 @@ export default function Home() {
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
+  const [adLoaded, setAdLoaded] = useState(false);
+
   const router = useRouter();
 
   // Initialize modular auth/firestore instances
@@ -58,7 +61,7 @@ export default function Home() {
         GetCourseList(user);
       } else {
         setCourseList([]);
-        // router.replace("/auth/signIn");
+        router.replace("/auth/signIn");
       }
     });
 
@@ -73,7 +76,7 @@ export default function Home() {
       await reload(user);
       const refreshedUser = auth.currentUser;
       if (!refreshedUser?.email) {
-        ToastAndroid.show("No user email found", ToastAndroid.SHORT);
+        ToastAndroid.show("Your email could not be found", ToastAndroid.SHORT);
         setCourseList([]);
         return;
       }
@@ -102,6 +105,12 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      GetCourseList(auth.currentUser);
+    }, [])
+  );
 
   const verify = async () => {
     const user = auth.currentUser;
@@ -192,11 +201,18 @@ export default function Home() {
         }
       />
 
-      <BannerAd
-        unitId={"ca-app-pub-8952058057579255/9705798694"}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-        requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-      />
+      {adLoaded && (
+        <BannerAd
+          unitId={"ca-app-pub-8952058057579255/9705798694"}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+          onAdLoaded={() => setAdLoaded(true)}
+          onAdFailedToLoad={(err) => {
+            console.log("Ad failed to load", err);
+            setAdLoaded(false);
+          }}
+        />
+      )}
     </>
   );
 }

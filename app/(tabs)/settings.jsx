@@ -32,7 +32,6 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
-
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [useBiometrics, setUseBiometrics] = useState(false);
@@ -78,7 +77,7 @@ export default function SettingsScreen() {
       } catch (error) {
         setFatalError(error);
         console.error("Failed to fetch settings", error);
-        if (typeof ToastAndroid !== 'undefined') {
+        if (typeof ToastAndroid !== "undefined") {
           ToastAndroid.show("Failed to fetch settings", ToastAndroid.SHORT);
         }
       } finally {
@@ -223,21 +222,58 @@ export default function SettingsScreen() {
       Alert.alert("Sharing failed", error.message);
     }
   };
+
+  const verify = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await sendEmailVerification(user);
+        alert(
+          `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
+        );
+      } catch (error) {
+        console.error("Failed to send verification email:", error);
+        alert("Failed to send verification email. Try again later.");
+      }
+    } else {
+      alert("No user is currently signed in.");
+    }
+  };
   let content;
   try {
     if (fatalError) {
       content = (
-        <View style={[styles.container, { paddingTop: 50, justifyContent: 'center', alignItems: 'center' }]}> 
-          <Text style={{ color: 'red', fontSize: 18, marginBottom: 20 }}>Something went wrong in Settings.</Text>
-          <Text style={{ color: 'red', fontSize: 14, marginBottom: 20 }}>{fatalError?.message || String(fatalError)}</Text>
-          <TouchableOpacity onPress={() => { setFatalError(null); }} style={{ backgroundColor: Colors.PRIMARY, padding: 12, borderRadius: 8 }}>
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>Try Again</Text>
+        <View
+          style={[
+            styles.container,
+            { paddingTop: 50, justifyContent: "center", alignItems: "center" },
+          ]}
+        >
+          <Text style={{ color: "red", fontSize: 18, marginBottom: 20 }}>
+            Something went wrong in Settings.
+          </Text>
+          <Text style={{ color: "red", fontSize: 14, marginBottom: 20 }}>
+            {fatalError?.message || String(fatalError)}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setFatalError(null);
+            }}
+            style={{
+              backgroundColor: Colors.PRIMARY,
+              padding: 12,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              Try Again
+            </Text>
           </TouchableOpacity>
         </View>
       );
     } else {
       content = (
-        <View style={[styles.container, { paddingTop: 50 }]}> 
+        <View style={[styles.container, { paddingTop: 50 }]}>
           {/* Header + Dropdown Button */}
           <View style={styles.header}>
             <Text style={styles.title}>Settings</Text>
@@ -271,7 +307,10 @@ export default function SettingsScreen() {
           )}
 
           {/* Settings List */}
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={styles.container}
+          >
             <Text style={styles.heading}>General</Text>
             <SettingItem
               label="Edit Profile"
@@ -365,6 +404,7 @@ export default function SettingsScreen() {
             />
 
             <Text style={styles.heading}>Account</Text>
+
             {userDetail?.member === true && (
               <SettingItem
                 label="Subscription & Billing"
@@ -373,22 +413,44 @@ export default function SettingsScreen() {
               />
             )}
 
-            <SettingItem label="Log Out" icon="exit" onPress={async () => {
-              await logOut();
-              router.replace("/auth/signIn");
-            }} />
+            {auth.currentUser && !auth.currentUser.emailVerified && (
+              <SettingItem
+                label="Verify Email"
+                icon="mail"
+                onPress={() => verify()}
+                disabled={!auth.currentUser || auth.currentUser.emailVerified}
+              />
+            )}
+
+            <SettingItem
+              label="Log Out"
+              icon="exit"
+              onPress={async () => {
+                await logOut();
+                router.replace("/auth/signIn");
+              }}
+            />
           </ScrollView>
         </View>
       );
     }
   } catch (err) {
     content = (
-      <View style={[styles.container, { paddingTop: 50, justifyContent: 'center', alignItems: 'center' }]}> 
-        <Text style={{ color: 'red', fontSize: 18, marginBottom: 20 }}>A fatal error occurred in Settings.</Text>
-        <Text style={{ color: 'red', fontSize: 14, marginBottom: 20 }}>{err?.message || String(err)}</Text>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: 50, justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <Text style={{ color: "red", fontSize: 18, marginBottom: 20 }}>
+          A fatal error occurred in Settings.
+        </Text>
+        <Text style={{ color: "red", fontSize: 14, marginBottom: 20 }}>
+          {err?.message || String(err)}
+        </Text>
       </View>
     );
-        }
+  }
   return content;
 }
 
@@ -407,7 +469,11 @@ const SettingItem = ({
     accessibilityLabel={label}
     style={{ opacity: disabled ? 0.5 : 1 }}
   >
-    <View style={styles.itemRow}>
+    <TouchableOpacity
+      onPress={disabled ? undefined : onPress}
+      disabled={disabled}
+      style={styles.itemRow}
+    >
       <View style={styles.itemLeft}>
         <Ionicons
           name={icon}
@@ -433,7 +499,7 @@ const SettingItem = ({
           <MaterialIcons name="chevron-right" size={24} color={Colors.GRAY} />
         </Pressable>
       )}
-    </View>
+    </TouchableOpacity>
   </View>
 );
 

@@ -1,7 +1,9 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuth } from "@react-native-firebase/auth";
+import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
 import * as Notifications from "expo-notifications";
-import { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -12,6 +14,7 @@ import {
 import * as Progress from "react-native-progress";
 import { Colors } from "../../constant/Colors";
 import { imageAssets } from "../../constant/Option";
+import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function CourseProgressCard({
   item,
@@ -21,9 +24,37 @@ export default function CourseProgressCard({
   onPress = null,
 }) {
   if (!item) return null; // Handle case where item is undefined or null
+  const auth = getAuth();
+  const firestore = getFirestore();
+  const { userDetail } = useContext(UserDetailContext);
+  const [userData, setUserData] = useState(null); // ← ADD THIS
+
+  async function fetchUserFromFirestore() {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      console.log("No authenticated user.");
+      return;
+    }
+
+    const userDocRef = doc(firestore, "users", userDetail.email); // using email as doc ID
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const data = userDocSnap.data();
+      setUserData(data); // ← STORE IT IN STATE
+    } else {
+      console.log("No user document found in Firestore.");
+    }
+  }
+
+  useEffect(() => {
+    fetchUserFromFirestore();
+  }, []);
 
   const GetCompletedChapters = (course) => {
     const total = course?.chapters?.length ?? 0;
+
     const completed = course?.completedChapter?.length ?? 0;
     if (total === 0) return 0; // avoid division by zero
     const percentage = completed / total;
@@ -31,6 +62,7 @@ export default function CourseProgressCard({
   };
 
   const notificationSentKey = `notificationSent-${item?.courseTitle}`;
+
 
   useEffect(() => {
     async function checkAndSendNotification() {
