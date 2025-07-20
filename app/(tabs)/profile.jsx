@@ -236,7 +236,6 @@ export default function Profile() {
           ]}
         />
 
-        
         {userDetail && (
           <>
             <View

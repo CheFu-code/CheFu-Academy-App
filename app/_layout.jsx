@@ -9,7 +9,7 @@ import * as Linking from "expo-linking";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission";
 import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNotification";
@@ -17,6 +17,7 @@ import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNot
 import { getApp } from "@react-native-firebase/app";
 import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
+import LottieView from "lottie-react-native";
 import { UserDetailContext } from "../context/UserDetailContext";
 
 // ✅ Sentry Init
@@ -30,8 +31,6 @@ Sentry.init({
     Sentry.feedbackIntegration(),
   ],
 });
-
-
 
 export default Sentry.wrap(function RootLayout() {
   const [userDetail, setUserDetail] = useState();
@@ -170,8 +169,23 @@ export default Sentry.wrap(function RootLayout() {
 
   if (fontError) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1B263B", paddingHorizontal: 24 }}>
-        <Text style={{ color: "#E57373", fontSize: 16, fontFamily: "System", textAlign: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#1B263B",
+          paddingHorizontal: 24,
+        }}
+      >
+        <Text
+          style={{
+            color: "#E57373",
+            fontSize: 16,
+            fontFamily: "System",
+            textAlign: "center",
+          }}
+        >
           Failed to load fonts. Please restart the app.
         </Text>
       </View>
@@ -188,7 +202,12 @@ export default Sentry.wrap(function RootLayout() {
           paddingHorizontal: 24,
         }}
       >
-        <ActivityIndicator size="large" color="#00BFFF" />
+        <LottieView
+          source={require("../assets/images/loading.json")}
+          autoPlay
+          loop
+          style={{ width: 150, height: 150 }}
+        />
 
         <Text
           style={{
