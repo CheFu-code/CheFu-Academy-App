@@ -11,7 +11,7 @@ admin.initializeApp({
 
 const router = express.Router();
 
-const PAYPAL_API = "https://api-m.sandbox.paypal.com"; // Sandbox
+const PAYPAL_API = "https://api-m.paypal.com"; // Live (Production)
 const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 
