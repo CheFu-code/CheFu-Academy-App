@@ -1,0 +1,138 @@
+com.chefu.chefuacademy.app-apng-3.0.5-0 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\024835a5550ecc1e5d830014f4ef3b5a\transformed\apng-3.0.5\res
+com.chefu.chefuacademy.app-expo.modules.systemui-5.0.10-1 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\028f709ccfd60f4d6c13042b01300528\transformed\expo.modules.systemui-5.0.10\res
+com.chefu.chefuacademy.app-activity-1.10.0-2 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\031eae23da538e01cd6efd5006ba65a8\transformed\activity-1.10.0\res
+com.chefu.chefuacademy.app-play-services-base-18.5.0-3 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\04b3c844b3393ff9a6c840f537ca40ca\transformed\play-services-base-18.5.0\res
+com.chefu.chefuacademy.app-ads-adservices-1.0.0-beta05-4 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\063f0b68715d5af80c1519ca9049ee22\transformed\ads-adservices-1.0.0-beta05\res
+com.chefu.chefuacademy.app-lifecycle-runtime-2.6.2-5 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\07879416d582847e19ddd4470bb4af81\transformed\lifecycle-runtime-2.6.2\res
+com.chefu.chefuacademy.app-core-202108261754-6 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\127ff04a1e882f52277ecc97c740fa2e\transformed\core-202108261754\res
+com.chefu.chefuacademy.app-recyclerview-1.1.0-7 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\12ccd27bf678e8b53fb529ef313c51ce\transformed\recyclerview-1.1.0\res
+com.chefu.chefuacademy.app-camera-view-1.4.1-8 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\14028ccea90efc20cfe87368af975dff\transformed\camera-view-1.4.1\res
+com.chefu.chefuacademy.app-profileinstaller-1.4.0-9 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\157248c89b6348d2fd007effe30e715a\transformed\profileinstaller-1.4.0\res
+com.chefu.chefuacademy.app-swiperefreshlayout-1.1.0-10 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\1667e2edb6996f57f31bcd2879a8080b\transformed\swiperefreshlayout-1.1.0\res
+com.chefu.chefuacademy.app-viewpager2-1.0.0-11 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\1fb2477d51a67accdb7390602247c355\transformed\viewpager2-1.0.0\res
+com.chefu.chefuacademy.app-firebase-inappmessaging-display-21.0.2-12 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\20b03771713cb224a80c2f69b22b9198\transformed\firebase-inappmessaging-display-21.0.2\res
+com.chefu.chefuacademy.app-startup-runtime-1.1.1-13 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\21a22cf37793525a1498ecaa9681755a\transformed\startup-runtime-1.1.1\res
+com.chefu.chefuacademy.app-expo.modules.sharing-13.1.5-14 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\26f9d9c35692a678d98a9a00db11c607\transformed\expo.modules.sharing-13.1.5\res
+com.chefu.chefuacademy.app-constraintlayout-2.1.4-15 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\29c2cb7187d26aabbcfff6cef62878b1\transformed\constraintlayout-2.1.4\res
+com.chefu.chefuacademy.app-activity-ktx-1.10.0-16 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\2d850b2b8d23fa8ec21e091c6c43cf25\transformed\activity-ktx-1.10.0\res
+com.chefu.chefuacademy.app-firebase-common-21.0.0-17 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\2eb7072148c9b18ee694522fce2385fc\transformed\firebase-common-21.0.0\res
+com.chefu.chefuacademy.app-emoji2-1.3.0-18 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\34317f65008edeee7a1b865842f33bd5\transformed\emoji2-1.3.0\res
+com.chefu.chefuacademy.app-glide-plugin-3.0.5-19 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\351a16d70326768b2c5854a6980432ee\transformed\glide-plugin-3.0.5\res
+com.chefu.chefuacademy.app-annotation-experimental-1.4.1-20 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\364ed88774b3d8549f8d57fc8c9bb368\transformed\annotation-experimental-1.4.1\res
+com.chefu.chefuacademy.app-BlurView-version-2.0.6-21 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4262deed128117f30b2ef6f31cc61b94\transformed\BlurView-version-2.0.6\res
+com.chefu.chefuacademy.app-browser-1.8.0-22 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\44908a145fafccf9855a9401b13dd8c8\transformed\browser-1.8.0\res
+com.chefu.chefuacademy.app-core-common-2.0.3-23 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4616352eb8692c4865ed3a5386567a49\transformed\core-common-2.0.3\res
+com.chefu.chefuacademy.app-sentry-android-core-7.22.5-24 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4705147a0459a3d52927bbb6ec6d35c4\transformed\sentry-android-core-7.22.5\res
+com.chefu.chefuacademy.app-biometric-1.2.0-alpha04-25 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4adb0fa16e7e575806a9c770c8a059f4\transformed\biometric-1.2.0-alpha04\res
+com.chefu.chefuacademy.app-play-services-ads-24.3.0-26 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4b0b3920c068a5272f2743dbfdc5f3ab\transformed\play-services-ads-24.3.0\res
+com.chefu.chefuacademy.app-transition-1.5.0-27 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4bc89a02aafa865159e134c45ccc2754\transformed\transition-1.5.0\res
+com.chefu.chefuacademy.app-gif-3.0.5-28 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4d5f55258971ab647b4e3954d8e2aa95\transformed\gif-3.0.5\res
+com.chefu.chefuacademy.app-tracing-1.2.0-29 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4d8ae305243ed87254227ae759a45910\transformed\tracing-1.2.0\res
+com.chefu.chefuacademy.app-camera-mlkit-vision-1.4.1-30 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\4dc282c7539b50678bcfbb2d198e828b\transformed\camera-mlkit-vision-1.4.1\res
+com.chefu.chefuacademy.app-tracing-ktx-1.2.0-31 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\58635ce3b2dda0dea92c0170faed0f25\transformed\tracing-ktx-1.2.0\res
+com.chefu.chefuacademy.app-material-1.12.0-32 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\5ae5dcacd584dd15cca165a8a53f860c\transformed\material-1.12.0\res
+com.chefu.chefuacademy.app-appauth-0.11.1-33 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\5d8465bae446547d4e5e53e7aeb1f1f0\transformed\appauth-0.11.1\res
+com.chefu.chefuacademy.app-play-services-auth-21.3.0-34 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\61a50bf027637f53c9a37068fa2a2017\transformed\play-services-auth-21.3.0\res
+com.chefu.chefuacademy.app-appcompat-resources-1.7.0-35 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\67f8237cebca48d79cc6ca8613d4a810\transformed\appcompat-resources-1.7.0\res
+com.chefu.chefuacademy.app-webkit-1.11.0-alpha02-36 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\68d3865407bafad5c74273502ceb4c6a\transformed\webkit-1.11.0-alpha02\res
+com.chefu.chefuacademy.app-ads-adservices-java-1.0.0-beta05-37 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\690846f12979cbbc9621527a884ab90e\transformed\ads-adservices-java-1.0.0-beta05\res
+com.chefu.chefuacademy.app-expo.modules.splashscreen-0.30.10-38 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\705b05b136136061c5849139228156a1\transformed\expo.modules.splashscreen-0.30.10\res
+com.chefu.chefuacademy.app-media-1.0.0-39 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\7207dcae480992f25204d1b869c374cf\transformed\media-1.0.0\res
+com.chefu.chefuacademy.app-expo.modules.notifications-0.31.4-40 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\729440f9a5bfafac425dc06ccd65cb71\transformed\expo.modules.notifications-0.31.4\res
+com.chefu.chefuacademy.app-firebase-messaging-24.1.2-41 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\7b2353fa252c12c4cb05269ac96f6ff9\transformed\firebase-messaging-24.1.2\res
+com.chefu.chefuacademy.app-lifecycle-service-2.6.2-42 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\7baee5cdc47f0d95d4ac7a407f49d5fc\transformed\lifecycle-service-2.6.2\res
+com.chefu.chefuacademy.app-avif-3.0.5-43 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\7cda1612154e78cb3c2174bbe9612ced\transformed\avif-3.0.5\res
+com.chefu.chefuacademy.app-androidsvg-aar-1.4-44 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\85c0e7eaa4ae652b6742a38072727635\transformed\androidsvg-aar-1.4\res
+com.chefu.chefuacademy.app-play-services-ads-api-24.3.0-45 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\89fcf76cfe9bb31a312dad1df4e7207e\transformed\play-services-ads-api-24.3.0\res
+com.chefu.chefuacademy.app-sqlite-framework-2.3.0-46 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\8ab37c06dfd067b6c96c32dd3e41ad98\transformed\sqlite-framework-2.3.0\res
+com.chefu.chefuacademy.app-fragment-1.6.1-47 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\8c2e480ddf423dea3ed80ad64fb01f51\transformed\fragment-1.6.1\res
+com.chefu.chefuacademy.app-expo.modules.imagepicker-16.1.4-48 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\8d200739c45c5eb15c894cf88f6414d1\transformed\expo.modules.imagepicker-16.1.4\res
+com.chefu.chefuacademy.app-expo.modules.filesystem-18.1.11-49 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\8d42067affa37cf5106d40977269b7ff\transformed\expo.modules.filesystem-18.1.11\res
+com.chefu.chefuacademy.app-lifecycle-process-2.6.2-50 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\9199512315edfb2a12b21ef60be4e11d\transformed\lifecycle-process-2.6.2\res
+com.chefu.chefuacademy.app-drawee-3.6.0-51 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\94b38949cdc56a23fbc1809c2b4c8ad0\transformed\drawee-3.6.0\res
+com.chefu.chefuacademy.app-drawerlayout-1.1.1-52 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\97f6fe92773f55de5e6c280d4ae6b7ed\transformed\drawerlayout-1.1.1\res
+com.chefu.chefuacademy.app-savedstate-ktx-1.2.1-53 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\9beeb7702c1ef1c88b1d1bbca5247681\transformed\savedstate-ktx-1.2.1\res
+com.chefu.chefuacademy.app-camera-extensions-1.4.1-54 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\9d76d7cfe9197849cf255754f85ea20f\transformed\camera-extensions-1.4.1\res
+com.chefu.chefuacademy.app-lifecycle-viewmodel-2.6.2-55 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\a3f1f537c108d2cf96d6cfcdf9919046\transformed\lifecycle-viewmodel-2.6.2\res
+com.chefu.chefuacademy.app-core-splashscreen-1.2.0-alpha02-56 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\a40c45dd9e4f4e0100705c631e77c8c5\transformed\core-splashscreen-1.2.0-alpha02\res
+com.chefu.chefuacademy.app-react-android-0.79.5-debug-57 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\a89efe01639eb7dad7f1852c2dc2010d\transformed\react-android-0.79.5-debug\res
+com.chefu.chefuacademy.app-lifecycle-livedata-core-ktx-2.6.2-58 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\aba69b19b44f1e687811abd21c979f48\transformed\lifecycle-livedata-core-ktx-2.6.2\res
+com.chefu.chefuacademy.app-expo.modules.clipboard-7.1.5-59 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\ac521f0f9f44cf2974d5bc1f65def9f4\transformed\expo.modules.clipboard-7.1.5\res
+com.chefu.chefuacademy.app-cardview-1.0.0-60 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\ac8c52e4449120b2006e501efe423c06\transformed\cardview-1.0.0\res
+com.chefu.chefuacademy.app-lottie-6.5.2-61 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\acbc5c68cd65e797921e907a5b015fe2\transformed\lottie-6.5.2\res
+com.chefu.chefuacademy.app-core-1.13.1-62 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\af9f1036362c92a9109f915df9f93bd0\transformed\core-1.13.1\res
+com.chefu.chefuacademy.app-sentry-android-7.22.5-63 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\b145b42d4b60a7923081421550e545fb\transformed\sentry-android-7.22.5\res
+com.chefu.chefuacademy.app-camera-lifecycle-1.4.1-64 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\b6892c6e30c2291c27a88d65f6f2677e\transformed\camera-lifecycle-1.4.1\res
+com.chefu.chefuacademy.app-room-runtime-2.5.0-65 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\b8d5a7c3119f3c4befc5b9e0d953c8fa\transformed\room-runtime-2.5.0\res
+com.chefu.chefuacademy.app-work-runtime-2.8.0-66 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c118c0e22543f369b16635ce20f326e2\transformed\work-runtime-2.8.0\res
+com.chefu.chefuacademy.app-camera-core-1.4.1-67 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c19c938306c1b7dcef0dc2ba1b0dfb0e\transformed\camera-core-1.4.1\res
+com.chefu.chefuacademy.app-core-ktx-1.13.1-68 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c1e2167a66d618d6ccaff9afd9bde988\transformed\core-ktx-1.13.1\res
+com.chefu.chefuacademy.app-lifecycle-viewmodel-ktx-2.6.2-69 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c1fc33c5412188c4c621b1ff1ef57acc\transformed\lifecycle-viewmodel-ktx-2.6.2\res
+com.chefu.chefuacademy.app-camera-camera2-1.4.1-70 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c5c8028dde7bc724b9b902ce04f3ccde\transformed\camera-camera2-1.4.1\res
+com.chefu.chefuacademy.app-emoji2-views-helper-1.3.0-71 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c5e68296472ab88663c72bf266e2a341\transformed\emoji2-views-helper-1.3.0\res
+com.chefu.chefuacademy.app-sqlite-2.3.0-72 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c6b540eef6f7883cbb607858dfaab7d6\transformed\sqlite-2.3.0\res
+com.chefu.chefuacademy.app-expo.modules.medialibrary-17.1.7-73 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\c7754d196c4b3393e89a88cbade491f0\transformed\expo.modules.medialibrary-17.1.7\res
+com.chefu.chefuacademy.app-autofill-1.1.0-74 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\cb722b861d919ff7ed147762f344b87d\transformed\autofill-1.1.0\res
+com.chefu.chefuacademy.app-awebp-3.0.5-75 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\d05e259969aeaa5ee920ea574b872597\transformed\awebp-3.0.5\res
+com.chefu.chefuacademy.app-sentry-android-replay-7.22.5-76 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\d06a854d2e505da36e019c3e7f77c6f6\transformed\sentry-android-replay-7.22.5\res
+com.chefu.chefuacademy.app-camera-video-1.4.1-77 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\d3eec7fd9d4dc05870e4c33c3ebd8e40\transformed\camera-video-1.4.1\res
+com.chefu.chefuacademy.app-fragment-ktx-1.6.1-78 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\d56d1d6bf4e58b58c2382fd38e295d6f\transformed\fragment-ktx-1.6.1\res
+com.chefu.chefuacademy.app-sentry-android-ndk-7.22.5-79 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\d983d94795861a3df92fd81336d266e6\transformed\sentry-android-ndk-7.22.5\res
+com.chefu.chefuacademy.app-android-image-cropper-4.6.0-80 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\da3d785accc181b5d8cd59ecc7f8a711\transformed\android-image-cropper-4.6.0\res
+com.chefu.chefuacademy.app-glide-4.16.0-81 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\da8f230f9ddb4f356244bf8c0c095e8a\transformed\glide-4.16.0\res
+com.chefu.chefuacademy.app-lifecycle-livedata-core-2.6.2-82 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\dc6d891b867b18dc8931e029a384516e\transformed\lifecycle-livedata-core-2.6.2\res
+com.chefu.chefuacademy.app-frameanimation-3.0.5-83 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\de1de07d4f978c271c6f75ed599525b0\transformed\frameanimation-3.0.5\res
+com.chefu.chefuacademy.app-play-services-basement-18.4.0-84 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\e054245bee9bbc8098dc00b5c8db8d90\transformed\play-services-basement-18.4.0\res
+com.chefu.chefuacademy.app-coordinatorlayout-1.2.0-85 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\e244c8cec913b808626e8030fc0aa61c\transformed\coordinatorlayout-1.2.0\res
+com.chefu.chefuacademy.app-lifecycle-livedata-2.6.2-86 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\e2d154a1a4d787afbd3b045212e52757\transformed\lifecycle-livedata-2.6.2\res
+com.chefu.chefuacademy.app-appcompat-1.7.0-87 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\e86979dddcd8eac9e9a65047af91df0a\transformed\appcompat-1.7.0\res
+com.chefu.chefuacademy.app-lifecycle-runtime-ktx-2.6.2-88 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\e9cd1d94524a98143cacf8a753d527da\transformed\lifecycle-runtime-ktx-2.6.2\res
+com.chefu.chefuacademy.app-credentials-1.2.0-rc01-89 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\ebecbd677b4a4fda1fcdc45db910ad7c\transformed\credentials-1.2.0-rc01\res
+com.chefu.chefuacademy.app-core-runtime-2.2.0-90 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\efc81dcea1af953d356bdc4ecb85f58c\transformed\core-runtime-2.2.0\res
+com.chefu.chefuacademy.app-credentials-play-services-auth-1.2.0-rc01-91 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\f7aaceb7f4a4484d601b1556a6b54c39\transformed\credentials-play-services-auth-1.2.0-rc01\res
+com.chefu.chefuacademy.app-savedstate-1.2.1-92 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\f985e0a59f7b06ecd22ee355d5c5fa12\transformed\savedstate-1.2.1\res
+com.chefu.chefuacademy.app-lifecycle-viewmodel-savedstate-2.6.2-93 C:\Users\Vunene Maluleke\.gradle\caches\8.13\transforms\fb695f2e5efac5395e2a16e93ba4786f\transformed\lifecycle-viewmodel-savedstate-2.6.2\res
+com.chefu.chefuacademy.app-pngs-94 D:\Google Play Store Apps\Learning App\android\app\build\generated\res\pngs\debug
+com.chefu.chefuacademy.app-res-95 D:\Google Play Store Apps\Learning App\android\app\build\generated\res\processDebugGoogleServices
+com.chefu.chefuacademy.app-resValues-96 D:\Google Play Store Apps\Learning App\android\app\build\generated\res\resValues\debug
+com.chefu.chefuacademy.app-packageDebugResources-97 D:\Google Play Store Apps\Learning App\android\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.chefu.chefuacademy.app-packageDebugResources-98 D:\Google Play Store Apps\Learning App\android\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.chefu.chefuacademy.app-debug-99 D:\Google Play Store Apps\Learning App\android\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.chefu.chefuacademy.app-debug-100 D:\Google Play Store Apps\Learning App\android\app\src\debug\res
+com.chefu.chefuacademy.app-main-101 D:\Google Play Store Apps\Learning App\android\app\src\main\res
+com.chefu.chefuacademy.app-debug-102 D:\Google Play Store Apps\Learning App\node_modules\@notifee\react-native\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-103 D:\Google Play Store Apps\Learning App\node_modules\@react-native-async-storage\async-storage\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-104 D:\Google Play Store Apps\Learning App\node_modules\@react-native-firebase\app\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-105 D:\Google Play Store Apps\Learning App\node_modules\@react-native-firebase\auth\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-106 D:\Google Play Store Apps\Learning App\node_modules\@react-native-firebase\firestore\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-107 D:\Google Play Store Apps\Learning App\node_modules\@react-native-firebase\in-app-messaging\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-108 D:\Google Play Store Apps\Learning App\node_modules\@react-native-firebase\messaging\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-109 D:\Google Play Store Apps\Learning App\node_modules\@react-native-google-signin\google-signin\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-110 D:\Google Play Store Apps\Learning App\node_modules\@sentry\react-native\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-111 D:\Google Play Store Apps\Learning App\node_modules\expo-constants\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-112 D:\Google Play Store Apps\Learning App\node_modules\expo-dev-client\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-113 D:\Google Play Store Apps\Learning App\node_modules\expo-dev-launcher\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-114 D:\Google Play Store Apps\Learning App\node_modules\expo-dev-menu-interface\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-115 D:\Google Play Store Apps\Learning App\node_modules\expo-dev-menu\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-116 D:\Google Play Store Apps\Learning App\node_modules\expo-image-loader\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-117 D:\Google Play Store Apps\Learning App\node_modules\expo-json-utils\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-118 D:\Google Play Store Apps\Learning App\node_modules\expo-manifests\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-119 D:\Google Play Store Apps\Learning App\node_modules\expo-modules-core\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-120 D:\Google Play Store Apps\Learning App\node_modules\expo-updates-interface\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-121 D:\Google Play Store Apps\Learning App\node_modules\expo\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-122 D:\Google Play Store Apps\Learning App\node_modules\lottie-react-native\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-123 D:\Google Play Store Apps\Learning App\node_modules\react-native-app-auth\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-124 D:\Google Play Store Apps\Learning App\node_modules\react-native-edge-to-edge\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-125 D:\Google Play Store Apps\Learning App\node_modules\react-native-fs\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-126 D:\Google Play Store Apps\Learning App\node_modules\react-native-gesture-handler\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-127 D:\Google Play Store Apps\Learning App\node_modules\react-native-google-mobile-ads\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-128 D:\Google Play Store Apps\Learning App\node_modules\react-native-immersive\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-129 D:\Google Play Store Apps\Learning App\node_modules\react-native-localize\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-130 D:\Google Play Store Apps\Learning App\node_modules\react-native-navigation-bar-color\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-131 D:\Google Play Store Apps\Learning App\node_modules\react-native-print\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-132 D:\Google Play Store Apps\Learning App\node_modules\react-native-reanimated\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-133 D:\Google Play Store Apps\Learning App\node_modules\react-native-safe-area-context\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-134 D:\Google Play Store Apps\Learning App\node_modules\react-native-screens\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-135 D:\Google Play Store Apps\Learning App\node_modules\react-native-svg\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-136 D:\Google Play Store Apps\Learning App\node_modules\react-native-vector-icons\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.chefu.chefuacademy.app-debug-137 D:\Google Play Store Apps\Learning App\node_modules\react-native-webview\android\build\intermediates\packaged_res\debug\packageDebugResources
