@@ -1,16 +1,41 @@
-# OSX
-#
+# macOS
 .DS_Store
 
-# Android/IntelliJ
-#
-#build/ i'll uncomment it out later
-.idea
-.gradle
-local.properties
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env*
+*.log
+
+# Android
+android/.gradle/
+android/app/build/
+android/app/.cxx/
+android/build/
 *.iml
+.gradle/
+local.properties
 *.hprof
 .cxx/
+.idea/
+*.apk
+*.aar
+
+# iOS (if using it later)
+ios/
+Pods/
+*.xcworkspace
+*.xcodeproj
+DerivedData/
+
+# Expo
+.expo/
+.expo-shared/
 
 # Bundle artifacts
 *.jsbundle
+
+# VS Code
+.vscode/
