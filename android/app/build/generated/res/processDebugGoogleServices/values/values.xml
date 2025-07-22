@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">441077080510</string>
+    <string name="google_api_key" translatable="false">AIzaSyDg-2ZFafv4bDtssjg9gQ_yaNruJVBVdz8</string>
+    <string name="google_app_id" translatable="false">1:441077080510:android:9219e59fa5e0b3be7bd9ef</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDg-2ZFafv4bDtssjg9gQ_yaNruJVBVdz8</string>
+    <string name="google_storage_bucket" translatable="false">cheforumreal.appspot.com</string>
+    <string name="project_id" translatable="false">cheforumreal</string>
+</resources>

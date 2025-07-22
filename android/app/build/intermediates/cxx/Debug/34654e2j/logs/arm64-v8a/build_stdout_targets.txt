@@ -1,0 +1,235 @@
+ninja: Entering directory `D:\Google Play Store Apps\Learning App\android\app\.cxx\Debug\34654e2j\arm64-v8a'
+[0/2] Re-checking globbed directories...
+[1/111] Building CXX object rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/States.cpp.o
+[2/111] Building CXX object rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/EventEmitters.cpp.o
+[3/111] Building CXX object rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/rnasyncstorage-generated.cpp.o
+[4/111] Building CXX object rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/rnasyncstorageJSI-generated.cpp.o
+[5/111] Building CXX object RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/RNGoogleSignInCGen-generated.cpp.o
+[6/111] Building CXX object rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/Props.cpp.o
+[7/111] Building CXX object rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/ShadowNodes.cpp.o
+[8/111] Building CXX object rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/ComponentDescriptors.cpp.o
+[9/111] Building CXX object CMakeFiles/appmodules.dir/OnLoad.cpp.o
+[10/111] Building CXX object RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/States.cpp.o
+[11/111] Building CXX object RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/EventEmitters.cpp.o
+[12/111] Building CXX object RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ShadowNodes.cpp.o
+[13/111] Building CXX object RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/RNGoogleSignInCGenJSI-generated.cpp.o
+[14/111] Building CXX object RNSentrySpec_autolinked_build/CMakeFiles/react_codegen_RNSentrySpec.dir/react/renderer/components/RNSentrySpec/EventEmitters.cpp.o
+[15/111] Building CXX object RNSentrySpec_autolinked_build/CMakeFiles/react_codegen_RNSentrySpec.dir/react/renderer/components/RNSentrySpec/RNSentrySpecJSI-generated.cpp.o
+[16/111] Building CXX object RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/Props.cpp.o
+[17/111] Building CXX object RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ComponentDescriptors.cpp.o
+[18/111] Building CXX object RNSentrySpec_autolinked_build/CMakeFiles/react_codegen_RNSentrySpec.dir/react/renderer/components/RNSentrySpec/States.cpp.o
+[19/111] Building CXX object RNSentrySpec_autolinked_build/CMakeFiles/react_codegen_RNSentrySpec.dir/RNSentrySpec-generated.cpp.o
+[20/111] Building CXX object RNSentrySpec_autolinked_build/CMakeFiles/react_codegen_RNSentrySpec.dir/react/renderer/components/RNSentrySpec/ComponentDescriptors.cpp.o
+[21/111] Building CXX object RNSentrySpec_autolinked_build/CMakeFiles/react_codegen_RNSentrySpec.dir/react/renderer/components/RNSentrySpec/Props.cpp.o
+[22/111] Building CXX object RNSentrySpec_autolinked_build/CMakeFiles/react_codegen_RNSentrySpec.dir/react/renderer/components/RNSentrySpec/ShadowNodes.cpp.o
+[23/111] Building CXX object lottiereactnative_autolinked_build/CMakeFiles/react_codegen_lottiereactnative.dir/react/renderer/components/lottiereactnative/EventEmitters.cpp.o
+[24/111] Building CXX object lottiereactnative_autolinked_build/CMakeFiles/react_codegen_lottiereactnative.dir/lottiereactnative-generated.cpp.o
+[25/111] Building CXX object lottiereactnative_autolinked_build/CMakeFiles/react_codegen_lottiereactnative.dir/react/renderer/components/lottiereactnative/ShadowNodes.cpp.o
+[26/111] Building CXX object lottiereactnative_autolinked_build/CMakeFiles/react_codegen_lottiereactnative.dir/react/renderer/components/lottiereactnative/States.cpp.o
+[27/111] Building CXX object lottiereactnative_autolinked_build/CMakeFiles/react_codegen_lottiereactnative.dir/react/renderer/components/lottiereactnative/Props.cpp.o
+[28/111] Building CXX object lottiereactnative_autolinked_build/CMakeFiles/react_codegen_lottiereactnative.dir/react/renderer/components/lottiereactnative/lottiereactnativeJSI-generated.cpp.o
+[29/111] Building CXX object rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/react/renderer/components/rngesturehandler_codegen/States.cpp.o
+[30/111] Building CXX object rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/react/renderer/components/rngesturehandler_codegen/EventEmitters.cpp.o
+[31/111] Building CXX object rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/react/renderer/components/rngesturehandler_codegen/ShadowNodes.cpp.o
+[32/111] Building CXX object lottiereactnative_autolinked_build/CMakeFiles/react_codegen_lottiereactnative.dir/react/renderer/components/lottiereactnative/ComponentDescriptors.cpp.o
+[33/111] Building CXX object rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/react/renderer/components/rngesturehandler_codegen/Props.cpp.o
+[34/111] Building CXX object rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/bac033cd950586cef66695376748dd33/ComponentDescriptors.cpp.o
+[35/111] Building CXX object RNGoogleMobileAdsSpec_autolinked_build/CMakeFiles/react_codegen_RNGoogleMobileAdsSpec.dir/react/renderer/components/RNGoogleMobileAdsSpec/States.cpp.o
+[36/111] Building CXX object rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/react/renderer/components/rngesturehandler_codegen/rngesturehandler_codegenJSI-generated.cpp.o
+[37/111] Building CXX object rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/rngesturehandler_codegen-generated.cpp.o
+[38/111] Building CXX object RNGoogleMobileAdsSpec_autolinked_build/CMakeFiles/react_codegen_RNGoogleMobileAdsSpec.dir/react/renderer/components/RNGoogleMobileAdsSpec/EventEmitters.cpp.o
+[39/111] Building CXX object RNGoogleMobileAdsSpec_autolinked_build/CMakeFiles/react_codegen_RNGoogleMobileAdsSpec.dir/RNGoogleMobileAdsSpec-generated.cpp.o
+[40/111] Building CXX object RNLocalizeSpec_autolinked_build/CMakeFiles/react_codegen_RNLocalizeSpec.dir/RNLocalizeSpec-generated.cpp.o
+[41/111] Building CXX object RNGoogleMobileAdsSpec_autolinked_build/CMakeFiles/react_codegen_RNGoogleMobileAdsSpec.dir/2e26a5ddee9cdd09e5c46bc2607ebc87/RNGoogleMobileAdsSpecJSI-generated.cpp.o
+[42/111] Building CXX object RNGoogleMobileAdsSpec_autolinked_build/CMakeFiles/react_codegen_RNGoogleMobileAdsSpec.dir/react/renderer/components/RNGoogleMobileAdsSpec/ShadowNodes.cpp.o
+[43/111] Building CXX object RNGoogleMobileAdsSpec_autolinked_build/CMakeFiles/react_codegen_RNGoogleMobileAdsSpec.dir/react/renderer/components/RNGoogleMobileAdsSpec/ComponentDescriptors.cpp.o
+[44/111] Building CXX object RNLocalizeSpec_autolinked_build/CMakeFiles/react_codegen_RNLocalizeSpec.dir/react/renderer/components/RNLocalizeSpec/States.cpp.o
+[45/111] Building CXX object RNLocalizeSpec_autolinked_build/CMakeFiles/react_codegen_RNLocalizeSpec.dir/react/renderer/components/RNLocalizeSpec/ComponentDescriptors.cpp.o
+[46/111] Building CXX object RNLocalizeSpec_autolinked_build/CMakeFiles/react_codegen_RNLocalizeSpec.dir/react/renderer/components/RNLocalizeSpec/ShadowNodes.cpp.o
+[47/111] Building CXX object RNGoogleMobileAdsSpec_autolinked_build/CMakeFiles/react_codegen_RNGoogleMobileAdsSpec.dir/react/renderer/components/RNGoogleMobileAdsSpec/Props.cpp.o
+[48/111] Building CXX object RNLocalizeSpec_autolinked_build/CMakeFiles/react_codegen_RNLocalizeSpec.dir/react/renderer/components/RNLocalizeSpec/RNLocalizeSpecJSI-generated.cpp.o
+[49/111] Building CXX object RNLocalizeSpec_autolinked_build/CMakeFiles/react_codegen_RNLocalizeSpec.dir/react/renderer/components/RNLocalizeSpec/EventEmitters.cpp.o
+[50/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/States.cpp.o
+[51/111] Building CXX object RNLocalizeSpec_autolinked_build/CMakeFiles/react_codegen_RNLocalizeSpec.dir/react/renderer/components/RNLocalizeSpec/Props.cpp.o
+[52/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o
+[53/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/2e8de8c878ac20e9f385b6babd13d8c7/components/safeareacontext/RNCSafeAreaViewState.cpp.o
+[54/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o
+[55/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o
+[56/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c4095fab32dc3b499b60e13123a8f3df/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o
+[57/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/ShadowNodes.cpp.o
+[58/111] Building CXX object CMakeFiles/appmodules.dir/D_/Google_Play_Store_Apps/Learning_App/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o
+[59/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/10effb554d3bc913b070a66d920f2a00/react/renderer/components/rnscreens/RNSModalScreenShadowNode.cpp.o
+[60/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o
+[61/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/f9f979b0f0a9c2b05d8eb64331da8fce/renderer/components/rnscreens/RNSFullWindowOverlayShadowNode.cpp.o
+[62/111] Building CXX object safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/e9a12c075ec04b6749cf4d0b45cc65c7/safeareacontext/safeareacontextJSI-generated.cpp.o
+[63/111] Linking CXX shared library "D:\Google Play Store Apps\Learning App\android\app\build\intermediates\cxx\Debug\34654e2j\obj\arm64-v8a\libreact_codegen_safeareacontext.so"
+FAILED: D:/Google Play Store Apps/Learning App/android/app/build/intermediates/cxx/Debug/34654e2j/obj/arm64-v8a/libreact_codegen_safeareacontext.so 
+cmd.exe /C "cd . && C:\Users\VUNENE~1\AppData\Local\Android\Sdk\ndk\271~1.122\TOOLCH~1\llvm\prebuilt\WINDOW~1\bin\CLANG_~1.EXE --target=aarch64-none-linux-android24 --sysroot="C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot" -fPIC -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__BIONIC_NO_PAGE_SIZE_MACRO -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -Wl,-z,max-page-size=16384 -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -shared -Wl,-soname,libreact_codegen_safeareacontext.so -o "D:\Google Play Store Apps\Learning App\android\app\build\intermediates\cxx\Debug\34654e2j\obj\arm64-v8a\libreact_codegen_safeareacontext.so" safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c4095fab32dc3b499b60e13123a8f3df/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/2e8de8c878ac20e9f385b6babd13d8c7/components/safeareacontext/RNCSafeAreaViewState.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/ShadowNodes.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/States.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/e9a12c075ec04b6749cf4d0b45cc65c7/safeareacontext/safeareacontextJSI-generated.cpp.o safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o  "C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/d6e46b19b602d3371982eebc7ed690ed/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.arm64-v8a/libfbjni.so"  "C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/jsi/libs/android.arm64-v8a/libjsi.so"  "C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/libs/android.arm64-v8a/libreactnative.so"  -latomic -lm && cd ."
+ld.lld: error: undefined symbol: std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::~basic_string()
+>>> referenced by safeareacontext-generated.cpp:22 (D:/Google Play Store Apps/Learning App/node_modules/react-native-safe-area-context/android/build/generated/source/codegen/jni/safeareacontext-generated.cpp:22)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(facebook::react::NativeSafeAreaContextSpecJSI::NativeSafeAreaContextSpecJSI(facebook::react::JavaTurboModule::InitParams const&))
+>>> referenced by safeareacontext-generated.cpp:22 (D:/Google Play Store Apps/Learning App/node_modules/react-native-safe-area-context/android/build/generated/source/codegen/jni/safeareacontext-generated.cpp:22)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(facebook::react::NativeSafeAreaContextSpecJSI::NativeSafeAreaContextSpecJSI(facebook::react::JavaTurboModule::InitParams const&))
+>>> referenced by safeareacontext-generated.cpp:17 (D:/Google Play Store Apps/Learning App/node_modules/react-native-safe-area-context/android/build/generated/source/codegen/jni/safeareacontext-generated.cpp:17)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(facebook::react::__hostFunction_NativeSafeAreaContextSpecJSI_getConstants(facebook::jsi::Runtime&, facebook::react::TurboModule&, facebook::jsi::Value const*, unsigned long))
+>>> referenced 68 more times
+
+ld.lld: error: undefined symbol: operator delete(void*)
+>>> referenced by safeareacontext.h:22 (D:/Google Play Store Apps/Learning App/node_modules/react-native-safe-area-context/android/build/generated/source/codegen/jni/safeareacontext.h:22)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(facebook::react::NativeSafeAreaContextSpecJSI::~NativeSafeAreaContextSpecJSI())
+>>> referenced by shared_ptr.h:246 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:246)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(std::__ndk1::__shared_ptr_emplace<facebook::react::NativeSafeAreaContextSpecJSI, std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>>::~__shared_ptr_emplace())
+>>> referenced by TurboModule.h:49 (C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/include/ReactCommon/TurboModule.h:49)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/e9a12c075ec04b6749cf4d0b45cc65c7/safeareacontext/safeareacontextJSI-generated.cpp.o:(facebook::react::TurboModule::~TurboModule())
+>>> referenced 35 more times
+
+ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::~__shared_weak_count()
+>>> referenced by shared_ptr.h:263 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:263)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(std::__ndk1::__shared_ptr_emplace<facebook::react::NativeSafeAreaContextSpecJSI, std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>>::__shared_ptr_emplace[abi:ne180000]<facebook::react::JavaTurboModule::InitParams const&, std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>, 0>(std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>, facebook::react::JavaTurboModule::InitParams const&))
+>>> referenced by shared_ptr.h:246 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:246)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(std::__ndk1::__shared_ptr_emplace<facebook::react::NativeSafeAreaContextSpecJSI, std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>>::~__shared_ptr_emplace())
+>>> referenced by shared_ptr.h:263 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:263)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o:(std::__ndk1::__shared_ptr_emplace<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>, std::__ndk1::allocator<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>>>::__shared_ptr_emplace[abi:ne180000]<facebook::react::ShadowNodeFragment const&, std::__ndk1::shared_ptr<facebook::react::ShadowNodeFamily const> const&, facebook::react::ShadowNodeTraits, std::__ndk1::allocator<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>>, 0>(std::__ndk1::allocator<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>>, facebook::react::ShadowNodeFragment const&, std::__ndk1::shared_ptr<facebook::react::ShadowNodeFamily const> const&, facebook::react::ShadowNodeTraits&&))
+>>> referenced 21 more times
+
+ld.lld: error: undefined symbol: vtable for __cxxabiv1::__si_class_type_info
+>>> referenced by safeareacontext-generated.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(typeinfo for facebook::react::NativeSafeAreaContextSpecJSI)
+>>> referenced by safeareacontext-generated.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(typeinfo for std::__ndk1::__shared_ptr_emplace<facebook::react::NativeSafeAreaContextSpecJSI, std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>>)
+>>> referenced by EventEmitters.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o:(typeinfo for std::__ndk1::__function::__func<facebook::react::RNCSafeAreaProviderEventEmitter::onInsetsChange(facebook::react::RNCSafeAreaProviderEventEmitter::OnInsetsChange) const::$_0, std::__ndk1::allocator<facebook::react::RNCSafeAreaProviderEventEmitter::onInsetsChange(facebook::react::RNCSafeAreaProviderEventEmitter::OnInsetsChange) const::$_0>, facebook::jsi::Value (facebook::jsi::Runtime&)>)
+>>> referenced 26 more times
+>>> the vtable symbol may be undefined because the class is missing its key function (see https://lld.llvm.org/missingkeyfunction)
+
+ld.lld: error: undefined symbol: std::__ndk1::__shared_weak_count::__get_deleter(std::type_info const&) const
+>>> referenced by safeareacontext-generated.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(vtable for std::__ndk1::__shared_ptr_emplace<facebook::react::NativeSafeAreaContextSpecJSI, std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>>)
+>>> referenced by ComponentDescriptors.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o:(vtable for std::__ndk1::__shared_ptr_emplace<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>, std::__ndk1::allocator<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>>>)
+>>> referenced by ComponentDescriptors.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o:(vtable for std::__ndk1::__shared_ptr_emplace<facebook::react::RNCSafeAreaProviderProps const, std::__ndk1::allocator<facebook::react::RNCSafeAreaProviderProps const>>)
+>>> referenced 8 more times
+
+ld.lld: error: undefined symbol: typeinfo for std::__ndk1::__shared_weak_count
+>>> referenced by safeareacontext-generated.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddc53df658e8e9fd0dca5b76abe926c0/source/codegen/jni/safeareacontext-generated.cpp.o:(typeinfo for std::__ndk1::__shared_ptr_emplace<facebook::react::NativeSafeAreaContextSpecJSI, std::__ndk1::allocator<facebook::react::NativeSafeAreaContextSpecJSI>>)
+>>> referenced by ComponentDescriptors.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o:(typeinfo for std::__ndk1::__shared_ptr_emplace<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>, std::__ndk1::allocator<facebook::react::ConcreteViewShadowNode<&facebook::react::RNCSafeAreaProviderComponentName.<char const at offset 0>, facebook::react::RNCSafeAreaProviderProps, facebook::react::RNCSafeAreaProviderEventEmitter, facebook::react::RNCSafeAreaProviderState, false>>>)
+>>> referenced by ComponentDescriptors.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o:(typeinfo for std::__ndk1::__shared_ptr_emplace<facebook::react::RNCSafeAreaProviderProps const, std::__ndk1::allocator<facebook::react::RNCSafeAreaProviderProps const>>)
+>>> referenced 8 more times
+
+ld.lld: error: undefined symbol: __cxa_begin_catch
+>>> referenced by propsConversions.h:132 (C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/include/react/renderer/core/propsConversions.h:132)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(facebook::react::RNCSafeAreaViewMode facebook::react::convertRawProp<facebook::react::RNCSafeAreaViewMode, facebook::react::RNCSafeAreaViewMode>(facebook::react::PropsParserContext const&, facebook::react::RawProps const&, char const*, facebook::react::RNCSafeAreaViewMode const&, facebook::react::RNCSafeAreaViewMode const&, char const*, char const*))
+>>> referenced by propsConversions.h:132 (C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/include/react/renderer/core/propsConversions.h:132)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(facebook::react::RNCSafeAreaViewEdgesStruct facebook::react::convertRawProp<facebook::react::RNCSafeAreaViewEdgesStruct, facebook::react::RNCSafeAreaViewEdgesStruct>(facebook::react::PropsParserContext const&, facebook::react::RawProps const&, char const*, facebook::react::RNCSafeAreaViewEdgesStruct const&, facebook::react::RNCSafeAreaViewEdgesStruct const&, char const*, char const*))
+>>> referenced by ostream:683 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/ostream:683)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>& std::__ndk1::__put_character_sequence[abi:ne180000]<char, std::__ndk1::char_traits<char>>(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>&, char const*, unsigned long))
+>>> referenced 1 more times
+
+ld.lld: error: undefined symbol: __cxa_end_catch
+>>> referenced by propsConversions.h:139 (C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/include/react/renderer/core/propsConversions.h:139)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(facebook::react::RNCSafeAreaViewMode facebook::react::convertRawProp<facebook::react::RNCSafeAreaViewMode, facebook::react::RNCSafeAreaViewMode>(facebook::react::PropsParserContext const&, facebook::react::RawProps const&, char const*, facebook::react::RNCSafeAreaViewMode const&, facebook::react::RNCSafeAreaViewMode const&, char const*, char const*))
+>>> referenced by propsConversions.h:139 (C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/include/react/renderer/core/propsConversions.h:139)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(facebook::react::RNCSafeAreaViewMode facebook::react::convertRawProp<facebook::react::RNCSafeAreaViewMode, facebook::react::RNCSafeAreaViewMode>(facebook::react::PropsParserContext const&, facebook::react::RawProps const&, char const*, facebook::react::RNCSafeAreaViewMode const&, facebook::react::RNCSafeAreaViewMode const&, char const*, char const*))
+>>> referenced by propsConversions.h:139 (C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/include/react/renderer/core/propsConversions.h:139)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(facebook::react::RNCSafeAreaViewEdgesStruct facebook::react::convertRawProp<facebook::react::RNCSafeAreaViewEdgesStruct, facebook::react::RNCSafeAreaViewEdgesStruct>(facebook::react::PropsParserContext const&, facebook::react::RawProps const&, char const*, facebook::react::RNCSafeAreaViewEdgesStruct const&, facebook::react::RNCSafeAreaViewEdgesStruct const&, char const*, char const*))
+>>> referenced 3 more times
+
+ld.lld: error: undefined symbol: __cxa_allocate_exception
+>>> referenced by variant:287 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/variant:287)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::__throw_bad_variant_access[abi:ne180000]())
+>>> referenced by stdexcept:249 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:249)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c4095fab32dc3b499b60e13123a8f3df/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_out_of_range[abi:ne180000](char const*))
+>>> referenced by stdexcept:241 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:241)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c4095fab32dc3b499b60e13123a8f3df/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_length_error[abi:ne180000](char const*))
+>>> referenced 3 more times
+
+ld.lld: error: undefined symbol: typeinfo for std::bad_variant_access
+>>> referenced by variant:287 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/variant:287)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::__throw_bad_variant_access[abi:ne180000]())
+>>> referenced by variant:287 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/variant:287)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::__throw_bad_variant_access[abi:ne180000]())
+
+ld.lld: error: undefined symbol: __cxa_throw
+>>> referenced by variant:287 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/variant:287)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::__throw_bad_variant_access[abi:ne180000]())
+>>> referenced by stdexcept:249 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:249)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c4095fab32dc3b499b60e13123a8f3df/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_out_of_range[abi:ne180000](char const*))
+>>> referenced by stdexcept:241 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/stdexcept:241)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c4095fab32dc3b499b60e13123a8f3df/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o:(std::__ndk1::__throw_length_error[abi:ne180000](char const*))
+>>> referenced 3 more times
+
+ld.lld: error: undefined symbol: vtable for std::bad_variant_access
+>>> referenced by variant:263 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/variant:263)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::bad_variant_access::bad_variant_access())
+>>> referenced by variant:263 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/variant:263)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::bad_variant_access::bad_variant_access())
+>>> the vtable symbol may be undefined because the class is missing its key function (see https://lld.llvm.org/missingkeyfunction)
+
+ld.lld: error: undefined symbol: std::exception::~exception()
+>>> referenced by variant:263 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/variant:263)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::bad_variant_access::~bad_variant_access())
+>>> referenced by function.h:67 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__functional/function.h:67)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/75e2ce45bc3b8bd1a5aecaef8076ff87/components/safeareacontext/ComponentDescriptors.cpp.o:(std::__ndk1::bad_function_call::~bad_function_call())
+
+ld.lld: error: undefined symbol: vtable for __cxxabiv1::__class_type_info
+>>> referenced by EventEmitters.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o:(typeinfo for std::__ndk1::__function::__base<facebook::jsi::Value (facebook::jsi::Runtime&)>)
+>>> referenced by EventEmitters.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o:(typeinfo for facebook::react::RNCSafeAreaProviderEventEmitter::onInsetsChange(facebook::react::RNCSafeAreaProviderEventEmitter::OnInsetsChange) const::$_0)
+>>> referenced by safeareacontextJSI-generated.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/e9a12c075ec04b6749cf4d0b45cc65c7/safeareacontext/safeareacontextJSI-generated.cpp.o:(typeinfo for std::__ndk1::__function::__base<facebook::jsi::Value (facebook::jsi::Runtime&, facebook::jsi::Value const&, facebook::jsi::Value const*, unsigned long)>)
+>>> referenced 8 more times
+>>> the vtable symbol may be undefined because the class is missing its key function (see https://lld.llvm.org/missingkeyfunction)
+
+ld.lld: error: undefined symbol: __cxa_pure_virtual
+>>> referenced by EventEmitters.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o:(vtable for std::__ndk1::__function::__base<facebook::jsi::Value (facebook::jsi::Runtime&)>)
+>>> referenced by EventEmitters.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o:(vtable for std::__ndk1::__function::__base<facebook::jsi::Value (facebook::jsi::Runtime&)>)
+>>> referenced by EventEmitters.cpp
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/c18fe25b0c52913c02fdcc751134e935/renderer/components/safeareacontext/EventEmitters.cpp.o:(vtable for std::__ndk1::__function::__base<facebook::jsi::Value (facebook::jsi::Runtime&)>)
+>>> referenced 40 more times
+
+ld.lld: error: undefined symbol: std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::basic_string(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> const&)
+>>> referenced by RawValue.h:439 (C:/Users/Vunene Maluleke/.gradle/caches/8.13/transforms/a89efe01639eb7dad7f1852c2dc2010d/transformed/react-android-0.79.5-debug/prefab/modules/reactnative/include/react/renderer/core/RawValue.h:439)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(facebook::react::RawValue::castValue(folly::dynamic const&, std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>*))
+>>> referenced by tuple:1409 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/tuple:1409)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::pair<std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> const, facebook::react::RawValue>::pair[abi:ne180000]<std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> const&, 0ul>(std::__ndk1::piecewise_construct_t, std::__ndk1::tuple<std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> const&>&, std::__ndk1::tuple<>&, std::__ndk1::__tuple_indices<0ul>, std::__ndk1::__tuple_indices<...>))
+>>> referenced by pair.h:207 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__utility/pair.h:207)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::pair<std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> const, facebook::react::RawValue>::pair[abi:ne180000]<std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>&, facebook::react::RawValue, 0>(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>&, facebook::react::RawValue&&))
+>>> referenced 8 more times
+
+ld.lld: error: undefined symbol: std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>::sentry::sentry(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>&)
+>>> referenced by ostream:669 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/ostream:669)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>& std::__ndk1::__put_character_sequence[abi:ne180000]<char, std::__ndk1::char_traits<char>>(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>&, char const*, unsigned long))
+
+ld.lld: error: undefined symbol: std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>::sentry::~sentry()
+>>> referenced by ostream:683 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/ostream:683)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>& std::__ndk1::__put_character_sequence[abi:ne180000]<char, std::__ndk1::char_traits<char>>(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>&, char const*, unsigned long))
+>>> referenced by ostream:683 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/ostream:683)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>& std::__ndk1::__put_character_sequence[abi:ne180000]<char, std::__ndk1::char_traits<char>>(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>&, char const*, unsigned long))
+
+ld.lld: error: undefined symbol: std::__ndk1::ios_base::__set_badbit_and_consider_rethrow()
+>>> referenced by ostream:684 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/ostream:684)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>& std::__ndk1::__put_character_sequence[abi:ne180000]<char, std::__ndk1::char_traits<char>>(std::__ndk1::basic_ostream<char, std::__ndk1::char_traits<char>>&, char const*, unsigned long))
+
+ld.lld: error: undefined symbol: std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::__init(unsigned long, char)
+>>> referenced by string:983 (C:/Users/Vunene Maluleke/AppData/Local/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/string:983)
+>>>               safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/3a4791574ccfbce4ce1bf4cff380989f/react/renderer/components/safeareacontext/Props.cpp.o:(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>::basic_string[abi:ne180000](unsigned long, char))
+
+ld.lld: error: too many errors emitted, stopping now (use --error-limit=0 to see all errors)
+CLANG_~1: error: linker command failed with exit code 1 (use -v to see invocation)
+[64/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/37f56221eb11b2b4aefdc1ffeaa84b0e/source/codegen/jni/react/renderer/components/rnscreens/States.cpp.o
+[65/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/f9f979b0f0a9c2b05d8eb64331da8fce/renderer/components/rnscreens/RNSScreenStackHeaderSubviewState.cpp.o
+[66/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/1b049720a5224a38a3e9b39b85d5dd22/components/rnscreens/RNSScreenStackHeaderConfigShadowNode.cpp.o
+[67/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/ee57849cf9a6ff05d10271666edb5488/common/cpp/react/renderer/components/rnscreens/RNSScreenState.cpp.o
+[68/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/49dc8290adf22faa9f60f088a3a4be9f/cpp/react/renderer/components/rnscreens/RNSScreenShadowNode.cpp.o
+[69/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/f9f979b0f0a9c2b05d8eb64331da8fce/renderer/components/rnscreens/RNSScreenStackHeaderConfigState.cpp.o
+[70/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/1b049720a5224a38a3e9b39b85d5dd22/components/rnscreens/RNSScreenStackHeaderSubviewShadowNode.cpp.o
+[71/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/2166ffce462e7f30cc65bd28c320fa73/jni/react/renderer/components/rnscreens/rnscreensJSI-generated.cpp.o
+[72/111] Building CXX object rnscreens_autolinked_build/CMakeFiles/react_codegen_rnscreens.dir/rnscreens.cpp.o
+ninja: build stopped: subcommand failed.
