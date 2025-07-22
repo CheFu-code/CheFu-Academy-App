@@ -34,8 +34,16 @@ jobs:
 
       - run: rm -rf node_modules/.cache/metro # clear metro cache (optional but helpful)
 
-      - name: Bundle React Native JS
-        run: npx react-native bundle --platform android --dev false --entry-file app/index.jsx --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
+      - name: Bundle JS and assets
+        run: |
+          mkdir -p android/app/src/main/assets
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file app/index.jsx \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/assets
+
 
       - run: chmod +x android/gradlew
 
