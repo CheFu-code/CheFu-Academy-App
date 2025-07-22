@@ -1,5 +1,5 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { getAuth } from "@react-native-firebase/auth";
+import { getAuth, sendEmailVerification } from "@react-native-firebase/auth";
 import {
   doc,
   getDoc,
@@ -34,7 +34,7 @@ import { UserDetailContext } from "../../context/UserDetailContext";
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
-  const [useBiometrics, setUseBiometrics] = useState(false);
+  const [useBiometrics, setUseBiometrics] = useState(true);
   const [showVersion, setShowVersion] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -227,6 +227,7 @@ export default function SettingsScreen() {
     const user = auth.currentUser;
     if (user) {
       try {
+        setLoading(true);
         await sendEmailVerification(user);
         alert(
           `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
@@ -234,9 +235,12 @@ export default function SettingsScreen() {
       } catch (error) {
         console.error("Failed to send verification email:", error);
         alert("Failed to send verification email. Try again later.");
+      } finally {
+        setLoading(false);
       }
     } else {
-      alert("No user is currently signed in.");
+      setFatalError(new Error("No user is currently signed in."));
+      Alert.alert("Error", "No user is currently signed in.");
     }
   };
   let content;
@@ -413,14 +417,18 @@ export default function SettingsScreen() {
               />
             )}
 
-            {auth.currentUser && !auth.currentUser.emailVerified && (
-              <SettingItem
-                label="Verify Email"
-                icon="mail"
-                onPress={() => verify()}
-                disabled={!auth.currentUser || auth.currentUser.emailVerified}
-              />
-            )}
+            {auth.currentUser &&
+              !auth.currentUser.emailVerified &&
+              (loading ? (
+                <ActivityIndicator size={24} color={Colors.GREEN} />
+              ) : (
+                <SettingItem
+                  label="Verify Email"
+                  icon="mail"
+                  onPress={() => verify()}
+                  disabled={!auth.currentUser || auth.currentUser.emailVerified}
+                />
+              ))}
 
             <SettingItem
               label="Log Out"

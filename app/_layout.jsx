@@ -9,7 +9,7 @@ import * as Linking from "expo-linking";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
 import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission";
 import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNotification";
@@ -17,7 +17,6 @@ import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNot
 import { getApp } from "@react-native-firebase/app";
 import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
-import LottieView from "lottie-react-native";
 import { UserDetailContext } from "../context/UserDetailContext";
 
 // ✅ Sentry Init
@@ -202,13 +201,13 @@ export default Sentry.wrap(function RootLayout() {
           paddingHorizontal: 24,
         }}
       >
-        <LottieView
+        {/* <LottieView
           source={require("../assets/images/loading.json")}
           autoPlay
           loop
           style={{ width: 150, height: 150 }}
-        />
-
+        /> */}
+        <ActivityIndicator color={"#E0E0E0"} size={"small"} />
         <Text
           style={{
             marginTop: 20,
