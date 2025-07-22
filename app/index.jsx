@@ -21,15 +21,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
 import { Colors } from "../constant/Colors";
 import { UserDetailContext } from "../context/UserDetailContext";
 
-import {
-  GoogleSignin
-} from "@react-native-google-signin/google-signin";
 
 export default function Index() {
   const router = useRouter();
@@ -37,17 +34,6 @@ export default function Index() {
   const { setUserDetail } = useContext(UserDetailContext);
   const auth = getAuth();
   const firestore = getFirestore();
-
-  // Google Sign-In config
-  useEffect(() => {
-    const config = {
-      webClientId:
-        "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com",
-      offlineAccess: true,
-    };
-
-    GoogleSignin.configure(config);
-  }, []);
 
   useEffect(() => {
     if (Platform.OS === "android" && ImmersiveMode?.setImmersive) {
@@ -170,8 +156,6 @@ export default function Index() {
         >
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
-
-       
 
         <TouchableOpacity
           disabled={loading}
