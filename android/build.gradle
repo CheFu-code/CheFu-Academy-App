@@ -31,8 +31,12 @@ allprojects {
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
+    
+    // Add this line below:
+    maven { url 'https://notifee.app/maven/' }
   }
 }
+
 
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
