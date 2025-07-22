@@ -59,7 +59,7 @@ export const imageAssets = {
   "/cybersecurity.png": require("../assets/images/cybersecurity.png"),
   "/blockchain-cryptocurrency.png": require("../assets/images/blockchain-cryptocurrency.png"),
   "/graphic_design.png": require("../assets/images/graphic_design.png"),
-  "/animation_motion_graphics.png": require("../assets/images/animation_motion_graphics.png"),
+  "/animation-motion-graphics.png": require("../assets/images/animation-motion-graphics.png"),
   "/interior_design.png": require("../assets/images/interior_design.png"),
   "/fashion_beauty.png": require("../assets/images/fashion_beauty.png"),
   "/entrepreneurship.png": require("../assets/images/entrepreneurship.png"),
