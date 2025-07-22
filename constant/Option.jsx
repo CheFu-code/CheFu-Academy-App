@@ -20,12 +20,12 @@ export const PracticeOption = [
 ];
 
 export const imageAssets = {
-  "/tech_coding.png": require("../assets/images/tech_coding.png"),
-  "/science_engineering.png": require("../assets/images/science_engineering.png"),
-  "/business_finance.png": require("../assets/images/business_finance.png"),
-  "/health_fitness.png": require("../assets/images/health_fitness.png"),
-  "/arts-creativity.png": require("../assets/images/arts-creativity.png"),
-  "/language_communication.png": require("../assets/images/language_communication.png"),
+  "/techCoding.png": require("../assets/images/techCoding.png"),
+  "/scienceEngineering.png": require("../assets/images/scienceEngineering.png"),
+  "/businessFinance.png": require("../assets/images/businessFinance.png"),
+  "/healthFitness.png": require("../assets/images/healthFitness.png"),
+  "/artsCreativity.png": require("../assets/images/artsCreativity.png"),
+  "/languageCommunication.png": require("../assets/images/languageCommunication.png"),
   "/personal_development.png": require("../assets/images/personal_development.png"),
   "/history_culture.png": require("../assets/images/history_culture.png"),
   "/math_logic.png": require("../assets/images/math_logic.png"),
@@ -59,7 +59,7 @@ export const imageAssets = {
   "/cybersecurity.png": require("../assets/images/cybersecurity.png"),
   "/blockchain-cryptocurrency.png": require("../assets/images/blockchain-cryptocurrency.png"),
   "/graphic_design.png": require("../assets/images/graphic_design.png"),
-  "/animation-motion-graphics.png": require("../assets/images/animation-motion-graphics.png"),
+  "/animationMotionGraphics.png": require("../assets/images/animationMotionGraphics.png"),
   "/interior_design.png": require("../assets/images/interior_design.png"),
   "/fashion_beauty.png": require("../assets/images/fashion_beauty.png"),
   "/entrepreneurship.png": require("../assets/images/entrepreneurship.png"),
