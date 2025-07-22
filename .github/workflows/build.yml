@@ -1,3 +1,11 @@
+name: Android Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +32,7 @@ jobs:
 
       - run: npm install -g expo-cli
 
-      - run: rm -rf node_modules/.cache/metro  # clear metro cache (optional but helpful)
+      - run: rm -rf node_modules/.cache/metro # clear metro cache (optional but helpful)
 
       - name: Bundle React Native JS
         run: npx react-native bundle --platform android --dev false --entry-file app/index.jsx --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
@@ -32,7 +40,7 @@ jobs:
       - run: chmod +x android/gradlew
 
       - name: Build Android release APK
-        run: cd android && ./gradlew assembleRelease
+        run: cd android && ./gradlew assembleRelease --stacktrace --info
 
       - uses: actions/upload-artifact@v4
         with:
