@@ -1,7 +1,6 @@
 globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 globalThis.RNFB_MODULAR_DEPRECATION_STRICT_MODE = true;
 
-import { UserDetailContext } from "@/context/UserDetailContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import {
@@ -26,6 +25,7 @@ import {
 } from "react-native";
 import ImmersiveMode from "react-native-immersive";
 import { Colors } from "../constant/Colors";
+import { UserDetailContext } from "../context/UserDetailContext";
 
 import {
   GoogleSignin
