@@ -75,6 +75,7 @@ export default Sentry.wrap(function RootLayout() {
         }
       } catch (error) {
         console.error("Biometric error:", error);
+        Sentry.captureException("Biometric error:", error);
         setAuthSuccess(true);
       } finally {
         setAuthChecked(true);
