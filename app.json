@@ -65,7 +65,8 @@
           "project": "chefu-academy",
           "organization": "chefu"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

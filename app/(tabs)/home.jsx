@@ -1,5 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Image,
   Platform,
@@ -48,6 +49,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
   const [adLoaded, setAdLoaded] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const router = useRouter();
 
@@ -113,48 +115,56 @@ export default function Home() {
   );
 
   const verify = async () => {
+    setSending(true);
     const user = auth.currentUser;
     if (user) {
       try {
         await sendEmailVerification(user);
-        alert(
+        Alert.alert(
+          "Success",
           `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
         );
       } catch (error) {
+        setSending(false);
         console.error("Failed to send verification email:", error);
-        alert("Failed to send verification email. Try again later.");
+        Alert.alert("Failed to send verification email. Try again later.");
       }
     } else {
-      alert("No user is currently signed in.");
+      Alert.alert("Seems like you're currently not signed in.");
+      setSending(false);
     }
   };
 
   return (
     <>
-      {auth.currentUser && !auth.currentUser.emailVerified && (
-        <View style={{ backgroundColor: Colors.BG_COLOR }}>
-          <TouchableOpacity
-            onPress={() => verify()}
-            style={{
-              backgroundColor: "#FFD700",
-              padding: 10,
-              marginTop: 35,
-              borderRadius: 15,
-              opacity: 0.8,
-            }}
-          >
-            <Text
+      {auth.currentUser &&
+        !auth.currentUser.emailVerified &&
+        (sending === true ? (
+          <ActivityIndicator color={Colors.GREEN} size={"small"} />
+        ) : (
+          <View style={{ backgroundColor: Colors.BG_COLOR }}>
+            <TouchableOpacity
+              onPress={() => verify()}
               style={{
-                color: "#000",
-                textAlign: "center",
-                textDecorationLine: "underline",
+                backgroundColor: "#FFD700",
+                padding: 10,
+                marginTop: 35,
+                borderRadius: 15,
+                opacity: 0.8,
               }}
             >
-              Please verify your email address to access all features.
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+              <Text
+                style={{
+                  color: "#000",
+                  textAlign: "center",
+                  textDecorationLine: "underline",
+                }}
+              >
+                Please verify your email address to access all features.
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ))}
 
       <FlatList
         data={courseList}
@@ -201,7 +211,18 @@ export default function Home() {
         }
       />
 
-      {adLoaded && (
+      <BannerAd
+        unitId={"ca-app-pub-8952058057579255/9705798694"}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+        onAdLoaded={() => setAdLoaded(true)}
+        onAdFailedToLoad={(err) => {
+          console.log("Ad failed to load", err);
+          setAdLoaded(false);
+        }}
+      />
+
+      {/* {adLoaded && (
         <BannerAd
           unitId={"ca-app-pub-8952058057579255/9705798694"}
           size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
@@ -212,7 +233,7 @@ export default function Home() {
             setAdLoaded(false);
           }}
         />
-      )}
+      )} */}
     </>
   );
 }

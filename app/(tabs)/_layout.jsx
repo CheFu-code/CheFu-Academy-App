@@ -59,6 +59,7 @@ const TabLayout = () => {
             bottom: 30,
             marginBottom: 20,
             marginTop: 30,
+            borderTopWidth: 0,
           },
         }}
       >

@@ -20,36 +20,74 @@ import { Colors } from "../../constant/Colors";
 
 // Firebase
 import auth from "@react-native-firebase/auth";
-import { doc, getDoc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+} from "@react-native-firebase/firestore";
 
 export default function EditProfile() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [fullname, setFullname] = useState("");
   const [phone, setPhone] = useState("");
-  const [countryCode, setCountryCode] = useState("ZA"); // default to South Africa
+  const [countryCode, setCountryCode] = useState("ZA");
   const [callingCode, setCallingCode] = useState("+27");
-
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
-  const db =getFirestore()
+  const db = getFirestore();
 
   useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      router.replace("/auth/signIn");
+      return;
+    }
+
+    setUser(currentUser);
+
     const fetchData = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const userRef = doc(db, "users", user.email); // ✅ use user.email here
-
+      const userRef = doc(db, "users", currentUser.email);
       const snap = await getDoc(userRef);
       if (snap.exists()) {
         const data = snap.data();
         setFullname(data.fullname || "");
-
         setPhone(data.phone || "");
         setCountryCode(data.countryCode || "");
       }
+      setLoading(false);
     };
+
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: Colors.BG_COLOR,
+        }}
+      >
+        <ActivityIndicator size="small" color="#fff" />
+        <Text
+          style={{
+            color: Colors.GREEN,
+            fontFamily: "outfit-bold",
+            fontSize: 16,
+          }}
+        >
+          Please wait
+        </Text>
+        <Text style={{ color: "white", marginTop: 10 }}>
+          We're loading your profile...
+        </Text>
+      </View>
+    );
+  }
 
   const validate = () => {
     const newErrors = {};
@@ -118,6 +156,7 @@ export default function EditProfile() {
           value={fullname}
           onChangeText={setFullname}
           autoCapitalize="words"
+          placeholderTextColor={Colors.WHITE}
         />
         {errors.fullname && (
           <Text style={styles.errorText}>{errors.fullname}</Text>
@@ -130,6 +169,7 @@ export default function EditProfile() {
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
+          placeholderTextColor={Colors.WHITE}
         />
         {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
 

@@ -26,7 +26,7 @@ export default function DownloadScreen() {
   }, []);
 
   const loadDownloads = async () => {
-    const saved = await AsyncStorage.getItem("offlineDownloads");
+    const saved = await AsyncStorage.getItem("offlineDownloads"); 
     if (saved) setDownloads(JSON.parse(saved));
   };
 
