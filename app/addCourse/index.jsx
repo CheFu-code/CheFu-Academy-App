@@ -13,7 +13,6 @@ import {
   ToastAndroid,
   View,
 } from "react-native";
-import { AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
 import Button from "../../component/Shared/Button";
 import { generateCourse, generateTopics } from "../../config/AiModel";
 import { Colors } from "../../constant/Colors";
@@ -166,23 +165,23 @@ export default function AddCourse() {
         })
       );
 
-      const interstitial = InterstitialAd.createForAdRequest(
-        INTERSTITIAL_AD_UNIT_ID,
-        { requestNonPersonalizedAdsOnly: true }
-      );
+      // const interstitial = InterstitialAd.createForAdRequest(
+      //   INTERSTITIAL_AD_UNIT_ID,
+      //   { requestNonPersonalizedAdsOnly: true }
+      // );
 
-      const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
-        if (type === AdEventType.LOADED) {
-          interstitial.show();
-        }
-        if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
-          unsubscribe();
-          router.push("/(tabs)/home");
-          ToastAndroid.show("Course created successfully!", ToastAndroid.SHORT);
-        }
-      });
+      // const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
+      // if (type === AdEventType.LOADED) {
+      // interstitial.show();
+      // }
+      // if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
+      // unsubscribe();
+      router.replace("/(tabs)/home");
+      ToastAndroid.show("Course created successfully!", ToastAndroid.SHORT);
+      // }
+      // });
 
-      interstitial.load();
+      // interstitial.load();
     } catch (e) {
       console.log("failed course", e.message);
       Alert.alert("Error", "Failed to generate course.");
