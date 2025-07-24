@@ -16,7 +16,10 @@ const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 console.log("🔐 PayPal CLIENT_ID:", CLIENT_ID);
 console.log("🔐 PayPal CLIENT_SECRET:", CLIENT_SECRET);
-
+if (!CLIENT_ID || !CLIENT_SECRET) {
+  console.error("❌ PayPal credentials not set in environment variables!");
+  return;
+}
 
 // Nodemailer transporter setup
 const transporter = nodemailer.createTransport({
