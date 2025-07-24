@@ -129,7 +129,8 @@ router.post("/capture-order", async (req, res) => {
 
     const db = admin.firestore();
 
-    const id = email + orderID;
+    const emailSafe = email.replace(/[@.]/g, "_"); // Replace unsafe characters
+    const id = `${emailSafe}_${orderID}`; // Join with underscore
 
     await db.collection("payments").doc(id).set({
       email,

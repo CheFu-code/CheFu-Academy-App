@@ -155,7 +155,9 @@ export default function AddCourse() {
       // Await all course writes before continuing
       await Promise.all(
         coursesArray.map(async (course) => {
-          const docId = Date.now().toString();
+          const emailSafe = userDetail?.email.replace(/[@.]/g, "_");
+          const docId = emailSafe + "_" + Date.now().toString();
+
           await setDoc(doc(db, "course", docId), {
             ...course,
             createdOn: new Date(),
