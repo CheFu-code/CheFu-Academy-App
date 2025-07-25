@@ -1,5 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   Image,
@@ -19,10 +20,6 @@ import NoCourse from "../../component/Home/NoCourse";
 import PracticeSection from "../../component/Home/PracticeSection";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
-
-// Modular React Native Firebase imports
-import authModule from "@react-native-firebase/auth";
-import firestoreModule from "@react-native-firebase/firestore";
 
 import {
   getAuth,
@@ -54,13 +51,13 @@ export default function Home() {
   const router = useRouter();
 
   // Initialize modular auth/firestore instances
-  const auth = getAuth(authModule.app);
-  const firestore = getFirestore(firestoreModule.app);
+  const auth = getAuth();
+  const firestore = getFirestore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        GetCourseList(user);
+        GetCourseList();
       } else {
         setCourseList([]);
         router.replace("/auth/signIn");
@@ -70,11 +67,18 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  const GetCourseList = async (user) => {
-    if (fetching) return;
+  const GetCourseList = async (isRefresh = false) => {
+    if (fetching && !isRefresh) return;
     setLoading(true);
     setFetching(true);
     try {
+      const user = auth.currentUser;
+      if (!user) {
+        // This case is mostly handled by onAuthStateChanged, but it's a good safeguard.
+        setCourseList([]);
+        return;
+      }
+
       await reload(user);
       const refreshedUser = auth.currentUser;
       if (!refreshedUser?.email) {
@@ -83,54 +87,73 @@ export default function Home() {
         return;
       }
 
-      // Build query
       const coursesRef = collection(firestore, "course");
       const q = query(
         coursesRef,
         where("createdBy", "==", refreshedUser.email),
         orderBy("createdOn", "desc")
       );
-
       const querySnapshot = await getDocs(q);
 
-      const courses = [];
-      querySnapshot.forEach((doc) => {
-        courses.push({ ...doc.data(), id: doc.id });
-      });
+      const courses = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
 
       setCourseList(courses);
-      ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
+      if (isRefresh) {
+        ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
+      }
     } catch (error) {
       console.error("🔥 Error fetching courses:", error);
+      let errorMessage = "Failed to fetch courses. Please try again.";
+      if (error.code === "firestore/unavailable") {
+        errorMessage = "Network error. Please check your connection.";
+      } else if (error.code === "firestore/permission-denied") {
+        errorMessage = "You don't have permission to access these courses.";
+      }
+      ToastAndroid.show(errorMessage, ToastAndroid.LONG);
       setCourseList([]);
     } finally {
       setLoading(false);
+      setFetching(false);
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      GetCourseList(auth.currentUser);
+      if (auth.currentUser) {
+        GetCourseList();
+      }
     }, [])
   );
 
   const verify = async () => {
-    setSending(true);
     const user = auth.currentUser;
-    if (user) {
-      try {
-        await sendEmailVerification(user);
-        Alert.alert(
-          "Success",
-          `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
-        );
-      } catch (error) {
-        setSending(false);
-        console.error("Failed to send verification email:", error);
-        Alert.alert("Failed to send verification email. Try again later.");
+    if (!user) {
+      Alert.alert(
+        "Not Signed In",
+        "Seems like you're currently not signed in."
+      );
+      return;
+    }
+
+    setSending(true);
+    try {
+      await sendEmailVerification(user);
+      Alert.alert(
+        "Success",
+        `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
+      );
+    } catch (error) {
+      console.error("Failed to send verification email:", error);
+      let errorMessage =
+        "Failed to send verification email. Please try again later.";
+      if (error.code === "auth/too-many-requests") {
+        errorMessage = "Too many requests. Please try again later.";
       }
-    } else {
-      Alert.alert("Seems like you're currently not signed in.");
+      Alert.alert("Error", errorMessage);
+    } finally {
       setSending(false);
     }
   };
