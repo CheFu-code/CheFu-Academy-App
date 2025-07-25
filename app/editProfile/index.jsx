@@ -1,6 +1,4 @@
-// EditProfile.js
-// (No navigation button found in first 80 lines, skipping UI navigation patch)
-
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -8,6 +6,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -26,6 +25,7 @@ import {
   getFirestore,
   updateDoc,
 } from "@react-native-firebase/firestore";
+import * as Sentry from "@sentry/react-native";
 
 export default function EditProfile() {
   const [user, setUser] = useState(null);
@@ -39,27 +39,39 @@ export default function EditProfile() {
   const db = getFirestore();
 
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      router.replace("/auth/signIn");
-      return;
-    }
-
-    setUser(currentUser);
-
-    const fetchData = async () => {
-      const userRef = doc(db, "users", currentUser.email);
-      const snap = await getDoc(userRef);
-      if (snap.exists()) {
-        const data = snap.data();
-        setFullname(data.fullname || "");
-        setPhone(data.phone || "");
-        setCountryCode(data.countryCode || "");
+    const unsubscribe = auth().onAuthStateChanged(async (currentUser) => {
+      if (!currentUser) {
+        router.replace("/auth/signIn");
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-    };
 
-    fetchData();
+      setUser(currentUser);
+
+      const fetchData = async () => {
+        try {
+          const userRef = doc(db, "users", currentUser.email);
+          const snap = await getDoc(userRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            setFullname(data.fullname || "");
+            setPhone(data.phone || "");
+            setCountryCode(data.countryCode || "ZA");
+            setCallingCode(data.callingCode || "+27");
+          }
+        } catch (error) {
+          console.error("Failed to fetch profile data:", error);
+          Sentry.captureException(error);
+          Alert.alert("Error", "Could not load your profile. Please try again later.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    });
+
+    return () => unsubscribe();
   }, []);
 
   if (loading) {
@@ -117,28 +129,30 @@ export default function EditProfile() {
       await updateDoc(userRef, {
         fullname,
         phone,
-        countryCode: callingCode,
+        countryCode,
+        callingCode,
       });
 
       Alert.alert("Success", "Your profile has been updated!");
       router.back();
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert("Error", error.message || "Could not update your profile.");
-      } else {
-        Alert.alert("Error", "Could not update your profile.");
+      console.error("Failed to save profile:", error);
+      Sentry.captureException(error);
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (error.code) {
+        switch (error.code) {
+          case "permission-denied":
+            errorMessage = "You do not have permission to perform this action.";
+            break;
+          case "unavailable":
+            errorMessage = "The service is currently unavailable. Please try again later.";
+            break;
+        }
       }
+      Alert.alert("Update Failed", errorMessage);
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const resetForm = () => {
-    setFullname("");
-
-    setPhone("");
-    setCountryCode("");
-    setErrors({});
   };
 
   return (
@@ -146,8 +160,35 @@ export default function EditProfile() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1 }}
     >
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Edit Profile</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+          paddingHorizontal: 20,
+          paddingTop: 40,
+          backgroundColor: Colors.BG_COLOR,
+          zIndex: 10,
+        }}
+      >
+        <Pressable onPress={() => !isSaving && router.back()}>
+          <Ionicons
+            style={{
+              padding: 3,
+              borderRadius: 10,
+              backgroundColor: Colors.BG_GRAY,
+            }}
+            name="arrow-back"
+            size={24}
+            color={Colors.PRIMARY}
+          />
+        </Pressable>
+        <Text style={styles.headerTitle}>Edit Profile</Text>
+      </View>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
 
         <Text style={styles.label}>Name</Text>
         <TextInput
@@ -202,7 +243,6 @@ export default function EditProfile() {
             ]}
             onPress={() => {
               if (isSaving) return;
-              resetForm();
               router.back();
             }}
             disabled={isSaving}
@@ -235,16 +275,12 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingBottom: 40,
-    marginTop: 100,
     backgroundColor: Colors.BG_COLOR,
     flexGrow: 1,
   },
-  title: {
+  headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 30,
-    textAlign: "center",
-    marginTop: 30,
     color: Colors.PRIMARY,
   },
   imagePicker: {
