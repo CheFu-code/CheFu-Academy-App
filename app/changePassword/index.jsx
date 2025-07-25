@@ -48,7 +48,6 @@ export default function ChangePassword() {
     const userDoc = await getDoc(userDocRef);
     const userData = userDoc.data();
 
-
     if (!curPwd || !newPwd || !confPwd) {
       return ToastAndroid.show("All fields are required", ToastAndroid.SHORT);
     }
@@ -85,15 +84,22 @@ export default function ChangePassword() {
       setConfirmPassword("");
       router.back();
 
-      await fetch("https://chefu-academy-tmzx.onrender.com/api/email/send-password-change", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: user?.email,
-          name: userData?.fullname || user?.email.split("@")[0],
-        }),
-      });
-      console.log("Password changed successfully");
+      if (userData?.emailPreferences?.security === true) {
+        await fetch(
+          "https://chefu-academy-tmzx.onrender.com/api/email/send-password-change",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: user?.email,
+              name: userData?.fullname || user?.email.split("@")[0],
+            }),
+          }
+        );
+        console.log("Password changed successfully");
+      } else {
+        console.log("no need to send email");
+      }
     } catch (err) {
       console.error(err);
       if (typeof Sentry !== "undefined") Sentry.captureException(err);
