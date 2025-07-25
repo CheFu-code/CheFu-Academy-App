@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import { getAuth } from "@react-native-firebase/auth";
+import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
 import * as Camera from "expo-camera";
-
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 import * as Notifications from "expo-notifications";
@@ -17,17 +18,18 @@ import {
 import { Colors } from "../../constant/Colors";
 
 export default function Permissions() {
-  // Use the Camera hook for permissions and request function
-  // (No navigation button found in first 80 lines, skipping UI navigation patch)
   const [cameraPermission, requestCameraPermission] =
     Camera.useCameraPermissions();
 
   const [permissions, setPermissions] = useState({
-    camera: null,
-    mediaLibrary: null,
-    location: null,
-    notifications: null,
+    camera: false,
+    mediaLibrary: false,
+    location: false,
+    notifications: false,
   });
+
+  const db = getFirestore();
+  const auth = getAuth();
 
   const permissionDisplayNames = {
     camera: "Camera",
@@ -37,9 +39,7 @@ export default function Permissions() {
   };
 
   const checkPermissions = async () => {
-    // cameraPermission may be undefined initially, so fallback to status
     const cameraStatus = cameraPermission?.status ?? "undetermined";
-
     const { status: mediaLibraryStatus } =
       await MediaLibrary.getPermissionsAsync();
     const { status: locationStatus } =
@@ -47,12 +47,29 @@ export default function Permissions() {
     const { status: notificationsStatus } =
       await Notifications.getPermissionsAsync();
 
-    setPermissions({
+    const updatedPermissions = {
       camera: cameraStatus === "granted",
       mediaLibrary: mediaLibraryStatus === "granted",
       location: locationStatus === "granted",
       notifications: notificationsStatus === "granted",
-    });
+    };
+
+    setPermissions(updatedPermissions);
+
+    // Save to Firestore under user's document
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await setDoc(
+          doc(db, "users", user.email),
+          { permissions: updatedPermissions },
+          { merge: true }
+        );
+        console.log("Permissions saved successfully");
+      } catch (error) {
+        console.error("Error saving permissions:", error);
+      }
+    }
   };
 
   const requestPermission = async (type) => {

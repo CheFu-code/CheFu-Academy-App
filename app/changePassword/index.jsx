@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
+import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -17,6 +18,7 @@ import {
 import { Colors } from "../../constant/Colors";
 
 export default function ChangePassword() {
+  // const auth = getAuth();
   const user = auth().currentUser;
   // (No navigation button found in first 80 lines, skipping UI navigation patch)
 
@@ -36,11 +38,16 @@ export default function ChangePassword() {
   };
 
   const handleChangePassword = async () => {
+    const db = getFirestore();
     if (loading) return; // Prevent double submission
     // Only trim on submit, not on every keystroke
     const curPwd = currentPassword.trim();
     const newPwd = newPassword.trim();
     const confPwd = confirmPassword.trim();
+    const userDocRef = doc(db, "users", user.email);
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data();
+
 
     if (!curPwd || !newPwd || !confPwd) {
       return ToastAndroid.show("All fields are required", ToastAndroid.SHORT);
@@ -67,10 +74,7 @@ export default function ChangePassword() {
     setLoading(true);
 
     try {
-      const credential = auth.EmailAuthProvider.credential(
-        user.email,
-        curPwd
-      );
+      const credential = auth.EmailAuthProvider.credential(user.email, curPwd);
 
       await user.reauthenticateWithCredential(credential);
       await user.updatePassword(newPwd);
@@ -80,9 +84,19 @@ export default function ChangePassword() {
       setNewPassword("");
       setConfirmPassword("");
       router.back();
+
+      await fetch("https://chefu-academy-tmzx.onrender.com/api/email/send-password-change", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user?.email,
+          name: userData?.fullname || user?.email.split("@")[0],
+        }),
+      });
+      console.log("Password changed successfully");
     } catch (err) {
       console.error(err);
-      if (typeof Sentry !== 'undefined') Sentry.captureException(err);
+      if (typeof Sentry !== "undefined") Sentry.captureException(err);
       if (err?.code === "auth/invalid-credential") {
         ToastAndroid.show(
           "Incorrect password. Please try again.",

@@ -162,7 +162,7 @@ export default function Index() {
         >
           <Text style={[styles.buttonText, { color: Colors.WHITE }]}>
             Already have an account? {"\n"}
-            <Text style={{ color: Colors.GREEN }}>Sign In</Text>
+            <Text style={{ color: Colors.PRIMARY }}>Sign In</Text>
           </Text>
         </TouchableOpacity>
 

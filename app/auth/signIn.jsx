@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
+import * as Device from "expo-device";
+import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
@@ -21,14 +23,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Colors } from "../../constant/Colors"; // Make sure this path is correct
-import { UserDetailContext } from "../../context/UserDetailContext"; // Adjust if needed
+import { Colors } from "../../constant/Colors";
+import { UserDetailContext } from "../../context/UserDetailContext";
 
 const SignIn = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUserDetail } = useContext(UserDetailContext);
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -82,9 +84,78 @@ const SignIn = () => {
     setLoading(true);
     try {
       const resp = await auth.signInWithEmailAndPassword(cleanEmail, password);
-      await getUserDetail(resp.user.email);
-      ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
+      const signedInEmail = resp.user.email;
+      const deviceInfo = {
+        brand: Device.brand,
+        modelName: Device.modelName,
+        osName: Device.osName,
+        osVersion: Device.osVersion,
+        deviceType: Device.deviceType,
+      };
+
+      // 2. Get location info
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      let locationInfo = {};
+      if (status === "granted") {
+        const location = await Location.getCurrentPositionAsync({});
+        locationInfo = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
+      } else {
+        console.warn("Location permission not granted.");
+        ToastAndroid.show(
+          "Please grant location permission to protect your account.",
+          ToastAndroid.SHORT
+        );
+      }
+
+      await getUserDetail(signedInEmail); // updates userDetail state
+
       router.replace("/(tabs)/home");
+      ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
+
+      const userDocRef = doc(db, "users", signedInEmail);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.data();
+
+      const previousDevices = userDoc.data()?.trustedDevices || [];
+
+      const currentDevice = deviceInfo; // e.g. brand + model + os
+
+      // Check if device is new
+      const isNewDevice = !previousDevices.some(
+        (d) =>
+          d.brand === currentDevice.brand &&
+          d.modelName === currentDevice.modelName &&
+          d.osName === currentDevice.osName &&
+          d.osVersion === currentDevice.osVersion
+      );
+
+      if (isNewDevice && userData?.emailPreferences?.security === true) {
+        // Send alert email
+        await fetch(
+          "https://chefu-academy-tmzx.onrender.com/api/email/send-alert",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: signedInEmail,
+              name: userData?.fullname || signedInEmail.split("@")[0],
+              device: deviceInfo,
+              location: locationInfo,
+            }),
+          }
+        );
+        // Update trusted devices and locations
+        await userDocRef.update({
+          trustedDevices: [...previousDevices, currentDevice],
+        });
+
+        console.log("alert email sent");
+      } else {
+        console.log("no need to send alert email");
+      }
     } catch (e) {
       Sentry.captureException(e);
       const contactSupport = () => Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
@@ -103,6 +174,24 @@ const SignIn = () => {
           ToastAndroid.show(
             "Invalid credentials. Please try again.",
             ToastAndroid.SHORT
+          );
+          break;
+        case "auth/unknown":
+          Alert.alert(
+            "Unknown Error",
+            "We encountered an unknown error. Please try again later"
+          );
+          break;
+        case "auth/network-request-failed":
+          Alert.alert(
+            "Network Error",
+            "Please check your internet connection and try again."
+          );
+          break;
+        case "auth/too-many-requests":
+          Alert.alert(
+            "Error",
+            "Too many requests have been made from this device."
           );
           break;
         case "auth/internal-error":

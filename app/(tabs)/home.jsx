@@ -142,7 +142,7 @@ export default function Home() {
     try {
       await sendEmailVerification(user);
       Alert.alert(
-        "Success",
+        "Email Verification Sent",
         `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
       );
     } catch (error) {
@@ -163,7 +163,16 @@ export default function Home() {
       {auth.currentUser &&
         !auth.currentUser.emailVerified &&
         (sending === true ? (
-          <ActivityIndicator color={Colors.GREEN} size={"small"} />
+          <ActivityIndicator
+            style={{
+              backgroundColor: Colors.GREEN,
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+            }}
+            color={Colors.GREEN}
+            size={"small"}
+          />
         ) : (
           <View style={{ backgroundColor: Colors.BG_COLOR }}>
             <TouchableOpacity

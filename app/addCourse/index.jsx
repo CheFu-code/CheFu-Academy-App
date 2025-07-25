@@ -260,7 +260,7 @@ export default function AddCourse() {
               marginTop: 10,
             }}
           >
-            What course do you want to create? (Example: Learn JavaScript,
+            What course do you want to create? (eg: Learn JavaScript,
             Machine Learning, History, Business studies, etc)
           </Text>
 
@@ -270,7 +270,7 @@ export default function AddCourse() {
             style={styles.textInput}
             numberOfLines={3}
             multiline={true}
-            placeholder="Example: Learn Biology"
+            placeholder="eg: Learn how to bake bread"
             color={Colors.GREEN}
             placeholderTextColor={Colors.GRAY}
           />
