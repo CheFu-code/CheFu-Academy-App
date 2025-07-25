@@ -98,7 +98,7 @@ export default function ChangePassword() {
         );
         console.log("Password changed successfully");
       } else {
-        console.log("no need to send email");
+        console.log("no need to send email!");
       }
     } catch (err) {
       console.error(err);
