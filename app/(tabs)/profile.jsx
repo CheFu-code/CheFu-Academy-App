@@ -400,7 +400,7 @@ export default function Profile() {
             </Text>
           </TouchableOpacity>
 
-          {userDetail?.member === true && (
+          {userDetail?.isVerified === true && (
             <TouchableOpacity
               style={[styles.menuItem, { marginTop: 5 }]}
               onPress={() => router.push("/download")}

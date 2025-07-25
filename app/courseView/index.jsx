@@ -65,9 +65,9 @@ export default function CourseView() {
 
     setLoading(true);
     try {
-      if (!userDetail?.member) {
+      if (userDetail?.isVerified === false) {
         ToastAndroid.show(
-          "You must be on a member plan to download courses",
+          "Please verify your email to download courses",
           ToastAndroid.SHORT
         );
         return;
@@ -150,7 +150,7 @@ export default function CourseView() {
     } catch (err) {
       ToastAndroid.show("Unexpected error during download", ToastAndroid.SHORT);
       // Optionally log error to Sentry or console
-      if (typeof console !== 'undefined') console.error(err);
+      if (typeof console !== "undefined") console.error(err);
     } finally {
       setLoading(false);
     }
@@ -412,7 +412,7 @@ export default function CourseView() {
         <Ionicons size={24} color={Colors.BLACK} name="arrow-back" />
       </Pressable>
 
-      {userDetail?.member === true ? (
+      {userDetail?.isVerified === true ? (
         <Pressable
           disabled={loading}
           onPress={() => downloadCourse(course)}

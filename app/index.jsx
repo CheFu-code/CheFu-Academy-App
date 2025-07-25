@@ -27,7 +27,6 @@ import ImmersiveMode from "react-native-immersive";
 import { Colors } from "../constant/Colors";
 import { UserDetailContext } from "../context/UserDetailContext";
 
-
 export default function Index() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -152,7 +151,6 @@ export default function Index() {
           disabled={loading}
           style={styles.button}
           onPress={() => router.push("/auth/signUp")}
-          // onPress={() => router.push("/oauthredirect")}
         >
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
@@ -164,11 +162,7 @@ export default function Index() {
         >
           <Text style={[styles.buttonText, { color: Colors.WHITE }]}>
             Already have an account? {"\n"}
-            <Text
-              style={{ color: Colors.BLACK, textDecorationLine: "underline" }}
-            >
-              Sign In
-            </Text>
+            <Text style={{ color: Colors.GREEN }}>Sign In</Text>
           </Text>
         </TouchableOpacity>
 

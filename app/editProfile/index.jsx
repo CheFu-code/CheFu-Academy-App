@@ -26,6 +26,7 @@ import {
   updateDoc,
 } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
+import LottieView from "lottie-react-native";
 
 export default function EditProfile() {
   const [user, setUser] = useState(null);
@@ -62,7 +63,10 @@ export default function EditProfile() {
         } catch (error) {
           console.error("Failed to fetch profile data:", error);
           Sentry.captureException(error);
-          Alert.alert("Error", "Could not load your profile. Please try again later.");
+          Alert.alert(
+            "Error",
+            "Could not load your profile. Please try again later."
+          );
         } finally {
           setLoading(false);
         }
@@ -81,21 +85,37 @@ export default function EditProfile() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: Colors.BG_COLOR,
+          backgroundColor: Colors.WHITE,
         }}
       >
-        <ActivityIndicator size="small" color="#fff" />
+        <LottieView
+          source={require("../../assets/images/loading.json")}
+          autoPlay
+          loop
+          style={{ width: 150, height: 150 }}
+        />
+
         <Text
           style={{
             color: Colors.GREEN,
             fontFamily: "outfit-bold",
-            fontSize: 16,
+            fontSize: 24,
+            marginTop: 10,
           }}
         >
-          Please wait
+          Hang tight!
         </Text>
-        <Text style={{ color: "white", marginTop: 10 }}>
-          We're loading your profile...
+
+        <Text
+          style={{
+            color: "black",
+            marginTop: 10,
+            fontFamily: "outfit-bold",
+            fontSize: 16,
+            textAlign: "center",
+          }}
+        >
+          Setting up your profile...
         </Text>
       </View>
     );
@@ -145,7 +165,8 @@ export default function EditProfile() {
             errorMessage = "You do not have permission to perform this action.";
             break;
           case "unavailable":
-            errorMessage = "The service is currently unavailable. Please try again later.";
+            errorMessage =
+              "The service is currently unavailable. Please try again later.";
             break;
         }
       }
@@ -185,11 +206,11 @@ export default function EditProfile() {
         </Pressable>
         <Text style={styles.headerTitle}>Edit Profile</Text>
       </View>
+
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-
         <Text style={styles.label}>Name</Text>
         <TextInput
           style={[styles.input, errors.fullname && styles.errorInput]}
@@ -277,6 +298,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     backgroundColor: Colors.BG_COLOR,
     flexGrow: 1,
+    marginTop: 60,
   },
   headerTitle: {
     fontSize: 28,

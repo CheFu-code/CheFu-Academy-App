@@ -3,13 +3,19 @@ import {
   getAuth,
 } from "@react-native-firebase/auth";
 
-import { doc, getDoc, getFirestore, setDoc } from "@react-native-firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+} from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -79,7 +85,10 @@ const SignUp = () => {
       await SaveUser(user);
 
       setErrorMsg("");
-      alert("Account created! Please check your email to verify your address.");
+      Alert.alert(
+        "Account Created Successfully",
+        "Please check your email to verify your address."
+      );
     } catch (e) {
       Sentry.captureException(e);
       if (!e || !e.code) {

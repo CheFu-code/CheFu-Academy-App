@@ -8,8 +8,9 @@ import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Stack, useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import "../app/firebase-background-handler";
 import { requestUserPermission } from "../app/notifications/requestUserPermission";
 import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNotification";
@@ -17,6 +18,7 @@ import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNot
 import { getApp } from "@react-native-firebase/app";
 import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
+import { Colors } from "../constant/Colors";
 import { UserDetailContext } from "../context/UserDetailContext";
 
 // ✅ Sentry Init
@@ -198,22 +200,24 @@ export default Sentry.wrap(function RootLayout() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#1B263B",
+          backgroundColor: Colors.WHITE,
           paddingHorizontal: 24,
         }}
       >
-        {/* <LottieView
+        <LottieView
           source={require("../assets/images/loading.json")}
           autoPlay
           loop
-          style={{ width: 150, height: 150 }}
-        /> */}
-        <ActivityIndicator color={"#E0E0E0"} size={"small"} />
+          style={{
+            width: 150,
+            height: 150,
+          }}
+        />
         <Text
           style={{
             marginTop: 20,
             fontSize: 16,
-            color: "#E0E0E0",
+            color: Colors.GREEN,
             fontFamily: "outfit-bold",
             textAlign: "center",
           }}
@@ -225,8 +229,8 @@ export default Sentry.wrap(function RootLayout() {
           style={{
             marginTop: 8,
             fontSize: 14,
-            color: "#9CA3AF",
-            fontFamily: "outfit",
+            color: Colors.BLACK,
+            fontFamily: "outfit-bold",
             textAlign: "center",
           }}
         >
