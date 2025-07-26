@@ -154,11 +154,11 @@ export default function QuizSummary() {
         <View
           style={{
             marginTop: 10,
-            backgroundColor: Colors.GRAY,
+            backgroundColor: Colors.BG_GRAY,
             maxHeight: 250,
             borderRadius: 15,
             borderWidth: 1,
-            borderColor: Colors.BG_GRAY,
+            borderColor: Colors.PRIMARY,
             padding: 10,
           }}
         >
@@ -173,7 +173,8 @@ export default function QuizSummary() {
                   style={{
                     paddingVertical: 8,
                     borderBottomWidth: 0.5,
-                    borderBottomColor: Colors.BG_GRAY,
+                    borderBottomColor: Colors.BLACK,
+                    display: "flex",
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -187,7 +188,7 @@ export default function QuizSummary() {
                         ? Colors.GREEN
                         : Colors.LIGHT_RED,
                       flex: 1,
-                      marginRight: 10,
+                      marginLeft: 10,
                     }}
                   >
                     {quizItem.question}

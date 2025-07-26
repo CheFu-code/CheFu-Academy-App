@@ -11,9 +11,8 @@ import {
   View,
 } from "react-native";
 
-import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
@@ -41,8 +40,6 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 
-// ... (all your imports stay the same)
-
 export default function Home() {
   const [courseList, setCourseList] = useState([]);
   const { userDetail } = useContext(UserDetailContext);
@@ -59,10 +56,8 @@ export default function Home() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log(
-          "👤 Authenticated user detected. Loading cached courses..."
-        );
-        loadCachedCourses();
+        console.log("👤 Authenticated user detected. Loading cached courses...");
+        loadCachedCoursesThenFetch();
       } else {
         console.log("🚫 No authenticated user. Redirecting...");
         setCourseList([]);
@@ -73,6 +68,37 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  // Load cached courses, then fetch fresh in background
+  const loadCachedCoursesThenFetch = async () => {
+    const cached = await loadCachedCourses();
+    if (!cached) {
+      await GetCourseList();
+    } else {
+      GetCourseList();
+    }
+  };
+
+  // Load cached courses from AsyncStorage
+  const loadCachedCourses = async () => {
+    try {
+      console.log("📦 Checking AsyncStorage for cached courses...");
+      const cached = await AsyncStorage.getItem(CACHE_KEY);
+      if (cached) {
+        console.log("✅ Cached courses found. Loading into state.");
+        const parsed = JSON.parse(cached);
+        setCourseList(parsed);
+        return parsed; // Return cached for comparison later
+      } else {
+        console.log("⚠️ No cached courses found.");
+        return null;
+      }
+    } catch (e) {
+      console.error("❌ Error loading cached courses:", e);
+      return null;
+    }
+  };
+
+  // Fetch courses from Firestore with cache comparison
   const GetCourseList = async (isRefresh = false) => {
     if (fetching && !isRefresh) return;
 
@@ -111,9 +137,21 @@ export default function Home() {
 
       console.log(`✅ ${courses.length} courses fetched.`);
 
+      // Compare with cached courses to avoid unnecessary AsyncStorage writes
+      const cachedCoursesJSON = await AsyncStorage.getItem(CACHE_KEY);
+      const cachedCourses = cachedCoursesJSON ? JSON.parse(cachedCoursesJSON) : null;
+      const isSame =
+        cachedCourses &&
+        JSON.stringify(cachedCourses) === JSON.stringify(courses);
+
       setCourseList(courses);
-      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(courses));
-      console.log("💾 Courses saved to AsyncStorage.");
+
+      if (!isSame) {
+        await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(courses));
+        console.log("💾 Courses saved to AsyncStorage.");
+      } else {
+        console.log("ℹ️ Courses identical to cache, skipping AsyncStorage save.");
+      }
 
       if (isRefresh) {
         ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
@@ -146,32 +184,10 @@ export default function Home() {
     }, [])
   );
 
-  const loadCachedCourses = async () => {
-    try {
-      console.log("📦 Checking AsyncStorage for cached courses...");
-      const cached = await AsyncStorage.getItem(CACHE_KEY);
-      if (cached) {
-        console.log("✅ Cached courses found. Loading into state.");
-        const parsed = JSON.parse(cached);
-        setCourseList(parsed);
-      } else {
-        console.log("⚠️ No cached courses found.");
-      }
-    } catch (e) {
-      console.error("❌ Error loading cached courses:", e);
-    } finally {
-      console.log("🔄 Fetching fresh courses in background...");
-      GetCourseList();
-    }
-  };
-
   const verify = async () => {
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert(
-        "Not Signed In",
-        "Seems like you're currently not signed in."
-      );
+      Alert.alert("Not Signed In", "Seems like you're currently not signed in.");
       return;
     }
 
@@ -185,8 +201,7 @@ export default function Home() {
       );
     } catch (error) {
       console.error("❌ Failed to send verification email:", error);
-      let errorMessage =
-        "Failed to send verification email. Please try again later.";
+      let errorMessage = "Failed to send verification email. Please try again later.";
       if (error.code === "auth/too-many-requests") {
         errorMessage = "Too many requests. Please try again later.";
       }
@@ -244,7 +259,7 @@ export default function Home() {
           if (user) {
             console.log("🔁 Manual refresh triggered.");
             setFetching(false);
-            GetCourseList(user);
+            GetCourseList(true);
           }
         }}
         refreshing={loading}

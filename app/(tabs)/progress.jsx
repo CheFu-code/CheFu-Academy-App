@@ -2,19 +2,22 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
-import {
-    FlatList,
-    Image,
-    Text,
-    View,
-} from "react-native";
+import { FlatList, Image, Text, View } from "react-native";
 import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
 // ✅ Modular Firestore API (React Native Firebase)
-import { collection, getDocs, getFirestore, orderBy, query, where } from "@react-native-firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  where,
+} from "@react-native-firebase/firestore";
+import LottieView from "lottie-react-native";
 
 export default function Progress({ enroll = false }) {
   const [courseList, setCourseList] = useState([]);
@@ -64,7 +67,7 @@ export default function Progress({ enroll = false }) {
     } catch (error) {
       console.error(error);
       Sentry.captureException(error);
-      if (typeof ToastAndroid !== 'undefined') {
+      if (typeof ToastAndroid !== "undefined") {
         ToastAndroid.show("Failed to load progress", ToastAndroid.SHORT);
       }
     } finally {
@@ -87,6 +90,39 @@ export default function Progress({ enroll = false }) {
       });
     }, 100);
   };
+
+  if (loading && courseList.length === 0) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: Colors.BG_COLOR,
+        }}
+      >
+        <LottieView
+          autoPlay
+          loop
+          source={require("../../assets/animations/Loading.json")}
+          style={{
+            width: 150,
+            height: 150,
+          }}
+        />
+        <Text
+          style={{
+            marginTop: 10,
+            fontFamily: "outfit-bold",
+            fontSize: 16,
+            color: Colors.PRIMARY,
+          }}
+        >
+          Loading your progress...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
@@ -116,7 +152,8 @@ export default function Progress({ enroll = false }) {
             data={courseList}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
-              const isLoading = loadingId === (item.id || item.courseTitle || "");
+              const isLoading =
+                loadingId === (item.id || item.courseTitle || "");
               return (
                 <CourseProgressCard
                   item={item}

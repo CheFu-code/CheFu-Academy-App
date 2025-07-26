@@ -1,14 +1,14 @@
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Dimensions,
   FlatList,
   Image,
-  Pressable,
   StyleSheet,
   Text,
-  View,
+  TouchableOpacity,
+  View
 } from "react-native";
 import FlipCard from "react-native-flip-card";
 import { Colors } from "../../constant/Colors";
@@ -53,15 +53,27 @@ export default function Flashcards() {
             alignItems: "center",
           }}
         >
-          <Pressable
+          <TouchableOpacity
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap:10
+            }}
             onPress={() => {
-              if (router && typeof router.back === 'function') router.back();
+              if (router && typeof router.back === "function") router.back();
             }}
             accessible={true}
             accessibilityLabel="Go back"
           >
-            <Ionicons name="arrow-back" size={22} color={"white"} />
-          </Pressable>
+            <AntDesign name="left" size={22} color={"white"} />
+            <Text style={{
+              fontFamily:"outfit-bold",
+              fontSize:17,
+              color:Colors.PRIMARY
+            }}>Flashcards</Text>
+          </TouchableOpacity>
           <Text
             style={{
               fontFamily: "outfit-bold",
