@@ -8,7 +8,7 @@ export const Colors = {
   LIGHT_GREEN: "#dbffdd",
   RED: "#f51c0c",
   LIGHT_RED: "#ffc8c4",
-  BG_COLOR: "#1B263B",
+  BG_COLOR: "#121212",
   YELLOW: "#FFD700",
   LIGHT_YELLOW: "#FFF9C4",
 

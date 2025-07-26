@@ -360,21 +360,23 @@ export default function Profile() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.menuItem, { marginTop: 5 }]}
-            onPress={() => subscribe()}
-            disabled={loading}
-          >
-            <FontAwesome5
-              name="money-bill-wave"
-              size={20}
-              color={Colors.GREEN}
-              style={styles.icon}
-            />
-            <Text style={[styles.menuLabel, { color: Colors.GREEN }]}>
-              Subscribe
-            </Text>
-          </TouchableOpacity>
+          {userDetail?.member === false && (
+            <TouchableOpacity
+              style={[styles.menuItem, { marginTop: 5 }]}
+              onPress={() => subscribe()}
+              disabled={loading}
+            >
+              <FontAwesome5
+                name="money-bill-wave"
+                size={20}
+                color={Colors.GREEN}
+                style={styles.icon}
+              />
+              <Text style={[styles.menuLabel, { color: Colors.GREEN }]}>
+                Subscribe
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={[styles.menuItem, { marginTop: 5 }]}
@@ -456,7 +458,7 @@ export default function Profile() {
             textAlign: "center",
             color: Colors.GRAY,
             marginTop: 10,
-            marginBottom: 20,
+            marginBottom: 30,
             fontFamily: "outfit",
           }}
         >
@@ -552,6 +554,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
+    maxWidth: 200,
+    marginBottom: 5,
   },
   profileEmail: {
     fontSize: 15,

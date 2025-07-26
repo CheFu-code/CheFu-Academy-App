@@ -316,11 +316,11 @@ export default function SettingsScreen() {
             style={styles.container}
           >
             <Text style={styles.heading}>General</Text>
-            <SettingItem
+            {/* <SettingItem
               label="Edit Profile"
               icon="person"
               onPress={() => router.push("/editProfile")}
-            />
+            /> */}
             <SettingItem
               label="Change Password"
               icon="lock-closed"
@@ -332,6 +332,7 @@ export default function SettingsScreen() {
               onPress={exportUserData}
               disabled={loading}
             />
+
             {loading && (
               <ActivityIndicator
                 size="small"
@@ -339,6 +340,12 @@ export default function SettingsScreen() {
                 style={{ marginBottom: 10 }}
               />
             )}
+            <SettingItem
+              label="Trusted Devices"
+              icon="hardware-chip"
+              onPress={() => router.push("/trustedDevices")}
+              disabled={loading}
+            />
 
             <Text style={styles.heading}>Notifications</Text>
             <SettingItem

@@ -244,12 +244,16 @@ export default function EditProfile() {
             withAlphaFilter
             countryCode={countryCode}
             onSelect={(country) => {
-              setCountryCode(country.cca2);
-              setCallingCode("+" + country.callingCode[0]);
+              if (country?.callingCode?.length && country?.cca2) {
+                setCountryCode(country.cca2);
+                setCallingCode("+" + country.callingCode[0]);
+              } else {
+                console.warn("Invalid country selected:", country);
+              }
             }}
             containerButtonStyle={styles.countryPickerButton}
           />
-          <Text style={styles.callingCodeText}>{callingCode}</Text>
+          <Text style={styles.callingCodeText}>{callingCode ?? "+00"}</Text>
         </View>
         {errors.countryCode && (
           <Text style={styles.errorText}>{errors.countryCode}</Text>

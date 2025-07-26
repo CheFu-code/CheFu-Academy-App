@@ -5,13 +5,14 @@ import * as Sentry from "@sentry/react-native";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Image,
   KeyboardAvoidingView,
   Linking,
+  Modal,
   Platform,
   Pressable,
   SafeAreaView,
@@ -214,6 +215,27 @@ const SignIn = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Modal animationType="fade" transparent={true} visible={loading}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <LottieView
+              source={require("./../../assets/animations/GO TO SCHOOL ANIMATION.json")}
+              autoPlay
+              loop
+              style={{ width: 150, height: 150 }}
+            />
+            <Text style={styles.modalTitle}>Signing you in...</Text>
+            <Text style={styles.modalSubtext}>
+              Just a moment while we load your profile.
+            </Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
   if (fatalError) {
     return (
       <SafeAreaView
@@ -261,15 +283,15 @@ const SignIn = () => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={{ alignItems: "center", paddingTop: 30, padding: 25 }}>
-            <Image
-              source={require("./../../assets/images/logo.png")}
+            <LottieView
+              autoPlay
+              loop={true}
+              source={require("./../../assets/animations/Chatbot.json")}
               style={{
-                width: 150,
-                height: 150,
-                borderRadius: 100,
-                borderWidth: 2,
-                borderColor: Colors.PRIMARY,
+                width: 180,
+                height: 180,
                 marginBottom: 15,
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -409,5 +431,30 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#858585",
     marginTop: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#121212",
+    padding: 30,
+    borderRadius: 16,
+    alignItems: "center",
+    width: 300,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: "outfit-bold",
+    color: Colors.GREEN,
+    marginTop: 15,
+  },
+  modalSubtext: {
+    fontSize: 14,
+    color: "#ccc",
+    textAlign: "center",
+    marginTop: 8,
   },
 });

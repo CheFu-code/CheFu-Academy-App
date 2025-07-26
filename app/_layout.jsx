@@ -249,7 +249,9 @@ export default Sentry.wrap(function RootLayout() {
           statusBarAnimation: "slide",
           gestureEnabled: true,
           animation: "slide_from_right",
-          contentStyle: { backgroundColor: "#1B263B" },
+          contentStyle: {
+            backgroundColor: Colors.BG_COLOR,
+          },
         }}
       />
     </UserDetailContext.Provider>

@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
 import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
@@ -145,8 +145,32 @@ export default function ChangePassword() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}
     >
+      <TouchableOpacity
+        onPress={() => router.back()}
+        disabled={loading}
+        style={{
+          marginTop: 50,
+          marginBottom: 50,
+          flexDirection: "row",
+          alignItems: "center",
+          marginLeft: 20,
+        }}
+      >
+        <AntDesign name="left" size={24} color="#fff" />
+        <Text
+          style={{
+            fontFamily: "outfit-bold",
+            color: "#fff",
+            fontSize: 18,
+            marginLeft: 6,
+          }}
+        >
+          Back
+        </Text>
+      </TouchableOpacity>
+
       <View style={styles.container}>
         <Text style={styles.heading}>Change Password</Text>
 

@@ -29,7 +29,7 @@ const TabLayout = () => {
                 bottom: 30,
                 height: 60 + insets.bottom,
                 overflow: "hidden",
-                backgroundColor: "rgba(255, 255, 255, 0.2)", // semi-transparent tint for glass effect
+                backgroundColor: "#121212", // semi-transparent tint for glass effect
                 shadowColor: Colors.PRIMARY,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -41,7 +41,7 @@ const TabLayout = () => {
           ),
           tabBarStyle: {
             paddingBottom: insets.bottom,
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
+            backgroundColor: "#121212",
             borderTopLeftRadius: 50,
             borderTopRightRadius: 50,
             borderBottomLeftRadius: 50,
@@ -49,7 +49,7 @@ const TabLayout = () => {
             height: 60,
             marginHorizontal: 10,
             elevation: 5,
-            shadowColor: "rgba(255, 255, 255, 0.3)",
+            shadowColor: "#121212",
             shadowOffset: {
               width: 0,
               height: 1,
@@ -59,7 +59,11 @@ const TabLayout = () => {
             bottom: 30,
             marginBottom: 20,
             marginTop: 30,
-            borderTopWidth: 0,
+            borderColor: "white",
+            borderTopWidth: 0.7,
+            borderLeftWidth: 0.7,
+            borderRightWidth: 0.7,
+            borderBottomWidth: 0.7,
           },
         }}
       >
