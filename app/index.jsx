@@ -20,6 +20,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -94,6 +95,12 @@ export default function Index() {
                 setLoading(false);
               }
             } catch (error) {
+              if (error.code === "firestore/unavailable") {
+                ToastAndroid.show(
+                  "Network error. Please check your connection.",
+                  ToastAndroid.SHORT
+                );
+              }
               console.error("Error fetching user data:", error);
               Sentry.captureException(error);
               setLoading(false);

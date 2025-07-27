@@ -1,10 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
-import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  Timestamp,
+  where,
+} from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
 import { useContext, useState } from "react";
 import {
   Alert,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -25,17 +34,65 @@ export default function AddCourse() {
   const [userInput, setUserInput] = useState("");
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState([]);
+  const [generatingTopic, setGeneratingTopic] = useState(false);
   const router = useRouter();
   const db = getFirestore();
   const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
 
   const generateTopic = async () => {
-    if (loading) return; // Prevent double submission
+    if (generatingTopic) return; // Prevent double submission
     if (!userInput.trim()) {
       Alert.alert("Input Required", "Please enter a course idea first.");
       return;
     }
-    setLoading(true);
+
+    // Get today's start and end timestamps manually
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0
+    );
+    const endOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
+
+    setGeneratingTopic(true);
+
+    try {
+      const courseQuery = query(
+        collection(db, "course"),
+        where("createdBy", "==", userDetail?.email),
+        where("createdOn", ">=", Timestamp.fromDate(startOfDay)),
+        where("createdOn", "<=", Timestamp.fromDate(endOfDay))
+      );
+      const snapshot = await getDocs(courseQuery);
+      const courseCountToday = snapshot.size;
+
+      if (courseCountToday >= 3) {
+        Alert.alert(
+          "Daily Limit Reached",
+          "Free users can only create up to 3 courses per day. Upgrade to member plan to unlock more."
+        );
+        setGeneratingTopic(false);
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking course count:", error);
+      Alert.alert("Error", "Failed to verify daily course limit.");
+      setGeneratingTopic(false);
+      return;
+    }
+
     let topicIdea = [];
     try {
       const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
@@ -46,6 +103,7 @@ export default function AddCourse() {
         );
         return;
       }
+      setGeneratingTopic(true);
       const promptText = userInput + Prompt.IDEA;
       const contents = [
         {
@@ -64,6 +122,8 @@ export default function AddCourse() {
           "The AI did not return any topics. Please try again later."
         );
         topicIdea = [];
+        setGeneratingTopic(false);
+        return;
       } else {
         try {
           topicIdea = JSON.parse(cleanedResponse);
@@ -82,7 +142,7 @@ export default function AddCourse() {
       topicIdea = [];
     } finally {
       setTopics(Array.isArray(topicIdea) ? topicIdea : []);
-      setLoading(false);
+      setGeneratingTopic(false);
     }
   };
 
@@ -148,7 +208,8 @@ export default function AddCourse() {
         : coursesObj.courses;
 
       if (!Array.isArray(coursesArray) || coursesArray.length === 0) {
-        Alert.alert("Error", "No courses found in AI response.");
+        Alert.alert("Error", "Our AI did not return any course data.");
+        setLoading(false);
         return;
       }
 
@@ -191,6 +252,51 @@ export default function AddCourse() {
       setLoading(false);
     }
   };
+
+  if (generatingTopic) {
+    return (
+      <Modal animationType="fade" transparent={true} visible={generatingTopic}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <LottieView
+              source={require("./../../assets/animations/Brainstorm.json")}
+              autoPlay
+              loop
+              style={{ width: 150, height: 150 }}
+            />
+            <Text style={styles.modalTitle}>
+              Let’s find what matters most to you.
+            </Text>
+            <Text style={styles.modalSubtext}>
+              Our AI is working to deliver personalized learning topics.
+            </Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Modal animationType="fade" transparent={true} visible={loading}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <LottieView
+              source={require("./../../assets/animations/generatingTopic.json")}
+              autoPlay
+              loop
+              style={{ width: 170, height: 170 }}
+            />
+            <Text style={styles.modalTitle}>Let the Genius Work</Text>
+            <Text style={styles.modalSubtext}>
+              CheFu Inc.’s powerful AI is engineering your course —
+              intelligently, efficiently, and uniquely for you.
+            </Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
@@ -260,8 +366,8 @@ export default function AddCourse() {
               marginTop: 10,
             }}
           >
-            What course do you want to create? (eg: Learn JavaScript,
-            Machine Learning, History, Business studies, etc)
+            What course do you want to create? (eg: Learn JavaScript, Machine
+            Learning, History, Business studies, etc)
           </Text>
 
           <TextInput
@@ -280,8 +386,8 @@ export default function AddCourse() {
             type="fill"
             onPress={generateTopic}
             loading={loading}
-            disabled={loading || !userInput.trim()}
-            opacity={loading || !userInput.trim() ? 0.4 : 1}
+            disabled={generatingTopic || !userInput.trim()}
+            opacity={generatingTopic || !userInput.trim() ? 0.4 : 1}
           />
 
           <View
@@ -351,6 +457,31 @@ export default function AddCourse() {
 }
 
 const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#121212",
+    padding: 30,
+    borderRadius: 16,
+    alignItems: "center",
+    width: 300,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: "outfit-bold",
+    color: Colors.GREEN,
+    marginTop: 15,
+  },
+  modalSubtext: {
+    fontSize: 14,
+    color: "#ccc",
+    textAlign: "center",
+    marginTop: 8,
+  },
   textInput: {
     padding: 15,
     backgroundColor: Colors.WHITE,
@@ -361,5 +492,6 @@ const styles = StyleSheet.create({
     height: 90,
     alignItems: "flex-start",
     fontSize: 16,
+    fontFamily: "outfit-bold",
   },
 });
