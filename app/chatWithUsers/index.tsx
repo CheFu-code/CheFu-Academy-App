@@ -34,9 +34,8 @@ export default function ChatWithUsers() {
     const router = useRouter();
 
     useEffect(() => {
-        const fetchChatsAndUsers = async () => {
+        const unsubscribe = firestore().collection("chats").onSnapshot(async (chatsSnapshot) => {
             try {
-                const chatsSnapshot = await firestore().collection("chats").get();
                 const chatIds = chatsSnapshot.docs.map((doc) => doc.id);
 
                 const userPromises = chatIds.map(async (userId) => {
@@ -51,8 +50,8 @@ export default function ChatWithUsers() {
                     const photoURL = userDoc.exists() ? userDoc.data()?.photoURL : null;
 
                     // Fetch last message and unread count
-                    const chatDoc = await firestore().collection("chats").doc(userId).get();
-                    const lastReadByAdmin = chatDoc.exists() ? chatDoc.data()?.lastReadByAdmin : null;
+                    const chatDoc = chatsSnapshot.docs.find(doc => doc.id === userId);
+                    const lastReadByAdmin = chatDoc?.data()?.lastReadByAdmin || null;
 
                     const messagesRef = firestore()
                         .collection("chats")
@@ -116,9 +115,9 @@ export default function ChatWithUsers() {
             } finally {
                 setLoading(false);
             }
-        };
+        });
 
-        fetchChatsAndUsers();
+        return () => unsubscribe();
     }, []);
 
     const handleUserPress = async (userId: string) => {
@@ -149,22 +148,24 @@ export default function ChatWithUsers() {
             />
             <View style={styles.chatContent}>
                 <View style={styles.chatHeader}>
-                    <Text style={styles.fullname}>{item.fullname}</Text>
-                    {item.unreadCount > 0 && (
-                        <View style={styles.unreadBadge}>
-                            <Text style={styles.unreadBadgeText}>{item.unreadCount}</Text>
-                        </View>
-                    )}
+                    <View style={styles.nameAndBadgeContainer}>
+                        <Text style={styles.fullname}>{item.fullname}</Text>
+                        {item.unreadCount > 0 && (
+                            <View style={styles.unreadBadge}>
+                                <Text style={styles.unreadBadgeText}>{item.unreadCount}</Text>
+                            </View>
+                        )}
+                    </View>
+                    <Text style={styles.timestamp}>
+                        {item.lastMessageTimestamp
+                            ? dayjs(item.lastMessageTimestamp.toDate()).fromNow(true)
+                            : ""}
+                    </Text>
                 </View>
                 <Text style={styles.lastMessage} numberOfLines={1}>
                     {item.lastMessage}
                 </Text>
             </View>
-            <Text style={styles.timestamp}>
-                {item.lastMessageTimestamp
-                    ? dayjs(item.lastMessageTimestamp.toDate()).fromNow(true)
-                    : ""}
-            </Text>
         </TouchableOpacity>
     );
 
@@ -208,15 +209,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 10,
         paddingHorizontal: 16,
-        paddingBottom: 18,
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.PRIMARY,
+        paddingBottom: 16,
     },
     headerText: {
         fontSize: 20,
         fontWeight: "bold",
         color: Colors.PRIMARY,
-
     },
     noChatsContainer: {
         flex: 1,
@@ -240,7 +238,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         marginRight: 12,
-        backgroundColor: "#fff",
+        backgroundColor: "#333",
     },
     chatContent: {
         flex: 1,
@@ -251,6 +249,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 4,
+    },
+    nameAndBadgeContainer: {
+        flexDirection: "row",
+        alignItems: "center",
     },
     fullname: {
         color: "white",
@@ -270,11 +272,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 6,
         paddingVertical: 2,
-        marginLeft: -50,
-        // marginRight:1,
-        marginBottom: 10,
-        justifyContent: "center",
-        alignItems: "center",
+        marginLeft: 8,
     },
     unreadBadgeText: {
         color: Colors.WHITE,
