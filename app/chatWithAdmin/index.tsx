@@ -213,7 +213,7 @@ export default function ChatWithAdmin() {
                             padding: 10,
                             borderRadius: 10,
                             maxWidth: "80%",
-                            marginBottom: 28
+                            marginBottom: 10
                         }}
                     >
                         <Text style={{ color: "white", fontFamily: "outfit-bold", marginBottom: 2 }}>

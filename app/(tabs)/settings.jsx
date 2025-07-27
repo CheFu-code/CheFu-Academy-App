@@ -1,10 +1,10 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { getAuth, sendEmailVerification } from "@react-native-firebase/auth";
 import {
-    doc,
-    getDoc,
-    getFirestore,
-    updateDoc,
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
 } from "@react-native-firebase/firestore";
 import * as LocalAuthentication from "expo-local-authentication";
 
@@ -16,18 +16,18 @@ import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Platform,
-    Pressable,
-    ScrollView,
-    Share,
-    StyleSheet,
-    Switch,
-    Text,
-    ToastAndroid,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Switch,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -345,6 +345,21 @@ export default function SettingsScreen() {
               onPress={() => router.push("/trustedDevices")}
               disabled={loading}
             />
+            {!userDetail?.roles?.includes("admin") && (
+              <SettingItem
+                label="Live Support"
+                icon="chatbubble-ellipses"
+                onPress={() => {
+                  if (userDetail?.roles?.includes("admin")) {
+                    ToastAndroid.show("You're an admin!", ToastAndroid.SHORT);
+                    return;
+                  } else {
+                    router.push("/chatWithAdmin");
+                  }
+                }}
+                disabled={loading}
+              />
+            )}
 
             <Text style={styles.heading}>Notifications</Text>
             <SettingItem
@@ -397,16 +412,7 @@ export default function SettingsScreen() {
                 </Text>
               </View>
             )}
-            {/* <SettingItem
-              label="What's New"
-              icon="sparkles"
-              onPress={() => Alert.alert("Release Notes Pressed")}
-            />
-            <SettingItem
-              label="Rate the App"
-              icon="star"
-              onPress={() => Alert.alert("Rate Us Pressed")}
-            /> */}
+
             <SettingItem
               label="Share CheFu Academy"
               icon="share-social"
@@ -436,15 +442,15 @@ export default function SettingsScreen() {
                 />
               ))}
 
-            {userDetail?.email === "kurisanim2@gmail.com" && (
+            {(userDetail?.email === "kurisanim2@gmail.com" ||
+              userDetail?.roles?.includes?.("admin")) && (
               <SettingItem
-                label="Live Support"
+                label="Admin Chat"
                 icon="chatbubble-ellipses"
-                onPress={() => {
-                  router.push("/chatWithUsers");
-                }}
+                onPress={() => router.push("/chatWithUsers")}
               />
             )}
+
             <SettingItem
               label="Log Out"
               icon="exit"

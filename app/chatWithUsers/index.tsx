@@ -208,12 +208,15 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 10,
         paddingHorizontal: 16,
-        paddingBottom: 16,
+        paddingBottom: 18,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.PRIMARY,
     },
     headerText: {
         fontSize: 20,
         fontWeight: "bold",
         color: Colors.PRIMARY,
+
     },
     noChatsContainer: {
         flex: 1,
@@ -237,7 +240,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         marginRight: 12,
-        backgroundColor: "#333",
+        backgroundColor: "#fff",
     },
     chatContent: {
         flex: 1,

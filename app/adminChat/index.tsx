@@ -29,7 +29,9 @@ export default function AdminChat() {
     const [input, setInput] = useState("");
     const flatListRef = useRef<FlatList>(null);
     const [sending, setSending] = useState(false);
-    const [selectedUserFullname, setSelectedUserFullname] = useState<string | null>(null);
+    const [selectedUserFullname, setSelectedUserFullname] = useState<
+        string | null
+    >(null);
 
     useEffect(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -40,15 +42,25 @@ export default function AdminChat() {
 
         const fetchUserFullname = async () => {
             try {
-                const userDoc = await firestore().collection("users").doc(String(selectedUserId)).get();
+                const userDoc = await firestore()
+                    .collection("users")
+                    .doc(String(selectedUserId))
+                    .get();
                 if (userDoc.exists()) {
-                    setSelectedUserFullname(userDoc.data()?.fullname || `User (${String(selectedUserId).substring(0, 5)}...)`);
+                    setSelectedUserFullname(
+                        userDoc.data()?.fullname ||
+                        `User (${String(selectedUserId).substring(0, 5)}...)`
+                    );
                 } else {
-                    setSelectedUserFullname(`User (${String(selectedUserId).substring(0, 5)}...)`);
+                    setSelectedUserFullname(
+                        `User (${String(selectedUserId).substring(0, 5)}...)`
+                    );
                 }
             } catch (error) {
                 console.error("Error fetching user fullname:", error);
-                setSelectedUserFullname(`User (${String(selectedUserId).substring(0, 5)}...)`);
+                setSelectedUserFullname(
+                    `User (${String(selectedUserId).substring(0, 5)}...)`
+                );
             }
         };
 
@@ -103,20 +115,29 @@ export default function AdminChat() {
                         alignItems: "center",
                         gap: 10,
                         marginTop: 35,
-                        marginBottom: 40,
+                        marginBottom: 10,
                         marginHorizontal: 20,
                     }}
                 >
                     <AntDesign color={"white"} name="left" size={24} />
-                    <Text
+                    <View
                         style={{
-                            color: Colors.PRIMARY,
-                            fontFamily: "outfit-bold",
-                            fontSize: 18,
+                            flexDirection: "column",
+                            alignItems: "flex-start",
+                            gap: 5,
+                            justifyContent: "flex-start",
                         }}
                     >
-                        Admin Dashboard
-                    </Text>
+                        <Text
+                            style={{
+                                color: Colors.GREEN,
+                                fontFamily: "outfit-bold",
+                                fontSize: 20,
+                            }}
+                        >
+                            {selectedUserFullname}
+                        </Text>
+                    </View>
                 </TouchableOpacity>
                 <FlatList
                     ref={flatListRef}
@@ -146,7 +167,9 @@ export default function AdminChat() {
                             >
                                 {item.sender === "admin" ? "Admin" : selectedUserFullname}
                             </Text>
-                            <Text style={{ color: "#fff" }}>{item.text}</Text>
+                            <Text style={{ color: "#fff", fontFamily: "outfit-bold" }}>
+                                {item.text}
+                            </Text>
                             <Text
                                 style={{
                                     color: item.sender === "admin" ? Colors.BLACK : Colors.GREEN,
@@ -201,12 +224,19 @@ export default function AdminChat() {
                             borderRadius: 20,
                             justifyContent: "center",
                             alignItems: "center",
-                            opacity: sending || !selectedUserId || input.trim() === "" ? 0.5 : 1,
+                            opacity:
+                                sending || !selectedUserId || input.trim() === "" ? 0.5 : 1,
                         }}
                     >
-                        {sending ? <ActivityIndicator size={"small"} color={"white"} /> : <Text style={{ color: Colors.PRIMARY, fontFamily: "outfit-bold" }}>
-                            Send
-                        </Text>}
+                        {sending ? (
+                            <ActivityIndicator size={"small"} color={"white"} />
+                        ) : (
+                            <Text
+                                style={{ color: Colors.PRIMARY, fontFamily: "outfit-bold" }}
+                            >
+                                Send
+                            </Text>
+                        )}
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
