@@ -27,15 +27,22 @@ interface ChatMessage {
 // Assuming a fixed admin email for notifications. In a real app, this might be fetched dynamically.
 const ADMIN_EMAIL = "kurisanim2@gmail.com"; // REPLACE WITH ACTUAL ADMIN EMAIL
 
-async function sendNotification(userEmail: string, title: string, body: string) {
+async function sendNotification(
+    userEmail: string,
+    title: string,
+    body: string
+) {
     try {
-        const response = await fetch("https://chefu-academy-tmzx.onrender.com/api/sendToUser", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ userEmail, title, body }),
-        });
+        const response = await fetch(
+            "https://chefu-academy-tmzx.onrender.com/api/sendToUser",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ userEmail, title, body }),
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -49,7 +56,7 @@ async function sendNotification(userEmail: string, title: string, body: string) 
 }
 
 export default function AdminChat() {
-    const { userDetail } = useContext(UserDetailContext)
+    const { userDetail } = useContext(UserDetailContext);
     const { selectedUserId } = useLocalSearchParams();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
@@ -113,6 +120,10 @@ export default function AdminChat() {
         if (input.trim() === "" || !selectedUserId) return;
         setSending(true);
 
+        const expireAt = firestore.Timestamp.fromDate(
+            new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+        );
+
         await firestore()
             .collection("chats")
             .doc(String(selectedUserId))
@@ -121,9 +132,10 @@ export default function AdminChat() {
                 text: input,
                 sender: "admin",
                 createdAt: firestore.FieldValue.serverTimestamp(),
+                expireAt, // 👈 Add this
             });
         setSending(false);
-        // Send notification to user 
+        // Send notification to user
         if (isAdmin) {
             await sendNotification(
                 ADMIN_EMAIL,
@@ -141,7 +153,7 @@ export default function AdminChat() {
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 100}
+            // keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 100}
             >
                 <TouchableOpacity
                     onPress={() => router.back()}
@@ -174,6 +186,7 @@ export default function AdminChat() {
                         </Text>
                     </View>
                 </TouchableOpacity>
+
                 <FlatList
                     ref={flatListRef}
                     data={messages}
@@ -184,11 +197,12 @@ export default function AdminChat() {
                                 alignSelf: item.sender === "admin" ? "flex-end" : "flex-start",
                                 backgroundColor:
                                     item.sender === "admin" ? Colors.PRIMARY : Colors.BG,
-                                marginVertical: 4,
-                                padding: 10,
+                                marginVertical: 2,
+                                padding: 8,
                                 borderRadius: 10,
                                 maxWidth: "80%",
                                 marginHorizontal: 20,
+                                minWidth: 75,
                             }}
                         >
                             <Text
@@ -196,15 +210,17 @@ export default function AdminChat() {
                                     color: item.sender === "admin" ? Colors.BLACK : Colors.RED,
                                     fontFamily: "outfit-bold",
                                     fontSize: 16,
-                                    marginBottom: 5,
+                                    marginBottom: 2,
                                     textAlign: item.sender === "admin" ? "right" : "left",
                                 }}
                             >
                                 {item.sender === "admin" ? "Admin" : selectedUserFullname}
                             </Text>
+
                             <Text style={{ color: "#fff", fontFamily: "outfit-bold" }}>
                                 {item.text}
                             </Text>
+
                             <Text
                                 style={{
                                     color: item.sender === "admin" ? Colors.BLACK : Colors.GREEN,
@@ -227,7 +243,7 @@ export default function AdminChat() {
                         flexDirection: "row",
                         padding: 10,
                         alignItems: "center",
-                        marginBottom: 50,
+                        // marginBottom: 50,
                     }}
                 >
                     <TextInput
@@ -240,13 +256,14 @@ export default function AdminChat() {
                         style={{
                             flex: 1,
                             borderColor: "#ccc",
-                            borderWidth: 1,
+                            borderWidth: 0.8,
                             borderRadius: 20,
                             paddingHorizontal: 16,
-                            paddingVertical: 10,
+                            // paddingVertical: 10,
                             marginRight: 10,
                             color: Colors.PRIMARY,
-                            marginTop: 10,
+                            marginTop: 8,
+                            fontFamily: "outfit-bold",
                         }}
                     />
                     <TouchableOpacity

@@ -1,7 +1,9 @@
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { AntDesign } from "@expo/vector-icons";
-import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import firestore, {
+    FirebaseFirestoreTypes
+} from "@react-native-firebase/firestore";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -15,7 +17,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 
 interface ChatMessage {
@@ -25,16 +27,13 @@ interface ChatMessage {
     createdAt: FirebaseFirestoreTypes.Timestamp;
 }
 
-// Assuming a fixed admin email for notifications. In a real app, this might be fetched dynamically.
-const ADMIN_EMAIL = "kurisanim2@gmail.com"; // REPLACE WITH ACTUAL ADMIN EMAIL
+const ADMIN_EMAIL = "kurisanim2@gmail.com";
 
 async function sendNotification(userEmail: string, title: string, body: string) {
     try {
         const response = await fetch("https://chefu-academy-tmzx.onrender.com/api/sendToUser", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userEmail, title, body }),
         });
 
@@ -73,20 +72,12 @@ export default function ChatWithAdmin() {
             .collection("chats")
             .doc(chatId)
             .collection("messages")
-            .orderBy("createdAt", "asc")
+            .orderBy("createdAt")
             .onSnapshot((snapshot) => {
-                const messages = snapshot.docs
-                    .map((doc) => {
-                        const data = doc.data();
-                        return {
-                            id: doc.id,
-                            text: data.text,
-                            sender: data.sender,
-                            createdAt: data.createdAt,
-                        } as ChatMessage;
-                    })
-                    .filter((msg): msg is ChatMessage => !!msg.text && !!msg.sender && !!msg.createdAt);
-
+                const messages = snapshot.docs.map((doc: FirebaseFirestoreTypes.DocumentSnapshot) => ({
+                    ...(doc.data() as ChatMessage),
+                    id: doc.id, // Overrides any existing 'id' in data
+                }));
                 setChatMessages(messages);
                 setLoading(false);
             });
@@ -102,20 +93,30 @@ export default function ChatWithAdmin() {
             const chatDocRef = firestore().collection("chats").doc(chatId);
 
             await firestore().runTransaction(async (transaction) => {
-                transaction.set(chatDocRef, {
-                    lastUpdated: firestore.FieldValue.serverTimestamp(),
-                    participants: isAdmin ? [chatId, "admin"] : [chatId],
-                }, { merge: true });
+                // Set chat metadata
+                transaction.set(
+                    chatDocRef,
+                    {
+                        lastUpdated: firestore.FieldValue.serverTimestamp(),
+                        participants: isAdmin ? [chatId, "admin"] : [chatId],
+                    },
+                    { merge: true }
+                );
 
+                // Prepare message data
                 const messagesRef = chatDocRef.collection("messages");
+                const expireAt = firestore.Timestamp.fromDate(
+                    new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+                );
+
                 transaction.set(messagesRef.doc(), {
                     text: message.trim(),
                     sender: isAdmin ? "admin" : "user",
                     createdAt: firestore.FieldValue.serverTimestamp(),
+                    expireAt,
                 });
             });
 
-            // Send notification to admin if the current user is not an admin
             if (!isAdmin && userDetail?.fullname) {
                 await sendNotification(
                     ADMIN_EMAIL,
@@ -132,11 +133,11 @@ export default function ChatWithAdmin() {
         }
     };
 
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 100}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
             <TouchableOpacity
                 onPress={() => router.back()}
@@ -144,8 +145,8 @@ export default function ChatWithAdmin() {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 10,
-                    marginTop: 35,
-                    marginBottom: 40,
+                    marginTop: 40,
+                    marginBottom: 20,
                     marginHorizontal: 20,
                 }}
             >
@@ -171,8 +172,7 @@ export default function ChatWithAdmin() {
                         marginBottom: 20,
                     }}
                 >
-                    Welcome {userDetail?.fullname?.split(" ")[0] || "there"}, how can we
-                    help you today?
+                    Welcome {userDetail?.fullname?.split(" ")[0] || "there"}, how can we help you today?
                 </Text>
             </View>
 
@@ -182,7 +182,7 @@ export default function ChatWithAdmin() {
                 contentContainerStyle={{
                     flexGrow: 1,
                     paddingHorizontal: 10,
-                    paddingBottom: 100,
+                    paddingBottom: 80,
                     backgroundColor: Colors.BG,
                     borderTopRightRadius: 20,
                     borderTopLeftRadius: 20,
@@ -240,33 +240,33 @@ export default function ChatWithAdmin() {
                         key={msg.id}
                         style={{
                             alignSelf: msg.sender === "admin" ? "flex-start" : "flex-end",
-                            backgroundColor:
-                                msg.sender === "admin" ? Colors.PRIMARY : Colors.GREEN,
-                            padding: 10,
+                            backgroundColor: msg.sender === "admin" ? Colors.PRIMARY : Colors.GREEN,
+                            padding: 8,
                             borderRadius: 10,
                             maxWidth: "80%",
-                            marginBottom: 10
+                            marginBottom: 5,
+                            minWidth: 75,
                         }}
                     >
-                        <Text style={{ color: "white", fontFamily: "outfit-bold", marginBottom: 2 }}>
+                        <Text
+                            style={{
+                                color: "white",
+                                fontFamily: "outfit-bold",
+                            }}
+                        >
                             {msg.text}
                         </Text>
                         <Text
                             style={{
-                                color: msg.sender === "admin" ? Colors.BLACK : Colors.WHITE,
+                                color: Colors.BLACK,
                                 fontFamily: "outfit-bold",
                                 fontSize: 10,
-                                marginTop: 2,
-                                borderTopWidth: 0.2,
+                                marginTop: 1,
                                 borderColor: "#333",
-                                paddingTop: 5,
                                 textAlign: msg.sender === "admin" ? "right" : "left",
-                                
                             }}
                         >
-                            {msg.createdAt?.toDate
-                                ? dayjs(msg.createdAt.toDate()).format("h:mm A")
-                                : ""}
+                            {msg.createdAt?.toDate ? dayjs(msg.createdAt.toDate()).format("h:mm A") : ""}
                         </Text>
                     </View>
                 ))}
@@ -298,10 +298,7 @@ export default function ChatWithAdmin() {
                         fontSize: 16,
                         backgroundColor: "#1a1a1a",
                         paddingHorizontal: 15,
-                        paddingVertical: 10,
                         borderRadius: 30,
-                        marginBottom: 50,
-
                     }}
                     value={message}
                     onChangeText={setMessage}
@@ -313,10 +310,7 @@ export default function ChatWithAdmin() {
                         marginLeft: 10,
                         padding: 10,
                         borderRadius: 50,
-                        backgroundColor: message.trim()
-                            ? Colors.LIGHT_GREEN
-                            : Colors.LIGHT_RED,
-                        marginBottom: 50,
+                        backgroundColor: message.trim() ? Colors.LIGHT_GREEN : Colors.LIGHT_RED,
                         justifyContent: "center",
                         alignItems: "center",
                     }}

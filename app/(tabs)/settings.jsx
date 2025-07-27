@@ -46,7 +46,7 @@ export default function SettingsScreen() {
   const auth = getAuth();
   const router = useRouter();
 
-  const options = ["Live Support"];
+  const options = ["Report a bug"];
 
   useEffect(() => {
     async function fetchSettings() {
