@@ -208,22 +208,27 @@ export default function ChatWithAdmin() {
                         style={{
                             alignSelf: msg.sender === "admin" ? "flex-start" : "flex-end",
                             backgroundColor:
-                                msg.sender === "admin" ? "#2a2a2a" : Colors.GREEN,
-                            marginVertical: 10,
+                                msg.sender === "admin" ? Colors.PRIMARY : Colors.GREEN,
+                            marginTop: 20,
                             padding: 10,
                             borderRadius: 10,
                             maxWidth: "80%",
+                            marginBottom:28
                         }}
                     >
-                        <Text style={{ color: "white", fontFamily: "outfit-bold" }}>
+                        <Text style={{ color: "white", fontFamily: "outfit-bold", marginBottom: 2 }}>
                             {msg.text}
                         </Text>
                         <Text
                             style={{
-                                color: Colors.BLACK,
-                                fontFamily: "outfit",
+                                color: msg.sender === "admin" ? Colors.BLACK : Colors.WHITE,
+                                fontFamily: "outfit-bold",
                                 fontSize: 10,
                                 marginTop: 2,
+                                borderTopWidth: 0.2,
+                                borderColor: "#333",
+                                paddingTop: 5,
+                                textAlign: msg.sender === "admin" ? "right" : "left",
                             }}
                         >
                             {msg.createdAt?.toDate
@@ -262,6 +267,8 @@ export default function ChatWithAdmin() {
                         paddingHorizontal: 15,
                         paddingVertical: 10,
                         borderRadius: 30,
+                        marginBottom: 50,
+
                     }}
                     value={message}
                     onChangeText={setMessage}
@@ -276,6 +283,9 @@ export default function ChatWithAdmin() {
                         backgroundColor: message.trim()
                             ? Colors.LIGHT_GREEN
                             : Colors.LIGHT_RED,
+                        marginBottom: 50,
+                        justifyContent: "center",
+                        alignItems: "center",
                     }}
                 >
                     {sending ? (
