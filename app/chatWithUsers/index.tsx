@@ -25,6 +25,7 @@ interface UserChat {
     lastMessage: string;
     lastMessageTimestamp: FirebaseFirestoreTypes.Timestamp | null;
     photoURL: string | null;
+    unreadCount: number;
 }
 
 export default function ChatWithUsers() {
@@ -49,14 +50,19 @@ export default function ChatWithUsers() {
                         : `User (${userId.substring(0, 5)}...)`;
                     const photoURL = userDoc.exists() ? userDoc.data()?.photoURL : null;
 
-                    // Fetch last message
-                    const messagesSnapshot = await firestore()
+                    // Fetch last message and unread count
+                    const chatDoc = await firestore().collection("chats").doc(userId).get();
+                    const lastReadByAdmin = chatDoc.exists() ? chatDoc.data()?.lastReadByAdmin : null;
+
+                    const messagesRef = firestore()
                         .collection("chats")
                         .doc(userId)
-                        .collection("messages")
+                        .collection("messages");
+
+                    const lastMessageQuery = messagesRef
                         .orderBy("createdAt", "desc")
-                        .limit(1)
-                        .get();
+                        .limit(1);
+                    const messagesSnapshot = await lastMessageQuery.get();
 
                     let lastMessage = "No messages yet";
                     let lastMessageTimestamp = null;
@@ -67,12 +73,27 @@ export default function ChatWithUsers() {
                         lastMessageTimestamp = lastMsgData.createdAt;
                     }
 
+                    let unreadCount = 0;
+                    if (lastReadByAdmin) {
+                        const unreadQuery = messagesRef
+                            .where("sender", "!=", "admin")
+                            .where("createdAt", ">", lastReadByAdmin);
+                        const unreadSnapshot = await unreadQuery.get();
+                        unreadCount = unreadSnapshot.size;
+                    } else {
+                        // If no lastReadByAdmin, all user messages are unread
+                        const allUserMessagesQuery = messagesRef.where("sender", "!=", "admin");
+                        const allUserMessagesSnapshot = await allUserMessagesQuery.get();
+                        unreadCount = allUserMessagesSnapshot.size;
+                    }
+
                     return {
                         id: userId,
                         fullname,
                         photoURL,
                         lastMessage,
                         lastMessageTimestamp,
+                        unreadCount,
                     };
                 });
 
@@ -100,7 +121,13 @@ export default function ChatWithUsers() {
         fetchChatsAndUsers();
     }, []);
 
-    const handleUserPress = (userId: string) => {
+    const handleUserPress = async (userId: string) => {
+        // Mark messages as read for this chat
+        await firestore().collection("chats").doc(userId).set(
+            { lastReadByAdmin: firestore.FieldValue.serverTimestamp() },
+            { merge: true }
+        );
+
         router.push({
             pathname: "/adminChat" as any,
             params: { selectedUserId: userId },
@@ -116,23 +143,28 @@ export default function ChatWithUsers() {
                 source={
                     item.photoURL
                         ? { uri: item.photoURL }
-                        : require("../../assets/images/user.png")
+                        : require("../../assets/images/logo.png")
                 }
                 style={styles.avatar}
             />
             <View style={styles.chatContent}>
                 <View style={styles.chatHeader}>
                     <Text style={styles.fullname}>{item.fullname}</Text>
-                    <Text style={styles.timestamp}>
-                        {item.lastMessageTimestamp
-                            ? dayjs(item.lastMessageTimestamp.toDate()).fromNow(true)
-                            : ""}
-                    </Text>
+                    {item.unreadCount > 0 && (
+                        <View style={styles.unreadBadge}>
+                            <Text style={styles.unreadBadgeText}>{item.unreadCount}</Text>
+                        </View>
+                    )}
                 </View>
                 <Text style={styles.lastMessage} numberOfLines={1}>
                     {item.lastMessage}
                 </Text>
             </View>
+            <Text style={styles.timestamp}>
+                {item.lastMessageTimestamp
+                    ? dayjs(item.lastMessageTimestamp.toDate()).fromNow(true)
+                    : ""}
+            </Text>
         </TouchableOpacity>
     );
 
@@ -229,5 +261,21 @@ const styles = StyleSheet.create({
     lastMessage: {
         color: "#bbb",
         fontSize: 14,
+    },
+    unreadBadge: {
+        backgroundColor: Colors.PRIMARY,
+        borderRadius: 10,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        marginLeft: -50,
+        // marginRight:1,
+        marginBottom: 10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    unreadBadgeText: {
+        color: Colors.WHITE,
+        fontSize: 12,
+        fontWeight: "bold",
     },
 });
