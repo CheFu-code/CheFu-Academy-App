@@ -1,6 +1,8 @@
 import { Colors } from "@/constant/Colors";
+import { AntDesign } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
-import { useLocalSearchParams } from "expo-router";
+import dayjs from "dayjs";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
@@ -14,10 +16,10 @@ import {
 } from "react-native";
 
 interface ChatMessage {
-    id: string;
-    text: string;
-    sender: string;
-    createdAt: any;
+  id: string;
+  text: string;
+  sender: string;
+  createdAt: any;
 }
 
 export default function AdminChat() {
@@ -67,6 +69,28 @@ export default function AdminChat() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={80}
       >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            marginTop: 35,
+            marginBottom: 40,
+            marginHorizontal: 20,
+          }}
+        >
+          <AntDesign color={"white"} name="left" size={24} />
+          <Text
+            style={{
+              color: Colors.PRIMARY,
+              fontFamily: "outfit-bold",
+              fontSize: 18,
+            }}
+          >
+            Admin Dashboard
+          </Text>
+        </TouchableOpacity>
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -84,13 +108,27 @@ export default function AdminChat() {
               }}
             >
               <Text style={{ color: "#fff" }}>{item.text}</Text>
+              <Text
+                style={{
+                  color: Colors.BLACK,
+                  fontFamily: "outfit",
+                  fontSize: 10,
+                  marginTop: 2,
+                }}
+              >
+                {item.createdAt?.toDate
+                  ? dayjs(item.createdAt.toDate()).format("h:mm A")
+                  : ""}
+              </Text>
             </View>
           )}
         />
 
         <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
           <TextInput
-          placeholderTextColor={Colors.WHITE}
+            numberOfLines={4}
+            multiline={true}
+            placeholderTextColor={Colors.WHITE}
             placeholder="Type a message..."
             value={input}
             onChangeText={setInput}
@@ -102,7 +140,7 @@ export default function AdminChat() {
               paddingHorizontal: 16,
               paddingVertical: 10,
               marginRight: 10,
-              color:Colors.PRIMARY
+              color: Colors.PRIMARY
             }}
           />
           <TouchableOpacity onPress={handleSend} style={{ paddingHorizontal: 16 }}>
