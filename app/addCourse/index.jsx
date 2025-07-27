@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
   collection,
+  doc,
   getDocs,
   getFirestore,
   query,
+  setDoc,
   Timestamp,
   where,
 } from "@react-native-firebase/firestore";
@@ -20,6 +22,7 @@ import {
   Text,
   TextInput,
   ToastAndroid,
+  TouchableOpacity,
   View,
 } from "react-native";
 import Button from "../../component/Shared/Button";
@@ -27,6 +30,7 @@ import { generateCourse, generateTopics } from "../../config/AiModel";
 import { Colors } from "../../constant/Colors";
 import Prompt from "../../constant/Prompt";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { handleAiError } from "../../utils/errorUtils";
 
 export default function AddCourse() {
   const [loading, setLoading] = useState(false);
@@ -38,6 +42,7 @@ export default function AddCourse() {
   const router = useRouter();
   const db = getFirestore();
   const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
+  const [limitModalVisible, setLimitModalVisible] = useState(false);
 
   const generateTopic = async () => {
     if (generatingTopic) return; // Prevent double submission
@@ -78,12 +83,13 @@ export default function AddCourse() {
       const snapshot = await getDocs(courseQuery);
       const courseCountToday = snapshot.size;
 
-      if (courseCountToday >= 3) {
-        Alert.alert(
-          "Daily Limit Reached",
-          "Free users can only create up to 3 courses per day. Upgrade to member plan to unlock more."
-        );
+      if (userDetail?.member === false && courseCountToday >= 3) {
+        setLimitModalVisible(true);
         setGeneratingTopic(false);
+        setUserInput("");
+        setTopics([]);
+        setSelectedTopic([]);
+        setLoading(false);
         return;
       }
     } catch (error) {
@@ -101,6 +107,7 @@ export default function AddCourse() {
           "API Key Missing",
           "Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file and restart Expo."
         );
+        setGeneratingTopic(false);
         return;
       }
       setGeneratingTopic(true);
@@ -129,11 +136,7 @@ export default function AddCourse() {
           topicIdea = JSON.parse(cleanedResponse);
         } catch (e) {
           topicIdea = [];
-          console.error("Failed to parse AI response:", e);
-          Alert.alert(
-            "Error",
-            `Our AI did not respond with supported data.\nPlease try again later. If the issue persists, contact support: ${support}`
-          );
+          handleAiError(e, support);
         }
       }
     } catch (error) {
@@ -190,11 +193,7 @@ export default function AddCourse() {
       try {
         coursesObj = JSON.parse(aiResp);
       } catch (e) {
-        console.error("Failed to parse AI response:", e);
-        Alert.alert(
-          "Error",
-          `Our AI did not respond with supported data.\nPlease try again later. If the issue persists, contact support: ${support}`
-        );
+        handleAiError(e, support);
         if (typeof Sentry !== "undefined") {
           Sentry.captureException(e, {
             extra: { aiResponse: aiResp },
@@ -228,23 +227,8 @@ export default function AddCourse() {
         })
       );
 
-      // const interstitial = InterstitialAd.createForAdRequest(
-      //   INTERSTITIAL_AD_UNIT_ID,
-      //   { requestNonPersonalizedAdsOnly: true }
-      // );
-
-      // const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
-      // if (type === AdEventType.LOADED) {
-      // interstitial.show();
-      // }
-      // if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
-      // unsubscribe();
       router.replace("/(tabs)/home");
       ToastAndroid.show("Course created successfully!", ToastAndroid.SHORT);
-      // }
-      // });
-
-      // interstitial.load();
     } catch (e) {
       console.log("failed course", e.message);
       Alert.alert("Error", "Failed to generate course.");
@@ -285,7 +269,7 @@ export default function AddCourse() {
               source={require("./../../assets/animations/generatingTopic.json")}
               autoPlay
               loop
-              style={{ width: 170, height: 170 }}
+              style={{ width: 190, height: 190 }}
             />
             <Text style={styles.modalTitle}>Let the Genius Work</Text>
             <Text style={styles.modalSubtext}>
@@ -299,160 +283,198 @@ export default function AddCourse() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-          paddingHorizontal: 30,
-          paddingTop: 40, // adjust for status bar
-          backgroundColor: Colors.BG_COLOR,
-          zIndex: 10,
-        }}
-      >
-        <Pressable
-          onPress={() => {
-            if (!loading) router.back();
-          }}
-        >
-          <Ionicons
-            style={{
-              padding: 3,
-              borderRadius: 10,
-              backgroundColor: Colors.BG_GRAY,
-            }}
-            name="arrow-back"
-            size={24}
-            color={Colors.PRIMARY}
-          />
-        </Pressable>
-        <Text
+    <>
+      <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <View
           style={{
-            fontFamily: "outfit-bold",
-            fontSize: 24,
-            color: Colors.PRIMARY,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            paddingHorizontal: 30,
+            paddingTop: 40, // adjust for status bar
+            backgroundColor: Colors.BG_COLOR,
+            zIndex: 10,
           }}
         >
-          Create new course
-        </Text>
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          padding: 30,
-          flexGrow: 1,
-          backgroundColor: Colors.BG_COLOR,
-        }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 16,
-              color: "#fff",
-              marginTop: 5,
+          <Pressable
+            onPress={() => {
+              if (!loading) router.back();
             }}
           >
-            What do you want to learn today?
-          </Text>
-          <Text
-            style={{
-              fontFamily: "outfit",
-              fontSize: 14,
-              color: "#666",
-              marginTop: 10,
-            }}
-          >
-            What course do you want to create? (eg: Learn JavaScript, Machine
-            Learning, History, Business studies, etc)
-          </Text>
-
-          <TextInput
-            onChangeText={(value) => setUserInput(value)}
-            value={userInput}
-            style={styles.textInput}
-            numberOfLines={3}
-            multiline={true}
-            placeholder="eg: Learn how to bake bread"
-            color={Colors.GREEN}
-            placeholderTextColor={Colors.GRAY}
-          />
-
-          <Button
-            text={"Generate Topic"}
-            type="fill"
-            onPress={generateTopic}
-            loading={loading}
-            disabled={generatingTopic || !userInput.trim()}
-            opacity={generatingTopic || !userInput.trim() ? 0.4 : 1}
-          />
-
-          <View
-            style={{
-              marginTop: 15,
-              marginBottom: 15,
-            }}
-          >
-            {topics.length > 0 && (
-              <Text
-                style={{
-                  fontFamily: "outfit",
-                  fontSize: 17,
-                  color: "#fff",
-                }}
-              >
-                Select all topics which you want to add in this course
-              </Text>
-            )}
-            <View
+            <Ionicons
               style={{
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
-                gap: 10,
-                marginTop: 6,
+                padding: 3,
+                borderRadius: 10,
+                backgroundColor: Colors.BG_GRAY,
+              }}
+              name="arrow-back"
+              size={24}
+              color={Colors.PRIMARY}
+            />
+          </Pressable>
+          <Text
+            style={{
+              fontFamily: "outfit-bold",
+              fontSize: 24,
+              color: Colors.PRIMARY,
+            }}
+          >
+            Create new course
+          </Text>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            padding: 30,
+            flexGrow: 1,
+            backgroundColor: Colors.BG_COLOR,
+          }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontFamily: "outfit",
+                fontSize: 16,
+                color: "#fff",
+                marginTop: 5,
               }}
             >
-              {topics.map((item, index) => (
-                <Pressable key={index} onPress={() => onTopicSelect(item)}>
-                  <Text
-                    style={{
-                      padding: 7,
-                      borderWidth: 0.4,
-                      borderColor: Colors.WHITE,
-                      borderRadius: 99,
-                      paddingHorizontal: 15,
-                      backgroundColor: isTopicSelected(item)
-                        ? Colors.PRIMARY
-                        : null,
-                      color: isTopicSelected(item)
-                        ? Colors.WHITE
-                        : Colors.GREEN,
-                    }}
-                  >
-                    {item.replace(/^"|"$/g, "")}
-                  </Text>
-                </Pressable>
-              ))}
+              What do you want to learn today?
+            </Text>
+            <Text
+              style={{
+                fontFamily: "outfit",
+                fontSize: 14,
+                color: "#666",
+                marginTop: 10,
+              }}
+            >
+              What course do you want to create? (eg: Learn JavaScript, Machine
+              Learning, History, Business studies, etc)
+            </Text>
+
+            <TextInput
+              onChangeText={(value) => setUserInput(value)}
+              value={userInput}
+              style={styles.textInput}
+              numberOfLines={3}
+              multiline={true}
+              placeholder="eg: Learn how to bake bread"
+              color={Colors.GREEN}
+              placeholderTextColor={Colors.GRAY}
+            />
+
+            <Button
+              text={"Generate Topic"}
+              type="fill"
+              onPress={generateTopic}
+              loading={loading}
+              disabled={generatingTopic || !userInput.trim()}
+              opacity={generatingTopic || !userInput.trim() ? 0.4 : 1}
+            />
+
+            <View
+              style={{
+                marginTop: 15,
+                marginBottom: 15,
+              }}
+            >
+              {topics.length > 0 && (
+                <Text
+                  style={{
+                    fontFamily: "outfit",
+                    fontSize: 17,
+                    color: "#fff",
+                  }}
+                >
+                  Select all topics which you want to add in this course
+                </Text>
+              )}
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 10,
+                  marginTop: 6,
+                }}
+              >
+                {topics.map((item, index) => (
+                  <Pressable key={index} onPress={() => onTopicSelect(item)}>
+                    <Text
+                      style={{
+                        padding: 7,
+                        borderWidth: 0.4,
+                        borderColor: Colors.WHITE,
+                        borderRadius: 99,
+                        paddingHorizontal: 15,
+                        backgroundColor: isTopicSelected(item)
+                          ? Colors.PRIMARY
+                          : null,
+                        color: isTopicSelected(item)
+                          ? Colors.WHITE
+                          : Colors.GREEN,
+                      }}
+                    >
+                      {item.replace(/^"|"$/g, "")}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+
+            {selectedTopic.length > 0 && (
+              <View style={{ marginBottom: 50 }}>
+                <Button
+                  loading={loading}
+                  onPress={() => onGenerateCourse()}
+                  text="Generate Course"
+                  disabled={loading}
+                />
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={limitModalVisible}
+        onRequestClose={() => setLimitModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Daily Limit Reached</Text>
+            <Text style={styles.modalSubtext}>
+              Free users can only create up to 3 courses per day. Upgrade to
+              unlock unlimited access.
+            </Text>
+
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setLimitModalVisible(false)}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.subscribeButton}
+                onPress={() => {
+                  setLimitModalVisible(false);
+                  router.push("/subscription");
+                }}
+              >
+                <Text style={styles.subscribeText}>Upgrade</Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          {selectedTopic.length > 0 && (
-            <View style={{ marginBottom: 50 }}>
-              <Button
-                loading={loading}
-                onPress={() => onGenerateCourse()}
-                text="Generate Course"
-                disabled={loading}
-              />
-            </View>
-          )}
         </View>
-      </ScrollView>
-    </View>
+      </Modal>
+    </>
   );
 }
 
@@ -481,6 +503,7 @@ const styles = StyleSheet.create({
     color: "#ccc",
     textAlign: "center",
     marginTop: 8,
+    fontFamily: "outfit",
   },
   textInput: {
     padding: 15,
@@ -493,5 +516,36 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     fontSize: 16,
     fontFamily: "outfit-bold",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  cancelButton: {
+    flex: 1,
+    padding: 10,
+    marginRight: 10,
+    alignItems: "center",
+  },
+  cancelText: {
+    fontFamily: "outfit-bold",
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
+    fontSize: 16,
+  },
+  subscribeButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: Colors.GREEN,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  subscribeText: {
+    fontWeight: "bold",
+    color: Colors.WHITE,
+    fontSize: 16,
   },
 });
