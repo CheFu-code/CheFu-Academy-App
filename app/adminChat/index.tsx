@@ -1,9 +1,10 @@
 import { Colors } from "@/constant/Colors";
+import { UserDetailContext } from "@/context/UserDetailContext";
 import { AntDesign } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
 import dayjs from "dayjs";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
@@ -23,7 +24,32 @@ interface ChatMessage {
     createdAt: any;
 }
 
+// Assuming a fixed admin email for notifications. In a real app, this might be fetched dynamically.
+const ADMIN_EMAIL = "kurisanim2@gmail.com"; // REPLACE WITH ACTUAL ADMIN EMAIL
+
+async function sendNotification(userEmail: string, title: string, body: string) {
+    try {
+        const response = await fetch("https://chefu-academy-tmzx.onrender.com/api/sendToUser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userEmail, title, body }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("❌ Failed to send notification:", errorText);
+        } else {
+            console.log("✅ Notification sent successfully!");
+        }
+    } catch (error) {
+        console.error("❌ Error sending notification:", error);
+    }
+}
+
 export default function AdminChat() {
+    const { userDetail } = useContext(UserDetailContext)
     const { selectedUserId } = useLocalSearchParams();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
@@ -32,6 +58,7 @@ export default function AdminChat() {
     const [selectedUserFullname, setSelectedUserFullname] = useState<
         string | null
     >(null);
+    const isAdmin = userDetail?.roles?.includes("admin");
 
     useEffect(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -96,6 +123,14 @@ export default function AdminChat() {
                 createdAt: firestore.FieldValue.serverTimestamp(),
             });
         setSending(false);
+        // Send notification to user 
+        if (isAdmin) {
+            await sendNotification(
+                ADMIN_EMAIL,
+                "You've got a reply from CheFu Academy Support",
+                input.trim()
+            );
+        }
         setInput("");
 
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -105,8 +140,8 @@ export default function AdminChat() {
         <SafeAreaView style={{ flex: 1 }}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
-                keyboardVerticalOffset={80}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 100}
             >
                 <TouchableOpacity
                     onPress={() => router.back()}

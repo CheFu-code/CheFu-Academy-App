@@ -25,6 +25,30 @@ interface ChatMessage {
     createdAt: FirebaseFirestoreTypes.Timestamp;
 }
 
+// Assuming a fixed admin email for notifications. In a real app, this might be fetched dynamically.
+const ADMIN_EMAIL = "kurisanim2@gmail.com"; // REPLACE WITH ACTUAL ADMIN EMAIL
+
+async function sendNotification(userEmail: string, title: string, body: string) {
+    try {
+        const response = await fetch("https://chefu-academy-tmzx.onrender.com/api/sendToUser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userEmail, title, body }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("❌ Failed to send notification:", errorText);
+        } else {
+            console.log("✅ Notification sent successfully!");
+        }
+    } catch (error) {
+        console.error("❌ Error sending notification:", error);
+    }
+}
+
 export default function ChatWithAdmin() {
     const { userDetail } = useContext(UserDetailContext);
     const router = useRouter();
@@ -91,6 +115,15 @@ export default function ChatWithAdmin() {
                 });
             });
 
+            // Send notification to admin if the current user is not an admin
+            if (!isAdmin && userDetail?.fullname) {
+                await sendNotification(
+                    ADMIN_EMAIL,
+                    `New message from ${userDetail.fullname}`,
+                    message.trim()
+                );
+            }
+
             setMessage("");
         } catch (error) {
             console.error("❌ Error sending message:", error);
@@ -103,7 +136,7 @@ export default function ChatWithAdmin() {
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}
             behavior={Platform.OS === "ios" ? "padding" : undefined}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 100}
         >
             <TouchableOpacity
                 onPress={() => router.back()}
@@ -209,7 +242,6 @@ export default function ChatWithAdmin() {
                             alignSelf: msg.sender === "admin" ? "flex-start" : "flex-end",
                             backgroundColor:
                                 msg.sender === "admin" ? Colors.PRIMARY : Colors.GREEN,
-                            marginTop: 20,
                             padding: 10,
                             borderRadius: 10,
                             maxWidth: "80%",
@@ -229,6 +261,7 @@ export default function ChatWithAdmin() {
                                 borderColor: "#333",
                                 paddingTop: 5,
                                 textAlign: msg.sender === "admin" ? "right" : "left",
+                                
                             }}
                         >
                             {msg.createdAt?.toDate
