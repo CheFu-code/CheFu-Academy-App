@@ -56,7 +56,6 @@ export default function Home() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("👤 Authenticated user detected. Loading cached courses...");
         loadCachedCoursesThenFetch();
       } else {
         console.log("🚫 No authenticated user. Redirecting...");
@@ -81,15 +80,12 @@ export default function Home() {
   // Load cached courses from AsyncStorage
   const loadCachedCourses = async () => {
     try {
-      console.log("📦 Checking AsyncStorage for cached courses...");
       const cached = await AsyncStorage.getItem(CACHE_KEY);
       if (cached) {
-        console.log("✅ Cached courses found. Loading into state.");
         const parsed = JSON.parse(cached);
         setCourseList(parsed);
         return parsed; // Return cached for comparison later
       } else {
-        console.log("⚠️ No cached courses found.");
         return null;
       }
     } catch (e) {
@@ -104,12 +100,10 @@ export default function Home() {
 
     setLoading(true);
     setFetching(true);
-    console.log("🌐 Fetching courses from Firestore...");
 
     try {
       const user = auth.currentUser;
       if (!user) {
-        console.log("⚠️ No current user found. Aborting fetch.");
         setCourseList([]);
         return;
       }
@@ -135,11 +129,11 @@ export default function Home() {
         id: doc.id,
       }));
 
-      console.log(`✅ ${courses.length} courses fetched.`);
-
       // Compare with cached courses to avoid unnecessary AsyncStorage writes
       const cachedCoursesJSON = await AsyncStorage.getItem(CACHE_KEY);
-      const cachedCourses = cachedCoursesJSON ? JSON.parse(cachedCoursesJSON) : null;
+      const cachedCourses = cachedCoursesJSON
+        ? JSON.parse(cachedCoursesJSON)
+        : null;
       const isSame =
         cachedCourses &&
         JSON.stringify(cachedCourses) === JSON.stringify(courses);
@@ -148,9 +142,7 @@ export default function Home() {
 
       if (!isSame) {
         await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(courses));
-        console.log("💾 Courses saved to AsyncStorage.");
       } else {
-        console.log("ℹ️ Courses identical to cache, skipping AsyncStorage save.");
       }
 
       if (isRefresh) {
@@ -178,7 +170,6 @@ export default function Home() {
   useFocusEffect(
     useCallback(() => {
       if (auth.currentUser) {
-        console.log("📌 useFocusEffect triggered. Refreshing courses...");
         GetCourseList();
       }
     }, [])
@@ -187,13 +178,15 @@ export default function Home() {
   const verify = async () => {
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert("Not Signed In", "Seems like you're currently not signed in.");
+      Alert.alert(
+        "Not Signed In",
+        "Seems like you're currently not signed in."
+      );
       return;
     }
 
     setSending(true);
     try {
-      console.log("📨 Sending verification email...");
       await sendEmailVerification(user);
       Alert.alert(
         "Email Verification Sent",
@@ -201,7 +194,8 @@ export default function Home() {
       );
     } catch (error) {
       console.error("❌ Failed to send verification email:", error);
-      let errorMessage = "Failed to send verification email. Please try again later.";
+      let errorMessage =
+        "Failed to send verification email. Please try again later.";
       if (error.code === "auth/too-many-requests") {
         errorMessage = "Too many requests. Please try again later.";
       }
@@ -257,7 +251,6 @@ export default function Home() {
         onRefresh={() => {
           const user = auth.currentUser;
           if (user) {
-            console.log("🔁 Manual refresh triggered.");
             setFetching(false);
             GetCourseList(true);
           }
@@ -297,7 +290,6 @@ export default function Home() {
         requestOptions={{ requestNonPersonalizedAdsOnly: true }}
         onAdLoaded={() => {
           setAdLoaded(true);
-          console.log("✅ Ad loaded successfully.");
         }}
         onAdFailedToLoad={(err) => {
           console.log("❌ Ad failed to load", err);

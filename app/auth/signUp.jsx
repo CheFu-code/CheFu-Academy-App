@@ -12,12 +12,14 @@ import {
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 
+import LottieView from "lottie-react-native";
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -230,6 +232,27 @@ const SignUp = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Modal animationType="fade" transparent={true} visible={loading}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <LottieView
+              source={require("./../../assets/animations/GO TO SCHOOL ANIMATION.json")}
+              autoPlay
+              loop
+              style={{ width: 150, height: 150 }}
+            />
+            <Text style={styles.modalTitle}>Creating your account...</Text>
+            <Text style={styles.modalSubtext}>
+              Just a moment while we create your account.
+            </Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
       <KeyboardAvoidingView
@@ -404,5 +427,30 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: Colors.WHITE,
     borderColor: Colors.PRIMARY,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#121212",
+    padding: 30,
+    borderRadius: 16,
+    alignItems: "center",
+    width: 300,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: "outfit-bold",
+    color: Colors.GREEN,
+    marginTop: 15,
+  },
+  modalSubtext: {
+    fontSize: 14,
+    color: "#ccc",
+    textAlign: "center",
+    marginTop: 8,
   },
 });

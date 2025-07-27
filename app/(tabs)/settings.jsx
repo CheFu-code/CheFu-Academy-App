@@ -1,10 +1,10 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { getAuth, sendEmailVerification } from "@react-native-firebase/auth";
 import {
-  doc,
-  getDoc,
-  getFirestore,
-  updateDoc,
+    doc,
+    getDoc,
+    getFirestore,
+    updateDoc,
 } from "@react-native-firebase/firestore";
 import * as LocalAuthentication from "expo-local-authentication";
 
@@ -16,18 +16,18 @@ import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  Pressable,
-  ScrollView,
-  Share,
-  StyleSheet,
-  Switch,
-  Text,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Platform,
+    Pressable,
+    ScrollView,
+    Share,
+    StyleSheet,
+    Switch,
+    Text,
+    ToastAndroid,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -46,7 +46,7 @@ export default function SettingsScreen() {
   const auth = getAuth();
   const router = useRouter();
 
-  const options = ["Report a bug"];
+  const options = ["Live Support"];
 
   useEffect(() => {
     async function fetchSettings() {
@@ -240,7 +240,7 @@ export default function SettingsScreen() {
       }
     } else {
       setFatalError(new Error("No user is currently signed in."));
-      Alert.alert("Error", "No user is currently signed in.");
+      Alert.alert("Error", "You're currently not signed in.");
     }
   };
   let content;
@@ -298,8 +298,7 @@ export default function SettingsScreen() {
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    setSelected(item);
-                    Linking.openURL("mailto:kurisanimaluleke77@gmail.com");
+                    router.push("/chatWithAdmin");
                     setIsOpen(false);
                   }}
                   style={styles.option}
@@ -437,6 +436,15 @@ export default function SettingsScreen() {
                 />
               ))}
 
+            {userDetail?.email === "kurisanim2@gmail.com" && (
+              <SettingItem
+                label="Live Support"
+                icon="chatbubble-ellipses"
+                onPress={() => {
+                  router.push("/chatWithUsers");
+                }}
+              />
+            )}
             <SettingItem
               label="Log Out"
               icon="exit"
@@ -563,7 +571,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: "#fff",
-    fontFamily: "outfit",
+    fontFamily: "outfit-bold",
   },
   heading: {
     fontSize: 18,

@@ -11,6 +11,7 @@ export const Colors = {
   BG_COLOR: "#121212",
   YELLOW: "#FFD700",
   LIGHT_YELLOW: "#FFF9C4",
+  BG: "#1B263B",
 
   GOOGLE: {
     BLUE: "#4285F4",
