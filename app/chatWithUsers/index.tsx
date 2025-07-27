@@ -44,10 +44,10 @@ export default function ChatWithUsers() {
                         .collection("users")
                         .doc(userId)
                         .get();
-                    const fullname = userDoc
+                    const fullname = userDoc.exists()
                         ? userDoc.data()?.fullname
                         : `User (${userId.substring(0, 5)}...)`;
-                    const photoURL = userDoc ? userDoc.data()?.photoURL : null;
+                    const photoURL = userDoc.exists() ? userDoc.data()?.photoURL : null;
 
                     // Fetch last message
                     const messagesSnapshot = await firestore()
@@ -102,7 +102,7 @@ export default function ChatWithUsers() {
 
     const handleUserPress = (userId: string) => {
         router.push({
-            pathname: "/adminChat",
+            pathname: "/adminChat" as any,
             params: { selectedUserId: userId },
         });
     };
