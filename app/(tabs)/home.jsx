@@ -15,7 +15,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
-import Header from "../../component/Home/Header";
 import NoCourse from "../../component/Home/NoCourse";
 import PracticeSection from "../../component/Home/PracticeSection";
 import { Colors } from "../../constant/Colors";
@@ -39,6 +38,9 @@ import {
 
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+import Header from "../../component/Home/Header";
+import LineLoader from "../../component/Home/LineLoader";
+import AppModal from "../../component/Shared/AppModal";
 
 export default function Home() {
   const [courseList, setCourseList] = useState([]);
@@ -48,7 +50,16 @@ export default function Home() {
   const [adLoaded, setAdLoaded] = useState(false);
   const [sending, setSending] = useState(false);
   const CACHE_KEY = "@cached_courses";
-
+  const [verifyEmail, setVerifyEmail] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
+  const [errorModal, setErrorModal] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
   const router = useRouter();
   const auth = getAuth();
   const firestore = getFirestore();
@@ -155,7 +166,8 @@ export default function Home() {
         errorMessage = "Network error. Please check your connection.";
       } else if (error.code === "firestore/permission-denied") {
         if (error.code === "auth/unknown") {
-          errorMessage = "Unknown error.";
+          errorMessage = "A little internal error has occurred.";
+          ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
         } else if (error.code === "firestore/permission-denied") {
           errorMessage = "You don't have permission to access these courses.";
         }
@@ -178,20 +190,23 @@ export default function Home() {
   const verify = async () => {
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert(
-        "Not Signed In",
-        "Seems like you're currently not signed in."
-      );
+      setErrorModal({
+        visible: true,
+        title: "Not Signed In",
+        message: "Seems like you're currently not signed in.",
+      });
+
       return;
     }
 
     setSending(true);
     try {
       await sendEmailVerification(user);
-      Alert.alert(
-        "Email Verification Sent",
-        `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
-      );
+      setVerifyEmail({
+        visible: true,
+        title: "Email Verification Sent",
+        message: `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`,
+      });
     } catch (error) {
       console.error("❌ Failed to send verification email:", error);
       let errorMessage =
@@ -245,6 +260,9 @@ export default function Home() {
           </View>
         ))}
 
+      <Header />
+      {loading && <LineLoader />}
+
       <FlatList
         data={courseList}
         style={{ backgroundColor: Colors.BG_COLOR }}
@@ -269,7 +287,6 @@ export default function Home() {
                 padding: 15,
               }}
             >
-              <Header />
               {courseList?.length === 0 ? (
                 <NoCourse />
               ) : (
@@ -282,6 +299,24 @@ export default function Home() {
             </View>
           </View>
         }
+      />
+
+      <AppModal
+        visible={errorModal.visible}
+        title={errorModal.title}
+        message={errorModal.message}
+        confirmText="OK"
+        showCancel={false}
+        onConfirm={() => setErrorModal({ ...errorModal, visible: false })}
+      />
+
+      <AppModal
+        visible={verifyEmail.visible}
+        title={verifyEmail.title}
+        message={verifyEmail.message}
+        confirmText="OK"
+        showCancel={false}
+        onConfirm={() => setVerifyEmail({ ...verifyEmail, visible: false })}
       />
 
       <BannerAd

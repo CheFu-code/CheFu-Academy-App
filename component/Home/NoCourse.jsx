@@ -24,7 +24,7 @@ export default function NoCourse() {
           color: "#fff",
         }}
       >
-        You don't have any course
+        You don't have any course yet
       </Text>
 
       <Button

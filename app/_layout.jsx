@@ -45,6 +45,7 @@ export default Sentry.wrap(function RootLayout() {
     outfit: require("../assets/fonts/Outfit-Regular.ttf"),
     "outfit-bold": require("../assets/fonts/Outfit-Bold.ttf"),
     michroma: require("../assets/fonts/Michroma-Regular.ttf"),
+    "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   // ✅ Biometric Authentication on App Launch

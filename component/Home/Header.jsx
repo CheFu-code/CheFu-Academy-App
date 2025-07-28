@@ -7,18 +7,20 @@ import {
   Linking,
   Modal,
   Pressable,
-  StyleSheet,
   Text,
+  TextInput,
   ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { styles } from "../../styles/Header.styles";
 
 export default function Header() {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
   const auth = getAuth();
 
@@ -81,25 +83,43 @@ export default function Header() {
 
   const modalOptions = [
     { label: "Add Course", icon: "add-circle-outline" },
-    { label: "View Profile", icon: "person-outline" },
+    // { label: "View Profile", icon: "person-outline" },
     { label: "Contact Support", icon: "mail-outline" },
     { label: "Rate our app", icon: "star-outline", color: Colors.YELLOW },
     { label: "Logout", icon: "log-out-outline", color: Colors.RED },
   ];
 
+  const handleSearch = () => {
+    if (!searchTerm.trim()) {
+      ToastAndroid.show("Please enter a search term", ToastAndroid.SHORT);
+      return;
+    }
+
+    router.push({
+      pathname: "/searchResults",
+      params: { query: searchTerm.trim() },
+    });
+    setSearchTerm("");
+  };
+
   return (
     <View style={styles.headerContainer}>
       <View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 5,
-          }}
-        >
-          <Text numberOfLines={1} style={styles.greeting}>
-            Hello{userDetail && `, ${userDetail?.fullname}`}
+        <View style={styles.subHeaderContainer}>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode={"tail"}
+            style={styles.greeting}
+          >
+            Hello
+            {userDetail?.fullname && (
+              <Text style={{ fontFamily: "outfit-bold" }}>
+                , {userDetail.fullname}
+              </Text>
+            )}
           </Text>
+
+          {/**checkmark icon */}
           {userDetail?.member === true && (
             <Ionicons
               style={{
@@ -110,21 +130,49 @@ export default function Header() {
               name="checkmark-circle"
             />
           )}
-        </View>
-        <Text style={styles.subText}>Expand Your Knowledge</Text>
-      </View>
 
-      {userDetail && (
-        <TouchableOpacity onPress={() => setShowModal(true)}>
-          <Foundation style={{
-            padding: 10,
-            backgroundColor: Colors.GRAY,
-            borderRadius: 100,
-            elevation: 5,
-            marginTop: 10,
-          }} name="indent-more" size={27} color={"white"} />
-        </TouchableOpacity>
-      )}
+          {/**show more options */}
+          {userDetail && (
+            <TouchableOpacity onPress={() => setShowModal(true)}>
+              <Foundation
+                style={styles.showMoreIcon}
+                name="indent-more"
+                size={27}
+                color={"white"}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/*Expand knowledge with our courses */}
+        <View>
+          <Text numberOfLines={1} ellipsizeMode={"tail"} style={styles.text}>
+            Expand your knowledge with our courses
+          </Text>
+        </View>
+
+        {/*text input */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Search for courses..."
+            placeholderTextColor={Colors.BLACK}
+            autoCorrect={false}
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            onSubmitEditing={handleSearch}
+            autoCapitalize="none"
+            style={[styles.text, { flex: 1 }]}
+          />
+          <TouchableOpacity onPress={() => handleSearch()}>
+            <Ionicons
+              style={styles.search}
+              size={20}
+              color={Colors.GREEN}
+              name="search"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <Modal
         transparent
@@ -162,60 +210,3 @@ export default function Header() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  greeting: {
-    fontFamily: "outfit-bold",
-    fontSize: 24,
-    color: "#fff",
-    marginTop: 35,
-    maxWidth: 200,
-  },
-  subText: {
-    fontFamily: "outfit",
-    fontSize: 16,
-    color: Colors.GREEN,
-    marginTop: 5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end",
-  },
-  modalSheet: {
-    backgroundColor: Colors.BG_COLOR,
-    padding: 20,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-  },
-  modalTitle: {
-    fontFamily: "outfit-bold",
-    fontSize: 20,
-    color: Colors.PRIMARY,
-    marginBottom: 15,
-  },
-  modalItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-    backgroundColor: "#222",
-    borderRadius: 10,
-    marginBottom: 12,
-    elevation: 2,
-  },
-  modalIcon: {
-    marginRight: 16,
-  },
-  modalText: {
-    fontFamily: "outfit",
-    fontSize: 16,
-    color: Colors.PRIMARY,
-  },
-});

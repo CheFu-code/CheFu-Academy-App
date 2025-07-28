@@ -4,13 +4,15 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 
 export default function CancelScreen() {
+
+  setTimeout
   return (
     <View style={styles.container}>
       <Ionicons name="close-circle-outline" size={100} color={Colors.RED} />
       <Text style={styles.title}>Subscription Canceled</Text>
       <Text style={styles.message}>
         We're sorry to see you go. Your subscription has been successfully
-        canceled. You will not be charged.
+        canceled. You will no longer be charged.
       </Text>
       <Link href="/(tabs)/home" asChild>
         <TouchableOpacity style={styles.button}>
