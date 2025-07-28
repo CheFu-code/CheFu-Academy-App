@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
+import messaging from "@react-native-firebase/messaging";
 import * as Sentry from "@sentry/react-native";
 import * as Device from "expo-device";
 import * as Location from "expo-location";
@@ -86,6 +87,24 @@ const SignIn = () => {
     try {
       const resp = await auth.signInWithEmailAndPassword(cleanEmail, password);
       const signedInEmail = resp.user.email;
+
+      // 🔔 1. Get FCM token
+      const fcmToken = await messaging().getToken();
+
+      if (fcmToken) {
+        // 🔥 2. Save to Firestore backend (use your own endpoint)
+        await fetch(
+          "https://chefu-academy-tmzx.onrender.com/api/save-fcm-token",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: signedInEmail, fcmToken }),
+          }
+        );
+      } else {
+        console.warn("⚠️ No FCM token received.");
+      }
+
       const deviceInfo = {
         brand: Device.brand,
         modelName: Device.modelName,

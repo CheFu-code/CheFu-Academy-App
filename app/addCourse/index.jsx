@@ -22,9 +22,9 @@ import {
   Text,
   TextInput,
   ToastAndroid,
-  TouchableOpacity,
   View,
 } from "react-native";
+import AppModal from "../../component/Shared/AppModal";
 import Button from "../../component/Shared/Button";
 import { generateCourse, generateTopics } from "../../config/AiModel";
 import { Colors } from "../../constant/Colors";
@@ -43,11 +43,20 @@ export default function AddCourse() {
   const db = getFirestore();
   const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
   const [limitModalVisible, setLimitModalVisible] = useState(false);
+  const [errorModal, setErrorModal] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
 
   const generateTopic = async () => {
     if (generatingTopic) return; // Prevent double submission
     if (!userInput.trim()) {
-      Alert.alert("Input Required", "Please enter a course idea first.");
+      setErrorModal({
+        visible: true,
+        title: "Input Required",
+        message: "Please enter a course idea first.",
+      });
       return;
     }
 
@@ -103,10 +112,11 @@ export default function AddCourse() {
     try {
       const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
       if (!apiKey) {
-        Alert.alert(
-          "API Key Missing",
-          "Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file and restart Expo."
-        );
+        setErrorModal({
+          visible: true,
+          title: "Missing Key",
+          message: "Your AI key is missing.",
+        });
         setGeneratingTopic(false);
         return;
       }
@@ -124,16 +134,25 @@ export default function AddCourse() {
           ? aiResponse.replace(/^```json[\r\n]+|```$/gi, "").trim()
           : aiResponse;
       if (!cleanedResponse || cleanedResponse.trim() === "") {
-        Alert.alert(
-          "No Response",
-          "The AI did not return any topics. Please try again later."
-        );
+        setErrorModal({
+          visible: true,
+          title: "No Response",
+          message: "The AI didn’t return any results.",
+        });
         topicIdea = [];
         setGeneratingTopic(false);
         return;
       } else {
+        function safeJsonParse(json) {
+          try {
+            return JSON.parse(json);
+          } catch {
+            return null;
+          }
+        }
+
         try {
-          topicIdea = JSON.parse(cleanedResponse);
+          topicIdea = safeJsonParse(cleanedResponse) || [];
         } catch (e) {
           topicIdea = [];
           handleAiError(e, support);
@@ -141,7 +160,11 @@ export default function AddCourse() {
       }
     } catch (error) {
       console.error("Error generating topic:", error);
-      Alert.alert("Error", error.message || "Failed to generate topic.");
+      setErrorModal({
+        visible: true,
+        title: "Error",
+        message: "Failed to generate topic.",
+      });
       topicIdea = [];
     } finally {
       setTopics(Array.isArray(topicIdea) ? topicIdea : []);
@@ -169,7 +192,12 @@ export default function AddCourse() {
   const onGenerateCourse = async () => {
     if (loading) return; // Prevent double submission
     if (!selectedTopic.length) {
-      Alert.alert("No Topics Selected", "Please select at least one topic.");
+      setErrorModal({
+        visible: true,
+        title: "No Topics Selected",
+        message: "Please select at least one topic.",
+      });
+
       return;
     }
     setLoading(true);
@@ -183,10 +211,12 @@ export default function AddCourse() {
     try {
       const aiResp = await generateCourse(contents);
       if (!aiResp || aiResp.trim() === "") {
-        Alert.alert(
-          "No Response",
-          "Our AI did not return any course data. Please try again later."
-        );
+        setErrorModal({
+          visible: true,
+          title: "No Response",
+          message: "The AI didn’t return any results.",
+        });
+        setLoading(false);
         return;
       }
       let coursesObj;
@@ -207,7 +237,11 @@ export default function AddCourse() {
         : coursesObj.courses;
 
       if (!Array.isArray(coursesArray) || coursesArray.length === 0) {
-        Alert.alert("Error", "Our AI did not return any course data.");
+        setErrorModal({
+          visible: true,
+          title: "No Response",
+          message: "The AI didn’t return any results.",
+        });
         setLoading(false);
         return;
       }
@@ -231,7 +265,11 @@ export default function AddCourse() {
       ToastAndroid.show("Course created successfully!", ToastAndroid.SHORT);
     } catch (e) {
       console.log("failed course", e.message);
-      Alert.alert("Error", "Failed to generate course.");
+      setErrorModal({
+        visible: true,
+        title: "Error",
+        message: "Failed to generate course.",
+      });
     } finally {
       setLoading(false);
     }
@@ -439,41 +477,28 @@ export default function AddCourse() {
         </ScrollView>
       </View>
 
-      <Modal
-        animationType="fade"
-        transparent={true}
+      <AppModal
+        visible={errorModal.visible}
+        title={errorModal.title}
+        message={errorModal.message}
+        confirmText="OK"
+        showCancel={false}
+        onConfirm={() => setErrorModal({ ...errorModal, visible: false })}
+      />
+
+      <AppModal
         visible={limitModalVisible}
-        onRequestClose={() => setLimitModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Daily Limit Reached</Text>
-            <Text style={styles.modalSubtext}>
-              Free users can only create up to 3 courses per day. Upgrade to
-              unlock unlimited access.
-            </Text>
-
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setLimitModalVisible(false)}
-              >
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.subscribeButton}
-                onPress={() => {
-                  setLimitModalVisible(false);
-                  router.push("/subscription");
-                }}
-              >
-                <Text style={styles.subscribeText}>Upgrade</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        title="Daily Limit Reached"
+        message="Free users can only create up to 3 courses per day. Upgrade to unlock unlimited access."
+        confirmText="Upgrade"
+        cancelText="Cancel"
+        confirmColor={Colors.GREEN}
+        onCancel={() => setLimitModalVisible(false)}
+        onConfirm={() => {
+          setLimitModalVisible(false);
+          router.push("/subscription");
+        }}
+      />
     </>
   );
 }

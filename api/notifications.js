@@ -75,6 +75,18 @@ router.post("/sendToUser", async (req, res) => {
     res.json({ success: true, response });
   } catch (error) {
     console.error("❌ Error sending notification:", error);
+    if (
+      error.code === "messaging/registration-token-not-registered" &&
+      userEmail
+    ) {
+      console.warn(
+        `Removing invalid FCM token for user ${userEmail} from Firestore.`
+      );
+      await firestore
+        .collection("users")
+        .doc(userEmail)
+        .update({ fcmToken: admin.firestore.FieldValue.delete() });
+    }
     res.status(500).send(error.message);
   }
 });
