@@ -23,7 +23,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -33,6 +32,7 @@ import * as RNLocalize from "react-native-localize";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { styles } from "../../styles/SignUp.styles";
 
 const SignUp = () => {
   const router = useRouter();
@@ -152,7 +152,6 @@ const SignUp = () => {
       };
 
       const country = RNLocalize.getCountry();
-      // Use user.displayName and user.email if available (Google sign-in)
       const userEmail = user.email || email.trim();
       const userFullName = user.displayName || fullName;
       const userPhoto = user.photoURL || null;
@@ -224,7 +223,7 @@ const SignUp = () => {
         );
       }
 
-      router.replace("/home");
+      router.replace("/(tabs)/home");
     } catch (e) {
       Sentry.captureException(e);
       console.log("Error in SaveUser:", e.message);
@@ -268,24 +267,9 @@ const SignUp = () => {
           <View style={{ alignItems: "center", padding: 10 }}>
             <Image
               source={require("./../../assets/images/logo.png")}
-              style={{
-                width: 150,
-                height: 150,
-                borderRadius: 100,
-                borderWidth: 2,
-                borderColor: Colors.PRIMARY,
-                marginBottom: 15,
-              }}
+              style={styles.logo}
             />
-            <Text
-              style={{
-                fontSize: 28,
-                fontFamily: "outfit-bold",
-                color: Colors.PRIMARY,
-              }}
-            >
-              Create new account
-            </Text>
+            <Text style={styles.title}>Create new account</Text>
 
             <TextInput
               placeholder="Fullname"
@@ -334,17 +318,13 @@ const SignUp = () => {
                 accessibilityRole="button"
               >
                 <Text
-                  style={{
-                    color:
-                      showPassword === true ? Colors.GREEN : Colors.PRIMARY,
-                    fontSize: 14,
-                    paddingTop: 6,
-                    backgroundColor: Colors.BG_GRAY,
-                    padding: 8,
-                    borderRadius: 10,
-                    fontFamily: "outfit",
-                    textAlign: "center",
-                  }}
+                  style={[
+                    styles.showPassword,
+                    {
+                      color:
+                        showPassword === true ? Colors.GREEN : Colors.PRIMARY,
+                    },
+                  ]}
                 >
                   {showPassword ? "Hide" : "Show"}
                 </Text>
@@ -361,27 +341,17 @@ const SignUp = () => {
 
             <TouchableOpacity
               onPress={CreateNewAccount}
-              style={{
-                padding: 15,
-                backgroundColor: Colors.PRIMARY,
-                width: "100%",
-                borderRadius: 10,
-                marginTop: 25,
-                opacity: loading || !email || !password || !fullName ? 0.4 : 1,
-              }}
+              style={[
+                styles.button,
+                {
+                  opacity:
+                    loading || !email || !password || !fullName ? 0.4 : 1,
+                },
+              ]}
               disabled={loading || !email || !password || !fullName}
             >
               {!loading ? (
-                <Text
-                  style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: 20,
-                    textAlign: "center",
-                    color: Colors.WHITE,
-                  }}
-                >
-                  Create Account
-                </Text>
+                <Text style={styles.buttonText}>Create Account</Text>
               ) : (
                 <ActivityIndicator color={"white"} size={"large"} />
               )}
@@ -416,41 +386,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-
-const styles = StyleSheet.create({
-  textInput: {
-    width: "100%",
-    borderWidth: 1,
-    padding: 15,
-    fontSize: 18,
-    marginTop: 20,
-    borderRadius: 8,
-    color: Colors.WHITE,
-    borderColor: Colors.PRIMARY,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#121212",
-    padding: 30,
-    borderRadius: 16,
-    alignItems: "center",
-    width: 300,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: "outfit-bold",
-    color: Colors.GREEN,
-    marginTop: 15,
-  },
-  modalSubtext: {
-    fontSize: 14,
-    color: "#ccc",
-    textAlign: "center",
-    marginTop: 8,
-  },
-});

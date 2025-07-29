@@ -80,11 +80,11 @@ export const styles = StyleSheet.create({
     elevation: 5,
   },
   showMoreIcon: {
-    padding: 10,
+    padding: 5,
     backgroundColor: Colors.GRAY,
     borderRadius: 100,
     elevation: 5,
-    marginTop: 10,
+    marginTop: 15,
   },
   text: {
     fontFamily: "outfit-bold",

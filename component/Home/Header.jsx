@@ -1,4 +1,4 @@
-import { Foundation, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth } from "@react-native-firebase/auth";
 import { useRouter } from "expo-router";
@@ -134,9 +134,9 @@ export default function Header() {
           {/**show more options */}
           {userDetail && (
             <TouchableOpacity onPress={() => setShowModal(true)}>
-              <Foundation
+              <Feather
                 style={styles.showMoreIcon}
-                name="indent-more"
+                name="more-horizontal"
                 size={27}
                 color={"white"}
               />
@@ -163,14 +163,16 @@ export default function Header() {
             autoCapitalize="none"
             style={[styles.text, { flex: 1 }]}
           />
-          <TouchableOpacity onPress={() => handleSearch()}>
-            <Ionicons
-              style={styles.search}
-              size={20}
-              color={Colors.GREEN}
-              name="search"
-            />
-          </TouchableOpacity>
+          {searchTerm.trim() && (
+            <TouchableOpacity onPress={() => handleSearch()}>
+              <Ionicons
+                style={styles.search}
+                size={20}
+                color={Colors.GREEN}
+                name="search"
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
