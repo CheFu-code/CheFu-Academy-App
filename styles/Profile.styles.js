@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
-    maxWidth: 200,
+    maxWidth: 250,
     marginBottom: 5,
   },
   profileEmail: {
@@ -31,6 +31,7 @@ export const styles = StyleSheet.create({
     fontFamily: "outfit",
     color: Colors.GRAY,
     marginTop: 3,
+    maxWidth:250
   },
   planStatus: {
     fontSize: 15,

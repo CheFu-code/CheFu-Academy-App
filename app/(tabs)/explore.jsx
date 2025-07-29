@@ -1,13 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 import { useCallback, useState } from "react";
 import {
+  FlatList,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   ToastAndroid,
-  View,
+  View
 } from "react-native";
 import CourseListByCategory from "../../component/Explore/CourseListByCategory";
 import { Colors } from "../../constant/Colors";
@@ -15,10 +14,15 @@ import { CourseCategory } from "../../constant/Option";
 
 export default function Explore() {
   const [refreshing, setRefreshing] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0); // 🔑 used to re-render
+  const [refreshKey, setRefreshKey] = useState(0);
+  const renderItem = ({ item }) => (
+    <View style={styles.categoryWrapper}>
+      <CourseListByCategory category={item} />
+    </View>
+  );
 
   const onRefresh = useCallback(() => {
-    if (refreshing) return; // Prevent double refresh
+    if (refreshing) return; 
     setRefreshing(true);
     try {
       setRefreshKey((prev) => prev + 1);
@@ -32,67 +36,56 @@ export default function Explore() {
     }
   }, [refreshing]);
 
+  if (refreshing) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: Colors.BG_COLOR,
+        }}
+      >
+        <LottieView
+          autoPlay
+          loop
+          source={require("../../assets/animations/Loading.json")}
+          style={{
+            width: 150,
+            height: 150,
+          }}
+        />
+        <Text
+          style={{
+            marginTop: 10,
+            fontFamily: "outfit-bold",
+            fontSize: 16,
+            color: Colors.PRIMARY,
+          }}
+        >
+          Loading...
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.headerWrapper}>
         <Text style={styles.headerText}>Explore more courses</Text>
       </View>
-      <View
-        style={{
-          marginTop: -16,
-          position: "relative",
-          marginHorizontal: 15,
-        }}
-      >
-        <TextInput
-          style={{
-            color: Colors.BLACK,
-            backgroundColor: "#f0f0f0",
-            paddingHorizontal: 20,
-            paddingRight: 45,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: "#ccc",
-            fontSize: 16,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: 2,
-          }}
-          placeholder="Filter courses by category"
-          placeholderTextColor="#888"
-        />
-        <Ionicons
-          name="filter-circle-outline"
-          size={25}
-          color={Colors.BLACK}
-          style={{
-            position: "absolute",
-            right: 15,
-            top: "50%",
-            transform: [{ translateY: -22 }], 
-            // backgroundColor:"red",
-            padding:10
-          }}
-        />
-      </View>
-      <ScrollView
+
+      <FlatList
+        style={styles.scrollContent}
+        data={CourseCategory}
+        keyExtractor={(item) => `${item}-${refreshKey}`}
+        renderItem={renderItem}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      >
-        {CourseCategory.map((category) => (
-          <View
-            key={`${category}-${refreshKey}`}
-            style={styles.categoryWrapper}
-          >
-            <CourseListByCategory category={category} />
-          </View>
-        ))}
-      </ScrollView>
+      />
     </View>
   );
 }

@@ -9,9 +9,9 @@ import {
   setDoc,
 } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
-import { Dimensions, Platform } from "react-native";
+import * as Device from "expo-device";
+import { Dimensions, I18nManager, Platform } from "react-native";
 import * as RNLocalize from "react-native-localize";
-import { DEFAULT_PREFS } from "../constant/Option";
 import { handleFirebaseAuthError } from "./firebaseErrors";
 
 const auth = getAuth();
@@ -43,6 +43,13 @@ export const saveUser = async (user, fullName, email) => {
       screenWidth: width,
       screenHeight: height,
       isTablet: width >= 600,
+      deviceName: Device.deviceName ?? null,
+      deviceModel: Device.modelName ?? null,
+      deviceBrand: Device.brand ?? null,
+      manufacturer: Device.manufacturer ?? null,
+      totalMemory: Device.totalMemory ?? null,
+      isRTL: I18nManager.isRTL,
+      orientation: height >= width ? "portrait" : "landscape",
     };
 
     const country = RNLocalize.getCountry() || "ZA";
@@ -56,6 +63,12 @@ export const saveUser = async (user, fullName, email) => {
 
     const userDocRef = doc(firestore, "users", userEmail);
     const userDoc = await getDoc(userDocRef);
+    const DEFAULT_PREFS = {
+      general: false,
+      marketing: false,
+      activity: false,
+      security: true,
+    };
 
     if (userDoc.exists()) {
       const existingData = userDoc.data();

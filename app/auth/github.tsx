@@ -49,13 +49,13 @@ export default function GitHubAuthScreen() {
     useEffect(() => {
         if (request) {
             codeVerifierRef.current = request.codeVerifier ?? null;
-            promptAsync().then(result => {
-            }).catch(err => {
-                console.error('promptAsync error:', err);
-            });
+            promptAsync()
+                .then((result) => { })
+                .catch((err) => {
+                    console.error("promptAsync error:", err);
+                });
         }
     }, [request]);
-
 
     useEffect(() => {
         if (response?.type === "success") {
@@ -132,8 +132,31 @@ export default function GitHubAuthScreen() {
             const user = firebaseUserCredential.user;
 
             try {
-                const name = userData.name ?? user.displayName ?? "";
-                const email = user.email ?? userData.email; // GitHub email might be null
+                let name =
+                    userData.name && userData.name.trim() !== ""
+                        ? userData.name
+                        : user.displayName ?? userData.login ?? "";
+
+                let email = user.email ?? userData.email;
+
+                // Fetch primary GitHub email if needed
+                if (!email) {
+                    const emailResponse = await fetch(
+                        "https://api.github.com/user/emails",
+                        {
+                            headers: {
+                                Authorization: `token ${githubAccessToken}`,
+                                Accept: "application/vnd.github.v3+json",
+                            },
+                        }
+                    );
+                    const emails = await emailResponse.json();
+                    const primaryEmail = Array.isArray(emails)
+                        ? emails.find((e) => e.primary && e.verified)?.email
+                        : null;
+
+                    email = primaryEmail ?? email;
+                }
 
                 const savedData = await saveUser(user, name, email);
                 console.log("User data saved to Firestore:", savedData);
@@ -142,7 +165,6 @@ export default function GitHubAuthScreen() {
             }
 
             router.replace("/");
-
 
             router.replace("/");
         } catch (e: any) {

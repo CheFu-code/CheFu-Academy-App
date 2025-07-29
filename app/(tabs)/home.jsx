@@ -69,7 +69,7 @@ export default function Home() {
       if (user) {
         loadCachedCoursesThenFetch();
       } else {
-        console.log("🚫 No authenticated user. Redirecting...");
+        console.log("🚫 No authenticated user from home. Redirecting...");
         setCourseList([]);
         router.replace("/auth/signIn");
       }

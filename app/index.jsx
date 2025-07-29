@@ -1,6 +1,3 @@
-globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
-globalThis.RNFB_MODULAR_DEPRECATION_STRICT_MODE = true;
-
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
@@ -65,7 +62,7 @@ export default function Index() {
 
               if (!user.email) {
                 console.warn(
-                  "User email is null or undefined, cannot fetch user document."
+                  "User email is null or undefined, cannot fetch user document. from welcome screen"
                 );
                 setLoading(false);
                 return;
@@ -119,7 +116,6 @@ export default function Index() {
             setLoading(false);
           }
         });
-
         return unsubscribe;
       } catch (error) {
         console.error("Error loading user from AsyncStorage:", error);

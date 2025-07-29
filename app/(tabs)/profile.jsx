@@ -35,8 +35,9 @@ import {
   TextInput,
   ToastAndroid,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
+import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { menuItems, url } from "../../constant/menuItems";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -54,9 +55,12 @@ export default function Profile() {
   const renderedMenuItems = menuItems(router, Linking, ToastAndroid, Colors);
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
   const auth = getAuth();
-
-  const [fetching, setFetching] = useState(false); // Prevent duplicate refresh
-
+  const [fetching, setFetching] = useState(false);
+  const [modalVisible, setModalVisible] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
   const refreshData = async () => {
     if (fetching) return;
     setRefreshing(true);
@@ -200,40 +204,66 @@ export default function Profile() {
     if (user) {
       try {
         await sendEmailVerification(user);
-        alert(
-          `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`
-        );
+        setModalVisible({
+          visible: true,
+          title: "Email Verification Sent",
+          message: `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`,
+        });
       } catch (error) {
         console.error("Failed to send verification email:", error);
         if (
           error.code === "auth/too-many-requests" ||
           error.message.includes("too-many-requests")
         ) {
-          alert(
-            "You've tried too many times. We’ve temporarily blocked requests from this device due to unusual activity. Please try again later."
-          );
+          setModalVisible({
+            visible: true,
+            title: "You've tried too many times.",
+            message:
+              "We’ve temporarily blocked requests from this device due to unusual activity. Please try again later.",
+          });
         } else {
-          alert("Failed to send verification email. Please try again later.");
+          setModalVisible({
+            visible: true,
+            title: "Failed to send verification email",
+            message: "Please try again later.",
+          });
         }
       }
     } else {
-      alert("No user is currently signed in from profile.");
+      setModalVisible({
+        visible: true,
+        title: "No User Found",
+        message: "No user is currently signed in from profile.",
+      });
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={[
-            styles.avatar,
-            {
-              borderColor:
-                userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
-            },
-          ]}
-        />
+        {userDetail?.provider === "github.com" ? (
+          <Image
+            style={[
+              styles.avatar,
+              {
+                borderColor:
+                  userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
+              },
+            ]}
+            source={{ uri: userDetail?.profilePicture }}
+          />
+        ) : (
+          <Image
+            source={require("../../assets/images/logo.png")}
+            style={[
+              styles.avatar,
+              {
+                borderColor:
+                  userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
+              },
+            ]}
+          />
+        )}
 
         {userDetail && (
           <>
@@ -247,10 +277,12 @@ export default function Profile() {
               <Text numberOfLines={1} style={styles.profileName}>
                 {userDetail.fullname}
               </Text>
+
               {userDetail?.member === true && (
                 <Ionicons color={"green"} size={20} name="checkmark-circle" />
               )}
             </View>
+
             <View
               style={{
                 flexDirection: "row",
@@ -258,24 +290,28 @@ export default function Profile() {
                 gap: 5,
               }}
             >
-              <Text style={styles.profileEmail}>{userDetail.email}</Text>
-              {auth.currentUser && !auth.currentUser.emailVerified && (
-                <TouchableOpacity onPress={() => verify()}>
-                  <Text
-                    numberOfLines={1}
-                    style={[
-                      styles.profileEmail,
-                      {
-                        color: Colors.LIGHT_RED,
-                        textDecorationLine: "underline",
-                      },
-                    ]}
-                  >
-                    email not verified
-                  </Text>
-                </TouchableOpacity>
-              )}
+              <Text numberOfLines={1} style={styles.profileEmail}>
+                {userDetail.email}
+              </Text>
             </View>
+
+            {auth.currentUser && !auth.currentUser.emailVerified && (
+              <TouchableOpacity onPress={() => verify()}>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.profileEmail,
+                    {
+                      color: Colors.LIGHT_RED,
+                      textDecorationLine: "underline",
+                    },
+                  ]}
+                >
+                  email not verified
+                </Text>
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
               onPress={() => subscribe()}
               disabled={loading}
@@ -404,7 +440,7 @@ export default function Profile() {
           <TouchableOpacity
             style={[styles.menuItem, { marginTop: 5 }]}
             onPress={() => {
-              if (userDetail?.isVerified === false) {
+              if (auth.currentUser && !auth.currentUser.emailVerified) {
                 ToastAndroid.show(
                   "Please verify your email to access your downloaded courses.",
                   ToastAndroid.LONG
@@ -455,8 +491,13 @@ export default function Profile() {
               color={Colors.RED}
               style={styles.icon}
             />
-            <Text style={[styles.menuLabel, { color: Colors.RED }]}>
-              Logout
+            <Text
+              style={[
+                styles.menuLabel,
+                { color: Colors.RED, fontFamily: "outfit-bold" },
+              ]}
+            >
+              Log Out
             </Text>
           </TouchableOpacity>
         </View>
@@ -535,6 +576,15 @@ export default function Profile() {
           </View>
         </View>
       </Modal>
+
+      <AppModal
+        visible={modalVisible.visible}
+        title={modalVisible.title}
+        message={modalVisible.message}
+        confirmText="OK"
+        showCancel={false}
+        onConfirm={() => setModalVisible({ ...modalVisible, visible: false })}
+      />
     </SafeAreaView>
   );
 }
