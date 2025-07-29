@@ -45,9 +45,9 @@ const saveUser = async (user, fullName, email) => {
       isTablet: width >= 600,
     };
 
-    const country = RNLocalize.getCountry();
+    const country = RNLocalize.getCountry() || "US";
     const userEmail = user.email || email.trim();
-    const userFullName = user.displayName || fullName;
+    const userFullName = user.displayName || fullName || "";
     const userPhoto = user?.photoURL ?? null;
     const userProvider =
       user?.providerData?.[0]?.providerId ?? user?.providerId ?? "email";
