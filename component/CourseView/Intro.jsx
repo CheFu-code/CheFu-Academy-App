@@ -1,9 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import {
-  doc,
-  getFirestore,
-  setDoc,
-} from "@react-native-firebase/firestore"; // use RN Firebase consistently
+import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore"; // use RN Firebase consistently
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
@@ -144,7 +140,7 @@ export default function Intro({ course, enroll }) {
           )}
         </ScrollView>
 
-        {enroll === "true" ? (
+        {enroll === "true" && course?.createdBy !== userDetail.email ? (
           <Button
             text={"Enroll Now"}
             loading={loading}

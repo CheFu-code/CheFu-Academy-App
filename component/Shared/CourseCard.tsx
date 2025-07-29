@@ -1,8 +1,10 @@
-import { Colors } from "@/constant/Colors";
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import { router } from "expo-router";
-import React from "react";
+import React, { useContext } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { imageAssets } from "../../constant/imageAssets";
+import { UserDetailContext } from "../../context/UserDetailContext";
+import { styles } from "../../styles/CourseCard.styles";
 
 type Chapter = {
     topic: string;
@@ -23,9 +25,18 @@ type Course = {
     quiz?: any[];
     description?: string;
     price?: number;
+    createdBy: string;
+    createdOn: FirebaseFirestoreTypes.Timestamp;
 };
 
-export default function CourseCard({ course, enroll }: { course: Course; enroll?: boolean }) {
+export default function CourseCard({
+    course,
+    enroll,
+}: {
+    course: Course;
+    enroll?: boolean;
+}) {
+    const { userDetail } = useContext(UserDetailContext);
     return (
         <>
             <TouchableOpacity
@@ -38,40 +49,44 @@ export default function CourseCard({ course, enroll }: { course: Course; enroll?
                         },
                     });
                 }}
-                style={{
-                    backgroundColor: Colors.BG_GRAY,
-                    borderRadius: 12,
-                    padding: 12,
-                    marginBottom: 15,
-                    marginTop: 10,
-                    width: "48%",
-                }}
+                style={styles.buttonContainer}
             >
                 {course.banner_image && (
                     <Image
                         source={imageAssets[course?.banner_image]}
-                        style={{ width: "100%", height: 100, borderRadius: 10 }}
+                        style={styles.bannerImage}
                         resizeMode="cover"
                     />
                 )}
-                <View style={{ flex: 1, justifyContent: "space-between", minHeight: 80 }}>
-                    <Text
-                        numberOfLines={3}
-                        style={{
-                            fontSize: 14,
-                            fontWeight: "bold",
-                            marginTop: 8,
-                            color: Colors.PRIMARY,
-                        }}
-                    >
+                <View
+                    style={{ flex: 1, justifyContent: "space-between", minHeight: 80 }}
+                >
+                    <Text numberOfLines={3} style={styles.courseTitle}>
                         {course.courseTitle}
                     </Text>
 
-                    <Text
-                        style={{ fontSize: 14, color: Colors.BLACK, fontFamily: "outfit", }}
-                    >
-                        Chapters: {course.chapters?.length || 0}
-                    </Text>
+                    {userDetail?.email !== course?.createdBy && (
+                        <Text numberOfLines={1}>{course?.createdBy}</Text>
+                    )}
+
+                    <View style={styles.chapterContainer}>
+                        <Text style={styles.chapter}>
+                            Chapters: {course.chapters?.length || 0}
+                        </Text>
+                        {course?.createdBy === userDetail.email && <Text>Owner</Text>}
+
+                        {course?.createdBy !== userDetail.email && (
+                            <Text numberOfLines={1} style={styles.time}>
+                                {course?.createdOn?.toDate
+                                    ? course.createdOn.toDate().toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })
+                                    : ""}
+                            </Text>
+                        )}
+                    </View>
                 </View>
             </TouchableOpacity>
         </>

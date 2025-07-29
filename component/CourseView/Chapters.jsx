@@ -57,7 +57,7 @@ export default function Chapters({ course }) {
                 if (!isOwner && !isEnrolled) {
                   ToastAndroid.show(
                     "Please enroll in this course to access chapters.",
-                    ToastAndroid.SHORT
+                    ToastAndroid.LONG
                   );
                   return;
                 }

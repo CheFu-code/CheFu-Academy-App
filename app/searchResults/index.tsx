@@ -1,11 +1,12 @@
 import CourseCard from "@/component/Shared/CourseCard";
 import { Colors } from "@/constant/Colors";
 import { AntDesign } from "@expo/vector-icons";
-import firestore from "@react-native-firebase/firestore";
+import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import { router, useLocalSearchParams } from "expo-router";
 import LottieView from "lottie-react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
+
 
 type Chapter = {
     topic: string;
@@ -26,6 +27,8 @@ type Course = {
     quiz?: any[];
     description?: string;
     price?: number;
+    createdBy: string;
+    createdOn: FirebaseFirestoreTypes.Timestamp;
 };
 
 export default function SearchScreen() {
@@ -55,6 +58,8 @@ export default function SearchScreen() {
                         quiz: data.quiz,
                         description: data.description,
                         price: data.price,
+                        createdBy: data.createdBy,
+                        createdOn: data.createdOn
                     };
                 })
 
@@ -103,7 +108,7 @@ export default function SearchScreen() {
                         color: Colors.PRIMARY,
                     }}
                 >
-                    Fetching your preferred courses...
+                    Finding courses you'll love...
                 </Text>
             </View>
         );

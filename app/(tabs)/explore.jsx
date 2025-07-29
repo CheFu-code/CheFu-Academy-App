@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   collection,
@@ -6,18 +7,30 @@ import {
   orderBy,
   query,
 } from "@react-native-firebase/firestore";
+import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
-import { useCallback, useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  FlatList,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  View
+} from "react-native";
 import CourseCard from "../../component/Shared/CourseCard";
 import { Colors } from "../../constant/Colors";
+import { UserDetailContext } from "../../context/UserDetailContext";
+import { styles } from "../../styles/Explore.styles";
 
 export default function ExploreScreen() {
+  const { userDetail } = useContext(UserDetailContext);
   const [courseData, setCourseData] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fetchCourses = useCallback(async () => {
     setRefreshing(true);
@@ -26,8 +39,12 @@ export default function ExploreScreen() {
       const q = query(collection(db, "course"), orderBy("createdOn", "desc"));
       const snapshot = await getDocs(q);
 
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const limitedData = data.slice(0, Math.ceil(data.length * 0.4)); // 40% of courses
+      let data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+      // ✅ Exclude courses owned by current user
+      data = data.filter((course) => course.createdBy !== userDetail?.email);
+
+      const limitedData = data.slice(0, Math.ceil(data.length * 0.4)); // 40%
 
       setCourseData(limitedData);
       setFilteredCourses(limitedData);
@@ -44,24 +61,24 @@ export default function ExploreScreen() {
       setRefreshing(false);
       setLoading(false);
     }
-  }, []);
+  }, [userDetail?.email]);
 
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);
 
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredCourses(courseData);
-    } else {
-      const filtered = courseData.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.category?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredCourses(filtered);
+  const handleSearch = () => {
+    if (!searchTerm.trim()) {
+      ToastAndroid.show("Please enter a search term", ToastAndroid.SHORT);
+      return;
     }
-  }, [searchQuery, courseData]);
+
+    router.push({
+      pathname: "/searchResults",
+      params: { query: searchTerm.trim() },
+    });
+    setSearchTerm("");
+  };
 
   if (loading) {
     return (
@@ -101,23 +118,27 @@ export default function ExploreScreen() {
       <View style={styles.headerWrapper}>
         <Text style={styles.headerText}>Explore more courses</Text>
       </View>
+
       <View style={{ padding: 15 }}>
-        <TextInput
-          placeholder="Search course or category..."
-          placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={{
-            borderColor: "#ccc",
-            borderWidth: 1,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            marginBottom: 12,
-            color: Colors.TEXT,
-            fontFamily: "outfit",
-          }}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Search course or category..."
+            placeholderTextColor={Colors.BLACK}
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            onSubmitEditing={handleSearch}
+            style={styles.textInput}
+            underlineColorAndroid="transparent"
+          />
+          <TouchableOpacity onPress={() => handleSearch()}>
+            <Ionicons
+              name="search"
+              size={20}
+              color={Colors.GREEN}
+              style={{ marginRight: 8 }}
+            />
+          </TouchableOpacity>
+        </View>
 
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -148,27 +169,3 @@ export default function ExploreScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.BG_COLOR,
-  },
-  headerWrapper: {
-    padding: 10,
-    marginTop: 30,
-    backgroundColor: Colors.BG_COLOR,
-  },
-  headerText: {
-    fontFamily: "outfit-bold",
-    fontSize: 26,
-    color: Colors.PRIMARY,
-  },
-  scrollContent: {
-    padding: 20,
-    backgroundColor: Colors.BG_COLOR,
-  },
-  categoryWrapper: {
-    marginTop: 10,
-  },
-});
