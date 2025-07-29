@@ -1,42 +1,69 @@
-import LottieView from "lottie-react-native";
-import { useCallback, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  View
-} from "react-native";
-import CourseListByCategory from "../../component/Explore/CourseListByCategory";
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+} from "@react-native-firebase/firestore";
+import LottieView from "lottie-react-native";
+import { useCallback, useEffect, useState } from "react";
+import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import CourseCard from "../../component/Shared/CourseCard";
 import { Colors } from "../../constant/Colors";
-import { CourseCategory } from "../../constant/Option";
 
-export default function Explore() {
+export default function ExploreScreen() {
+  const [courseData, setCourseData] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const renderItem = ({ item }) => (
-    <View style={styles.categoryWrapper}>
-      <CourseListByCategory category={item} />
-    </View>
-  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const onRefresh = useCallback(() => {
-    if (refreshing) return; 
+  const fetchCourses = useCallback(async () => {
     setRefreshing(true);
     try {
-      setRefreshKey((prev) => prev + 1);
-      setTimeout(() => {
-        ToastAndroid.show("Courses refreshed", ToastAndroid.SHORT);
-        setRefreshing(false);
-      }, 1000);
-    } catch (err) {
-      ToastAndroid.show("Failed to refresh", ToastAndroid.SHORT);
-      setRefreshing(false);
-    }
-  }, [refreshing]);
+      const db = getFirestore();
+      const q = query(collection(db, "course"), orderBy("createdOn", "desc"));
+      const snapshot = await getDocs(q);
 
-  if (refreshing) {
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const limitedData = data.slice(0, Math.ceil(data.length * 0.4)); // 40% of courses
+
+      setCourseData(limitedData);
+      setFilteredCourses(limitedData);
+      await AsyncStorage.setItem("cachedCourses", JSON.stringify(limitedData));
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
+      const cached = await AsyncStorage.getItem("cachedCourses");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setCourseData(parsed);
+        setFilteredCourses(parsed);
+      }
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
+
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredCourses(courseData);
+    } else {
+      const filtered = courseData.filter(
+        (item) =>
+          item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.category?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCourses(filtered);
+    }
+  }, [searchQuery, courseData]);
+
+  if (loading) {
     return (
       <View
         style={{
@@ -70,22 +97,54 @@ export default function Explore() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
       <View style={styles.headerWrapper}>
         <Text style={styles.headerText}>Explore more courses</Text>
       </View>
+      <View style={{ padding: 15 }}>
+        <TextInput
+          placeholder="Search course or category..."
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={{
+            borderColor: "#ccc",
+            borderWidth: 1,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            marginBottom: 12,
+            color: Colors.TEXT,
+            fontFamily: "outfit",
+          }}
+        />
 
-      <FlatList
-        style={styles.scrollContent}
-        data={CourseCategory}
-        keyExtractor={(item) => `${item}-${refreshKey}`}
-        renderItem={renderItem}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={filteredCourses}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          contentContainerStyle={{
+            paddingBottom: 160,
+            paddingTop: 5,
+          }}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+          renderItem={({ item }) => (
+            <CourseCard
+              course={item}
+              enroll={true}
+              style={{ width: "48%", marginBottom: 16 }}
+            />
+          )}
+          ListEmptyComponent={
+            <Text style={{ textAlign: "center", marginTop: 20, color: "#999" }}>
+              No courses found.
+            </Text>
+          }
+          refreshing={loading}
+          onRefresh={fetchCourses}
+        />
+      </View>
     </View>
   );
 }
@@ -96,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.BG_COLOR,
   },
   headerWrapper: {
-    padding: 25,
+    padding: 10,
     marginTop: 30,
     backgroundColor: Colors.BG_COLOR,
   },

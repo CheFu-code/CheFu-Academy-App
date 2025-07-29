@@ -7,12 +7,25 @@ import LottieView from "lottie-react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
+type Chapter = {
+    topic: string;
+    content: string;
+    example?: string;
+    explain?: string;
+    code?: string;
+};
+
 type Course = {
     id: string;
-    title: string;
+    courseTitle: string;
     category?: string;
     banner_image?: string;
-    // Add other fields as needed from your Firestore course document
+    chapters?: Chapter[];
+    flashcards?: any[];
+    qa?: any[];
+    quiz?: any[];
+    description?: string;
+    price?: number;
 };
 
 export default function SearchScreen() {
@@ -33,19 +46,21 @@ export default function SearchScreen() {
 
                     return {
                         id: doc.id,
-                        title: data.courseTitle || "",
+                        courseTitle: data.courseTitle || data.title || "",
                         category: data.category,
                         banner_image: data.banner_image,
                         chapters: data.chapters,
                         flashcards: data.flashcards,
                         qa: data.qa,
                         quiz: data.quiz,
+                        description: data.description,
+                        price: data.price,
                     };
                 })
 
                 .filter(
                     (course) =>
-                        course.title?.toLowerCase().includes(term.toLowerCase()) ||
+                        course.courseTitle?.toLowerCase().includes(term.toLowerCase()) ||
                         course.category?.toLowerCase().includes(term.toLowerCase())
                 );
 
@@ -110,7 +125,7 @@ export default function SearchScreen() {
                         gap: 8,
                         borderBottomWidth: 1,
                         borderBottomColor: Colors.PRIMARY,
-                        paddingBottom: 20
+                        paddingBottom: 20,
                     }}
                 >
                     <AntDesign color={"white"} size={20} name="left" />
@@ -150,10 +165,12 @@ export default function SearchScreen() {
 
                                 fontFamily: "outfit",
                                 fontSize: 14,
-                                marginTop: 30
+                                marginTop: 30,
                             }}
                         >
-                            We couldn't find any courses for your query. Try browsing by category — for example: Coding, Science, Engineering, Cooking, etc.
+                            We couldn't find any courses for your query. Try browsing by
+                            category — for example: Coding, Science, Engineering, Cooking,
+                            etc.
                         </Text>
                     </View>
                 ) : (
@@ -215,7 +232,12 @@ export default function SearchScreen() {
                             data={results}
                             numColumns={2}
                             keyExtractor={(item) => item.id}
-                            renderItem={({ item }) => <CourseCard course={item} />}
+                            renderItem={({ item }) => (
+                                <CourseCard
+                                    course={item}
+                                    enroll={true}
+                                />
+                            )}
                             columnWrapperStyle={{
                                 justifyContent: "space-between",
                                 paddingHorizontal: 10,
@@ -224,7 +246,6 @@ export default function SearchScreen() {
                                 paddingBottom: 160,
                                 paddingTop: 10,
                             }}
-
                         />
                     </View>
                 )}

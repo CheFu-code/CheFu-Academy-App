@@ -1,6 +1,7 @@
 import { Colors } from "@/constant/Colors";
+import { router } from "expo-router";
 import React from "react";
-import { Image, Pressable, Text } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { imageAssets } from "../../constant/imageAssets";
 
 type Chapter = {
@@ -13,7 +14,7 @@ type Chapter = {
 
 type Course = {
     id: string;
-    title: string;
+    courseTitle: string;
     category?: string;
     banner_image?: string;
     chapters?: Chapter[];
@@ -24,17 +25,26 @@ type Course = {
     price?: number;
 };
 
-export default function CourseCard({ course }: { course: Course }) {
+export default function CourseCard({ course, enroll }: { course: Course; enroll?: boolean }) {
     return (
         <>
-            <Pressable
+            <TouchableOpacity
+                onPress={() => {
+                    router.push({
+                        pathname: "/courseView",
+                        params: {
+                            courseParams: JSON.stringify(course),
+                            enroll: enroll?.toString(),
+                        },
+                    });
+                }}
                 style={{
                     backgroundColor: Colors.BG_GRAY,
                     borderRadius: 12,
                     padding: 12,
                     marginBottom: 15,
                     marginTop: 10,
-                    width: "48%", // Allow space for two cards with spacing
+                    width: "48%",
                 }}
             >
                 {course.banner_image && (
@@ -44,25 +54,26 @@ export default function CourseCard({ course }: { course: Course }) {
                         resizeMode="cover"
                     />
                 )}
+                <View style={{ flex: 1, justifyContent: "space-between", minHeight: 80 }}>
+                    <Text
+                        numberOfLines={3}
+                        style={{
+                            fontSize: 14,
+                            fontWeight: "bold",
+                            marginTop: 8,
+                            color: Colors.PRIMARY,
+                        }}
+                    >
+                        {course.courseTitle}
+                    </Text>
 
-                <Text
-                    numberOfLines={3}
-                    style={{
-                        fontSize: 14,
-                        fontWeight: "bold",
-                        marginTop: 8,
-                        color: Colors.PRIMARY,
-                    }}
-                >
-                    {course.title}
-                </Text>
-
-                <Text
-                    style={{ fontSize: 14, color: Colors.BLACK, fontFamily: "outfit" }}
-                >
-                    Chapters: {course.chapters?.length || 0}
-                </Text>
-            </Pressable>
+                    <Text
+                        style={{ fontSize: 14, color: Colors.BLACK, fontFamily: "outfit", }}
+                    >
+                        Chapters: {course.chapters?.length || 0}
+                    </Text>
+                </View>
+            </TouchableOpacity>
         </>
     );
 }

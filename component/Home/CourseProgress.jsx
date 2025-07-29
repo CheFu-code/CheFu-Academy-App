@@ -38,8 +38,6 @@ export default function CourseProgress({ courseList, enroll = false }) {
     <View
       style={{
         marginTop: 10,
-        // borderTopLeftRadius: 30,
-        // borderBottomRightRadius: 25,
       }}
     >
       <Text

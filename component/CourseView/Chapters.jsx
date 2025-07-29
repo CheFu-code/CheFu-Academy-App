@@ -15,6 +15,7 @@ import { UserDetailContext } from "../../context/UserDetailContext";
 export default function Chapters({ course }) {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const router = useRouter();
+
   const isChapterCompleted = (index) => {
     if (!Array.isArray(course?.completedChapter)) return false;
     // Compare as strings
@@ -23,6 +24,8 @@ export default function Chapters({ course }) {
     );
     return isCompleted ? true : false;
   };
+
+  
   return (
     <View
       style={{
@@ -48,21 +51,33 @@ export default function Chapters({ course }) {
           return (
             <TouchableOpacity
               onPress={() => {
+                const isOwner = course?.createdBy === userDetail?.email;
+                const isEnrolled = course.enrolled === true && isOwner;
+
+                if (!isOwner && !isEnrolled) {
+                  ToastAndroid.show(
+                    "Please enroll in this course to access chapters.",
+                    ToastAndroid.SHORT
+                  );
+                  return;
+                }
+
                 if (completed && userDetail.member === false) {
                   ToastAndroid.show(
                     "You completed this chapter. Subscribe to revisit it.",
                     ToastAndroid.SHORT
                   );
-                } else {
-                  router.push({
-                    pathname: "/chapterView",
-                    params: {
-                      chapterParams: JSON.stringify(item),
-                      docId: course?.docId,
-                      chapterIndex: index,
-                    },
-                  });
+                  return;
                 }
+
+                router.push({
+                  pathname: "/chapterView",
+                  params: {
+                    chapterParams: JSON.stringify(item),
+                    docId: course?.docId,
+                    chapterIndex: index,
+                  },
+                });
               }}
               key={index}
               style={{
@@ -85,7 +100,6 @@ export default function Chapters({ course }) {
                   display: "flex",
                   flexDirection: "row",
                   gap: 5,
-                  // backgroundColor: Colors.BG_GRAY,
                 }}
               >
                 <Text

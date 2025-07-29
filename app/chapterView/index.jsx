@@ -1,7 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
-  arrayUnion, doc,
-  getDoc, getFirestore, updateDoc
+  arrayUnion,
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
 } from "@react-native-firebase/firestore";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";

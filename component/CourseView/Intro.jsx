@@ -52,7 +52,7 @@ export default function Intro({ course, enroll }) {
 
       await setDoc(doc(db, "course", docId), data);
 
-      router.push({
+      router.replace({
         pathname: "/courseView/",
         params: {
           courseParams: JSON.stringify(data),
