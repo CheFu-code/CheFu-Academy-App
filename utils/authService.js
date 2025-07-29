@@ -34,7 +34,7 @@ export const signUpUser = async (fullName, email, password) => {
   }
 };
 
-const saveUser = async (user, fullName, email) => {
+export const saveUser = async (user, fullName, email) => {
   try {
     const { width, height } = Dimensions.get("window");
     const deviceInfo = {
@@ -94,16 +94,16 @@ const saveUser = async (user, fullName, email) => {
       const cleanData = Object.fromEntries(
         Object.entries(data).filter(([_, v]) => v !== undefined)
       );
+
       console.log("Saving user data:", cleanData);
 
       await setDoc(userDocRef, cleanData);
-
       await sendWelcomeEmail(userEmail, userFullName);
       return cleanData;
     }
   } catch (e) {
     Sentry.captureException(e);
-    console.log("Error in saveUser:", e.message);
+    console.log("Error in saveUser:", e?.message || e);
     throw new Error("Failed to save your data. Please try again later.");
   }
 };
