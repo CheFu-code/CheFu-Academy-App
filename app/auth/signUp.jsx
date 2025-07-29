@@ -67,7 +67,6 @@ const SignUp = () => {
         message:
           "Please check your inbox to verify your email address — and if it’s not there, don’t forget to look in your spam folder.",
       });
-      router.replace("/(tabs)/home");
     } catch (error) {
       setErrorMsg(error.message);
     } finally {
@@ -234,7 +233,10 @@ const SignUp = () => {
         message={successModal.message}
         confirmText="OK"
         showCancel={false}
-        onConfirm={() => setSuccessModal({ ...successModal, visible: false })}
+        onConfirm={() => {
+          setSuccessModal({ ...successModal, visible: false });
+          router.replace("/(tabs)/home");
+        }}
       />
     </>
   );

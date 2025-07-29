@@ -19,7 +19,11 @@ const firestore = getFirestore();
 
 export const signUpUser = async (fullName, email, password) => {
   try {
-    const resp = await createUserWithEmailAndPassword(auth, email.trim(), password);
+    const resp = await createUserWithEmailAndPassword(
+      auth,
+      email.trim(),
+      password
+    );
     const user = resp.user;
     await user.sendEmailVerification();
     const userData = await saveUser(user, fullName, email);
@@ -44,11 +48,9 @@ const saveUser = async (user, fullName, email) => {
     const country = RNLocalize.getCountry();
     const userEmail = user.email || email.trim();
     const userFullName = user.displayName || fullName;
-    const userPhoto = user.photoURL || null;
+    const userPhoto = user?.photoURL ?? null;
     const userProvider =
-      (user.providerData && user.providerData[0]?.providerId) ||
-      user.providerId ||
-      "email";
+      user?.providerData?.[0]?.providerId ?? user?.providerId ?? "email";
 
     const userDocRef = doc(firestore, "users", userEmail);
     const userDoc = await getDoc(userDocRef);
@@ -99,11 +101,14 @@ const saveUser = async (user, fullName, email) => {
 
 const sendWelcomeEmail = async (email, name) => {
   try {
-    await fetch("https://chefu-academy-tmzx.onrender.com/api/email/send-welcome", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name }),
-    });
+    await fetch(
+      "https://chefu-academy-tmzx.onrender.com/api/email/send-welcome",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name }),
+      }
+    );
   } catch (error) {
     Sentry.captureException(error);
     console.error("Failed to send welcome email:", error);
