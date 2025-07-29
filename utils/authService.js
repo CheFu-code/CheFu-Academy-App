@@ -45,8 +45,10 @@ const saveUser = async (user, fullName, email) => {
       isTablet: width >= 600,
     };
 
-    const country = RNLocalize.getCountry() || "US";
-    const userEmail = user.email || email.trim();
+    const country = RNLocalize.getCountry() || "ZA";
+    const userEmail = (user.email ?? email)?.trim();
+    const now = new Date();
+
     const userFullName = user.displayName || fullName || "";
     const userPhoto = user?.photoURL ?? null;
     const userProvider =
@@ -59,8 +61,8 @@ const saveUser = async (user, fullName, email) => {
       const existingData = userDoc.data();
       const updatedData = {
         ...existingData,
-        lastLogin: new Date(),
-        updatedAt: new Date(),
+        lastLogin: now,
+        updatedAt: now,
         fullname: userFullName,
         profilePicture: userPhoto,
         provider: userProvider,
@@ -73,12 +75,12 @@ const saveUser = async (user, fullName, email) => {
         email: userEmail,
         member: false,
         isVerified: user.emailVerified,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
         uid: user.uid,
         emailPreferences: DEFAULT_PREFS,
         profilePicture: userPhoto,
-        lastLogin: new Date(),
+        lastLogin: now,
         provider: userProvider,
         onboardingComplete: false,
         roles: ["user"],
@@ -88,9 +90,16 @@ const saveUser = async (user, fullName, email) => {
         subscriptionStatus: "free",
         deviceInfo,
       };
-      await setDoc(userDocRef, data);
+
+      const cleanData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== undefined)
+      );
+      console.log("Saving user data:", cleanData);
+
+      await setDoc(userDocRef, cleanData);
+
       await sendWelcomeEmail(userEmail, userFullName);
-      return data;
+      return cleanData;
     }
   } catch (e) {
     Sentry.captureException(e);

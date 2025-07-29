@@ -1,6 +1,7 @@
 globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 globalThis.RNFB_MODULAR_DEPRECATION_STRICT_MODE = true;
 
+import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import {
@@ -18,7 +19,6 @@ import {
   Pressable,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
   ToastAndroid,
   TouchableOpacity,
@@ -27,6 +27,7 @@ import {
 import ImmersiveMode from "react-native-immersive";
 import { Colors } from "../constant/Colors";
 import { UserDetailContext } from "../context/UserDetailContext";
+import { styles } from "../styles/WelcomeScreen.styles";
 
 export default function Index() {
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function Index() {
               setLoading(false);
             }
           } else {
-            console.log("No user is currently signed in.");
+            console.log("No user is currently signed in from welcome screen.");
             setLoading(false);
           }
         });
@@ -122,13 +123,10 @@ export default function Index() {
     loadUser();
   }, []);
 
+  const gitHub = () => {};
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-      }}
-    >
+    <View style={styles.centeredContainer}>
       <Image
         source={require("./../assets/images/landing.png")}
         style={{ width: "100%", height: 360, marginTop: 20 }}
@@ -162,6 +160,17 @@ export default function Index() {
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity onPress={() => gitHub()} styles={styles.gitHub}>
+          <AntDesign
+            style={{
+              textAlign: "center",
+              marginTop: 10,
+            }}
+            name="github"
+            size={24}
+          />
+        </TouchableOpacity>
+
         <TouchableOpacity
           disabled={loading}
           onPress={() => router.push("/auth/signIn")}
@@ -174,16 +183,8 @@ export default function Index() {
         </TouchableOpacity>
 
         <Pressable disabled={loading}>
-          <Text
-            style={{
-              textAlign: "center",
-              color: Colors.WHITE,
-              marginTop: 30,
-              fontSize: 14,
-              marginBottom: 75,
-            }}
-          >
-            By signing up, you agree to our{" "}
+          <Text style={styles.conditions}>
+            By using our app, you agree to our{" "}
             <Text
               style={{ color: Colors.YELLOW, textDecorationLine: "underline" }}
               onPress={() => router.push("/terms")}
@@ -203,54 +204,3 @@ export default function Index() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  centeredContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: Colors.BG_COLOR,
-  },
-  bottomSheet: {
-    padding: 25,
-    backgroundColor: Colors.PRIMARY,
-    borderTopLeftRadius: 35,
-    borderTopRightRadius: 35,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: Colors.WHITE,
-  },
-  subtitle: {
-    fontSize: 20,
-    color: Colors.WHITE,
-    marginTop: 20,
-    textAlign: "center",
-    fontFamily: "outfit",
-  },
-  button: {
-    padding: 15,
-    backgroundColor: Colors.WHITE,
-    marginTop: 20,
-    borderRadius: 10,
-    marginBottom: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  button2: {
-    marginTop: 10,
-    borderWidth: 0.4,
-    borderColor: Colors.BG_GRAY,
-    borderRadius: 30,
-    padding: 8,
-    marginHorizontal: 40,
-  },
-  buttonText: {
-    textAlign: "center",
-    fontSize: 17,
-    fontFamily: "outfit-bold",
-  },
-});

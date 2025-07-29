@@ -239,7 +239,7 @@ export default function SettingsScreen() {
         setLoading(false);
       }
     } else {
-      setFatalError(new Error("No user is currently signed in."));
+      setFatalError(new Error("No user is currently signed in from settings."));
       Alert.alert("Error", "You're currently not signed in.");
     }
   };

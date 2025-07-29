@@ -33,7 +33,8 @@ export default function Header() {
         await AsyncStorage.removeItem("userDetail");
         setUserDetail(null);
         ToastAndroid.show("Logged out successfully", ToastAndroid.SHORT);
-        router.replace("/auth/signIn");
+        // router.replace("/auth/signIn");
+        router.replace("/");
       } catch (error) {
         if (error.code === "auth/no-current-user") {
           ToastAndroid.show("You're not logged in", ToastAndroid.SHORT);
@@ -106,30 +107,38 @@ export default function Header() {
     <View style={styles.headerContainer}>
       <View>
         <View style={styles.subHeaderContainer}>
-          <Text
-            numberOfLines={1}
-            ellipsizeMode={"tail"}
-            style={styles.greeting}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap:5
+            }}
           >
-            Hello
-            {userDetail?.fullname && (
-              <Text style={{ fontFamily: "outfit-bold" }}>
-                , {userDetail.fullname}
-              </Text>
-            )}
-          </Text>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode={"tail"}
+              style={styles.greeting}
+            >
+              Hello
+              {userDetail?.fullname && (
+                <Text style={{ fontFamily: "outfit-bold" }}>
+                  , {userDetail.fullname}
+                </Text>
+              )}
+            </Text>
 
-          {/**checkmark icon */}
-          {userDetail?.member === true && (
-            <Ionicons
-              style={{
-                marginTop: 35,
-              }}
-              color={Colors.PRIMARY}
-              size={20}
-              name="checkmark-circle"
-            />
-          )}
+            {/**checkmark icon */}
+            {userDetail?.member === true && (
+              <Ionicons
+                style={{
+                  marginTop: 25,
+                }}
+                color={Colors.PRIMARY}
+                size={20}
+                name="checkmark-circle"
+              />
+            )}
+          </View>
 
           {/**show more options */}
           {userDetail && (

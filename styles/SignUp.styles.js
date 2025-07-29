@@ -12,6 +12,14 @@ export const styles = StyleSheet.create({
     color: Colors.WHITE,
     borderColor: Colors.PRIMARY,
   },
+  conditions: {
+    textAlign: "center",
+    color: Colors.WHITE,
+    marginTop: 30,
+    fontSize: 14,
+    marginBottom: 75,
+    fontFamily: "outfit",
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",

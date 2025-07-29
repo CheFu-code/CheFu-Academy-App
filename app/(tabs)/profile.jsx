@@ -217,7 +217,7 @@ export default function Profile() {
         }
       }
     } else {
-      alert("No user is currently signed in.");
+      alert("No user is currently signed in from profile.");
     }
   };
 

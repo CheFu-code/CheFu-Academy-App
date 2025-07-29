@@ -24,20 +24,20 @@ import { signUpUser } from "../../utils/authService";
 const SignUp = () => {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
+  const [fullNameError, setFullNameError] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setUserDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (pw) => pw.length >= 6;
   const [successModal, setSuccessModal] = useState({
     visible: false,
     title: "",
     message: "",
   });
-
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePassword = (pw) => pw.length >= 6;
 
   const handleSignUp = async () => {
     if (loading) return;
@@ -74,6 +74,12 @@ const SignUp = () => {
     }
   };
 
+  const validateFullName = (name) => {
+    const isValid = /^[a-zA-Z\s-]{1,20}$/.test(name.trim());
+    setFullNameError(!isValid);
+    return isValid;
+  };
+
   if (loading) {
     return (
       <Modal animationType="fade" transparent={true} visible={loading}>
@@ -103,29 +109,47 @@ const SignUp = () => {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={30}
         >
+          <View style={{ alignItems: "center", padding: 10 }}>
+            <Image
+              source={require("./../../assets/images/logo.png")}
+              style={styles.logo}
+            />
+            <Text style={styles.title}>Create new account</Text>
+          </View>
           <ScrollView
             contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
             <View style={{ alignItems: "center", padding: 10 }}>
-              <Image
-                source={require("./../../assets/images/logo.png")}
-                style={styles.logo}
-              />
-              <Text style={styles.title}>Create new account</Text>
-
               <TextInput
                 placeholder="Fullname"
-                style={styles.textInput}
+                style={[
+                  styles.textInput,
+                  fullNameError && { borderColor: "red" },
+                ]}
                 placeholderTextColor={Colors.GRAY}
-                onChangeText={(v) => setFullName(v.trimStart())}
-                maxLength={50}
+                onChangeText={(v) => {
+                  const clean = v.replace(/[^a-zA-Z\s-]/g, "").slice(0, 20);
+                  setFullName(clean);
+                  validateFullName(clean);
+                }}
+                onBlur={() => validateFullName(fullName)}
+                maxLength={20}
                 value={fullName}
                 accessibilityLabel="Full Name"
                 autoCapitalize="words"
                 returnKeyType="next"
               />
+              {fullNameError && (
+                <Text
+                  style={{ color: "red", marginTop: 4, fontFamily: "outfit" }}
+                >
+                  Name must be 1–20 letters only 'A–Z, spaces,
+                  hyphens(optional)'.
+                </Text>
+              )}
+
               <TextInput
                 placeholder="Email"
                 style={styles.textInput}
@@ -211,6 +235,8 @@ const SignUp = () => {
                 <Text style={{ color: Colors.WHITE }}>
                   Already have an account?{" "}
                 </Text>
+
+
                 <Pressable onPress={() => router.replace("/auth/signIn")}>
                   <Text
                     style={{
@@ -221,7 +247,35 @@ const SignUp = () => {
                     Sign In
                   </Text>
                 </Pressable>
+
+
               </View>
+
+
+              <Pressable disabled={loading}>
+                <Text style={styles.conditions}>
+                  By signing up, you agree to our{" "}
+                  <Text
+                    style={{
+                      color: Colors.YELLOW,
+                      textDecorationLine: "underline",
+                    }}
+                    onPress={() => router.push("/terms")}
+                  >
+                    Terms of Service
+                  </Text>{" "}
+                  and{" "}
+                  <Text
+                    style={{
+                      color: Colors.YELLOW,
+                      textDecorationLine: "underline",
+                    }}
+                    onPress={() => router.push("/privacy")}
+                  >
+                    Privacy Policy
+                  </Text>
+                </Text>
+              </Pressable>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
