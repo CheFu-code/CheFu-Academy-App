@@ -63,6 +63,14 @@ export default function Index() {
             try {
               await user.reload();
 
+              if (!user.email) {
+                console.warn(
+                  "User email is null or undefined, cannot fetch user document."
+                );
+                setLoading(false);
+                return;
+              }
+
               const userRef = doc(firestore, "users", user.email);
 
               const result = await getDoc(userRef);
@@ -123,7 +131,9 @@ export default function Index() {
     loadUser();
   }, []);
 
-  const gitHub = () => {};
+  const gitHub = () => {
+    router.push("/auth/github");
+  };
 
   return (
     <View style={styles.centeredContainer}>
@@ -164,7 +174,7 @@ export default function Index() {
           <AntDesign
             style={{
               textAlign: "center",
-              marginTop: 10,
+              marginVertical: 10,
             }}
             name="github"
             size={24}

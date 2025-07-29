@@ -125,6 +125,7 @@ export default function Home() {
         console.log("❌ User email missing after reload.");
         ToastAndroid.show("Your email could not be found", ToastAndroid.SHORT);
         setCourseList([]);
+        router.replace("/")
         return;
       }
 
