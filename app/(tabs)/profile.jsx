@@ -105,7 +105,7 @@ export default function Profile() {
             await signOut(getAuth());
             await AsyncStorage.removeItem("userDetail");
             setUserDetail(null);
-            router.replace("/auth/signIn");
+            router.push("/auth/signIn");
             ToastAndroid.show("Logged out successfully", ToastAndroid.SHORT);
           } catch (error) {
             console.error("Logout error:", error);
@@ -169,7 +169,7 @@ export default function Profile() {
       setShowPasswordModal(false);
       setPassword("");
       ToastAndroid.show("Account deleted successfully", ToastAndroid.SHORT);
-      router.replace("/");
+      router.push("/");
     } catch (error) {
       console.error("❌ Delete account error:", error);
       Sentry.captureException(error);

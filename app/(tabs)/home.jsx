@@ -165,6 +165,13 @@ export default function Home() {
       if (error.code === "firestore/unavailable") {
         errorMessage = "Network error. Please check your connection.";
       } else if (error.code === "firestore/permission-denied") {
+        if (error.code === "auth/user-not-found") {
+          errorMessage =
+            "There is no user record corresponding to this identifier. The user may have been deleted.";
+        } else if (error.code === "auth/invalid-email") {
+          errorMessage = "The email address is badly formatted.";
+        }
+      } else if (error.code === "firestore/permission-denied") {
         if (error.code === "auth/unknown") {
           errorMessage = "A little internal error has occurred.";
           ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
