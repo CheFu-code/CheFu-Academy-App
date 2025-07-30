@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
 import messaging from "@react-native-firebase/messaging";
@@ -18,7 +18,6 @@ import {
   Pressable,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   ToastAndroid,
@@ -27,6 +26,7 @@ import {
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { styles } from "../../styles/SignIn.styles";
 
 const SignIn = () => {
   const router = useRouter();
@@ -286,6 +286,14 @@ const SignIn = () => {
     );
   }
 
+  const gitHub = () => {
+    router.push("/auth/github");
+  };
+
+  const google = () => {
+    router.push("/auth/google");
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
       <KeyboardAvoidingView
@@ -306,22 +314,9 @@ const SignIn = () => {
               autoPlay
               loop={true}
               source={require("./../../assets/animations/Chatbot.json")}
-              style={{
-                width: 180,
-                height: 180,
-                marginBottom: 15,
-                resizeMode: "contain",
-              }}
+              style={styles.lottieView}
             />
-            <Text
-              style={{
-                fontSize: 28,
-                fontFamily: "outfit-bold",
-                color: Colors.PRIMARY,
-              }}
-            >
-              Welcome back
-            </Text>
+            <Text style={styles.welcomeText}>Welcome back</Text>
 
             <TextInput
               placeholder="Email"
@@ -350,16 +345,12 @@ const SignIn = () => {
                   if (passwordError) setPasswordError("");
                 }}
                 autoCapitalize="none"
-                style={{
-                  flex: 1,
-                  fontSize: 18,
-                  paddingVertical: 15,
-                  color: "#ffffff",
-                }}
+                style={styles.passwordInput}
                 onSubmitEditing={() => {
                   if (!loading) handleSignIn();
                 }}
               />
+
               <Pressable onPress={() => setShowPassword((prev) => !prev)}>
                 <Ionicons
                   name={showPassword ? "eye-off" : "eye"}
@@ -383,29 +374,38 @@ const SignIn = () => {
               </Text>
             </Pressable>
 
+            <View style={styles.iconsContainer}>
+              <TouchableOpacity onPress={() => gitHub()}>
+                <AntDesign
+                  style={styles.icons}
+                  size={24}
+                  color={"white"}
+                  name="github"
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => google()}>
+                <AntDesign
+                  style={styles.icons}
+                  name="google"
+                  size={24}
+                  color={"white"}
+                />
+              </TouchableOpacity>
+            </View>
+
             <TouchableOpacity
-              style={{
-                padding: 15,
-                backgroundColor: Colors.PRIMARY,
-                width: "100%",
-                borderRadius: 10,
-                marginTop: 25,
-                opacity: loading || !email || !password ? 0.4 : 1,
-              }}
+              style={[
+                styles.signInButonContaner,
+                {
+                  opacity: loading || !email || !password ? 0.4 : 1,
+                },
+              ]}
               onPress={handleSignIn}
               disabled={loading || !email || !password}
             >
               {!loading ? (
-                <Text
-                  style={{
-                    fontFamily: "outfit",
-                    fontSize: 20,
-                    textAlign: "center",
-                    color: Colors.WHITE,
-                  }}
-                >
-                  Sign In
-                </Text>
+                <Text style={styles.signInButton}>Sign In</Text>
               ) : (
                 <ActivityIndicator color="white" size="large" />
               )}
@@ -429,51 +429,3 @@ const SignIn = () => {
 };
 
 export default SignIn;
-
-const styles = StyleSheet.create({
-  textInput: {
-    width: "100%",
-    borderWidth: 1,
-    padding: 15,
-    fontSize: 18,
-    marginTop: 20,
-    borderRadius: 8,
-    color: "#ffffff",
-    borderColor: "#858585",
-  },
-  passwordContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    borderColor: "#858585",
-    marginTop: 20,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#121212",
-    padding: 30,
-    borderRadius: 16,
-    alignItems: "center",
-    width: 300,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: "outfit-bold",
-    color: Colors.GREEN,
-    marginTop: 15,
-  },
-  modalSubtext: {
-    fontSize: 14,
-    color: "#ccc",
-    textAlign: "center",
-    marginTop: 8,
-  },
-});

@@ -11,8 +11,10 @@ import {
 } from "expo-auth-session";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import LottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import { styles } from "../../styles/GitHub.styles";
 import { saveUser } from "../../utils/authService";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -164,9 +166,7 @@ export default function GitHubAuthScreen() {
                 console.error("Error saving user:", e.message);
             }
 
-            router.replace("/");
-
-            router.replace("/");
+            router.replace("/(tabs)/home");
         } catch (e: any) {
             console.error("GitHub sign-in failed:", e.message);
             setError(`GitHub sign-in failed: ${e.message}`);
@@ -190,7 +190,7 @@ export default function GitHubAuthScreen() {
 
         return (
             <View style={styles.container}>
-                <Text style={styles.errorText}>Error: {String(error)}</Text>
+                <Text style={styles.errorText}>Error:</Text>
                 <Text style={styles.message}>Please try again.</Text>
             </View>
         );
@@ -198,29 +198,14 @@ export default function GitHubAuthScreen() {
 
     return (
         <View style={styles.container}>
+            <LottieView
+                source={require("./../../assets/animations/GO TO SCHOOL ANIMATION.json")}
+                autoPlay
+                loop
+                style={{ width: 150, height: 150 }}
+            />
             <Text style={styles.message}>Redirecting...</Text>
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: Colors.BG_COLOR,
-    },
-    message: {
-        marginTop: 20,
-        fontSize: 20,
-        color: Colors.PRIMARY,
-        fontFamily: "outfit-bold",
-    },
-    errorText: {
-        marginTop: 20,
-        fontSize: 16,
-        color: "red",
-        textAlign: "center",
-        marginHorizontal: 20,
-    },
-});

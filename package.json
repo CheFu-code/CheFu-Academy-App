@@ -30,6 +30,7 @@
     "dayjs": "^1.11.13",
     "dedent": "^1.6.0",
     "expo": "^53.0.19",
+    "expo-auth-session": "~6.2.1",
     "expo-blur": "~14.1.5",
     "expo-camera": "~16.1.10",
     "expo-clipboard": "^7.1.5",
@@ -83,8 +84,7 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5",
-    "expo-auth-session": "~6.2.1"
+    "react-native-webview": "13.13.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

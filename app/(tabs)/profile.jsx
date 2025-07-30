@@ -21,6 +21,7 @@ import {
   setDoc,
 } from "@react-native-firebase/firestore";
 
+import Entypo from "@expo/vector-icons/Entypo";
 import { useCallback, useContext, useState } from "react";
 import {
   ActivityIndicator,
@@ -241,29 +242,21 @@ export default function Profile() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        {userDetail?.provider === "github.com" ? (
-          <Image
-            style={[
-              styles.avatar,
-              {
-                borderColor:
-                  userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
-              },
-            ]}
-            source={{ uri: userDetail?.profilePicture }}
-          />
-        ) : (
-          <Image
-            source={require("../../assets/images/logo.png")}
-            style={[
-              styles.avatar,
-              {
-                borderColor:
-                  userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
-              },
-            ]}
-          />
-        )}
+        <Image
+          style={[
+            styles.avatar,
+            {
+              borderColor:
+                userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
+            },
+          ]}
+          source={
+            userDetail?.provider === "github.com" ||
+            userDetail?.provider === "google.com"
+              ? { uri: userDetail?.profilePicture }
+              : require("../../assets/images/logo.png")
+          }
+        />
 
         {userDetail && (
           <>
@@ -426,8 +419,8 @@ export default function Profile() {
             }
             disabled={loading}
           >
-            <Ionicons
-              name="cloud-download-outline"
+            <Entypo
+              name="google-play"
               size={26}
               color={Colors.GREEN}
               style={styles.icon}

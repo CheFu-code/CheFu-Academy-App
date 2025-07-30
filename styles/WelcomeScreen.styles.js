@@ -63,4 +63,11 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
   },
+  iconsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 30,
+    marginVertical: 15,
+  },
 });

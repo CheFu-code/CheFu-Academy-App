@@ -131,6 +131,10 @@ export default function Index() {
     router.push("/auth/github");
   };
 
+  const google = () => {
+    router.push("/auth/google");
+  };
+
   return (
     <View style={styles.centeredContainer}>
       <Image
@@ -166,16 +170,15 @@ export default function Index() {
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => gitHub()} styles={styles.gitHub}>
-          <AntDesign
-            style={{
-              textAlign: "center",
-              marginVertical: 10,
-            }}
-            name="github"
-            size={24}
-          />
-        </TouchableOpacity>
+        <View style={styles.iconsContainer}>
+          <TouchableOpacity onPress={gitHub}>
+            <AntDesign name="github" size={30} color="#000" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={google}>
+            <AntDesign name="google" size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           disabled={loading}
