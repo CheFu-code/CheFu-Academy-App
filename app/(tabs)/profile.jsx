@@ -2,13 +2,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -66,7 +60,7 @@ export default function Profile() {
   const [showPassword, setShowPassword] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [fetching, setFetching] = useState(false);
-  const isFreeUser = userDetail?.member === false;
+  const isFreeUser = !userDetail?.member; // simpler check
 
   const [modalVisible, setModalVisible] = useState({
     visible: false,
@@ -74,21 +68,27 @@ export default function Profile() {
     message: "",
   });
 
-  const showToast = (message, duration = ToastAndroid.SHORT) =>
-    ToastAndroid.show(message, duration);
+  // Toast helper wrapped with useCallback to avoid re-creation
+  const showToast = useCallback(
+    (message, duration = ToastAndroid.SHORT) =>
+      ToastAndroid.show(message, duration),
+    []
+  );
 
+  // Capitalize helper - memoized to prevent recreation
   const capitalize = useCallback(
     (str) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : ""),
     []
   );
 
+  // Memoize menuItems since it depends only on router
   const renderedMenuItems = useMemo(
     () => menuItems(router, Linking, ToastAndroid, Colors),
     [router]
   );
 
   // --- Refresh Profile ---
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     if (fetching || !userDetail?.email) return;
 
     setRefreshing(true);
@@ -110,18 +110,20 @@ export default function Profile() {
       setRefreshing(false);
       setFetching(false);
     }
-  };
+  }, [fetching, userDetail?.email, setUserDetail, showToast]);
 
+  // Redirect if no user, else refresh profile once on mount
   useEffect(() => {
     if (!userDetail?.email) {
       router.replace("/auth/signIn");
     } else if (!refreshing) {
       refreshData();
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once on mount
 
   // --- Logout ---
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     Alert.alert("Logout?", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -144,13 +146,17 @@ export default function Profile() {
         },
       },
     ]);
-  };
+  }, [auth, router, setUserDetail, showToast]);
 
   // --- Delete Account ---
-  const confirmDeleteAccount = () => setShowPasswordModal(true);
+  const confirmDeleteAccount = useCallback(
+    () => setShowPasswordModal(true),
+    []
+  );
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = useCallback(async () => {
     if (!password) return;
+
     try {
       const user = auth.currentUser;
       const firestore = getFirestore();
@@ -164,7 +170,11 @@ export default function Profile() {
       const userSnap = await getDoc(userDocRef);
 
       if (userSnap.exists()) {
-        const deletedRef = doc(firestore, "deletedAccounts", user.email + user.uid);
+        const deletedRef = doc(
+          firestore,
+          "deletedAccounts",
+          user.email + user.uid
+        );
         await setDoc(deletedRef, {
           ...userSnap.data(),
           email: user.email,
@@ -182,7 +192,9 @@ export default function Profile() {
       router.push("/");
     } catch (err) {
       Sentry.captureException(err);
-      if (["auth/wrong-password", "auth/invalid-credential"].includes(err.code)) {
+      if (
+        ["auth/wrong-password", "auth/invalid-credential"].includes(err.code)
+      ) {
         showToast("Incorrect password");
       } else {
         showToast("Failed to delete account");
@@ -190,9 +202,10 @@ export default function Profile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [auth, password, router, setUserDetail, showToast]);
 
-  const verify = async () => {
+  // --- Send Email Verification ---
+  const verify = useCallback(async () => {
     const user = auth.currentUser;
     if (!user) {
       setModalVisible({
@@ -221,15 +234,16 @@ export default function Profile() {
           : "Please try again later.",
       });
     }
-  };
+  }, [auth.currentUser]);
 
-  const subscribe = () => {
+  // --- Subscription Handler ---
+  const subscribe = useCallback(() => {
     if (userDetail?.member === true) {
       showToast("You are already a member.");
     } else {
       router.push("/subscription");
     }
-  };
+  }, [userDetail?.member, router, showToast]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -242,9 +256,10 @@ export default function Profile() {
         )}
 
         <Image
-          style={[styles.avatar, {
-            borderColor: userDetail?.member ? Colors.GREEN : Colors.PRIMARY,
-          }]}
+          style={[
+            styles.avatar,
+            { borderColor: userDetail?.member ? Colors.GREEN : Colors.PRIMARY },
+          ]}
           source={
             ["github.com", "google.com"].includes(userDetail?.provider)
               ? { uri: userDetail.profilePicture }
@@ -255,12 +270,18 @@ export default function Profile() {
         {/* User Info */}
         {userDetail && (
           <>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
               <Text numberOfLines={1} style={styles.profileName}>
                 {userDetail.fullname}
               </Text>
               {userDetail.member && (
-                <Ionicons color={"green"} size={20} name="checkmark-circle" />
+                <Ionicons
+                  color={Colors.GREEN}
+                  size={20}
+                  name="checkmark-circle"
+                />
               )}
             </View>
 
@@ -274,7 +295,10 @@ export default function Profile() {
                   numberOfLines={1}
                   style={[
                     styles.profileEmail,
-                    { color: Colors.LIGHT_RED, textDecorationLine: "underline" },
+                    {
+                      color: Colors.LIGHT_RED,
+                      textDecorationLine: "underline",
+                    },
                   ]}
                 >
                   email not verified
@@ -291,7 +315,7 @@ export default function Profile() {
               accessibilityHint="Opens subscription page"
             >
               {loading ? (
-                <ActivityIndicator color={"green"} size={"small"} />
+                <ActivityIndicator color={Colors.GREEN} size="small" />
               ) : (
                 <Text
                   style={{
@@ -436,7 +460,10 @@ export default function Profile() {
               style={styles.icon}
             />
             <Text
-              style={[styles.menuLabel, { color: Colors.RED, fontFamily: "outfit-bold" }]}
+              style={[
+                styles.menuLabel,
+                { color: Colors.RED, fontFamily: "outfit-bold" },
+              ]}
             >
               Log Out
             </Text>
@@ -462,6 +489,8 @@ export default function Profile() {
                 onChangeText={setPassword}
                 style={styles.inputWithIcon}
                 placeholderTextColor="#ccc"
+                autoCapitalize="none"
+                autoCorrect={false}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons
@@ -492,7 +521,7 @@ export default function Profile() {
                 disabled={!password || loading}
               >
                 {loading ? (
-                  <ActivityIndicator size={"large"} color={"white"} />
+                  <ActivityIndicator size="large" color="white" />
                 ) : (
                   <Text style={styles.modalButtonText}>Delete</Text>
                 )}
@@ -508,7 +537,9 @@ export default function Profile() {
         message={modalVisible.message}
         confirmText="OK"
         showCancel={false}
-        onConfirm={() => setModalVisible({ ...modalVisible, visible: false })}
+        onConfirm={() =>
+          setModalVisible((prev) => ({ ...prev, visible: false }))
+        }
       />
     </SafeAreaView>
   );
