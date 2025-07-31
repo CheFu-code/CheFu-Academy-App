@@ -155,7 +155,9 @@ export default function Home() {
 
       // Compare new courses with cache to avoid redundant writes
       const cachedCoursesJSON = await AsyncStorage.getItem(CACHE_KEY);
-      const cachedCourses = cachedCoursesJSON ? JSON.parse(cachedCoursesJSON) : null;
+      const cachedCourses = cachedCoursesJSON
+        ? JSON.parse(cachedCoursesJSON)
+        : null;
 
       const isSame =
         cachedCourses &&
@@ -233,7 +235,8 @@ export default function Home() {
       });
     } catch (error) {
       console.error("Failed to send verification email:", error);
-      let errorMessage = "Failed to send verification email. Please try again later.";
+      let errorMessage =
+        "Failed to send verification email. Please try again later.";
 
       if (error.code === "auth/too-many-requests") {
         errorMessage = "Too many requests. Please try again later.";
@@ -248,8 +251,9 @@ export default function Home() {
   return (
     <>
       {/* Email verification prompt */}
-      {auth.currentUser && !auth.currentUser.emailVerified && (
-        sending ? (
+      {auth.currentUser &&
+        !auth.currentUser.emailVerified &&
+        (sending ? (
           <ActivityIndicator
             style={{
               backgroundColor: Colors.GREEN,
@@ -286,8 +290,7 @@ export default function Home() {
               </Text>
             </TouchableOpacity>
           </View>
-        )
-      )}
+        ))}
 
       <Header />
       {loading && <LineLoader />}
@@ -347,7 +350,9 @@ export default function Home() {
         message={verifyEmail.message}
         confirmText="OK"
         showCancel={false}
-        onConfirm={() => setVerifyEmail((prev) => ({ ...prev, visible: false }))}
+        onConfirm={() =>
+          setVerifyEmail((prev) => ({ ...prev, visible: false }))
+        }
       />
 
       {/* Banner Ad */}
