@@ -134,16 +134,25 @@ export default function AdminChat() {
                 createdAt: firestore.FieldValue.serverTimestamp(),
                 expireAt, // 👈 Add this
             });
+        setInput("");
         setSending(false);
+
+        // 2. Fetch user email
+        const userDoc = await firestore()
+            .collection("users")
+            .doc(String(selectedUserId))
+            .get();
+
+        const userEmail = userDoc.exists() ? userDoc.data()?.email : null;
+        // setSending(false);
         // Send notification to user
-        if (isAdmin) {
+        if (isAdmin && userEmail) {
             await sendNotification(
-                ADMIN_EMAIL,
+                userEmail,
                 "You've got a reply from CheFu Academy Support",
                 input.trim()
             );
         }
-        setInput("");
 
         flatListRef.current?.scrollToEnd({ animated: true });
     };
@@ -243,7 +252,7 @@ export default function AdminChat() {
                         flexDirection: "row",
                         padding: 10,
                         alignItems: "center",
-                        // marginBottom: 50,
+                        paddingBottom: 45,
                     }}
                 >
                     <TextInput
@@ -259,7 +268,7 @@ export default function AdminChat() {
                             borderWidth: 0.8,
                             borderRadius: 20,
                             paddingHorizontal: 16,
-                            // paddingVertical: 10,
+                            // paddingVertical: 45,
                             marginRight: 10,
                             color: Colors.PRIMARY,
                             marginTop: 8,

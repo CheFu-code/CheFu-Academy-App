@@ -15,20 +15,6 @@ export const menuItems = (router, Linking, ToastAndroid, Colors) => [
     icon: "stats-chart-outline",
     onPress: () => router.push("/(tabs)/progress"),
   },
-  {
-    label: "Help & Support",
-    icon: "help-circle-outline",
-    onPress: () =>
-      Linking.openURL(
-        "mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here."
-      ),
-  },
-
-  {
-    label: "Terms of Service",
-    icon: "document-text-outline",
-    onPress: () => router.push("/terms"),
-  },
 ];
 
 export const url =

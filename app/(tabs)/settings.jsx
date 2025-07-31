@@ -18,6 +18,7 @@ import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -40,7 +41,7 @@ export default function SettingsScreen() {
   const [isOpen, setIsOpen] = useState(false);
   const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
   const [fatalError, setFatalError] = useState(null);
-  const { userDetail } = useContext(UserDetailContext);
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
   const db = getFirestore();
   const auth = getAuth();
@@ -183,6 +184,8 @@ export default function SettingsScreen() {
   const logOut = async () => {
     try {
       await auth.signOut();
+      await AsyncStorage.removeItem("userDetail");
+      setUserDetail(null);
       ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
     } catch (err) {
       setFatalError(err);
@@ -404,6 +407,20 @@ export default function SettingsScreen() {
             <SettingItem
               label="About this App"
               icon="information-circle-outline"
+              onPress={() => router.push("/about")}
+            />
+            <SettingItem
+              label="Help & Support"
+              icon="help-circle-outline"
+              onPress={() => {
+                Linking.openURL(
+                  "mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here."
+                );
+              }}
+            />
+            <SettingItem
+              label="Terms of Service"
+              icon="document-text-outline"
               onPress={() => router.push("/about")}
             />
             <SettingItem

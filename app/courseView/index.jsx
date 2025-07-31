@@ -435,7 +435,7 @@ export default function CourseView() {
               </Animated.View>
             </TouchableOpacity>
           ) : (
-            <Ionicons name="download-outline" size={24} color="white" />
+            <MaterialIcons name="file-download" size={24} color="white" />
           )}
         </Pressable>
       ) : (

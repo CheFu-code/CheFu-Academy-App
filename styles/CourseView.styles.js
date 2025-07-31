@@ -19,6 +19,10 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  chapterText: { fontFamily: "outfit-bold", fontSize: 20, color: Colors.WHITE },
+  chapterTextContent: {
+    fontFamily: "outfit-bold",
+    fontSize: 20,
+    color: Colors.WHITE,
+  },
   chapterNameContainer: { display: "flex", flexDirection: "row", gap: 5 },
 });

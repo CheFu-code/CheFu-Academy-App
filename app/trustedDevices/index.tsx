@@ -189,13 +189,16 @@ export default function TrustedDevices() {
                                     <View>
                                         <Text
                                             style={{
-                                                fontSize: 14,
+                                                fontSize: 15,
                                                 color: Colors.BLACK,
                                                 fontFamily: "outfit-bold",
+                                                marginBottom: 5,
                                             }}
                                         >
                                             {device.modelName || "Unknown Device"}
                                         </Text>
+
+
                                         <Text
                                             numberOfLines={3}
                                             style={{
@@ -205,8 +208,10 @@ export default function TrustedDevices() {
                                                 maxWidth: 210,
                                             }}
                                         >
-                                            OS: {device.osName || "Unknown OS"}
+                                            <Text style={{ fontFamily: "outfit-bold", color: Colors.BLACK }}>Operating System:</Text> {device.osName || "Unknown OS"}
                                         </Text>
+
+
                                         <Text
                                             numberOfLines={1}
                                             style={{
@@ -216,17 +221,21 @@ export default function TrustedDevices() {
                                                 maxWidth: 210,
                                             }}
                                         >
-                                            Version: {device.osVersion || "N/A"}
+                                            <Text style={{ fontFamily: "outfit-bold", color: Colors.BLACK }}>Version: </Text>{device.osVersion || "N/A"}
                                         </Text>
+
+
                                         <Text
                                             style={{
-                                                fontFamily: "outfit-bold",
+                                                fontFamily: "outfit",
                                                 fontSize: 12,
                                                 color: Colors.BLACK,
                                             }}
                                         >
-                                            Brand: {device.brand || "Unknown Brand"}
+                                            <Text style={{ fontFamily: "outfit-bold", color: Colors.BLACK }}>Brand:</Text> {device.brand || "Unknown Brand"}
                                         </Text>
+
+
                                     </View>
                                     <TouchableOpacity
                                         disabled={loadingDevice === device.modelName}

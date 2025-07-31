@@ -31,7 +31,7 @@ export default function Chapters({ course }) {
         padding: 20,
       }}
     >
-      <Text style={styles.chapterText}>Chapters</Text>
+      <Text style={styles.chapterTextContent}>Chapters</Text>
 
       <FlatList
         style={{ marginBottom: 40 }}

@@ -115,7 +115,10 @@ export default function ChatWithAdmin() {
                     createdAt: firestore.FieldValue.serverTimestamp(),
                     expireAt,
                 });
+                setLoading(false);
+                setMessage("");
             });
+
 
             if (!isAdmin && userDetail?.fullname) {
                 await sendNotification(
@@ -125,7 +128,7 @@ export default function ChatWithAdmin() {
                 );
             }
 
-            setMessage("");
+
         } catch (error) {
             console.error("❌ Error sending message:", error);
         } finally {
@@ -284,6 +287,7 @@ export default function ChatWithAdmin() {
                     position: "absolute",
                     bottom: 0,
                     width: "100%",
+                    paddingBottom: 45,
                 }}
             >
                 <TextInput

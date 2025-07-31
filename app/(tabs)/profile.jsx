@@ -64,6 +64,12 @@ export default function Profile() {
   });
   const refreshData = async () => {
     if (fetching) return;
+    if (!userDetail?.email) {
+      // If userDetail or email is missing, skip refresh
+      console.warn("No userDetail or email to refresh");
+      setRefreshing(false);
+      return;
+    }
     setRefreshing(true);
     setFetching(true);
     try {
@@ -95,6 +101,13 @@ export default function Profile() {
   useFocusEffect(
     useCallback(() => {
       refreshData();
+    }, [])
+  );
+  useFocusEffect(
+    useCallback(() => {
+      if (!userDetail?.email) {
+        router.replace("/auth/signIn");
+      }
     }, [])
   );
 
