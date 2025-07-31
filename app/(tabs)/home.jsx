@@ -310,7 +310,7 @@ export default function Home() {
         ListHeaderComponent={
           <View>
             <Image
-              style={{ position: "absolute", width: "100%", height: 500 }}
+              style={{ position: "absolute", width: "100%", height: 400 }}
               source={require("../../assets/images/graph.png")}
               resizeMode="cover"
             />

@@ -4,6 +4,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuth } from "@react-native-firebase/auth";
 import * as FileSystem from "expo-file-system"; // ← Add this
 import * as Print from "expo-print";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -35,6 +36,7 @@ export default function CourseView() {
   const { userDetail } = useContext(UserDetailContext);
   const [loading, setLoading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const auth = getAuth();
 
   useEffect(() => {
     if (
@@ -65,7 +67,7 @@ export default function CourseView() {
 
     setLoading(true);
     try {
-      if (userDetail?.isVerified === false) {
+      if (!auth.currentUser?.emailVerified) {
         ToastAndroid.show(
           "Please verify your email to download courses",
           ToastAndroid.SHORT
