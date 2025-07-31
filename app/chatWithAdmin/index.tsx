@@ -247,7 +247,7 @@ export default function ChatWithAdmin() {
                             padding: 8,
                             borderRadius: 10,
                             maxWidth: "80%",
-                            marginBottom:15,
+                            marginBottom:10,
                             minWidth: 75,
                         }}
                     >

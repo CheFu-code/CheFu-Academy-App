@@ -123,7 +123,8 @@ export default function AdminChat() {
         const expireAt = firestore.Timestamp.fromDate(
             new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
         );
-
+        setInput("");
+        setSending(false);
         await firestore()
             .collection("chats")
             .doc(String(selectedUserId))
@@ -134,8 +135,7 @@ export default function AdminChat() {
                 createdAt: firestore.FieldValue.serverTimestamp(),
                 expireAt, // 👈 Add this
             });
-        setInput("");
-        setSending(false);
+
 
         // 2. Fetch user email
         const userDoc = await firestore()

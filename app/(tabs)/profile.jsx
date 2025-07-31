@@ -59,6 +59,7 @@ export default function Profile() {
   const router = useRouter();
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const auth = getAuth();
+  const CACHE_KEY = "@cached_courses";
 
   // Destructure to reduce repeated optional chaining
   const {
@@ -142,7 +143,7 @@ export default function Profile() {
 
   // --- Logout ---
   const handleLogout = useCallback(() => {
-    console.log("handle logout")
+    console.log("handle logout");
     Alert.alert("Logout?", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -153,7 +154,8 @@ export default function Profile() {
             setLoading(true);
             await signOut(auth);
             await AsyncStorage.removeItem("userDetail");
-            console.log("async storage removed")
+            await AsyncStorage.removeItem(CACHE_KEY);
+            console.log("async storage removed");
             setUserDetail(null);
             router.push("/auth/signIn");
             showToast("Logged out successfully");

@@ -42,7 +42,7 @@ export default function SettingsScreen() {
   const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
   const [fatalError, setFatalError] = useState(null);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
-
+  const CACHE_KEY = "@cached_courses";
   const db = getFirestore();
   const auth = getAuth();
   const router = useRouter();
@@ -185,6 +185,7 @@ export default function SettingsScreen() {
     try {
       await auth.signOut();
       await AsyncStorage.removeItem("userDetail");
+      await AsyncStorage.removeItem(CACHE_KEY);
       setUserDetail(null);
       ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
     } catch (err) {

@@ -23,7 +23,7 @@ export default function Header() {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
   const auth = getAuth();
-
+  const CACHE_KEY = "@cached_courses";
   const handleOption = async (option) => {
     setShowModal(false);
 
@@ -31,6 +31,8 @@ export default function Header() {
       try {
         await auth.signOut();
         await AsyncStorage.removeItem("userDetail");
+        await AsyncStorage.removeItem(CACHE_KEY);
+        console.log("async storage removed");
         setUserDetail(null);
         ToastAndroid.show("Logged out successfully", ToastAndroid.SHORT);
         // router.replace("/auth/signIn");
@@ -111,7 +113,7 @@ export default function Header() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap:5
+              gap: 5,
             }}
           >
             <Text
