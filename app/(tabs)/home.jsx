@@ -13,6 +13,7 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
+
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import NoCourse from "../../component/Home/NoCourse";
@@ -38,6 +39,7 @@ import {
 
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+
 import Header from "../../component/Home/Header";
 import LineLoader from "../../component/Home/LineLoader";
 import AppModal from "../../component/Shared/AppModal";
@@ -49,64 +51,71 @@ export default function Home() {
   const [fetching, setFetching] = useState(false);
   const [adLoaded, setAdLoaded] = useState(false);
   const [sending, setSending] = useState(false);
+
   const CACHE_KEY = "@cached_courses";
+
   const [verifyEmail, setVerifyEmail] = useState({
     visible: false,
     title: "",
     message: "",
   });
+
   const [errorModal, setErrorModal] = useState({
     visible: false,
     title: "",
     message: "",
   });
+
   const router = useRouter();
   const auth = getAuth();
   const firestore = getFirestore();
 
+  // ------------------------------------
+  // AUTH STATE LISTENER & COURSE LOADING
+  // ------------------------------------
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         loadCachedCoursesThenFetch();
       } else {
-        console.log("🚫 No authenticated user from home. Redirecting...");
         setCourseList([]);
         router.replace("/auth/signIn");
       }
     });
 
-    return () => unsubscribe();
-  }, []);
+    return unsubscribe;
+  }, [auth, router]);
 
-  // Load cached courses, then fetch fresh in background
+  // Load cached courses then fetch fresh in background without waiting for it
   const loadCachedCoursesThenFetch = async () => {
     const cached = await loadCachedCourses();
     if (!cached) {
-      await GetCourseList();
+      await fetchCourses();
     } else {
-      GetCourseList();
+      fetchCourses(); // fire and forget
     }
   };
 
-  // Load cached courses from AsyncStorage
+  // Load courses from AsyncStorage cache
   const loadCachedCourses = async () => {
     try {
       const cached = await AsyncStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         setCourseList(parsed);
-        return parsed; // Return cached for comparison later
-      } else {
-        return null;
+        return parsed;
       }
-    } catch (e) {
-      console.error("❌ Error loading cached courses:", e);
+      return null;
+    } catch (error) {
+      console.error("Error loading cached courses:", error);
       return null;
     }
   };
 
-  // Fetch courses from Firestore with cache comparison
-  const GetCourseList = async (isRefresh = false) => {
+  // -------------------------
+  // FETCH COURSES FROM FIRESTORE
+  // -------------------------
+  const fetchCourses = async (isRefresh = false) => {
     if (fetching && !isRefresh) return;
 
     setLoading(true);
@@ -119,10 +128,11 @@ export default function Home() {
         return;
       }
 
+      // Reload user to get latest email verification status
       await reload(user);
+
       const refreshedUser = auth.currentUser;
       if (!refreshedUser?.email) {
-        console.log("❌ User email missing after reload.");
         ToastAndroid.show("Your email could not be found", ToastAndroid.SHORT);
         setCourseList([]);
         router.replace("/");
@@ -135,17 +145,18 @@ export default function Home() {
         where("createdBy", "==", refreshedUser.email),
         orderBy("createdOn", "desc")
       );
+
       const querySnapshot = await getDocs(q);
+
       const courses = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
 
-      // Compare with cached courses to avoid unnecessary AsyncStorage writes
+      // Compare new courses with cache to avoid redundant writes
       const cachedCoursesJSON = await AsyncStorage.getItem(CACHE_KEY);
-      const cachedCourses = cachedCoursesJSON
-        ? JSON.parse(cachedCoursesJSON)
-        : null;
+      const cachedCourses = cachedCoursesJSON ? JSON.parse(cachedCoursesJSON) : null;
+
       const isSame =
         cachedCourses &&
         JSON.stringify(cachedCourses) === JSON.stringify(courses);
@@ -154,32 +165,34 @@ export default function Home() {
 
       if (!isSame) {
         await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(courses));
-      } else {
       }
 
       if (isRefresh) {
         ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
       }
     } catch (error) {
-      console.error("🔥 Error fetching courses:", error);
+      console.error("Error fetching courses:", error);
       let errorMessage = "Failed to fetch courses. Please try again.";
-      if (error.code === "firestore/unavailable") {
-        errorMessage = "Network error. Please check your connection.";
-      } else if (error.code === "firestore/permission-denied") {
-        if (error.code === "auth/user-not-found") {
-          errorMessage =
-            "There is no user record corresponding to this identifier. The user may have been deleted.";
-        } else if (error.code === "auth/invalid-email") {
-          errorMessage = "The email address is badly formatted.";
-        }
-      } else if (error.code === "firestore/permission-denied") {
-        if (error.code === "auth/unknown") {
-          errorMessage = "A little internal error has occurred.";
-          ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-        } else if (error.code === "firestore/permission-denied") {
+
+      // More concise error handling
+      switch (error.code) {
+        case "firestore/unavailable":
+          errorMessage = "Network error. Please check your connection.";
+          break;
+        case "firestore/permission-denied":
           errorMessage = "You don't have permission to access these courses.";
-        }
+          break;
+        case "auth/user-not-found":
+          errorMessage = "User not found. Your account may have been deleted.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address format.";
+          break;
+        case "auth/too-many-requests":
+          errorMessage = "Too many requests. Please try again later.";
+          break;
       }
+
       ToastAndroid.show(errorMessage, ToastAndroid.LONG);
     } finally {
       setLoading(false);
@@ -187,23 +200,26 @@ export default function Home() {
     }
   };
 
+  // REFRESH ON SCREEN FOCUS
   useFocusEffect(
     useCallback(() => {
       if (auth.currentUser) {
-        GetCourseList();
+        fetchCourses();
       }
-    }, [])
+    }, [auth])
   );
 
+  // ---------------------------------------
+  // SEND EMAIL VERIFICATION
+  // ---------------------------------------
   const verify = async () => {
     const user = auth.currentUser;
     if (!user) {
       setErrorModal({
         visible: true,
         title: "Not Signed In",
-        message: "Seems like you're currently not signed in.",
+        message: "You are currently not signed in.",
       });
-
       return;
     }
 
@@ -213,15 +229,16 @@ export default function Home() {
       setVerifyEmail({
         visible: true,
         title: "Email Verification Sent",
-        message: `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`,
+        message: `Verification email sent to ${user.email}. Check your inbox and spam folder.`,
       });
     } catch (error) {
-      console.error("❌ Failed to send verification email:", error);
-      let errorMessage =
-        "Failed to send verification email. Please try again later.";
+      console.error("Failed to send verification email:", error);
+      let errorMessage = "Failed to send verification email. Please try again later.";
+
       if (error.code === "auth/too-many-requests") {
         errorMessage = "Too many requests. Please try again later.";
       }
+
       Alert.alert("Error", errorMessage);
     } finally {
       setSending(false);
@@ -230,30 +247,33 @@ export default function Home() {
 
   return (
     <>
-      {auth.currentUser &&
-        !auth.currentUser.emailVerified &&
-        (sending ? (
+      {/* Email verification prompt */}
+      {auth.currentUser && !auth.currentUser.emailVerified && (
+        sending ? (
           <ActivityIndicator
             style={{
               backgroundColor: Colors.GREEN,
               position: "absolute",
               top: "50%",
               left: "50%",
+              transform: [{ translateX: -15 }, { translateY: -15 }], // center precisely
+              zIndex: 1000,
             }}
             color={Colors.GREEN}
             size="small"
           />
         ) : (
-          <View style={{ backgroundColor: Colors.BG_COLOR }}>
+          <View style={{ backgroundColor: Colors.BG_COLOR, padding: 10 }}>
             <TouchableOpacity
               onPress={verify}
               style={{
                 backgroundColor: "#FFD700",
                 padding: 10,
-                marginTop: 35,
+                marginTop: Platform.OS === "ios" ? 50 : 35,
                 borderRadius: 15,
-                opacity: 0.8,
+                opacity: 0.9,
               }}
+              activeOpacity={0.7}
             >
               <Text
                 style={{
@@ -266,19 +286,20 @@ export default function Home() {
               </Text>
             </TouchableOpacity>
           </View>
-        ))}
+        )
+      )}
 
       <Header />
       {loading && <LineLoader />}
 
       <FlatList
         data={courseList}
+        keyExtractor={(item) => item.id}
         style={{ backgroundColor: Colors.BG_COLOR }}
         onRefresh={() => {
-          const user = auth.currentUser;
-          if (user) {
+          if (auth.currentUser) {
             setFetching(false);
-            GetCourseList(true);
+            fetchCourses(true);
           }
         }}
         refreshing={loading}
@@ -288,6 +309,7 @@ export default function Home() {
             <Image
               style={{ position: "absolute", width: "100%", height: 500 }}
               source={require("../../assets/images/graph.png")}
+              resizeMode="cover"
             />
             <View
               style={{
@@ -295,7 +317,7 @@ export default function Home() {
                 padding: 15,
               }}
             >
-              {courseList?.length === 0 ? (
+              {courseList.length === 0 ? (
                 <NoCourse />
               ) : (
                 <>
@@ -309,13 +331,14 @@ export default function Home() {
         }
       />
 
+      {/* Modals */}
       <AppModal
         visible={errorModal.visible}
         title={errorModal.title}
         message={errorModal.message}
         confirmText="OK"
         showCancel={false}
-        onConfirm={() => setErrorModal({ ...errorModal, visible: false })}
+        onConfirm={() => setErrorModal((prev) => ({ ...prev, visible: false }))}
       />
 
       <AppModal
@@ -324,24 +347,27 @@ export default function Home() {
         message={verifyEmail.message}
         confirmText="OK"
         showCancel={false}
-        onConfirm={() => setVerifyEmail({ ...verifyEmail, visible: false })}
+        onConfirm={() => setVerifyEmail((prev) => ({ ...prev, visible: false }))}
       />
 
-      <View style={{ display: adLoaded ? "flex" : "none" }}>
-        <BannerAd
-          unitId="ca-app-pub-8952058057579255/9705798694"
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-          onAdLoaded={() => {
-            console.log("✅ Ad successfully loaded");
-            setAdLoaded(true);
-          }}
-          onAdFailedToLoad={(err) => {
-            console.log("Ad failed to load", err);
-            setAdLoaded(false);
-          }}
-        />
-      </View>
+      {/* Banner Ad */}
+      {adLoaded && (
+        <View>
+          <BannerAd
+            unitId="ca-app-pub-8952058057579255/9705798694"
+            size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+            requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+            onAdLoaded={() => {
+              console.log("Ad successfully loaded");
+              setAdLoaded(true);
+            }}
+            onAdFailedToLoad={(err) => {
+              console.log("Ad failed to load", err);
+              setAdLoaded(false);
+            }}
+          />
+        </View>
+      )}
     </>
   );
 }
