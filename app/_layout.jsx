@@ -93,7 +93,7 @@ export default Sentry.wrap(function RootLayout() {
     const unsubscribe = onAuthStateChanged(getAuth(getApp()), (user) => {
       if (authChecked && authSuccess && !user && !alreadyRedirected.current) {
         alreadyRedirected.current = true;
-        console.warn("⚠️ No authenticated user from layout. Redirecting to sign-in...");
+        console.warn("No authenticated user from layout. Redirecting to welcome screen");
         router.replace("/");
       }
     });

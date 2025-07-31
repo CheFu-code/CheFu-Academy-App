@@ -132,8 +132,8 @@ export default function Home() {
       await reload(user);
 
       const refreshedUser = auth.currentUser;
-      if (!refreshedUser?.email) {
-        ToastAndroid.show("Your email could not be found", ToastAndroid.SHORT);
+      if (!refreshedUser || !refreshedUser.email) {
+        ToastAndroid.show("Please try to login again.", ToastAndroid.LONG);
         setCourseList([]);
         router.replace("/");
         return;

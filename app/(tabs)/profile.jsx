@@ -142,6 +142,7 @@ export default function Profile() {
 
   // --- Logout ---
   const handleLogout = useCallback(() => {
+    console.log("handle logout")
     Alert.alert("Logout?", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -152,6 +153,7 @@ export default function Profile() {
             setLoading(true);
             await signOut(auth);
             await AsyncStorage.removeItem("userDetail");
+            console.log("async storage removed")
             setUserDetail(null);
             router.push("/auth/signIn");
             showToast("Logged out successfully");
