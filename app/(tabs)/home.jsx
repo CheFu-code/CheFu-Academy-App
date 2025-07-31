@@ -125,7 +125,7 @@ export default function Home() {
         console.log("❌ User email missing after reload.");
         ToastAndroid.show("Your email could not be found", ToastAndroid.SHORT);
         setCourseList([]);
-        router.replace("/")
+        router.replace("/");
         return;
       }
 
@@ -327,18 +327,21 @@ export default function Home() {
         onConfirm={() => setVerifyEmail({ ...verifyEmail, visible: false })}
       />
 
-      <BannerAd
-        unitId="ca-app-pub-8952058057579255/9705798694"
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-        requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-        onAdLoaded={() => {
-          setAdLoaded(true);
-        }}
-        onAdFailedToLoad={(err) => {
-          console.log("❌ Ad failed to load", err);
-          setAdLoaded(false);
-        }}
-      />
+      <View style={{ display: adLoaded ? "flex" : "none" }}>
+        <BannerAd
+          unitId="ca-app-pub-8952058057579255/9705798694"
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+          onAdLoaded={() => {
+            console.log("✅ Ad successfully loaded");
+            setAdLoaded(true);
+          }}
+          onAdFailedToLoad={(err) => {
+            console.log("Ad failed to load", err);
+            setAdLoaded(false);
+          }}
+        />
+      </View>
     </>
   );
 }

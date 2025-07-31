@@ -1,28 +1,7 @@
-import { FontAwesome6, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
-import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
-
-import {
-  deleteUser,
-  EmailAuthProvider,
-  getAuth,
-  reauthenticateWithCredential,
-  sendEmailVerification,
-  signOut,
-} from "@react-native-firebase/auth";
-import {
-  deleteDoc,
-  doc,
-  getDoc,
-  getFirestore,
-  setDoc,
-} from "@react-native-firebase/firestore";
-
-import Entypo from "@expo/vector-icons/Entypo";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -38,6 +17,29 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { FontAwesome6, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
+import Entypo from "@expo/vector-icons/Entypo";
+
+import {
+  deleteUser,
+  EmailAuthProvider,
+  getAuth,
+  reauthenticateWithCredential,
+  sendEmailVerification,
+  signOut,
+} from "@react-native-firebase/auth";
+
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+} from "@react-native-firebase/firestore";
+
+import * as Sentry from "@sentry/react-native";
+
 import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { menuItems, url } from "../../constant/menuItems";
@@ -53,15 +55,29 @@ export default function Profile() {
   const [showPassword, setShowPassword] = useState(false);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const renderedMenuItems = menuItems(router, Linking, ToastAndroid, Colors);
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
   const auth = getAuth();
+  const isFreeUser = userDetail?.member === false;
   const [fetching, setFetching] = useState(false);
+  const showToast = (message, duration = ToastAndroid.SHORT) => {
+    ToastAndroid.show(message, duration);
+  };
+
+  const capitalize = useCallback(
+    (str) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : ""),
+    []
+  );
+
   const [modalVisible, setModalVisible] = useState({
     visible: false,
     title: "",
     message: "",
   });
+
+  const renderedMenuItems = useMemo(
+    () => menuItems(router, Linking, ToastAndroid, Colors),
+    [router]
+  );
+
   const refreshData = async () => {
     if (fetching) return;
     if (!userDetail?.email) {
@@ -86,30 +102,22 @@ export default function Profile() {
       }
     } catch (error) {
       console.error("Error refreshing data:", error);
-      if (typeof ToastAndroid !== "undefined") {
-        ToastAndroid.show("Failed to refresh profile", ToastAndroid.SHORT);
-      }
-      if (typeof Sentry !== "undefined") {
-        Sentry.captureException(error);
-      }
+      ToastAndroid.show("Failed to refresh profile", ToastAndroid.SHORT);
+      Sentry.captureException?.(error);
     } finally {
       setRefreshing(false);
       setFetching(false);
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      refreshData();
-    }, [])
-  );
-  useFocusEffect(
-    useCallback(() => {
-      if (!userDetail?.email) {
-        router.replace("/auth/signIn");
-      }
-    }, [])
-  );
+  useEffect(() => {
+    if (!userDetail?.email) {
+      router.replace("/auth/signIn");
+      return;
+    }
+
+    if (!refreshing) refreshData();
+  }, []);
 
   const handleLogout = async () => {
     Alert.alert("Logout?", "Are you sure you want to log out?", [
@@ -124,10 +132,10 @@ export default function Profile() {
             await AsyncStorage.removeItem("userDetail");
             setUserDetail(null);
             router.push("/auth/signIn");
-            ToastAndroid.show("Logged out successfully", ToastAndroid.SHORT);
+            showToast("Logged out successfully");
           } catch (error) {
             console.error("Logout error:", error);
-            ToastAndroid.show("Logout failed", ToastAndroid.SHORT);
+            showToast("Logout failed");
             Sentry.captureException(error);
           } finally {
             setLoading(false);
@@ -150,7 +158,7 @@ export default function Profile() {
       const user = auth.currentUser;
 
       if (!user || !user.email) {
-        ToastAndroid.show("No user is logged in", ToastAndroid.SHORT);
+        showToast("No user currently logged in");
         return;
       }
 
@@ -186,7 +194,7 @@ export default function Profile() {
       setUserDetail(null);
       setShowPasswordModal(false);
       setPassword("");
-      ToastAndroid.show("Account deleted successfully", ToastAndroid.SHORT);
+      showToast("Account deleted successfully");
       router.push("/");
     } catch (error) {
       console.error("❌ Delete account error:", error);
@@ -195,9 +203,9 @@ export default function Profile() {
         error.code === "auth/wrong-password" ||
         error.code === "auth/invalid-credential"
       ) {
-        ToastAndroid.show("Incorrect password", ToastAndroid.SHORT);
+        showToast("Incorrect password");
       } else {
-        ToastAndroid.show("Failed to delete account", ToastAndroid.SHORT);
+        showToast("Failed to delete account");
       }
     } finally {
       setLoading(false);
@@ -206,7 +214,7 @@ export default function Profile() {
 
   const subscribe = () => {
     if (userDetail.member === true) {
-      ToastAndroid.show("You're already on member plan", ToastAndroid.SHORT);
+      showToast("You are already a member.");
       return;
     } else {
       router.push("/subscription");
@@ -255,6 +263,18 @@ export default function Profile() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        {auth.currentUser?.emailVerified && (
+          <Text
+            style={[
+              styles.profileEmail,
+              {
+                color: Colors.GREEN,
+              },
+            ]}
+          >
+            Email Verified
+          </Text>
+        )}
         <Image
           style={[
             styles.avatar,
@@ -319,6 +339,8 @@ export default function Profile() {
             )}
 
             <TouchableOpacity
+              accessibilityLabel="Subscribe to a plan"
+              accessibilityHint="Opens subscription page"
               onPress={() => subscribe()}
               disabled={loading}
               style={[styles.planStatus]}
@@ -329,15 +351,14 @@ export default function Profile() {
                 <Text
                   style={{
                     color: userDetail.member ? Colors.GREEN : Colors.RED,
-                    textDecorationLine:
-                      userDetail?.member === false ? "underline" : "none",
+                    textDecorationLine: isFreeUser ? "underline" : "none",
                     fontFamily: "outfit-bold",
                   }}
                 >
                   {userDetail?.planType && (
                     <Text>{`${capitalize(userDetail.planType)} Plan`}</Text>
                   )}
-                  {userDetail?.member === false && <Text>Free Plan</Text>}
+                  {isFreeUser && <Text>Free Plan</Text>}
                 </Text>
               )}
             </TouchableOpacity>
@@ -358,6 +379,7 @@ export default function Profile() {
         )}
       </View>
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={refreshData} />
         }
@@ -385,7 +407,7 @@ export default function Profile() {
 
           <View style={styles.divider} />
 
-          {userDetail?.member === false && (
+          {isFreeUser && (
             <TouchableOpacity
               style={[styles.menuItem, { marginTop: 5 }]}
               onPress={() => subscribe()}
