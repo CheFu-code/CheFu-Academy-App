@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
     fontFamily: "outfit",
     color: Colors.GRAY,
     marginTop: 3,
-    maxWidth:250
+    maxWidth: 250,
   },
   planStatus: {
     fontSize: 15,
@@ -122,5 +122,18 @@ export const styles = StyleSheet.create({
     fontFamily: "outfit",
     fontSize: 16,
     paddingRight: 10, // spacing before the icon
+  },
+  expiryText: {
+    fontFamily: "outfit",
+    fontSize: 15,
+    marginTop: 5,
+    color: "#ccc",
+  },
+  versionText: {
+    textAlign: "center",
+    color: Colors.GRAY,
+    marginTop: 10,
+    marginBottom: 20,
+    fontFamily: "outfit",
   },
 });

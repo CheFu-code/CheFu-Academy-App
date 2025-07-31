@@ -1,7 +1,14 @@
+// --- External imports ---
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -18,9 +25,11 @@ import {
   View,
 } from "react-native";
 
+// --- Icons ---
 import { FontAwesome6, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 
+// --- Firebase ---
 import {
   deleteUser,
   EmailAuthProvider,
@@ -29,7 +38,6 @@ import {
   sendEmailVerification,
   signOut,
 } from "@react-native-firebase/auth";
-
 import {
   deleteDoc,
   doc,
@@ -38,8 +46,8 @@ import {
   setDoc,
 } from "@react-native-firebase/firestore";
 
+// --- Shared ---
 import * as Sentry from "@sentry/react-native";
-
 import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { menuItems, url } from "../../constant/menuItems";
@@ -49,23 +57,16 @@ import { styles } from "../../styles/Profile.styles";
 export default function Profile() {
   const router = useRouter();
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const auth = getAuth();
+
+  // --- Local States ---
   const [loading, setLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const auth = getAuth();
-  const isFreeUser = userDetail?.member === false;
   const [fetching, setFetching] = useState(false);
-  const showToast = (message, duration = ToastAndroid.SHORT) => {
-    ToastAndroid.show(message, duration);
-  };
-
-  const capitalize = useCallback(
-    (str) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : ""),
-    []
-  );
+  const isFreeUser = userDetail?.member === false;
 
   const [modalVisible, setModalVisible] = useState({
     visible: false,
@@ -73,37 +74,38 @@ export default function Profile() {
     message: "",
   });
 
+  const showToast = (message, duration = ToastAndroid.SHORT) =>
+    ToastAndroid.show(message, duration);
+
+  const capitalize = useCallback(
+    (str) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : ""),
+    []
+  );
+
   const renderedMenuItems = useMemo(
     () => menuItems(router, Linking, ToastAndroid, Colors),
     [router]
   );
 
+  // --- Refresh Profile ---
   const refreshData = async () => {
-    if (fetching) return;
-    if (!userDetail?.email) {
-      // If userDetail or email is missing, skip refresh
-      console.warn("No userDetail or email to refresh");
-      setRefreshing(false);
-      return;
-    }
+    if (fetching || !userDetail?.email) return;
+
     setRefreshing(true);
     setFetching(true);
+
     try {
       const firestore = getFirestore();
-      const userDocSnap = await getDoc(
-        doc(firestore, "users", userDetail.email)
-      );
-
-      if (userDocSnap.exists()) {
-        setUserDetail(userDocSnap.data());
-        ToastAndroid.show("Profile refreshed", ToastAndroid.SHORT);
+      const snap = await getDoc(doc(firestore, "users", userDetail.email));
+      if (snap.exists()) {
+        setUserDetail(snap.data());
+        showToast("Profile refreshed");
       } else {
-        ToastAndroid.show("Your data not found", ToastAndroid.SHORT);
+        showToast("Your data not found");
       }
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-      ToastAndroid.show("Failed to refresh profile", ToastAndroid.SHORT);
-      Sentry.captureException?.(error);
+    } catch (err) {
+      Sentry.captureException(err);
+      showToast("Failed to refresh profile");
     } finally {
       setRefreshing(false);
       setFetching(false);
@@ -113,30 +115,29 @@ export default function Profile() {
   useEffect(() => {
     if (!userDetail?.email) {
       router.replace("/auth/signIn");
-      return;
+    } else if (!refreshing) {
+      refreshData();
     }
-
-    if (!refreshing) refreshData();
   }, []);
 
-  const handleLogout = async () => {
+  // --- Logout ---
+  const handleLogout = () => {
     Alert.alert("Logout?", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Logout",
         style: "destructive",
         onPress: async () => {
-          setLoading(true);
           try {
-            await signOut(getAuth());
+            setLoading(true);
+            await signOut(auth);
             await AsyncStorage.removeItem("userDetail");
             setUserDetail(null);
             router.push("/auth/signIn");
             showToast("Logged out successfully");
           } catch (error) {
-            console.error("Logout error:", error);
-            showToast("Logout failed");
             Sentry.captureException(error);
+            showToast("Logout failed");
           } finally {
             setLoading(false);
           }
@@ -145,64 +146,43 @@ export default function Profile() {
     ]);
   };
 
-  const confirmDeleteAccount = () => {
-    setShowPasswordModal(true);
-  };
+  // --- Delete Account ---
+  const confirmDeleteAccount = () => setShowPasswordModal(true);
 
   const handleDeleteAccount = async () => {
     if (!password) return;
-
     try {
-      const auth = getAuth();
-      const firestore = getFirestore();
       const user = auth.currentUser;
-
-      if (!user || !user.email) {
-        showToast("No user currently logged in");
-        return;
-      }
+      const firestore = getFirestore();
+      if (!user?.email) return showToast("No user currently logged in");
 
       setLoading(true);
-
-      const credential = EmailAuthProvider.credential(user.email, password);
-      await reauthenticateWithCredential(user, credential);
+      const cred = EmailAuthProvider.credential(user.email, password);
+      await reauthenticateWithCredential(user, cred);
 
       const userDocRef = doc(firestore, "users", user.email);
-      const userDocSnap = await getDoc(userDocRef);
+      const userSnap = await getDoc(userDocRef);
 
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        const deletedRef = doc(
-          firestore,
-          "deletedAccounts",
-          user.email + user.uid
-        );
+      if (userSnap.exists()) {
+        const deletedRef = doc(firestore, "deletedAccounts", user.email + user.uid);
         await setDoc(deletedRef, {
-          ...userData,
+          ...userSnap.data(),
           email: user.email,
           deletedAt: new Date(),
         });
-
         await deleteDoc(userDocRef);
-      } else {
-        console.warn("⚠️ No user document found in Firestore for", user.email);
       }
 
       await deleteUser(user);
-
       await AsyncStorage.removeItem("userDetail");
       setUserDetail(null);
       setShowPasswordModal(false);
       setPassword("");
       showToast("Account deleted successfully");
       router.push("/");
-    } catch (error) {
-      console.error("❌ Delete account error:", error);
-      Sentry.captureException(error);
-      if (
-        error.code === "auth/wrong-password" ||
-        error.code === "auth/invalid-credential"
-      ) {
+    } catch (err) {
+      Sentry.captureException(err);
+      if (["auth/wrong-password", "auth/invalid-credential"].includes(err.code)) {
         showToast("Incorrect password");
       } else {
         showToast("Failed to delete account");
@@ -212,125 +192,89 @@ export default function Profile() {
     }
   };
 
-  const subscribe = () => {
-    if (userDetail.member === true) {
-      showToast("You are already a member.");
-      return;
-    } else {
-      router.push("/subscription");
-    }
-  };
-
   const verify = async () => {
-    const user = getAuth().currentUser;
-    if (user) {
-      try {
-        await sendEmailVerification(user);
-        setModalVisible({
-          visible: true,
-          title: "Email Verification Sent",
-          message: `We've sent a verification email to ${user.email}! Check your inbox — and if it’s not there, don’t forget to look in your spam folder.`,
-        });
-      } catch (error) {
-        console.error("Failed to send verification email:", error);
-        if (
-          error.code === "auth/too-many-requests" ||
-          error.message.includes("too-many-requests")
-        ) {
-          setModalVisible({
-            visible: true,
-            title: "You've tried too many times.",
-            message:
-              "We’ve temporarily blocked requests from this device due to unusual activity. Please try again later.",
-          });
-        } else {
-          setModalVisible({
-            visible: true,
-            title: "Failed to send verification email",
-            message: "Please try again later.",
-          });
-        }
-      }
-    } else {
+    const user = auth.currentUser;
+    if (!user) {
       setModalVisible({
         visible: true,
         title: "No User Found",
         message: "No user is currently signed in from profile.",
       });
+      return;
+    }
+
+    try {
+      await sendEmailVerification(user);
+      setModalVisible({
+        visible: true,
+        title: "Email Verification Sent",
+        message: `We've sent a verification email to ${user.email}! Check your inbox.`,
+      });
+    } catch (err) {
+      Sentry.captureException(err);
+      const tooMany = err.code === "auth/too-many-requests";
+      setModalVisible({
+        visible: true,
+        title: tooMany ? "Too Many Attempts" : "Verification Failed",
+        message: tooMany
+          ? "We’ve temporarily blocked requests due to unusual activity."
+          : "Please try again later.",
+      });
+    }
+  };
+
+  const subscribe = () => {
+    if (userDetail?.member === true) {
+      showToast("You are already a member.");
+    } else {
+      router.push("/subscription");
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header Section */}
       <View style={styles.header}>
         {auth.currentUser?.emailVerified && (
-          <Text
-            style={[
-              styles.profileEmail,
-              {
-                color: Colors.GREEN,
-              },
-            ]}
-          >
+          <Text style={[styles.profileEmail, { color: Colors.GREEN }]}>
             Email Verified
           </Text>
         )}
+
         <Image
-          style={[
-            styles.avatar,
-            {
-              borderColor:
-                userDetail?.member === true ? Colors.GREEN : Colors.PRIMARY,
-            },
-          ]}
+          style={[styles.avatar, {
+            borderColor: userDetail?.member ? Colors.GREEN : Colors.PRIMARY,
+          }]}
           source={
-            userDetail?.provider === "github.com" ||
-            userDetail?.provider === "google.com"
-              ? { uri: userDetail?.profilePicture }
+            ["github.com", "google.com"].includes(userDetail?.provider)
+              ? { uri: userDetail.profilePicture }
               : require("../../assets/images/logo.png")
           }
         />
 
+        {/* User Info */}
         {userDetail && (
           <>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
               <Text numberOfLines={1} style={styles.profileName}>
                 {userDetail.fullname}
               </Text>
-
-              {userDetail?.member === true && (
+              {userDetail.member && (
                 <Ionicons color={"green"} size={20} name="checkmark-circle" />
               )}
             </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <Text numberOfLines={1} style={styles.profileEmail}>
-                {userDetail.email}
-              </Text>
-            </View>
+            <Text numberOfLines={1} style={styles.profileEmail}>
+              {userDetail.email}
+            </Text>
 
-            {auth.currentUser && !auth.currentUser.emailVerified && (
-              <TouchableOpacity onPress={() => verify()}>
+            {!auth.currentUser?.emailVerified && (
+              <TouchableOpacity onPress={verify}>
                 <Text
                   numberOfLines={1}
                   style={[
                     styles.profileEmail,
-                    {
-                      color: Colors.LIGHT_RED,
-                      textDecorationLine: "underline",
-                    },
+                    { color: Colors.LIGHT_RED, textDecorationLine: "underline" },
                   ]}
                 >
                   email not verified
@@ -338,39 +282,33 @@ export default function Profile() {
               </TouchableOpacity>
             )}
 
+            {/* Plan Button */}
             <TouchableOpacity
+              onPress={subscribe}
+              disabled={loading}
+              style={styles.planStatus}
               accessibilityLabel="Subscribe to a plan"
               accessibilityHint="Opens subscription page"
-              onPress={() => subscribe()}
-              disabled={loading}
-              style={[styles.planStatus]}
             >
               {loading ? (
                 <ActivityIndicator color={"green"} size={"small"} />
               ) : (
                 <Text
                   style={{
-                    color: userDetail.member ? Colors.GREEN : Colors.RED,
+                    color: isFreeUser ? Colors.RED : Colors.GREEN,
                     textDecorationLine: isFreeUser ? "underline" : "none",
                     fontFamily: "outfit-bold",
                   }}
                 >
-                  {userDetail?.planType && (
-                    <Text>{`${capitalize(userDetail.planType)} Plan`}</Text>
-                  )}
-                  {isFreeUser && <Text>Free Plan</Text>}
+                  {userDetail.planType
+                    ? `${capitalize(userDetail.planType)} Plan`
+                    : "Free Plan"}
                 </Text>
               )}
             </TouchableOpacity>
+
             {userDetail.planType && (
-              <Text
-                style={{
-                  fontFamily: "outfit",
-                  fontSize: 15,
-                  marginTop: 5,
-                  color: "#ccc",
-                }}
-              >
+              <Text style={styles.expiryText}>
                 Your plan will expire on{" "}
                 {new Date(userDetail.memberUntil).toLocaleDateString()}
               </Text>
@@ -378,17 +316,18 @@ export default function Profile() {
           </>
         )}
       </View>
+
+      {/* Scroll Menu */}
       <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={refreshData} />
         }
-        showsVerticalScrollIndicator={false}
-        style={styles.container}
       >
         <View style={styles.menuSection}>
           {renderedMenuItems.map((item) => (
-            // {menuItems.map((item) => (
             <TouchableOpacity
               key={item.label}
               style={styles.menuItem}
@@ -410,7 +349,7 @@ export default function Profile() {
           {isFreeUser && (
             <TouchableOpacity
               style={[styles.menuItem, { marginTop: 5 }]}
-              onPress={() => subscribe()}
+              onPress={subscribe}
               disabled={loading}
             >
               <SimpleLineIcons
@@ -429,14 +368,10 @@ export default function Profile() {
             style={[styles.menuItem, { marginTop: 5 }]}
             onPress={() =>
               Linking.openURL(url).catch((err) => {
-                console.error("Failed to open URL:", err);
-                ToastAndroid.show(
-                  "Failed to open Google Play store",
-                  ToastAndroid.SHORT
-                );
+                console.error("URL open failed:", err);
+                showToast("Failed to open Google Play");
               })
             }
-            disabled={loading}
           >
             <Entypo
               name="google-play"
@@ -451,17 +386,14 @@ export default function Profile() {
 
           <TouchableOpacity
             style={[styles.menuItem, { marginTop: 5 }]}
-            onPress={() => {
-              if (auth.currentUser && !auth.currentUser.emailVerified) {
-                ToastAndroid.show(
-                  "Please verify your email to access your downloaded courses.",
-                  ToastAndroid.LONG
-                );
-                return;
-              } else {
-                router.push("/download");
-              }
-            }}
+            onPress={() =>
+              auth.currentUser?.emailVerified
+                ? router.push("/download")
+                : showToast(
+                    "Please verify your email to access downloads.",
+                    ToastAndroid.LONG
+                  )
+            }
           >
             <FontAwesome6
               name="download"
@@ -504,29 +436,19 @@ export default function Profile() {
               style={styles.icon}
             />
             <Text
-              style={[
-                styles.menuLabel,
-                { color: Colors.RED, fontFamily: "outfit-bold" },
-              ]}
+              style={[styles.menuLabel, { color: Colors.RED, fontFamily: "outfit-bold" }]}
             >
               Log Out
             </Text>
           </TouchableOpacity>
         </View>
-        <Text
-          style={{
-            textAlign: "center",
-            color: Colors.GRAY,
-            marginTop: 10,
-            marginBottom: 30,
-            fontFamily: "outfit",
-          }}
-        >
+
+        <Text style={styles.versionText}>
           App Version {Constants.expoConfig?.version ?? "N/A"}
         </Text>
       </ScrollView>
 
-      {/* Password Modal */}
+      {/* Confirm Password Modal */}
       <Modal transparent visible={showPasswordModal} animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -552,31 +474,22 @@ export default function Profile() {
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: Colors.GRAY,
-                    disabled: loading,
-                    opacity: loading ? 0.5 : 1,
-                  },
-                ]}
+                style={[styles.modalButton, { backgroundColor: Colors.GRAY }]}
                 onPress={() => {
                   setShowPasswordModal(false);
                   setPassword("");
                 }}
+                disabled={loading}
               >
                 <Text style={styles.modalButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.modalButton,
-                  {
-                    backgroundColor: Colors.RED,
-                    disabled: !password,
-                    opacity: !password || loading ? 0.5 : 1,
-                  },
+                  { backgroundColor: Colors.RED, opacity: !password ? 0.5 : 1 },
                 ]}
                 onPress={handleDeleteAccount}
+                disabled={!password || loading}
               >
                 {loading ? (
                   <ActivityIndicator size={"large"} color={"white"} />
