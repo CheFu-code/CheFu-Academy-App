@@ -3,14 +3,14 @@ import { useRouter } from "expo-router";
 import { useContext } from "react";
 import {
   FlatList,
-  StyleSheet,
   Text,
   ToastAndroid,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { styles } from "../../styles/CourseView.styles";
 
 export default function Chapters({ course }) {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -25,22 +25,13 @@ export default function Chapters({ course }) {
     return isCompleted ? true : false;
   };
 
-  
   return (
     <View
       style={{
         padding: 20,
       }}
     >
-      <Text
-        style={{
-          fontFamily: "outfit-bold",
-          fontSize: 20,
-          color: Colors.WHITE,
-        }}
-      >
-        Chapters
-      </Text>
+      <Text style={styles.chapterText}>Chapters</Text>
 
       <FlatList
         style={{ marginBottom: 40 }}
@@ -80,28 +71,15 @@ export default function Chapters({ course }) {
                 });
               }}
               key={index}
-              style={{
-                marginVertical: 8,
-                padding: 15,
-                backgroundColor: "#f0f0f0",
-                borderRadius: 10,
-                borderWidth: 1,
-                borderStyle: "solid",
-                borderColor: completed ? Colors.GREEN : "#ccc",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                opacity: completed && userDetail.member === false ? 0.6 : 1,
-              }}
+              style={[
+                styles.buttonContainer,
+                {
+                  opacity: completed && userDetail.member === false ? 0.6 : 1,
+                  borderColor: completed ? Colors.GREEN : "#ccc",
+                },
+              ]}
             >
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: 5,
-                }}
-              >
+              <View style={styles.chapterNameContainer}>
                 <Text
                   style={[
                     styles.chapterText,
@@ -134,10 +112,3 @@ export default function Chapters({ course }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  chapterText: {
-    fontFamily: "outfit",
-    fontSize: 16,
-  },
-});

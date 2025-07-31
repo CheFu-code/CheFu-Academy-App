@@ -65,9 +65,9 @@ export default function CourseCard({
                         {course.courseTitle}
                     </Text>
 
-                    {userDetail?.email !== course?.createdBy && (
+                    {/* {userDetail?.email !== course?.createdBy && (
                         <Text numberOfLines={1}>{course?.createdBy}</Text>
-                    )}
+                    )} */}
 
                     <View style={styles.chapterContainer}>
                         <Text style={styles.chapter}>

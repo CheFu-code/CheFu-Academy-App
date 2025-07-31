@@ -1,4 +1,4 @@
-import { FontAwesome5, FontAwesome6, Ionicons } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
@@ -372,30 +372,14 @@ export default function Profile() {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity
-            style={[styles.menuItem, { marginTop: 5 }]}
-            onPress={() => router.push("/about")}
-            disabled={loading}
-          >
-            <Ionicons
-              name="information-circle-outline"
-              size={26}
-              color={Colors.PRIMARY}
-              style={styles.icon}
-            />
-            <Text style={[styles.menuLabel, { color: Colors.PRIMARY }]}>
-              About This App
-            </Text>
-          </TouchableOpacity>
-
           {userDetail?.member === false && (
             <TouchableOpacity
               style={[styles.menuItem, { marginTop: 5 }]}
               onPress={() => subscribe()}
               disabled={loading}
             >
-              <FontAwesome5
-                name="money-bill-wave"
+              <SimpleLineIcons
+                name="paypal"
                 size={20}
                 color={Colors.GREEN}
                 style={styles.icon}

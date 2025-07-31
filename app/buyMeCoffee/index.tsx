@@ -1,85 +1,29 @@
 import { AntDesign, Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { router } from "expo-router";
 import {
-    ActivityIndicator,
+    Linking,
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from "react-native";
-import { WebView } from "react-native-webview";
 import { Colors } from "../../constant/Colors";
+import { styles } from "../../styles/BuyMeCoffee.styles";
 
 export default function BuyMeCoffee() {
-    const [open, setOpen] = useState(false)
-
-    if (open) {
-        return (
-            <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
-                <TouchableOpacity
-                    onPress={() => setOpen(false)}
-                    style={{
-                        padding: 15,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        backgroundColor: Colors.BG_COLOR,
-                        zIndex: 1,
-                    }}
-                >
-                    <AntDesign name="left" size={24} color="white" />
-                    <Text style={{ color: Colors.YELLOW, marginLeft: 8, fontSize: 16 }}>
-                        Back
-                    </Text>
-                </TouchableOpacity>
-
-                <WebView
-                    source={{ uri: "https://www.buymeacoffee.com/chefu" }}
-                    style={{ flex: 1 }}
-                    startInLoadingState={true}
-                    renderLoading={() => (
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <ActivityIndicator color={"yellow"} />
-                        </View>
-                    )}
-                />
-
-            </View>
-        );
-    }
-
-
 
     return (
-        <View style={{ backgroundColor: Colors.BG_COLOR, padding: 20, }}>
-
-            <TouchableOpacity
-                style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 8,
-                    marginTop: 20,
-                }}
-            >
+        <View style={{ backgroundColor: Colors.BG_COLOR, padding: 20 }}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <AntDesign
                     style={{ marginTop: 5 }}
                     name="left"
                     size={24}
                     color="white"
                 />
-                <Text
-                    style={{
-                        color: Colors.YELLOW,
-                        fontFamily: "space-mono",
-                        fontSize: 20,
-                    }}
-                >
-                    Buy me coffee
-                </Text>
+                <Text style={styles.buyMeCoffee}>Buy me coffee</Text>
             </TouchableOpacity>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-            >
+            <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={styles.heading}>☕ Support CheFu Academy</Text>
 
                 <Text style={styles.paragraph}>
@@ -116,20 +60,11 @@ export default function BuyMeCoffee() {
                 </Text>
             </ScrollView>
 
-
             <TouchableOpacity
                 onPress={() => {
-                    setOpen(true)
+                    Linking.openURL("https://www.buymeacoffee.com/chefu");
                 }}
-                style={{
-                    borderRadius: 20,
-                    backgroundColor: Colors.YELLOW,
-                    padding: 10,
-                    maxWidth: 200,
-                    alignItems: "center",
-                    alignSelf: "center",
-                    marginBottom: 80
-                }}
+                style={styles.buttonContainer}
             >
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
                     <Feather
@@ -138,48 +73,10 @@ export default function BuyMeCoffee() {
                         size={22}
                         color="black"
                     />
-                    <Text
-                        style={{
-                            textAlign: "center",
-                            padding: 5,
-                            fontFamily: "outfit-bold",
-                        }}
-                    >
-                        Buy me a coffee
-                    </Text>
+                    <Text style={styles.buttonText}>Buy me a coffee</Text>
                 </View>
             </TouchableOpacity>
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        // padding: 20,
-        // paddingBottom: 40,
-        color: Colors.BG_COLOR,
-    },
-    heading: {
-        fontSize: 23,
-        fontWeight: "bold",
-        marginBottom: 15,
-        color: Colors.PRIMARY,
-        marginTop: 25,
-        textAlign: "center",
-    },
-    paragraph: {
-        fontSize: 16,
-        lineHeight: 24,
-        color: "#fff",
-        marginBottom: 15,
-    },
-    quote: {
-        fontStyle: "italic",
-        fontSize: 16,
-        color: "#666",
-        marginVertical: 20,
-        paddingLeft: 10,
-        borderLeftWidth: 3,
-        borderLeftColor: "#ccc",
-    },
-});

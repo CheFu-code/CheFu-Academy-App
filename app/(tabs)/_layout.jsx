@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -88,12 +88,12 @@ const TabLayout = () => {
           name="explore"
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons
+              <MaterialCommunityIcons
                 style={{
                   marginTop: 25,
                   height: "100%",
                 }}
-                name="search-outline"
+                name="book-search"
                 size={size}
                 color={color}
               />
@@ -110,10 +110,14 @@ const TabLayout = () => {
                 style={{
                   marginTop: 25,
                   height: "100%",
+                  backgroundColor: Colors.LIGHT_GREEN,
+                  padding: 18,
+                  borderRadius: 100,
+                  color: Colors.BLACK,
                 }}
                 name="bar-chart-outline"
                 size={size}
-                color={color}
+                color={Colors.BLACK}
               />
             ),
             tabBarLabel: "Progress",

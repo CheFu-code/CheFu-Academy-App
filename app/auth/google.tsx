@@ -79,7 +79,7 @@ export default function GoogleAuthScreen() {
                 loop
                 style={{ width: 150, height: 150 }}
             />
-            <Text style={styles.message}>Please press the button below to sign in</Text>
+            <Text style={styles.message}>Finishing setup...</Text>
 
         </View>
     );

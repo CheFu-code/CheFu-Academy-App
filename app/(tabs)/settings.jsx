@@ -327,7 +327,7 @@ export default function SettingsScreen() {
             />
             <SettingItem
               label="Export My Data"
-              icon="download"
+              icon="share-outline"
               onPress={exportUserData}
               disabled={loading}
             />
@@ -339,12 +339,7 @@ export default function SettingsScreen() {
                 style={{ marginBottom: 10 }}
               />
             )}
-            <SettingItem
-              label="Trusted Devices"
-              icon="hardware-chip"
-              onPress={() => router.push("/trustedDevices")}
-              disabled={loading}
-            />
+
             {!userDetail?.roles?.includes("admin") && (
               <SettingItem
                 label="Live Support"
@@ -398,7 +393,19 @@ export default function SettingsScreen() {
               onPress={() => router.push("/permissions")}
             />
 
+            <SettingItem
+              label="Trusted Devices"
+              icon="hardware-chip"
+              onPress={() => router.push("/trustedDevices")}
+              disabled={loading}
+            />
+
             <Text style={styles.heading}>About</Text>
+            <SettingItem
+              label="About this App"
+              icon="information-circle-outline"
+              onPress={() => router.push("/about")}
+            />
             <SettingItem
               label="App Version"
               icon="information-circle"
