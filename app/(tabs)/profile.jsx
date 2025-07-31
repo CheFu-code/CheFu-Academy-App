@@ -1,8 +1,15 @@
-// --- External imports ---
+// --- Imports ---
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -53,14 +60,26 @@ export default function Profile() {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const auth = getAuth();
 
+  // Destructure to reduce repeated optional chaining
+  const {
+    email,
+    fullname,
+    member,
+    memberUntil,
+    planType,
+    profilePicture,
+    provider,
+  } = userDetail || {};
+
   // --- Local States ---
   const [loading, setLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [fetching, setFetching] = useState(false);
-  const isFreeUser = !userDetail?.member; // simpler check
+  const fetchingRef = useRef(false); // Use ref to avoid re-renders when tracking fetching
+
+  const isFreeUser = !member;
 
   const [modalVisible, setModalVisible] = useState({
     visible: false,
@@ -89,14 +108,14 @@ export default function Profile() {
 
   // --- Refresh Profile ---
   const refreshData = useCallback(async () => {
-    if (fetching || !userDetail?.email) return;
+    if (fetchingRef.current || !email) return;
 
     setRefreshing(true);
-    setFetching(true);
+    fetchingRef.current = true;
 
     try {
       const firestore = getFirestore();
-      const snap = await getDoc(doc(firestore, "users", userDetail.email));
+      const snap = await getDoc(doc(firestore, "users", email));
       if (snap.exists()) {
         setUserDetail(snap.data());
         showToast("Profile refreshed");
@@ -108,19 +127,18 @@ export default function Profile() {
       showToast("Failed to refresh profile");
     } finally {
       setRefreshing(false);
-      setFetching(false);
+      fetchingRef.current = false;
     }
-  }, [fetching, userDetail?.email, setUserDetail, showToast]);
+  }, [email, setUserDetail, showToast]);
 
   // Redirect if no user, else refresh profile once on mount
   useEffect(() => {
-    if (!userDetail?.email) {
+    if (!email) {
       router.replace("/auth/signIn");
-    } else if (!refreshing) {
+    } else {
       refreshData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // run once on mount
+  }, [email, router, refreshData]);
 
   // --- Logout ---
   const handleLogout = useCallback(() => {
@@ -234,16 +252,16 @@ export default function Profile() {
           : "Please try again later.",
       });
     }
-  }, [auth.currentUser]);
+  }, [auth]);
 
   // --- Subscription Handler ---
   const subscribe = useCallback(() => {
-    if (userDetail?.member === true) {
+    if (member === true) {
       showToast("You are already a member.");
     } else {
       router.push("/subscription");
     }
-  }, [userDetail?.member, router, showToast]);
+  }, [member, router, showToast]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -258,11 +276,11 @@ export default function Profile() {
         <Image
           style={[
             styles.avatar,
-            { borderColor: userDetail?.member ? Colors.GREEN : Colors.PRIMARY },
+            { borderColor: member ? Colors.GREEN : Colors.PRIMARY },
           ]}
           source={
-            ["github.com", "google.com"].includes(userDetail?.provider)
-              ? { uri: userDetail.profilePicture }
+            ["github.com", "google.com"].includes(provider)
+              ? { uri: profilePicture }
               : require("../../assets/images/logo.png")
           }
         />
@@ -274,9 +292,9 @@ export default function Profile() {
               style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
             >
               <Text numberOfLines={1} style={styles.profileName}>
-                {userDetail.fullname}
+                {fullname}
               </Text>
-              {userDetail.member && (
+              {member && (
                 <Ionicons
                   color={Colors.GREEN}
                   size={20}
@@ -286,7 +304,7 @@ export default function Profile() {
             </View>
 
             <Text numberOfLines={1} style={styles.profileEmail}>
-              {userDetail.email}
+              {email}
             </Text>
 
             {!auth.currentUser?.emailVerified && (
@@ -324,17 +342,15 @@ export default function Profile() {
                     fontFamily: "outfit-bold",
                   }}
                 >
-                  {userDetail.planType
-                    ? `${capitalize(userDetail.planType)} Plan`
-                    : "Free Plan"}
+                  {planType ? `${capitalize(planType)} Plan` : "Free Plan"}
                 </Text>
               )}
             </TouchableOpacity>
 
-            {userDetail.planType && (
+            {planType && memberUntil && (
               <Text style={styles.expiryText}>
                 Your plan will expire on{" "}
-                {new Date(userDetail.memberUntil).toLocaleDateString()}
+                {new Date(memberUntil).toLocaleDateString()}
               </Text>
             )}
           </>
@@ -492,7 +508,9 @@ export default function Profile() {
                 autoCapitalize="none"
                 autoCorrect={false}
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <TouchableOpacity
+                onPress={() => setShowPassword((prev) => !prev)}
+              >
                 <Ionicons
                   name={showPassword ? "eye-off" : "eye"}
                   size={22}
