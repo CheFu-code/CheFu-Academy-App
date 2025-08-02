@@ -18,7 +18,9 @@ import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNot
 import { getApp } from "@react-native-firebase/app";
 import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
+import OfflineScreen from "../component/OfflineScreen";
 import { Colors } from "../constant/Colors";
+import { NetworkProvider, useNetwork } from "../context/NetworkContext";
 import { UserDetailContext } from "../context/UserDetailContext";
 
 // ✅ Sentry Init
@@ -33,10 +35,11 @@ Sentry.init({
   ],
 });
 
-export default Sentry.wrap(function RootLayout() {
+function LayoutContent() {
   const [userDetail, setUserDetail] = useState();
   const [authChecked, setAuthChecked] = useState(false);
   const [authSuccess, setAuthSuccess] = useState(false);
+  const { isConnected } = useNetwork();
   const router = useRouter();
   const lastHandledOrderID = useRef(null);
   const alreadyRedirected = useRef(false);
@@ -48,7 +51,6 @@ export default Sentry.wrap(function RootLayout() {
     "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // ✅ Biometric Authentication on App Launch
   useEffect(() => {
     const checkBiometrics = async () => {
       try {
@@ -74,7 +76,7 @@ export default Sentry.wrap(function RootLayout() {
 
           setAuthSuccess(result.success);
         } else {
-          setAuthSuccess(true); // Biometric disabled, allow in
+          setAuthSuccess(true);
         }
       } catch (error) {
         console.error("Biometric error:", error);
@@ -88,19 +90,19 @@ export default Sentry.wrap(function RootLayout() {
     checkBiometrics();
   }, []);
 
-  // ✅ Global Auth Redirect
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(getApp()), (user) => {
       if (authChecked && authSuccess && !user && !alreadyRedirected.current) {
         alreadyRedirected.current = true;
-        console.warn("No authenticated user from layout. Redirecting to welcome screen");
+        console.warn(
+          "No authenticated user from layout. Redirecting to welcome screen"
+        );
         router.replace("/");
       }
     });
     return unsubscribe;
   }, [authChecked, authSuccess, router]);
 
-  // ✅ Notifications Setup
   useEffect(() => {
     requestUserPermission();
 
@@ -138,7 +140,6 @@ export default Sentry.wrap(function RootLayout() {
     return () => unsubscribe();
   }, []);
 
-  // ✅ Deep Link Setup
   useEffect(() => {
     const subscription = Linking.addEventListener("url", ({ url }) => {
       handleDeepLink(url);
@@ -170,6 +171,8 @@ export default Sentry.wrap(function RootLayout() {
     }
   };
 
+  if (!isConnected) return <OfflineScreen />;
+
   if (fontError) {
     return (
       <View
@@ -194,6 +197,7 @@ export default Sentry.wrap(function RootLayout() {
       </View>
     );
   }
+
   if (!fontsLoaded || !authChecked || !authSuccess) {
     return (
       <View
@@ -209,10 +213,7 @@ export default Sentry.wrap(function RootLayout() {
           source={require("../assets/images/loading.json")}
           autoPlay
           loop
-          style={{
-            width: 150,
-            height: 150,
-          }}
+          style={{ width: 150, height: 150 }}
         />
         <Text
           style={{
@@ -225,7 +226,6 @@ export default Sentry.wrap(function RootLayout() {
         >
           Please wait while we unlock CheFu Academy for you...
         </Text>
-
         <Text
           style={{
             marginTop: 8,
@@ -256,5 +256,13 @@ export default Sentry.wrap(function RootLayout() {
         }}
       />
     </UserDetailContext.Provider>
+  );
+}
+
+export default Sentry.wrap(function RootLayout() {
+  return (
+    <NetworkProvider>
+      <LayoutContent />
+    </NetworkProvider>
   );
 });
