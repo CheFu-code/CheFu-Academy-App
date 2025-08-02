@@ -313,7 +313,7 @@ const SignIn = () => {
             <LottieView
               autoPlay
               loop={true}
-              source={require("./../../assets/animations/Chatbot.json")}
+              source={require("./../../assets/animations/Login.json")}
               style={styles.lottieView}
             />
             <Text style={styles.welcomeText}>Welcome back</Text>

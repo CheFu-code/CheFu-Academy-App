@@ -18,7 +18,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   ToastAndroid,
@@ -30,6 +29,7 @@ import { generateCourse, generateTopics } from "../../config/AiModel";
 import { Colors } from "../../constant/Colors";
 import Prompt from "../../constant/Prompt";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { styles } from "../../styles/AddCourse";
 import { handleAiError } from "../../utils/errorUtils";
 
 export default function AddCourse() {
@@ -323,42 +323,20 @@ export default function AddCourse() {
   return (
     <>
       <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-            paddingHorizontal: 30,
-            paddingTop: 40, // adjust for status bar
-            backgroundColor: Colors.BG_COLOR,
-            zIndex: 10,
-          }}
-        >
+        <View style={styles.container}>
           <Pressable
             onPress={() => {
               if (!loading) router.back();
             }}
           >
             <Ionicons
-              style={{
-                padding: 3,
-                borderRadius: 10,
-                backgroundColor: Colors.BG_GRAY,
-              }}
+              style={styles.backIcon}
               name="arrow-back"
               size={24}
               color={Colors.PRIMARY}
             />
           </Pressable>
-          <Text
-            style={{
-              fontFamily: "outfit-bold",
-              fontSize: 24,
-              color: Colors.PRIMARY,
-            }}
-          >
-            Create new course
-          </Text>
+          <Text style={styles.header}>Create new course</Text>
         </View>
 
         <ScrollView
@@ -371,26 +349,9 @@ export default function AddCourse() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 16,
-                color: "#fff",
-                marginTop: 5,
-              }}
-            >
-              What do you want to learn today?
-            </Text>
-            <Text
-              style={{
-                fontFamily: "outfit",
-                fontSize: 14,
-                color: "#666",
-                marginTop: 10,
-              }}
-            >
-              What course do you want to create? (eg: Learn JavaScript, Machine
-              Learning, History, Business studies, etc)
+            <Text style={styles.title}>What do you want to learn today?</Text>
+            <Text style={styles.subtitle}>
+              What course do you want to create? (eg: Learn JavaScript)
             </Text>
 
             <TextInput
@@ -420,41 +381,25 @@ export default function AddCourse() {
               }}
             >
               {topics.length > 0 && (
-                <Text
-                  style={{
-                    fontFamily: "outfit",
-                    fontSize: 17,
-                    color: "#fff",
-                  }}
-                >
+                <Text style={styles.selectTopic}>
                   Select all topics which you want to add in this course
                 </Text>
               )}
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 10,
-                  marginTop: 6,
-                }}
-              >
+              <View style={styles.topicsContainer}>
                 {topics.map((item, index) => (
                   <Pressable key={index} onPress={() => onTopicSelect(item)}>
                     <Text
-                      style={{
-                        padding: 7,
-                        borderWidth: 0.4,
-                        borderColor: Colors.WHITE,
-                        borderRadius: 99,
-                        paddingHorizontal: 15,
-                        backgroundColor: isTopicSelected(item)
-                          ? Colors.PRIMARY
-                          : null,
-                        color: isTopicSelected(item)
-                          ? Colors.WHITE
-                          : Colors.GREEN,
-                      }}
+                      style={[
+                        styles.topics,
+                        {
+                          backgroundColor: isTopicSelected(item)
+                            ? Colors.PRIMARY
+                            : null,
+                          color: isTopicSelected(item)
+                            ? Colors.WHITE
+                            : Colors.GREEN,
+                        },
+                      ]}
                     >
                       {item.replace(/^"|"$/g, "")}
                     </Text>
@@ -502,75 +447,3 @@ export default function AddCourse() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#121212",
-    padding: 30,
-    borderRadius: 16,
-    alignItems: "center",
-    width: 300,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: "outfit-bold",
-    color: Colors.GREEN,
-    marginTop: 15,
-  },
-  modalSubtext: {
-    fontSize: 14,
-    color: "#ccc",
-    textAlign: "center",
-    marginTop: 8,
-    fontFamily: "outfit",
-  },
-  textInput: {
-    padding: 15,
-    backgroundColor: Colors.WHITE,
-    width: "100%",
-    borderRadius: 10,
-    marginTop: 20,
-    color: "green", // Assuming a dark text color for input
-    height: 90,
-    alignItems: "flex-start",
-    fontSize: 16,
-    fontFamily: "outfit-bold",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  cancelButton: {
-    flex: 1,
-    padding: 10,
-    marginRight: 10,
-    alignItems: "center",
-  },
-  cancelText: {
-    fontFamily: "outfit-bold",
-    color: "red",
-    textAlign: "center",
-    marginTop: 10,
-    fontSize: 16,
-  },
-  subscribeButton: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: Colors.GREEN,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  subscribeText: {
-    fontWeight: "bold",
-    color: Colors.WHITE,
-    fontSize: 16,
-  },
-});

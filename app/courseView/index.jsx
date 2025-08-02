@@ -414,7 +414,7 @@ export default function CourseView() {
         <Ionicons size={24} color={Colors.BLACK} name="arrow-back" />
       </Pressable>
 
-      {userDetail?.isVerified === true ? (
+      {auth.currentUser?.emailVerified ? (
         <Pressable
           disabled={loading}
           onPress={() => downloadCourse(course)}

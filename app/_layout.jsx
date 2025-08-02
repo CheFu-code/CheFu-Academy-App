@@ -51,6 +51,32 @@ function LayoutContent() {
     "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
+  // useEffect(() => {
+  //   const checkInstaller = async () => {
+  //     if (Platform.OS === "android") {
+  //       const installer = await DeviceInfo.getInstallerPackageName();
+  //       if (installer !== "com.android.vending") {
+  //         Alert.alert(
+  //           "Get the Official Version",
+  //           "Please install CheFu Academy from Google Play to receive updates.",
+  //           [
+  //             {
+  //               text: "Go to Play Store",
+  //               onPress: () =>
+  //                 Linking.openURL(
+  //                   "https://play.google.com/store/apps/details?id=com.chefu.chefuacademy"
+  //                 ),
+  //             },
+  //             { text: "Cancel", style: "cancel" },
+  //           ]
+  //         );
+  //       }
+  //     }
+  //   };
+
+  //   checkInstaller();
+  // }, []);
+
   useEffect(() => {
     const checkBiometrics = async () => {
       try {
@@ -205,12 +231,12 @@ function LayoutContent() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: Colors.WHITE,
-          paddingHorizontal: 24,
+          backgroundColor: Colors.BG_COLOR,
+          paddingHorizontal: 18,
         }}
       >
         <LottieView
-          source={require("../assets/images/loading.json")}
+          source={require("../assets/animations/Face scanning.json")}
           autoPlay
           loop
           style={{ width: 150, height: 150 }}
@@ -230,7 +256,7 @@ function LayoutContent() {
           style={{
             marginTop: 8,
             fontSize: 14,
-            color: Colors.BLACK,
+            color: Colors.WHITE,
             fontFamily: "outfit-bold",
             textAlign: "center",
           }}

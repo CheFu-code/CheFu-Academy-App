@@ -79,9 +79,7 @@ export default function Profile() {
   const [showPassword, setShowPassword] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const fetchingRef = useRef(false); // Use ref to avoid re-renders when tracking fetching
-
   const isFreeUser = !member;
-
   const [modalVisible, setModalVisible] = useState({
     visible: false,
     title: "",

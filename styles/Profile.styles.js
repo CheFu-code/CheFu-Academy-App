@@ -18,6 +18,7 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
     marginBottom: 15,
     marginTop: 30,
+    objectFit: "contain",
   },
   profileName: {
     fontSize: 22,
