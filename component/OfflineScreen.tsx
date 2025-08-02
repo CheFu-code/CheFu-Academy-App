@@ -8,7 +8,7 @@ export default function OfflineScreen() {
 
         <View style={styles.container}>
             <LottieView
-                source={require("../assets/animations/No Connection.json")}
+                source={require("../assets/animations/no internet.json")}
                 autoPlay
                 loop
                 style={styles.lottie}
@@ -31,15 +31,16 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     title: {
-        color: Colors.PRIMARY,
+        color: Colors.RED,
         fontSize: 24,
-        fontWeight: "bold",
+        fontFamily: "outfit-bold",
         marginBottom: 8,
     },
     subtitle: {
         color: "#fff",
         fontSize: 16,
         textAlign: "center",
+        fontFamily: "outfit",
     },
     lottie: {
         width: 150,
