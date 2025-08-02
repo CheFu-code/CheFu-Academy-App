@@ -431,7 +431,11 @@ export default function CourseView() {
           {loading ? (
             <ActivityIndicator size={"small"} color={"white"} />
           ) : downloaded ? (
-            <TouchableOpacity onPress={() => router.push("/download")}>
+            <TouchableOpacity
+              onPress={() => {
+                ToastAndroid.show("Already downloaded", ToastAndroid.SHORT);
+              }}
+            >
               <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
                 <MaterialIcons name="download-done" size={24} color="white" />
               </Animated.View>
