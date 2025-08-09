@@ -1,75 +1,70 @@
 {
-  "expo": {
-    "name": "CheFu Academy",
-    "slug": "chefu-academy",
-    "version": "1.2025.1",
-    "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
-    "scheme": "chefu-academy",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "package": "com.chefu.chefuacademy",
-      "googleServicesFile": "./google-services.json",
-      "permissions": [
-        "NOTIFICATIONS"
-      ],
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#FFF9C4"
-      },
-      "edgeToEdgeEnabled": true,
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "data": {
-            "scheme": "chefu-academy"
-          },
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+    "expo": {
+        "name": "CheFu Academy",
+        "slug": "chefu-academy",
+        "version": "1.2025.1",
+        "orientation": "portrait",
+        "icon": "./assets/images/logo.png",
+        "scheme": "chefu-academy",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "package": "com.chefu.chefuacademy",
+            "googleServicesFile": "./google-services.json",
+            "permissions": ["NOTIFICATIONS"],
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/logo.png",
+                "backgroundColor": "#FFF9C4"
+            },
+            "edgeToEdgeEnabled": true,
+            "intentFilters": [
+                {
+                    "action": "VIEW",
+                    "data": {
+                        "scheme": "chefu-academy"
+                    },
+                    "category": ["BROWSABLE", "DEFAULT"]
+                }
+            ]
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/images/logo.png"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/logo.png",
+                    "imageWidth": 200,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#FFF9C4"
+                }
+            ],
+            [
+                "react-native-google-mobile-ads",
+                {
+                    "androidAppId": "ca-app-pub-8952058057579255~3331962035",
+                    "iosAppId": "ca-app-pub-8952058057579255~3331962035"
+                }
+            ],
+            [
+                "@sentry/react-native/expo",
+                {
+                    "url": "https://sentry.io/",
+                    "project": "chefu-academy",
+                    "organization": "chefu"
+                }
+            ],
+            "expo-web-browser"
+        ],
+        "experiments": {
+            "typedRoutes": true
         }
-      ]
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/logo.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/logo.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#FFF9C4"
-        }
-      ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-8952058057579255~3331962035",
-          "iosAppId": "ca-app-pub-8952058057579255~3331962035"
-        }
-      ],
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "chefu-academy",
-          "organization": "chefu"
-        }
-      ],
-      "expo-web-browser"
-    ],
-    "experiments": {
-      "typedRoutes": true
     }
-  }
 }

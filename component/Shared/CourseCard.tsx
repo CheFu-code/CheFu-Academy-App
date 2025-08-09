@@ -59,30 +59,34 @@ export default function CourseCard({
                     />
                 )}
                 <View
-                    style={{ flex: 1, justifyContent: "space-between", minHeight: 80 }}
+                    style={{
+                        flex: 1,
+                        justifyContent: "space-between",
+                        minHeight: 80,
+                    }}
                 >
                     <Text numberOfLines={3} style={styles.courseTitle}>
                         {course.courseTitle}
                     </Text>
 
-                    {/* {userDetail?.email !== course?.createdBy && (
-                        <Text numberOfLines={1}>{course?.createdBy}</Text>
-                    )} */}
-
                     <View style={styles.chapterContainer}>
                         <Text style={styles.chapter}>
                             Chapters: {course.chapters?.length || 0}
                         </Text>
-                        {course?.createdBy === userDetail.email && <Text>Owner</Text>}
+                        {course?.createdBy === userDetail.email && (
+                            <Text>Owner</Text>
+                        )}
 
                         {course?.createdBy !== userDetail.email && (
                             <Text numberOfLines={1} style={styles.time}>
                                 {course?.createdOn?.toDate
-                                    ? course.createdOn.toDate().toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    })
+                                    ? course.createdOn
+                                          .toDate()
+                                          .toLocaleDateString("en-US", {
+                                              year: "numeric",
+                                              month: "long",
+                                              day: "numeric",
+                                          })
                                     : ""}
                             </Text>
                         )}

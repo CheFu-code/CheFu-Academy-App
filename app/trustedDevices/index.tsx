@@ -71,28 +71,47 @@ export default function TrustedDevices() {
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            if (!userDetail?.email || !userDetail?.trustedDevices) {
-                                ToastAndroid.show("Your data not found", ToastAndroid.SHORT);
+                            if (
+                                !userDetail?.email ||
+                                !userDetail?.trustedDevices
+                            ) {
+                                ToastAndroid.show(
+                                    "Your data not found",
+                                    ToastAndroid.SHORT
+                                );
                                 return;
                             }
                             setLoadingDevice(device.modelName || "unknown");
-                            const filteredDevices = userDetail.trustedDevices.filter(
-                                (d: TrustedDevice) =>
-                                    !(
-                                        d.brand === device.brand &&
-                                        d.modelName === device.modelName &&
-                                        d.osName === device.osName &&
-                                        d.osVersion === device.osVersion &&
-                                        d.deviceType === device.deviceType
-                                    )
+                            const filteredDevices =
+                                userDetail.trustedDevices.filter(
+                                    (d: TrustedDevice) =>
+                                        !(
+                                            d.brand === device.brand &&
+                                            d.modelName === device.modelName &&
+                                            d.osName === device.osName &&
+                                            d.osVersion === device.osVersion &&
+                                            d.deviceType === device.deviceType
+                                        )
+                                );
+                            await updateDoc(
+                                doc(db, "users", userDetail.email),
+                                {
+                                    trustedDevices: filteredDevices,
+                                }
                             );
-                            await updateDoc(doc(db, "users", userDetail.email), {
+                            setUserDetail({
+                                ...userDetail,
                                 trustedDevices: filteredDevices,
                             });
-                            setUserDetail({ ...userDetail, trustedDevices: filteredDevices });
-                            Alert.alert("Success", "Device removed from trusted list");
+                            Alert.alert(
+                                "Success",
+                                "Device removed from trusted list"
+                            );
                         } catch (error) {
-                            console.error("Error removing trusted device:", error);
+                            console.error(
+                                "Error removing trusted device:",
+                                error
+                            );
                             Alert.alert("Error", "Failed to remove device");
                         } finally {
                             setLoadingDevice(null);
@@ -195,9 +214,9 @@ export default function TrustedDevices() {
                                                 marginBottom: 5,
                                             }}
                                         >
-                                            {device.modelName || "Unknown Device"}
+                                            {device.modelName ||
+                                                "Unknown Device"}
                                         </Text>
-
 
                                         <Text
                                             numberOfLines={3}
@@ -208,9 +227,16 @@ export default function TrustedDevices() {
                                                 maxWidth: 210,
                                             }}
                                         >
-                                            <Text style={{ fontFamily: "outfit-bold", color: Colors.BLACK }}>Operating System:</Text> {device.osName || "Unknown OS"}
+                                            <Text
+                                                style={{
+                                                    fontFamily: "outfit-bold",
+                                                    color: Colors.BLACK,
+                                                }}
+                                            >
+                                                Operating System:
+                                            </Text>{" "}
+                                            {device.osName || "Unknown OS"}
                                         </Text>
-
 
                                         <Text
                                             numberOfLines={1}
@@ -221,9 +247,16 @@ export default function TrustedDevices() {
                                                 maxWidth: 210,
                                             }}
                                         >
-                                            <Text style={{ fontFamily: "outfit-bold", color: Colors.BLACK }}>Version: </Text>{device.osVersion || "N/A"}
+                                            <Text
+                                                style={{
+                                                    fontFamily: "outfit-bold",
+                                                    color: Colors.BLACK,
+                                                }}
+                                            >
+                                                Version:{" "}
+                                            </Text>
+                                            {device.osVersion || "N/A"}
                                         </Text>
-
 
                                         <Text
                                             style={{
@@ -232,24 +265,41 @@ export default function TrustedDevices() {
                                                 color: Colors.BLACK,
                                             }}
                                         >
-                                            <Text style={{ fontFamily: "outfit-bold", color: Colors.BLACK }}>Brand:</Text> {device.brand || "Unknown Brand"}
+                                            <Text
+                                                style={{
+                                                    fontFamily: "outfit-bold",
+                                                    color: Colors.BLACK,
+                                                }}
+                                            >
+                                                Brand:
+                                            </Text>{" "}
+                                            {device.brand || "Unknown Brand"}
                                         </Text>
-
-
                                     </View>
                                     <TouchableOpacity
-                                        disabled={loadingDevice === device.modelName}
-                                        onPress={() => deleteFromTrustedDevices(device)}
+                                        disabled={
+                                            loadingDevice === device.modelName
+                                        }
+                                        onPress={() =>
+                                            deleteFromTrustedDevices(device)
+                                        }
                                         style={{
                                             paddingHorizontal: 10,
                                             paddingVertical: 8,
                                             borderRadius: 12,
                                             backgroundColor: Colors.LIGHT_RED,
-                                            opacity: loadingDevice === device.modelName ? 0.6 : 1,
+                                            opacity:
+                                                loadingDevice ===
+                                                device.modelName
+                                                    ? 0.6
+                                                    : 1,
                                         }}
                                     >
                                         {loadingDevice === device.modelName ? (
-                                            <ActivityIndicator color={Colors.WHITE} size="small" />
+                                            <ActivityIndicator
+                                                color={Colors.WHITE}
+                                                size="small"
+                                            />
                                         ) : (
                                             <Text
                                                 style={{
@@ -290,7 +340,9 @@ export default function TrustedDevices() {
                                 marginTop: 10,
                             }}
                         >
-                            Trusted devices will be added automatically as you continue using the app. You can revisit this page after multiple logins to see them.
+                            Trusted devices will be added automatically as you
+                            continue using the app. You can revisit this page
+                            after multiple logins to see them.
                         </Text>
                     </>
                 )}
@@ -306,12 +358,13 @@ export default function TrustedDevices() {
                                 lineHeight: 20,
                             }}
                         >
-                            Any logins not done on trusted devices listed above will be
-                            flagged, and a security alert will be sent to your email for
-                            verification—but only if you have toggled on the option to send
-                            email alerts under the Email Alerts setting. By default, this
-                            option is turned on. You can toggle it off if you don’t want to
-                            receive email alerts.
+                            Any logins not done on trusted devices listed above
+                            will be flagged, and a security alert will be sent
+                            to your email for verification—but only if you have
+                            toggled on the option to send email alerts under the
+                            Email Alerts setting. By default, this option is
+                            turned on. You can toggle it off if you don’t want
+                            to receive email alerts.
                         </Text>
                     </View>
                 )}

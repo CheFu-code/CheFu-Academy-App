@@ -83,7 +83,7 @@ export default function AdminChat() {
                 if (userDoc.exists()) {
                     setSelectedUserFullname(
                         userDoc.data()?.fullname ||
-                        `User (${String(selectedUserId).substring(0, 5)}...)`
+                            `User (${String(selectedUserId).substring(0, 5)}...)`
                     );
                 } else {
                     setSelectedUserFullname(
@@ -136,7 +136,6 @@ export default function AdminChat() {
                 expireAt, // 👈 Add this
             });
 
-
         // 2. Fetch user email
         const userDoc = await firestore()
             .collection("users")
@@ -162,7 +161,7 @@ export default function AdminChat() {
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-            // keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 100}
+                // keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 100}
             >
                 <TouchableOpacity
                     onPress={() => router.back()}
@@ -203,9 +202,14 @@ export default function AdminChat() {
                     renderItem={({ item }) => (
                         <View
                             style={{
-                                alignSelf: item.sender === "admin" ? "flex-end" : "flex-start",
+                                alignSelf:
+                                    item.sender === "admin"
+                                        ? "flex-end"
+                                        : "flex-start",
                                 backgroundColor:
-                                    item.sender === "admin" ? Colors.PRIMARY : Colors.BG,
+                                    item.sender === "admin"
+                                        ? Colors.PRIMARY
+                                        : Colors.BG,
                                 marginVertical: 2,
                                 padding: 8,
                                 borderRadius: 10,
@@ -216,31 +220,52 @@ export default function AdminChat() {
                         >
                             <Text
                                 style={{
-                                    color: item.sender === "admin" ? Colors.BLACK : Colors.RED,
+                                    color:
+                                        item.sender === "admin"
+                                            ? Colors.BLACK
+                                            : Colors.RED,
                                     fontFamily: "outfit-bold",
                                     fontSize: 16,
                                     marginBottom: 2,
-                                    textAlign: item.sender === "admin" ? "right" : "left",
+                                    textAlign:
+                                        item.sender === "admin"
+                                            ? "right"
+                                            : "left",
                                 }}
                             >
-                                {item.sender === "admin" ? "Admin" : selectedUserFullname}
+                                {item.sender === "admin"
+                                    ? "Admin"
+                                    : selectedUserFullname}
                             </Text>
 
-                            <Text style={{ color: "#fff", fontFamily: "outfit-bold" }}>
+                            <Text
+                                style={{
+                                    color: "#fff",
+                                    fontFamily: "outfit-bold",
+                                }}
+                            >
                                 {item.text}
                             </Text>
 
                             <Text
                                 style={{
-                                    color: item.sender === "admin" ? Colors.BLACK : Colors.GREEN,
+                                    color:
+                                        item.sender === "admin"
+                                            ? Colors.BLACK
+                                            : Colors.GREEN,
                                     fontFamily: "outfit-bold",
                                     fontSize: 10,
                                     marginTop: 2,
-                                    textAlign: item.sender === "admin" ? "right" : "left",
+                                    textAlign:
+                                        item.sender === "admin"
+                                            ? "right"
+                                            : "left",
                                 }}
                             >
                                 {item.createdAt?.toDate
-                                    ? dayjs(item.createdAt.toDate()).format("h:mm A")
+                                    ? dayjs(item.createdAt.toDate()).format(
+                                          "h:mm A"
+                                      )
                                     : ""}
                             </Text>
                         </View>
@@ -276,7 +301,9 @@ export default function AdminChat() {
                         }}
                     />
                     <TouchableOpacity
-                        disabled={sending || !selectedUserId || input.trim() === ""}
+                        disabled={
+                            sending || !selectedUserId || input.trim() === ""
+                        }
                         onPress={handleSend}
                         style={{
                             paddingHorizontal: 16,
@@ -286,14 +313,21 @@ export default function AdminChat() {
                             justifyContent: "center",
                             alignItems: "center",
                             opacity:
-                                sending || !selectedUserId || input.trim() === "" ? 0.5 : 1,
+                                sending ||
+                                !selectedUserId ||
+                                input.trim() === ""
+                                    ? 0.5
+                                    : 1,
                         }}
                     >
                         {sending ? (
                             <ActivityIndicator size={"small"} color={"white"} />
                         ) : (
                             <Text
-                                style={{ color: Colors.PRIMARY, fontFamily: "outfit-bold" }}
+                                style={{
+                                    color: Colors.PRIMARY,
+                                    fontFamily: "outfit-bold",
+                                }}
                             >
                                 Send
                             </Text>

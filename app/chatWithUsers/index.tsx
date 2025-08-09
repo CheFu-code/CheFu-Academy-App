@@ -34,98 +34,113 @@ export default function ChatWithUsers() {
     const router = useRouter();
 
     useEffect(() => {
-        const unsubscribe = firestore().collection("chats").onSnapshot(async (chatsSnapshot) => {
-            try {
-                const chatIds = chatsSnapshot.docs.map((doc) => doc.id);
+        const unsubscribe = firestore()
+            .collection("chats")
+            .onSnapshot(async (chatsSnapshot) => {
+                try {
+                    const chatIds = chatsSnapshot.docs.map((doc) => doc.id);
 
-                const userPromises = chatIds.map(async (userId) => {
-                    // Fetch user data
-                    const userDoc = await firestore()
-                        .collection("users")
-                        .doc(userId)
-                        .get();
-                    const fullname = userDoc.exists()
-                        ? userDoc.data()?.fullname
-                        : `User (${userId.substring(0, 5)}...)`;
-                    const photoURL = userDoc.exists() ? userDoc.data()?.photoURL : null;
+                    const userPromises = chatIds.map(async (userId) => {
+                        // Fetch user data
+                        const userDoc = await firestore()
+                            .collection("users")
+                            .doc(userId)
+                            .get();
+                        const fullname = userDoc.exists()
+                            ? userDoc.data()?.fullname
+                            : `User (${userId.substring(0, 5)}...)`;
+                        const photoURL = userDoc.exists()
+                            ? userDoc.data()?.photoURL
+                            : null;
 
-                    // Fetch last message and unread count
-                    const chatDoc = chatsSnapshot.docs.find(doc => doc.id === userId);
-                    const lastReadByAdmin = chatDoc?.data()?.lastReadByAdmin || null;
-
-                    const messagesRef = firestore()
-                        .collection("chats")
-                        .doc(userId)
-                        .collection("messages");
-
-                    const lastMessageQuery = messagesRef
-                        .orderBy("createdAt", "desc")
-                        .limit(1);
-                    const messagesSnapshot = await lastMessageQuery.get();
-
-                    let lastMessage = "No messages yet";
-                    let lastMessageTimestamp = null;
-
-                    if (!messagesSnapshot.empty) {
-                        const lastMsgData = messagesSnapshot.docs[0].data();
-                        lastMessage = lastMsgData.text;
-                        lastMessageTimestamp = lastMsgData.createdAt;
-                    }
-
-                    let unreadCount = 0;
-                    if (lastReadByAdmin) {
-                        const unreadQuery = messagesRef
-                            .where("sender", "!=", "admin")
-                            .where("createdAt", ">", lastReadByAdmin);
-                        const unreadSnapshot = await unreadQuery.get();
-                        unreadCount = unreadSnapshot.size;
-                    } else {
-                        // If no lastReadByAdmin, all user messages are unread
-                        const allUserMessagesQuery = messagesRef.where("sender", "!=", "admin");
-                        const allUserMessagesSnapshot = await allUserMessagesQuery.get();
-                        unreadCount = allUserMessagesSnapshot.size;
-                    }
-
-                    return {
-                        id: userId,
-                        fullname,
-                        photoURL,
-                        lastMessage,
-                        lastMessageTimestamp,
-                        unreadCount,
-                    };
-                });
-
-                const usersData = await Promise.all(userPromises);
-
-                // Sort chats by the most recent message
-                usersData.sort((a, b) => {
-                    if (a.lastMessageTimestamp && b.lastMessageTimestamp) {
-                        return (
-                            b.lastMessageTimestamp.toMillis() -
-                            a.lastMessageTimestamp.toMillis()
+                        // Fetch last message and unread count
+                        const chatDoc = chatsSnapshot.docs.find(
+                            (doc) => doc.id === userId
                         );
-                    }
-                    return 0;
-                });
+                        const lastReadByAdmin =
+                            chatDoc?.data()?.lastReadByAdmin || null;
 
-                setUserChats(usersData);
-            } catch (error) {
-                console.error("❌ Error fetching chats:", error);
-            } finally {
-                setLoading(false);
-            }
-        });
+                        const messagesRef = firestore()
+                            .collection("chats")
+                            .doc(userId)
+                            .collection("messages");
+
+                        const lastMessageQuery = messagesRef
+                            .orderBy("createdAt", "desc")
+                            .limit(1);
+                        const messagesSnapshot = await lastMessageQuery.get();
+
+                        let lastMessage = "No messages yet";
+                        let lastMessageTimestamp = null;
+
+                        if (!messagesSnapshot.empty) {
+                            const lastMsgData = messagesSnapshot.docs[0].data();
+                            lastMessage = lastMsgData.text;
+                            lastMessageTimestamp = lastMsgData.createdAt;
+                        }
+
+                        let unreadCount = 0;
+                        if (lastReadByAdmin) {
+                            const unreadQuery = messagesRef
+                                .where("sender", "!=", "admin")
+                                .where("createdAt", ">", lastReadByAdmin);
+                            const unreadSnapshot = await unreadQuery.get();
+                            unreadCount = unreadSnapshot.size;
+                        } else {
+                            // If no lastReadByAdmin, all user messages are unread
+                            const allUserMessagesQuery = messagesRef.where(
+                                "sender",
+                                "!=",
+                                "admin"
+                            );
+                            const allUserMessagesSnapshot =
+                                await allUserMessagesQuery.get();
+                            unreadCount = allUserMessagesSnapshot.size;
+                        }
+
+                        return {
+                            id: userId,
+                            fullname,
+                            photoURL,
+                            lastMessage,
+                            lastMessageTimestamp,
+                            unreadCount,
+                        };
+                    });
+
+                    const usersData = await Promise.all(userPromises);
+
+                    // Sort chats by the most recent message
+                    usersData.sort((a, b) => {
+                        if (a.lastMessageTimestamp && b.lastMessageTimestamp) {
+                            return (
+                                b.lastMessageTimestamp.toMillis() -
+                                a.lastMessageTimestamp.toMillis()
+                            );
+                        }
+                        return 0;
+                    });
+
+                    setUserChats(usersData);
+                } catch (error) {
+                    console.error("❌ Error fetching chats:", error);
+                } finally {
+                    setLoading(false);
+                }
+            });
 
         return () => unsubscribe();
     }, []);
 
     const handleUserPress = async (userId: string) => {
         // Mark messages as read for this chat
-        await firestore().collection("chats").doc(userId).set(
-            { lastReadByAdmin: firestore.FieldValue.serverTimestamp() },
-            { merge: true }
-        );
+        await firestore()
+            .collection("chats")
+            .doc(userId)
+            .set(
+                { lastReadByAdmin: firestore.FieldValue.serverTimestamp() },
+                { merge: true }
+            );
 
         router.push({
             pathname: "/adminChat" as any,
@@ -152,13 +167,17 @@ export default function ChatWithUsers() {
                         <Text style={styles.fullname}>{item.fullname}</Text>
                         {item.unreadCount > 0 && (
                             <View style={styles.unreadBadge}>
-                                <Text style={styles.unreadBadgeText}>{item.unreadCount}</Text>
+                                <Text style={styles.unreadBadgeText}>
+                                    {item.unreadCount}
+                                </Text>
                             </View>
                         )}
                     </View>
                     <Text style={styles.timestamp}>
                         {item.lastMessageTimestamp
-                            ? dayjs(item.lastMessageTimestamp.toDate()).fromNow(true)
+                            ? dayjs(item.lastMessageTimestamp.toDate()).fromNow(
+                                  true
+                              )
                             : ""}
                     </Text>
                 </View>
@@ -171,7 +190,10 @@ export default function ChatWithUsers() {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.header}>
+            <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.header}
+            >
                 <AntDesign color={"white"} name="left" size={24} />
                 <Text style={styles.headerText}>User Chats</Text>
             </TouchableOpacity>

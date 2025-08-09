@@ -52,7 +52,7 @@ export default function GitHubAuthScreen() {
         if (request) {
             codeVerifierRef.current = request.codeVerifier ?? null;
             promptAsync()
-                .then((result) => { })
+                .then((result) => {})
                 .catch((err) => {
                     console.error("promptAsync error:", err);
                 });
@@ -95,7 +95,8 @@ export default function GitHubAuthScreen() {
                     },
                     body: JSON.stringify({
                         client_id: process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID!,
-                        client_secret: process.env.EXPO_PUBLIC_GITHUB_CLIENT_SECRET!,
+                        client_secret:
+                            process.env.EXPO_PUBLIC_GITHUB_CLIENT_SECRET!,
                         code,
                         code_verifier: codeVerifier,
                         redirect_uri: redirectUri,
@@ -137,7 +138,7 @@ export default function GitHubAuthScreen() {
                 let name =
                     userData.name && userData.name.trim() !== ""
                         ? userData.name
-                        : user.displayName ?? userData.login ?? "";
+                        : (user.displayName ?? userData.login ?? "");
 
                 let email = user.email ?? userData.email;
 
@@ -208,4 +209,3 @@ export default function GitHubAuthScreen() {
         </View>
     );
 }
-

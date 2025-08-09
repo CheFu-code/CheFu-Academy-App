@@ -5,21 +5,20 @@ const path = require("path");
 // Get the default Metro config
 const defaultConfig = getDefaultConfig(__dirname);
 
-
 // Get Sentry's Metro config
 const sentryConfig = getSentryExpoConfig(__dirname);
 
 // Your custom additions (alias)
 const customConfig = {
-  resolver: {
-    alias: {
-      "@": path.resolve(__dirname),
+    resolver: {
+        alias: {
+            "@": path.resolve(__dirname),
+        },
     },
-  },
 };
 
 // Merge defaultConfig and sentryConfig first, then merge your customConfig
 module.exports = mergeConfig(
-  mergeConfig(defaultConfig, sentryConfig),
-  customConfig
+    mergeConfig(defaultConfig, sentryConfig),
+    customConfig
 );

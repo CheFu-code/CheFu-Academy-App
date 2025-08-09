@@ -1,30 +1,30 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.organizeImports": "explicit",
-    "source.sortMembers": "explicit"
-  },
-  "cSpell.words": [
-    "appspot",
-    "checkmark",
-    "cheforumreal",
-    "chefu",
-    "chefuacademy",
-    "ellipsize",
-    "firebaseapp",
-    "firestore",
-    "genai",
-    "gradlew",
-    "HCCPEMB",
-    "IZOYY",
-    "JCNs",
-    "netinfo",
-    "notifee",
-    "prebuild",
-    "Pressable",
-    "rgba",
-    "RNFB",
-    "scikit",
-    "Skus"
-  ]
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit",
+        "source.sortMembers": "explicit"
+    },
+    "cSpell.words": [
+        "appspot",
+        "checkmark",
+        "cheforumreal",
+        "chefu",
+        "chefuacademy",
+        "ellipsize",
+        "firebaseapp",
+        "firestore",
+        "genai",
+        "gradlew",
+        "HCCPEMB",
+        "IZOYY",
+        "JCNs",
+        "netinfo",
+        "notifee",
+        "prebuild",
+        "Pressable",
+        "rgba",
+        "RNFB",
+        "scikit",
+        "Skus"
+    ]
 }

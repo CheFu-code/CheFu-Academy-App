@@ -5,7 +5,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 export default function OfflineScreen() {
     return (
-
         <View style={styles.container}>
             <LottieView
                 source={require("../assets/animations/no internet.json")}

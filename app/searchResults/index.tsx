@@ -1,12 +1,13 @@
 import CourseCard from "@/component/Shared/CourseCard";
 import { Colors } from "@/constant/Colors";
 import { AntDesign } from "@expo/vector-icons";
-import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import firestore, {
+    FirebaseFirestoreTypes,
+} from "@react-native-firebase/firestore";
 import { router, useLocalSearchParams } from "expo-router";
 import LottieView from "lottie-react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-
 
 type Chapter = {
     topic: string;
@@ -59,14 +60,18 @@ export default function SearchScreen() {
                         description: data.description,
                         price: data.price,
                         createdBy: data.createdBy,
-                        createdOn: data.createdOn
+                        createdOn: data.createdOn,
                     };
                 })
 
                 .filter(
                     (course) =>
-                        course.courseTitle?.toLowerCase().includes(term.toLowerCase()) ||
-                        course.category?.toLowerCase().includes(term.toLowerCase())
+                        course.courseTitle
+                            ?.toLowerCase()
+                            .includes(term.toLowerCase()) ||
+                        course.category
+                            ?.toLowerCase()
+                            .includes(term.toLowerCase())
                 );
 
             setResults(filtered);
@@ -142,7 +147,12 @@ export default function SearchScreen() {
                         }}
                     >
                         Results for
-                        <Text style={{ fontFamily: "outfit-bold", color: Colors.PRIMARY }}>
+                        <Text
+                            style={{
+                                fontFamily: "outfit-bold",
+                                color: Colors.PRIMARY,
+                            }}
+                        >
                             {" "}
                             "{query}"
                         </Text>
@@ -150,7 +160,12 @@ export default function SearchScreen() {
                 </TouchableOpacity>
 
                 {results.length === 0 ? (
-                    <View style={{ alignItems: "center", justifyContent: "center" }}>
+                    <View
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
                         <Text
                             style={{
                                 color: Colors.GRAY,
@@ -173,9 +188,9 @@ export default function SearchScreen() {
                                 marginTop: 30,
                             }}
                         >
-                            We couldn't find any courses for your query. Try browsing by
-                            category — for example: Coding, Science, Engineering, Cooking,
-                            etc.
+                            We couldn't find any courses for your query. Try
+                            browsing by category — for example: Coding, Science,
+                            Engineering, Cooking, etc.
                         </Text>
                     </View>
                 ) : (
@@ -238,10 +253,7 @@ export default function SearchScreen() {
                             numColumns={2}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => (
-                                <CourseCard
-                                    course={item}
-                                    enroll={true}
-                                />
+                                <CourseCard course={item} enroll={true} />
                             )}
                             columnWrapperStyle={{
                                 justifyContent: "space-between",

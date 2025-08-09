@@ -2,7 +2,7 @@ import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { AntDesign } from "@expo/vector-icons";
 import firestore, {
-    FirebaseFirestoreTypes
+    FirebaseFirestoreTypes,
 } from "@react-native-firebase/firestore";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -29,13 +29,20 @@ interface ChatMessage {
 
 const ADMIN_EMAIL = "kurisanim2@gmail.com";
 
-async function sendNotification(userEmail: string, title: string, body: string) {
+async function sendNotification(
+    userEmail: string,
+    title: string,
+    body: string
+) {
     try {
-        const response = await fetch("https://chefu-academy-tmzx.onrender.com/api/sendToUser", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userEmail, title, body }),
-        });
+        const response = await fetch(
+            "https://chefu-academy-tmzx.onrender.com/api/sendToUser",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userEmail, title, body }),
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -74,10 +81,12 @@ export default function ChatWithAdmin() {
             .collection("messages")
             .orderBy("createdAt")
             .onSnapshot((snapshot) => {
-                const messages = snapshot.docs.map((doc: FirebaseFirestoreTypes.DocumentSnapshot) => ({
-                    ...(doc.data() as ChatMessage),
-                    id: doc.id, // Overrides any existing 'id' in data
-                }));
+                const messages = snapshot.docs.map(
+                    (doc: FirebaseFirestoreTypes.DocumentSnapshot) => ({
+                        ...(doc.data() as ChatMessage),
+                        id: doc.id, // Overrides any existing 'id' in data
+                    })
+                );
                 setChatMessages(messages);
                 setLoading(false);
             });
@@ -119,7 +128,6 @@ export default function ChatWithAdmin() {
                 setMessage("");
             });
 
-
             if (!isAdmin && userDetail?.fullname) {
                 await sendNotification(
                     ADMIN_EMAIL,
@@ -127,15 +135,12 @@ export default function ChatWithAdmin() {
                     message.trim()
                 );
             }
-
-
         } catch (error) {
             console.error("❌ Error sending message:", error);
         } finally {
             setSending(false);
         }
     };
-
 
     return (
         <KeyboardAvoidingView
@@ -175,7 +180,8 @@ export default function ChatWithAdmin() {
                         marginBottom: 20,
                     }}
                 >
-                    Welcome {userDetail?.fullname?.split(" ")[0] || "there"}, how can we help you today?
+                    Welcome {userDetail?.fullname?.split(" ")[0] || "there"},
+                    how can we help you today?
                 </Text>
             </View>
 
@@ -210,7 +216,13 @@ export default function ChatWithAdmin() {
                             source={require("../../assets/animations/Loading.json")}
                         />
 
-                        <Text style={{ textAlign: "center", marginTop: 20, color: "gray" }}>
+                        <Text
+                            style={{
+                                textAlign: "center",
+                                marginTop: 20,
+                                color: "gray",
+                            }}
+                        >
                             Loading messages...
                         </Text>
                     </View>
@@ -242,12 +254,18 @@ export default function ChatWithAdmin() {
                     <View
                         key={msg.id}
                         style={{
-                            alignSelf: msg.sender === "admin" ? "flex-start" : "flex-end",
-                            backgroundColor: msg.sender === "admin" ? Colors.PRIMARY : Colors.GREEN,
+                            alignSelf:
+                                msg.sender === "admin"
+                                    ? "flex-start"
+                                    : "flex-end",
+                            backgroundColor:
+                                msg.sender === "admin"
+                                    ? Colors.PRIMARY
+                                    : Colors.GREEN,
                             padding: 8,
                             borderRadius: 10,
                             maxWidth: "80%",
-                            marginBottom:10,
+                            marginBottom: 10,
                             minWidth: 75,
                         }}
                     >
@@ -266,10 +284,13 @@ export default function ChatWithAdmin() {
                                 fontSize: 10,
                                 marginTop: 1,
                                 borderColor: "#333",
-                                textAlign: msg.sender === "admin" ? "right" : "left",
+                                textAlign:
+                                    msg.sender === "admin" ? "right" : "left",
                             }}
                         >
-                            {msg.createdAt?.toDate ? dayjs(msg.createdAt.toDate()).format("h:mm A") : ""}
+                            {msg.createdAt?.toDate
+                                ? dayjs(msg.createdAt.toDate()).format("h:mm A")
+                                : ""}
                         </Text>
                     </View>
                 ))}
@@ -314,19 +335,26 @@ export default function ChatWithAdmin() {
                         marginLeft: 10,
                         padding: 10,
                         borderRadius: 50,
-                        backgroundColor: message.trim() ? Colors.LIGHT_GREEN : Colors.LIGHT_RED,
+                        backgroundColor: message.trim()
+                            ? Colors.LIGHT_GREEN
+                            : Colors.LIGHT_RED,
                         justifyContent: "center",
                         alignItems: "center",
                     }}
                 >
                     {sending ? (
-                        <ActivityIndicator size={"small"} color={Colors.PRIMARY} />
+                        <ActivityIndicator
+                            size={"small"}
+                            color={Colors.PRIMARY}
+                        />
                     ) : (
                         <AntDesign
                             style={{ opacity: message.trim() ? 1 : 0.5 }}
                             name="arrowup"
                             size={24}
-                            color={message.trim() ? Colors.GREEN : Colors.PRIMARY}
+                            color={
+                                message.trim() ? Colors.GREEN : Colors.PRIMARY
+                            }
                         />
                     )}
                 </TouchableOpacity>
