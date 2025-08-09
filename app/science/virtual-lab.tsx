@@ -12,8 +12,6 @@ import {
     View,
 } from "react-native";
 
-import Slider from "@react-native-community/slider";
-
 export default function VirtualLab() {
     const router = useRouter();
 
@@ -38,6 +36,13 @@ export default function VirtualLab() {
             if (interval) clearInterval(interval);
         };
     }, [heaterOn]);
+
+    const adjustWaterAmount = (change: number) => {
+        setWaterAmount((prev) => {
+            const newVal = Math.min(5, Math.max(0.1, prev + change));
+            return parseFloat(newVal.toFixed(1));
+        });
+    };
 
     return (
         <View style={styles.container}>
@@ -64,23 +69,28 @@ export default function VirtualLab() {
                     />
                 </View>
 
-                {/* Water Amount Slider */}
-                <View style={styles.row}>
+                {/* Water Amount Control */}
+                <View style={[styles.row, { marginTop: 20 }]}>
                     <Text style={styles.label}>
                         Water Amount: {waterAmount.toFixed(1)} L
                     </Text>
+                    <View style={styles.stepper}>
+                        <TouchableOpacity
+                            style={styles.stepperButton}
+                            onPress={() => adjustWaterAmount(-0.1)}
+                            accessibilityLabel="Decrease water amount"
+                        >
+                            <Text style={styles.stepperText}>−</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.stepperButton}
+                            onPress={() => adjustWaterAmount(0.1)}
+                            accessibilityLabel="Increase water amount"
+                        >
+                            <Text style={styles.stepperText}>+</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <Slider
-                    minimumValue={0.1}
-                    maximumValue={5}
-                    value={waterAmount}
-                    step={0.1}
-                    minimumTrackTintColor="#8E44AD"
-                    maximumTrackTintColor="#000000"
-                    onValueChange={setWaterAmount}
-                    style={{ width: "100%", height: 40 }}
-                    accessibilityLabel="Water amount slider"
-                />
 
                 {/* Temperature Display */}
                 <View style={styles.temperatureContainer}>
@@ -174,5 +184,21 @@ const styles = StyleSheet.create({
         color: Colors.GRAY,
         fontSize: 16,
         lineHeight: 22,
+    },
+    stepper: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+    },
+    stepperButton: {
+        backgroundColor: "#444",
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+    },
+    stepperText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: Colors.WHITE,
     },
 });

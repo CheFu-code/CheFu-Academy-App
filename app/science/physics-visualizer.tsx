@@ -1,102 +1,157 @@
 ﻿import { Colors } from "@/constant/Colors";
+import {
+    angleStep,
+    DEBOUNCE_DELAY,
+    feetPerMeter,
+    gravityStep,
+    k,
+    maxAngle,
+    maxGravity,
+    maxVelocity,
+    minAngle,
+    minGravity,
+    minVelocity,
+    velocityStep,
+} from "@/constant/physics";
+import { PRESETS } from "@/constant/Planets";
+import { clampAndStep } from "@/utils/math";
 import { AntDesign } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
     AccessibilityInfo,
-    PanResponder,
     Platform,
     Pressable,
-    StyleSheet,
+    ScrollView,
+    Switch,
     Text,
+    TextInput,
     Vibration,
     View,
 } from "react-native";
-
-const PRESETS = [
-    { label: "Earth", gravity: 9.8 },
-    { label: "Moon", gravity: 1.62 },
-    { label: "Mars", gravity: 3.71 },
-    { label: "Jupiter", gravity: 24.79 },
-];
-
-const DEBOUNCE_DELAY = 100; // ms
+import { styles } from "../../styles/PhysicsVisualizer.styles";
 
 export default function PhysicsVisualizer() {
     const [gravity, setGravity] = useState(9.8);
     const [unit, setUnit] = useState("m/s²");
     const [history, setHistory] = useState<number[]>([]);
     const [accessibilityEnabled, setAccessibilityEnabled] = useState(false);
+    const [initialVelocity, setInitialVelocity] = useState(20);
+    const [launchAngle, setLaunchAngle] = useState(45);
+    const [airResistance, setAirResistance] = useState(false);
+    const router = useRouter();
+    const gravityDebounce = useRef<number | null>(null);
+    const velocityDebounce = useRef<number | null>(null);
+    const angleDebounce = useRef<number | null>(null);
 
-    const sliderWidth = 300;
-    const min = 0;
-    const max = 30;
-    const step = 0.1;
-
-    // Debounce gravity updates to avoid spamming setState
-    const debounceTimeout = useRef<number | null>(null);
-
-    // Accessibility status listener
     useEffect(() => {
         AccessibilityInfo.isScreenReaderEnabled().then(setAccessibilityEnabled);
     }, []);
 
-    const updateGravity = (val: number) => {
-        val = Math.max(min, Math.min(max, val));
-        val = Math.round(val / step) * step;
+    function onGravityChange(text: string) {
+        const val = parseFloat(text);
+        if (isNaN(val)) return;
+        const stepped = clampAndStep(val, minGravity, maxGravity, gravityStep);
 
-        if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-        debounceTimeout.current = setTimeout(() => {
-            setGravity(val);
-            // Save history (max 10)
-            setHistory((h) => [val, ...h].slice(0, 10));
+        if (gravityDebounce.current) clearTimeout(gravityDebounce.current);
+        gravityDebounce.current = setTimeout(() => {
+            setGravity(stepped);
+            setHistory((h) => [stepped, ...h].slice(0, 10));
             if (Platform.OS !== "web") Vibration.vibrate(10);
         }, DEBOUNCE_DELAY);
-    };
+    }
 
-    const pan = useRef(
-        PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gestureState) => {
-                let deltaX = gestureState.moveX - gestureState.x0;
-                let ratio = deltaX / sliderWidth;
-                let newVal = gravity + ratio * (max - min);
-                updateGravity(newVal);
-            },
-            onPanResponderRelease: () => {},
-        })
-    ).current;
+    // Debounced velocity input update
+    function onVelocityChange(text: string) {
+        const val = parseFloat(text);
+        if (isNaN(val)) return;
+        const stepped = clampAndStep(
+            val,
+            minVelocity,
+            maxVelocity,
+            velocityStep
+        );
 
-    const thumbLeft = ((gravity - min) / (max - min)) * sliderWidth;
+        if (velocityDebounce.current) clearTimeout(velocityDebounce.current);
+        velocityDebounce.current = setTimeout(() => {
+            setInitialVelocity(stepped);
+        }, DEBOUNCE_DELAY);
+    }
 
-    // Toggle units conversion
+    // Debounced angle input update
+    function onAngleChange(text: string) {
+        const val = parseFloat(text);
+        if (isNaN(val)) return;
+        const stepped = clampAndStep(val, minAngle, maxAngle, angleStep);
+
+        if (angleDebounce.current) clearTimeout(angleDebounce.current);
+        angleDebounce.current = setTimeout(() => {
+            setLaunchAngle(stepped);
+        }, DEBOUNCE_DELAY);
+    }
+
+    // Unit toggle
     const toggleUnit = () => {
         if (unit === "m/s²") {
             setUnit("ft/s²");
-            setGravity((g) => +(g * 3.28084).toFixed(2));
+            setGravity((g) => +(g * feetPerMeter).toFixed(2));
+            setInitialVelocity((v) => +(v * feetPerMeter).toFixed(2));
         } else {
             setUnit("m/s²");
-            setGravity((g) => +(g / 3.28084).toFixed(2));
+            setGravity((g) => +(g / feetPerMeter).toFixed(2));
+            setInitialVelocity((v) => +(v / feetPerMeter).toFixed(2));
         }
     };
 
-    // Reset gravity to Earth's default in current unit
-    const resetGravity = () => {
-        setGravity(unit === "m/s²" ? 9.8 : +(9.8 * 3.28084).toFixed(2));
+    // Reset all values
+    const reset = () => {
+        setGravity(unit === "m/s²" ? 9.8 : +(9.8 * feetPerMeter).toFixed(2));
+        setInitialVelocity(20);
+        setLaunchAngle(45);
+        setAirResistance(false);
         setHistory([]);
     };
 
-    // Calculate projectile motion for 45° launch at initial velocity 20 m/s or ft/s depending on unit
-    const initialVelocity = 20;
-    const gForCalc = unit === "m/s²" ? gravity : gravity / 3.28084; // convert to m/s² for calc
+    // Projectile motion calculations
+    const gForCalc = unit === "m/s²" ? gravity : gravity / feetPerMeter;
+    const vForCalc =
+        unit === "m/s²" ? initialVelocity : initialVelocity / feetPerMeter;
+    const angleRad = (launchAngle * Math.PI) / 180;
 
-    const timeOfFlight =
-        (2 * initialVelocity * Math.sin(Math.PI / 4)) / gForCalc;
-    const maxHeight =
-        (Math.pow(initialVelocity, 2) * Math.pow(Math.sin(Math.PI / 4), 2)) /
-        (2 * gForCalc);
-    const range =
-        (Math.pow(initialVelocity, 2) * Math.sin(Math.PI / 2)) / gForCalc;
+    let timeOfFlight, maxHeight, range;
+
+    if (airResistance) {
+        const t_step = 0.01;
+        let vx = vForCalc * Math.cos(angleRad);
+        let vy = vForCalc * Math.sin(angleRad);
+        let x = 0;
+        let y = 0;
+        let t = 0;
+        maxHeight = 0;
+
+        while (y >= 0) {
+            const v = Math.sqrt(vx * vx + vy * vy);
+            const ax = -k * vx;
+            const ay = -gForCalc - k * vy;
+
+            vx += ax * t_step;
+            vy += ay * t_step;
+            x += vx * t_step;
+            y += vy * t_step;
+            t += t_step;
+
+            if (y > maxHeight) maxHeight = y;
+        }
+
+        timeOfFlight = t;
+        range = x;
+    } else {
+        timeOfFlight = (2 * vForCalc * Math.sin(angleRad)) / gForCalc;
+        maxHeight =
+            (Math.pow(vForCalc, 2) * Math.pow(Math.sin(angleRad), 2)) /
+            (2 * gForCalc);
+        range = (Math.pow(vForCalc, 2) * Math.sin(2 * angleRad)) / gForCalc;
+    }
 
     return (
         <View style={styles.container}>
@@ -114,252 +169,148 @@ export default function PhysicsVisualizer() {
             </Pressable>
 
             <View style={styles.content}>
-                <Text
-                    style={styles.label}
-                    accessibilityRole="adjustable"
-                    accessibilityValue={{ min, max, now: Math.round(gravity * 100) }}
-                    accessibilityHint="Adjust gravity value"
-                    accessibilityActions={[
-                        { name: "increment", label: "Increase gravity" },
-                        { name: "decrement", label: "Decrease gravity" },
-                    ]}
-                    onAccessibilityAction={(event) => {
-                        if (event.nativeEvent.actionName === "increment")
-                            updateGravity(gravity + step);
-                        else if (event.nativeEvent.actionName === "decrement")
-                            updateGravity(gravity - step);
-                    }}
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
                 >
-                    Gravity: {gravity.toFixed(2)} {unit}
-                </Text>
+                    {/* Gravity Input */}
+                    <Text style={styles.label}>Gravity ({unit}):</Text>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType="numeric"
+                        defaultValue={gravity.toFixed(2)}
+                        onChangeText={onGravityChange}
+                        accessibilityLabel="Gravity input"
+                        accessibilityHint={`Enter gravity value between ${minGravity} and ${maxGravity} ${unit}`}
+                    />
 
-                <Pressable onPress={toggleUnit} style={styles.unitToggle}>
-                    <Text style={styles.unitToggleText}>
-                        Toggle Unit (m/s² ⇄ ft/s²)
+                    {/* Velocity Input */}
+                    <Text style={styles.label}>
+                        Initial Velocity ({unit.split("/")[0]}):
                     </Text>
-                </Pressable>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType="numeric"
+                        defaultValue={initialVelocity.toFixed(2)}
+                        onChangeText={onVelocityChange}
+                        accessibilityLabel="Initial velocity input"
+                        accessibilityHint={`Enter initial velocity between ${minVelocity} and ${maxVelocity} ${
+                            unit.split("/")[0]
+                        }`}
+                    />
 
-                <View
-                    style={[styles.slider, { width: sliderWidth }]}
-                    {...pan.panHandlers}
-                >
-                    <View style={[styles.track, { width: sliderWidth }]} />
-                    <View style={[styles.filledTrack, { width: thumbLeft }]} />
-                    <View style={[styles.thumb, { left: thumbLeft - 12 }]} />
-                </View>
+                    {/* Launch Angle Input */}
+                    <Text style={styles.label}>Launch Angle (°):</Text>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType="numeric"
+                        defaultValue={launchAngle.toFixed(2)}
+                        onChangeText={onAngleChange}
+                        accessibilityLabel="Launch angle input"
+                        accessibilityHint={`Enter launch angle between ${minAngle} and ${maxAngle} degrees`}
+                    />
 
-                <View style={styles.presetsRow}>
-                    {PRESETS.map((preset) => (
+                    {/* Controls */}
+                    <View style={styles.controlsRow}>
                         <Pressable
-                            key={preset.label}
-                            style={styles.presetButton}
-                            onPress={() =>
-                                setGravity(
-                                    unit === "m/s²"
-                                        ? preset.gravity
-                                        : +(preset.gravity * 3.28084).toFixed(2)
-                                )
-                            }
-                            accessibilityRole="button"
-                            accessibilityLabel={`Set gravity to ${preset.label}`}
+                            onPress={toggleUnit}
+                            style={styles.unitToggle}
                         >
-                            <Text style={styles.presetText}>
-                                {preset.label}
+                            <Text style={styles.unitToggleText}>
+                                Toggle Unit
                             </Text>
                         </Pressable>
-                    ))}
-                </View>
-
-                <Pressable
-                    style={styles.resetButton}
-                    onPress={resetGravity}
-                    accessibilityRole="button"
-                    accessibilityLabel="Reset gravity"
-                >
-                    <Text style={styles.resetButtonText}>Reset Gravity</Text>
-                </Pressable>
-
-                <View style={styles.visualizationBox}>
-                    <Text style={styles.visualizationText}>
-                        Projectile motion at 45° launch, initial velocity:{" "}
-                        {initialVelocity} {unit}
-                    </Text>
-                    <Text style={styles.visualizationText}>
-                        Time of flight: {timeOfFlight.toFixed(2)} s
-                    </Text>
-                    <Text style={styles.visualizationText}>
-                        Max height: {maxHeight.toFixed(2)} {unit}
-                    </Text>
-                    <Text style={styles.visualizationText}>
-                        Range: {range.toFixed(2)} {unit}
-                    </Text>
-                </View>
-
-                <Text style={styles.historyTitle}>
-                    Gravity History (last 10 changes)
-                </Text>
-                <View style={[styles.historyContainer, { width: sliderWidth }]}>
-                    {history.length === 0 && (
-                        <Text style={styles.historyEmpty}>No changes yet</Text>
-                    )}
-                    {history.map((val, i) => {
-                        const height = (val / max) * 100;
-                        return (
-                            <View
-                                key={i}
-                                style={[
-                                    styles.historyBar,
-                                    {
-                                        height: height,
-                                        backgroundColor:
-                                            Colors.PRIMARY || "#8E44AD",
-                                    },
-                                ]}
-                                accessible
-                                accessibilityLabel={`Gravity value ${val.toFixed(
-                                    2
-                                )} ${unit}`}
+                        <View style={styles.switchContainer}>
+                            <Text style={styles.label}>Air Resistance</Text>
+                            <Switch
+                                value={airResistance}
+                                onValueChange={setAirResistance}
                             />
-                        );
-                    })}
-                </View>
+                        </View>
+                    </View>
+
+                    {/* Presets */}
+                    <View style={styles.presetsRow}>
+                        {PRESETS.map((preset) => (
+                            <Pressable
+                                key={preset.label}
+                                style={styles.presetButton}
+                                onPress={() =>
+                                    setGravity(
+                                        unit === "m/s²"
+                                            ? preset.gravity
+                                            : +(
+                                                  preset.gravity * feetPerMeter
+                                              ).toFixed(2)
+                                    )
+                                }
+                                accessibilityRole="button"
+                                accessibilityLabel={`Set gravity to ${preset.label}`}
+                            >
+                                <Text style={styles.presetText}>
+                                    {preset.label}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </View>
+
+                    {/* Reset Button */}
+                    <Pressable
+                        style={styles.resetButton}
+                        onPress={reset}
+                        accessibilityRole="button"
+                        accessibilityLabel="Reset all values"
+                    >
+                        <Text style={styles.resetButtonText}>Reset</Text>
+                    </Pressable>
+
+                    {/* Results */}
+                    <View style={styles.visualizationBox}>
+                        <Text style={styles.visualizationText}>
+                            Time of flight: {timeOfFlight.toFixed(2)} s
+                        </Text>
+                        <Text style={styles.visualizationText}>
+                            Max height: {maxHeight.toFixed(2)}{" "}
+                            {unit.split("/")[0]}
+                        </Text>
+                        <Text style={styles.visualizationText}>
+                            Range: {range.toFixed(2)} {unit.split("/")[0]}
+                        </Text>
+                    </View>
+
+                    {/* History */}
+                    <Text style={styles.historyTitle}>
+                        Gravity History (last 10 changes)
+                    </Text>
+                    <View style={[styles.historyContainer, { width: 300 }]}>
+                        {history.length === 0 && (
+                            <Text style={styles.historyEmpty}>
+                                No changes yet
+                            </Text>
+                        )}
+                        {history.map((val, i) => {
+                            const height = (val / maxGravity) * 100;
+                            return (
+                                <View
+                                    key={i}
+                                    style={[
+                                        styles.historyBar,
+                                        {
+                                            height: height,
+                                            backgroundColor:
+                                                Colors.PRIMARY || "#8E44AD",
+                                        },
+                                    ]}
+                                    accessible
+                                    accessibilityLabel={`Gravity value ${val.toFixed(
+                                        2
+                                    )} ${unit}`}
+                                />
+                            );
+                        })}
+                    </View>
+                </ScrollView>
             </View>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-        paddingTop: Platform.OS === "android" ? 40 : 60,
-        paddingHorizontal: 16,
-    },
-    backButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 20,
-    },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: Colors.WHITE,
-        marginLeft: 12,
-    },
-    content: {
-        flex: 1,
-        alignItems: "center",
-    },
-    label: {
-        color: Colors.WHITE,
-        fontSize: 18,
-        marginBottom: 8,
-    },
-    unitToggle: {
-        marginBottom: 20,
-        backgroundColor: Colors.PRIMARY || "#8E44AD",
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 12,
-    },
-    unitToggleText: {
-        color: Colors.WHITE,
-        fontWeight: "600",
-        fontSize: 16,
-    },
-    slider: {
-        height: 40,
-        justifyContent: "center",
-        marginBottom: 24,
-    },
-    track: {
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: Colors.GRAY || "#ddd",
-        position: "absolute",
-        left: 0,
-    },
-    filledTrack: {
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: Colors.PRIMARY || "#8E44AD",
-        position: "absolute",
-        left: 0,
-    },
-    thumb: {
-        position: "absolute",
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: Colors.PRIMARY || "#8E44AD",
-        top: 8,
-    },
-    presetsRow: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        width: 320,
-        marginBottom: 16,
-    },
-    presetButton: {
-        backgroundColor: Colors.BLACK || "#222",
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: Colors.PRIMARY || "#8E44AD",
-    },
-    presetText: {
-        color: Colors.WHITE,
-        fontWeight: "600",
-    },
-    resetButton: {
-        backgroundColor: Colors.PRIMARY || "#8E44AD",
-        paddingVertical: 10,
-        paddingHorizontal: 32,
-        borderRadius: 12,
-        marginBottom: 24,
-    },
-    resetButtonText: {
-        color: "white",
-        fontWeight: "600",
-        fontSize: 16,
-        textAlign: "center",
-    },
-    visualizationBox: {
-        marginTop: 12,
-        width: 320,
-        borderRadius: 12,
-        borderWidth: 2,
-        borderColor: Colors.PRIMARY || "#8E44AD",
-        padding: 16,
-        backgroundColor: Colors.BLACK || "#222",
-    },
-    visualizationText: {
-        color: Colors.WHITE,
-        fontSize: 16,
-        textAlign: "center",
-        marginBottom: 6,
-    },
-    historyTitle: {
-        color: Colors.WHITE,
-        fontSize: 16,
-        fontWeight: "600",
-        marginTop: 12,
-        marginBottom: 6,
-    },
-    historyContainer: {
-        flexDirection: "row",
-        alignItems: "flex-end",
-        height: 100,
-        gap: 4,
-    },
-    historyBar: {
-        width: 20,
-        borderRadius: 4,
-        marginHorizontal: 2,
-    },
-    historyEmpty: {
-        color: Colors.GRAY,
-        fontStyle: "italic",
-    },
-});
