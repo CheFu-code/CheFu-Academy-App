@@ -1,41 +1,68 @@
 ﻿import { Colors } from "@/constant/Colors";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-    Platform,
+    Alert,
     ScrollView,
-    StyleSheet,
     Switch,
     Text,
     TouchableOpacity,
+    Vibration,
     View,
 } from "react-native";
+import { styles } from "../../styles/VirtualLab.styles";
 
 export default function VirtualLab() {
     const router = useRouter();
-
     const [heaterOn, setHeaterOn] = useState(false);
-    const [temperature, setTemperature] = useState(20); // Initial temp in °C
-    const [waterAmount, setWaterAmount] = useState(1); // liters
+    const [coolingOn, setCoolingOn] = useState(false);
+    const [temperature, setTemperature] = useState(20);
+    const [waterAmount, setWaterAmount] = useState(1);
+    const [energyUsed, setEnergyUsed] = useState(0); // kJ
+    const [elapsedTime, setElapsedTime] = useState(0); // seconds
+    const [paused, setPaused] = useState(false);
+    const [history, setHistory] = useState<{ time: string; temp: number }[]>(
+        []
+    );
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
-        let interval: number | null = null;
+        if (paused) return;
+        if (timerRef.current) clearInterval(timerRef.current);
 
-        if (heaterOn) {
-            interval = setInterval(() => {
-                setTemperature((temp) => Math.min(temp + 1, 100)); // max 100 °C
-            }, 1000);
-        } else {
-            interval = setInterval(() => {
-                setTemperature((temp) => Math.max(temp - 1, 20)); // cools to 20 °C
-            }, 1000);
-        }
+        timerRef.current = setInterval(() => {
+            setElapsedTime((t) => t + 1);
+
+            setTemperature((temp) => {
+                const rate = 1 / waterAmount;
+                let newTemp = temp;
+
+                if (heaterOn) {
+                    setEnergyUsed((e) => e + 4.2 * waterAmount * rate);
+                    newTemp = Math.min(temp + rate, 100);
+                } else if (coolingOn) {
+                    newTemp = Math.max(temp - rate * 1.5, 20); // faster cooling
+                } else {
+                    newTemp = Math.max(temp - rate * 0.5, 20); // passive cooling
+                }
+
+                if (newTemp >= 100) {
+                    Vibration.vibrate(500);
+                    Alert.alert(
+                        "Warning",
+                        "Water is boiling! Turn off the heater."
+                    );
+                    return;
+                }
+
+            });
+        }, 1000);
 
         return () => {
-            if (interval) clearInterval(interval);
+            if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [heaterOn]);
+    }, [heaterOn, coolingOn, waterAmount, paused]);
 
     const adjustWaterAmount = (change: number) => {
         setWaterAmount((prev) => {
@@ -44,17 +71,60 @@ export default function VirtualLab() {
         });
     };
 
+    const resetExperiment = () => {
+        setHeaterOn(false);
+        setCoolingOn(false);
+        setTemperature(20);
+        setWaterAmount(1);
+        setEnergyUsed(0);
+        setElapsedTime(0);
+        setHistory([]);
+        setPaused(false);
+    };
+
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, "0")}`;
+    };
+
+    const experimentNote = () => {
+        if (temperature >= 100) return "Water is boiling!";
+        if (heaterOn) return "Heater is ON. Temperature rising...";
+        if (coolingOn) return "Forced cooling active...";
+        if (!heaterOn && temperature > 20) return "Cooling naturally...";
+        return "Water is at room temperature.";
+    };
+
+    const energyCost = () => {
+        const kWh = energyUsed / 3600; // 1 kWh = 3600 kJ
+        const pricePerKWh = 2.5; // example cost in Rands
+        return (kWh * pricePerKWh).toFixed(2);
+    };
+
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 8,
+                    }}
                     onPress={() => router.back()}
                     accessibilityLabel="Go back"
                 >
-                    <AntDesign name="left" size={24} color={Colors.WHITE} />
+                    <AntDesign
+                        style={{ marginTop: 10 }}
+                        name="left"
+                        size={24}
+                        color={Colors.WHITE}
+                    />
+                    <Text style={styles.title}>
+                        Virtual Lab - Water Heating
+                    </Text>
                 </TouchableOpacity>
-                <Text style={styles.title}>Virtual Lab - Water Heating</Text>
             </View>
 
             <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -62,10 +132,23 @@ export default function VirtualLab() {
                 <View style={styles.row}>
                     <Text style={styles.label}>Heater:</Text>
                     <Switch
-                        trackColor={{ false: "#767577", true: "#81b0ff" }}
-                        thumbColor={heaterOn ? "#f5dd4b" : "#f4f3f4"}
-                        onValueChange={setHeaterOn}
                         value={heaterOn}
+                        onValueChange={(v) => {
+                            setHeaterOn(v);
+                            if (v) setCoolingOn(false);
+                        }}
+                    />
+                </View>
+
+                {/* Cooling Toggle */}
+                <View style={styles.row}>
+                    <Text style={styles.label}>Cooling:</Text>
+                    <Switch
+                        value={coolingOn}
+                        onValueChange={(v) => {
+                            setCoolingOn(v);
+                            if (v) setHeaterOn(false);
+                        }}
                     />
                 </View>
 
@@ -78,14 +161,12 @@ export default function VirtualLab() {
                         <TouchableOpacity
                             style={styles.stepperButton}
                             onPress={() => adjustWaterAmount(-0.1)}
-                            accessibilityLabel="Decrease water amount"
                         >
                             <Text style={styles.stepperText}>−</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.stepperButton}
                             onPress={() => adjustWaterAmount(0.1)}
-                            accessibilityLabel="Increase water amount"
                         >
                             <Text style={styles.stepperText}>+</Text>
                         </TouchableOpacity>
@@ -94,111 +175,58 @@ export default function VirtualLab() {
 
                 {/* Temperature Display */}
                 <View style={styles.temperatureContainer}>
-                    <Text style={styles.temperatureText}>
+                    <Text
+                        style={[
+                            styles.temperatureText,
+                            temperature >= 100 && { color: "#FF0000" },
+                        ]}
+                    >
                         {temperature.toFixed(1)} °C
                     </Text>
-                    <Text style={styles.infoText}>
-                        {temperature >= 100
-                            ? "Water is boiling!"
-                            : temperature <= 20
-                            ? "Water is at room temperature."
-                            : "Heating water..."}
+                    <Text style={styles.infoText}>{experimentNote()}</Text>
+                </View>
+
+                {/* Experiment Stats */}
+                <View style={styles.statsBox}>
+                    <Text style={styles.statsText}>
+                        Elapsed Time: {formatTime(elapsedTime)}
+                    </Text>
+                    <Text style={styles.statsText}>
+                        Energy Used: {energyUsed.toFixed(1)} kJ
+                    </Text>
+                    <Text style={styles.statsText}>
+                        Energy Cost: R {energyCost()}
                     </Text>
                 </View>
 
-                {/* Experiment Notes */}
-                <View style={styles.notesBox}>
-                    <Text style={styles.notesTitle}>Experiment Notes:</Text>
-                    <Text style={styles.notesText}>
-                        Adjust the water amount and toggle the heater. The
-                        temperature will increase when the heater is on and
-                        decrease when it is off.
+                {/* Pause / Resume */}
+                <TouchableOpacity
+                    style={[styles.resetButton, { backgroundColor: "#00796B" }]}
+                    onPress={() => setPaused((p) => !p)}
+                >
+                    <Text style={styles.resetText}>
+                        {paused ? "Resume" : "Pause"}
                     </Text>
+                </TouchableOpacity>
+
+                {/* Reset Button */}
+                <TouchableOpacity
+                    style={styles.resetButton}
+                    onPress={resetExperiment}
+                >
+                    <Text style={styles.resetText}>Reset Experiment</Text>
+                </TouchableOpacity>
+
+                {/* Notes */}
+                <View style={styles.notesBox}>
+                    <Text style={styles.notesTitle}>Experiment History:</Text>
+                    {history.slice(-10).map((h, i) => (
+                        <Text key={i} style={styles.notesText}>
+                            {h.time} → {h.temp.toFixed(1)}°C
+                        </Text>
+                    ))}
                 </View>
             </ScrollView>
         </View>
     );
 }
-
-const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 50 : 30;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-        paddingTop: STATUS_BAR_HEIGHT,
-        paddingHorizontal: 16,
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 16,
-        marginBottom: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: Colors.WHITE,
-        flexShrink: 1,
-    },
-    contentContainer: {
-        paddingBottom: 40,
-    },
-    row: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 12,
-    },
-    label: {
-        fontSize: 18,
-        color: Colors.WHITE,
-    },
-    temperatureContainer: {
-        marginTop: 24,
-        alignItems: "center",
-    },
-    temperatureText: {
-        fontSize: 48,
-        fontWeight: "bold",
-        color: "#FF4500",
-    },
-    infoText: {
-        fontSize: 16,
-        color: Colors.GRAY,
-        marginTop: 8,
-    },
-    notesBox: {
-        marginTop: 40,
-        backgroundColor: "#2a2a2a",
-        borderRadius: 12,
-        padding: 16,
-    },
-    notesTitle: {
-        fontWeight: "bold",
-        fontSize: 18,
-        color: Colors.WHITE,
-        marginBottom: 8,
-    },
-    notesText: {
-        color: Colors.GRAY,
-        fontSize: 16,
-        lineHeight: 22,
-    },
-    stepper: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-    },
-    stepperButton: {
-        backgroundColor: "#444",
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 6,
-    },
-    stepperText: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: Colors.WHITE,
-    },
-});

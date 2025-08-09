@@ -13,6 +13,15 @@ import {
 
 export default function Engineering() {
     const router = useRouter();
+    type EngineeringRoute =
+        | "circuit-simulator"
+        | "data-analysis"
+        | "mechanics-lab"
+        | "system-design";
+
+    const handleToolPress = (screenName: EngineeringRoute) => {
+        router.push(`/engineering/${screenName}`);
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -38,10 +47,23 @@ export default function Engineering() {
                 <ToolButton
                     icon="construct-outline"
                     label="Circuit Simulator"
+                    onPress={() => handleToolPress("circuit-simulator")}
                 />
-                <ToolButton icon="hammer-outline" label="Mechanics Lab" />
-                <ToolButton icon="analytics-outline" label="Data Analysis" />
-                <ToolButton icon="settings-outline" label="System Design" />
+                <ToolButton
+                    onPress={() => handleToolPress("mechanics-lab")}
+                    icon="hammer-outline"
+                    label="Mechanics Lab"
+                />
+                <ToolButton
+                    onPress={() => handleToolPress("data-analysis")}
+                    icon="analytics-outline"
+                    label="Data Analysis"
+                />
+                <ToolButton
+                    onPress={() => handleToolPress("system-design")}
+                    icon="settings-outline"
+                    label="System Design"
+                />
             </View>
         </ScrollView>
     );
@@ -50,13 +72,15 @@ export default function Engineering() {
 function ToolButton({
     icon,
     label,
+    onPress,
 }: {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
+    onPress: () => void;
 }) {
     return (
-        <TouchableOpacity style={styles.button}>
-            <Ionicons name={icon} size={24} color="#fff" />
+        <TouchableOpacity style={styles.button} onPress={onPress}>
+            <Ionicons name={icon} size={24} color="#ffffff" />
             <Text style={styles.buttonText}>{label}</Text>
         </TouchableOpacity>
     );

@@ -1,6 +1,10 @@
-import { FontAwesome6 } from "@expo/vector-icons";
+import { Colors } from "@/constant/Colors";
+import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+    ActivityIndicator,
     ScrollView,
     Text,
     TextInput,
@@ -11,29 +15,60 @@ import {
 export default function MathSolver() {
     const [input, setInput] = useState("");
     const [result, setResult] = useState("");
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const API_KEY = "AIzaSyDslnFAex5WgQcEmnFw1SysNBdJbkuehzY";
+    const genAI = new GoogleGenerativeAI(API_KEY);
 
-    const handleSolve = () => {
+    const handleSolve = async () => {
         if (!input.trim()) return;
-        // Simulate solving
-        setResult(`Result for: ${input}`);
+        setLoading(true);
+        setResult("");
+
+        try {
+            const model = genAI.getGenerativeModel({
+                model: "gemini-2.0-flash",
+            });
+
+            const prompt = `Solve the math problem step-by-step. Provide only the detailed solution steps followed by the final answer. Do not include any additional explanations or commentary:\n${input}`;
+
+            const response = await model.generateContent(prompt);
+
+            const text = response.response.text();
+            setResult(text);
+        } catch (error) {
+            console.error(error);
+            setResult("Error: Unable to solve the problem.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <View style={{ flex: 1, backgroundColor: "#0E101C", padding: 20 }}>
-            {/* Header */}
-            <Text
+            <TouchableOpacity
+                onPress={() => router.back()}
                 style={{
-                    fontSize: 28,
-                    fontWeight: "600",
-                    color: "#fff",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 8,
+                    marginTop: 25,
                     marginBottom: 20,
-                    fontFamily: "outfit",
                 }}
             >
-                🧮 Math Solver
-            </Text>
+                <AntDesign name="left" size={24} color={Colors.WHITE} />
+                <Text
+                    style={{
+                        fontSize: 28,
+                        fontWeight: "600",
+                        color: "#fff",
+                        fontFamily: "outfit",
+                    }}
+                >
+                    Math Solver
+                </Text>
+            </TouchableOpacity>
 
-            {/* Input Box */}
             <View
                 style={{
                     backgroundColor: "#1C1F33",
@@ -55,27 +90,36 @@ export default function MathSolver() {
                     multiline
                 />
             </View>
-
-            {/* Solve Button */}
-            <TouchableOpacity
-                onPress={handleSolve}
-                style={{
-                    backgroundColor: "#2E3565",
-                    paddingVertical: 14,
-                    borderRadius: 10,
-                    alignItems: "center",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    gap: 10,
-                }}
-            >
-                <FontAwesome6 name="calculator" size={18} color="#fff" />
-                <Text
-                    style={{ color: "#fff", fontSize: 16, fontWeight: "500" }}
+            {input.trim() !== "" && (
+                <TouchableOpacity
+                    onPress={handleSolve}
+                    style={{
+                        backgroundColor: "#2E3565",
+                        paddingVertical: 14,
+                        borderRadius: 10,
+                        alignItems: "center",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        gap: 10,
+                        opacity: loading ? 0.7 : 1,
+                    }}
                 >
-                    Solve
-                </Text>
-            </TouchableOpacity>
+                    <FontAwesome6 name="calculator" size={18} color="#fff" />
+                    {loading ? (
+                        <ActivityIndicator size={"small"} color="#fff" />
+                    ) : (
+                        <Text
+                            style={{
+                                color: "#fff",
+                                fontSize: 16,
+                                fontFamily: "outfit",
+                            }}
+                        >
+                            Solve
+                        </Text>
+                    )}
+                </TouchableOpacity>
+            )}
 
             {/* Result */}
             {result !== "" && (
