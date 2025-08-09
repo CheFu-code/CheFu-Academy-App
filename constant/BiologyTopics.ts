@@ -725,4 +725,490 @@ export const TOPICS: Topic[] = [
         description:
             "Study of how nutrition influences gene expression.",
     },
+    {
+        id: "121",
+        title: "Cytology",
+        description:
+            "The study of cells.",
+    },
+    {
+        id: "122",
+        title: "Ornithology",
+        description:
+            "The study of birds.",
+    },
+    {
+        id: "123",
+        title: "Entomology",
+        description:
+            "The study of insects.",
+    },
+    {
+        id: "124",
+        title: "Ichthyology",
+        description:
+            "The study of fish.",
+    },
+    {
+        id: "125",
+        title: "Herpetology",
+        description:
+            "The study of reptiles and amphibians.",
+    },
+    {
+        id: "126",
+        title: "Mammalogy",
+        description:
+            "The study of mammals.",
+    },
+    {
+        id: "127",
+        title: "Primatology",
+        description:
+            "The study of primates.",
+    },
+    {
+        id: "128",
+        title: "Cetology",
+        description:
+            "The study of marine mammals.",
+    },
+    {
+        id: "129",
+        title: "Malacology",
+        description:
+            "The study of molluscs.",
+    },
+    {
+        id: "130",
+        title: "Helminthology",
+        description:
+            "The study of parasitic worms.",
+    },
+    {
+        id: "131",
+        title: "Protozoology",
+        description:
+            "The study of protozoa.",
+    },
+    {
+        id: "132",
+        title: "Bacteriology",
+        description:
+            "The study of bacteria.",
+    },
+    {
+        id: "133",
+        title: "Phycology",
+        description:
+            "The study of algae.",
+    },
+    {
+        id: "134",
+        title: "Bryology",
+        description:
+            "The study of mosses, liverworts, and hornworts.",
+    },
+    {
+        id: "135",
+        title: "Pteridology",
+        description:
+            "The study of ferns and their relatives.",
+    },
+    {
+        id: "136",
+        title: "Dendrology",
+        description:
+            "The study of trees and other woody plants.",
+    },
+    {
+        id: "137",
+        title: "Lichenology",
+        description:
+            "The study of lichens.",
+    },
+    {
+        id: "138",
+        title: "Paleobotany",
+        description:
+            "The study of fossil plants.",
+    },
+    {
+        id: "139",
+        title: "Palynology",
+        description:
+            "The study of pollen grains and spores.",
+    },
+    {
+        id: "140",
+        title: "Plant anatomy",
+        description:
+            "The study of the internal structure of plants.",
+    },
+    {
+        id: "141",
+        title: "Plant morphology",
+        description:
+            "The study of the external form and structure of plants.",
+    },
+    {
+        id: "142",
+        title: "Plant taxonomy",
+        description:
+            "The classification of plants.",
+    },
+    {
+        id: "143",
+        title: "Economic botany",
+        description:
+            "The study of the economic importance of plants.",
+    },
+    {
+        id: "144",
+        title: "Ethnobotany",
+        description:
+            "The study of the relationship between people and plants.",
+    },
+    {
+        id: "145",
+        title: "Geobotany",
+        description:
+            "The study of the geographical distribution of plants.",
+    },
+    {
+        id: "146",
+        title: "Phytogeography",
+        description:
+            "The study of the geographical distribution of plants.",
+    },
+    {
+        id: "147",
+        title: "Acarology",
+        description:
+            "The study of ticks and mites.",
+    },
+    {
+        id: "148",
+        title: "Arachnology",
+        description:
+            "The study of spiders and their relatives.",
+    },
+    {
+        id: "149",
+        title: "Apiology",
+        description:
+            "The study of bees.",
+    },
+    {
+        id: "150",
+        title: "Coleopterology",
+        description:
+            "The study of beetles.",
+    },
+    {
+        id: "151",
+        title: "Dipterology",
+        description:
+            "The study of flies.",
+    },
+    {
+        id: "152",
+        title: "Lepidopterology",
+        description:
+            "The study of moths and butterflies.",
+    },
+    {
+        id: "153",
+        title: "Myrmecology",
+        description:
+            "The study of ants.",
+    },
+    {
+        id: "154",
+        title: "Nematology",
+        description:
+            "The study of nematodes.",
+    },
+    {
+        id: "155",
+        title: "Neuroanatomy",
+        description:
+            "The study of the structure of the nervous system.",
+    },
+    {
+        id: "156",
+        title: "Neurochemistry",
+        description:
+            "The study of the chemical processes in the nervous system.",
+    },
+    {
+        id: "157",
+        title: "Neuropharmacology",
+        description:
+            "The study of the effects of drugs on the nervous system.",
+    },
+    {
+        id: "158",
+        title: "Neurophysiology",
+        description:
+            "The study of the function of the nervous system.",
+    },
+    {
+        id: "159",
+        title: "Cognitive neuroscience",
+        description:
+            "The study of the neural basis of cognition.",
+    },
+    {
+        id: "160",
+        title: "Computational neuroscience",
+        description:
+            "The study of brain function in terms of the information processing properties of the structures that make up the nervous system.",
+    },
+    {
+        id: "161",
+        title: "Systems neuroscience",
+        description:
+            "The study of the function of neural circuits and systems.",
+    },
+    {
+        id: "162",
+        title: "Molecular neuroscience",
+        description:
+            "The study of the nervous system at the molecular level.",
+    },
+    {
+        id: "163",
+        title: "Developmental neuroscience",
+        description:
+            "The study of the development of the nervous system.",
+    },
+    {
+        id: "164",
+        title: "Clinical neuroscience",
+        description:
+            "The study of the nervous system in health and disease.",
+    },
+    {
+        id: "165",
+        title: "Behavioral neuroscience",
+        description:
+            "The study of the neural basis of behavior.",
+    },
+    {
+        id: "166",
+        title: "Social neuroscience",
+        description:
+            "The study of the neural basis of social behavior.",
+    },
+    {
+        id: "167",
+        title: "Affective neuroscience",
+        description:
+            "The study of the neural basis of emotion.",
+    },
+    {
+        id: "168",
+        title: "Evolutionary neuroscience",
+        description:
+            "The study of the evolution of the nervous system.",
+    },
+    {
+        id: "169",
+        title: "Paleoneurology",
+        description:
+            "The study of the evolution of the brain using fossil evidence.",
+    },
+    {
+        id: "170",
+        title: "Cardiology",
+        description:
+            "The study of the heart.",
+    },
+    {
+        id: "171",
+        title: "Dermatology",
+        description:
+            "The study of the skin.",
+    },
+    {
+        id: "172",
+        title: "Gastroenterology",
+        description:
+            "The study of the digestive system.",
+    },
+    {
+        id: "173",
+        title: "Hematology",
+        description:
+            "The study of blood.",
+    },
+    {
+        id: "174",
+        title: "Hepatology",
+        description:
+            "The study of the liver, gallbladder, biliary tree, and pancreas.",
+    },
+    {
+        id: "175",
+        title: "Nephrology",
+        description:
+            "The study of the kidneys.",
+    },
+    {
+        id: "176",
+        title: "Neurology",
+        description:
+            "The study of the nervous system.",
+    },
+    {
+        id: "177",
+        title: "Ophthalmology",
+        description:
+            "The study of the eye.",
+    },
+    {
+        id: "178",
+        title: "Otolaryngology",
+        description:
+            "The study of the ear, nose, and throat.",
+    },
+    {
+        id: "179",
+        title: "Pediatrics",
+        description:
+            "The branch of medicine that deals with the medical care of infants, children, and adolescents.",
+    },
+    {
+        id: "180",
+        title: "Psychiatry",
+        description:
+            "The study and treatment of mental illness, emotional disturbance, and abnormal behavior.",
+    },
+    {
+        id: "181",
+        title: "Pulmonology",
+        description:
+            "The branch of medicine that deals with diseases of the respiratory tract.",
+    },
+    {
+        id: "182",
+        title: "Rheumatology",
+        description:
+            "The study of rheumatism, arthritis, and other disorders of the joints, muscles, and ligaments.",
+    },
+    {
+        id: "183",
+        title: "Urology",
+        description:
+            "The branch of medicine that focuses on surgical and medical diseases of the male and female urinary-tract system and the male reproductive organs.",
+    },
+    {
+        id: "184",
+        title: "Andrology",
+        description:
+            "The branch of medicine that deals with male health, particularly relating to the problems of the male reproductive system and urological problems that are unique to men.",
+    },
+    {
+        id: "185",
+        title: "Gynecology",
+        description:
+            "The branch of medicine that deals with the functions and diseases specific to women and girls, especially those affecting the reproductive system.",
+    },
+    {
+        id: "186",
+        title: "Obstetrics",
+        description:
+            "The branch of medicine and surgery concerned with childbirth and the care of women giving birth.",
+    },
+    {
+        id: "187",
+        title: "Gerontology",
+        description:
+            "The study of the social, cultural, psychological, cognitive, and biological aspects of aging.",
+    },
+    {
+        id: "188",
+        title: "Geriatrics",
+        description:
+            "The branch of medicine or social science dealing with the health and care of old people.",
+    },
+    {
+        id: "189",
+        title: "Kinesiology",
+        description:
+            "The study of the mechanics of body movements.",
+    },
+    {
+        id: "190",
+        title: "Osteology",
+        description:
+            "The study of the structure and function of the skeleton and bony structures.",
+    },
+    {
+        id: "191",
+        title: "Myology",
+        description:
+            "The study of the structure, arrangement, and action of muscles.",
+    },
+    {
+        id: "192",
+        title: "Splanchnology",
+        description:
+            "The study of the viscera.",
+    },
+    {
+        id: "193",
+        title: "Syndesmology",
+        description:
+            "The study of ligaments.",
+    },
+    {
+        id: "194",
+        title: "Angiology",
+        description:
+            "The study of the circulatory system and of the lymphatic system.",
+    },
+    {
+        id: "195",
+        title: "Craniology",
+        description:
+            "The scientific study of the shape and size of the skulls of different human races.",
+    },
+    {
+        id: "196",
+        title: "Dactylology",
+        description:
+            "The use of the fingers and hands to communicate and convey ideas, as in sign language.",
+    },
+    {
+        id: "197",
+        title: "Odontology",
+        description:
+            "The scientific study of the structure and diseases of teeth.",
+    },
+    {
+        id: "198",
+        title: "Stomatology",
+        description:
+            "The study of the mouth and its diseases.",
+    },
+    {
+        id: "199",
+        title: "Phrenology",
+        description:
+            "The detailed study of the shape and size of the cranium as a supposed indication of character and mental abilities.",
+    },
+    {
+        id: "200",
+        title: "Astrobiology",
+        description:
+            "The study of the origin, evolution, distribution, and future of life in the universe.",
+    },
+    {
+        id: "201",
+        title: "Bioethics",
+        description:
+            "The study of the ethical issues emerging from advances in biology and medicine.",
+    }
 ];
