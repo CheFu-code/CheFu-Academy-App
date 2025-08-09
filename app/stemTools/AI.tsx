@@ -1,4 +1,5 @@
 import ChatMessage from "@/component/ChatMessage";
+import { Colors } from "@/constant/Colors";
 import { pickImage } from "@/hooks/useImagePicker";
 import useVoiceRecorder from "@/hooks/useVoiceRecorder";
 import { sendImageWithPrompt } from "@/lib/sendImageWithPrompt";
@@ -18,7 +19,7 @@ import {
     TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    View
+    View,
 } from "react-native";
 import { styles } from "../../styles/AIChat.styles";
 
@@ -101,6 +102,13 @@ export default function AIChat() {
                     />
                     <Text style={styles.title}>AI Assistant</Text>
                 </TouchableOpacity>
+                <View style={{ padding: 10 }}>
+                    <Text style={{ fontFamily: "outfit", color: Colors.GRAY, fontSize: 13 }}>
+                        Note: We don’t save your chat history for security
+                        reasons. When you return to this screen, previous
+                        messages won’t be available.{" "}
+                    </Text>
+                </View>
 
                 <FlatList
                     ref={flatListRef}

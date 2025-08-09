@@ -8,10 +8,10 @@ export const styles = StyleSheet.create({
     },
     title: {
         fontSize: 28,
-        fontWeight: "bold",
         color: "#fff",
-        marginBottom: 10,
+        marginBottom: 8,
         marginTop: 35,
+        fontFamily: "outfit-bold",
     },
     chatContainer: {
         paddingHorizontal: 12,

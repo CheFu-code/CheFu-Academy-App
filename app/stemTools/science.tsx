@@ -1,4 +1,4 @@
-import { Colors } from "@/constant/Colors"; // Customize this to match your theme
+import { Colors } from "@/constant/Colors";
 import { AntDesign } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -11,8 +11,18 @@ import {
     View,
 } from "react-native";
 
+type ScienceRoute =
+    | "periodic-table"
+    | "virtual-lab"
+    | "physics-visualizer"
+    | "biology-explorer";
+
 export default function Science() {
     const router = useRouter();
+
+    const handleToolPress = (screenName: ScienceRoute) => {
+        router.push(`/science/${screenName}`);
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -28,16 +38,33 @@ export default function Science() {
                 />
                 <Text style={styles.title}>Science Tools</Text>
             </TouchableOpacity>
+
             <Text style={styles.subtitle}>
                 Dive into the world of science with AI-powered visualizations
                 and experiments.
             </Text>
 
             <View style={styles.toolsContainer}>
-                <ToolCard icon="flask-outline" label="Periodic Table" />
-                <ToolCard icon="planet-outline" label="Virtual Lab" />
-                <ToolCard icon="magnet-outline" label="Physics Visualizer" />
-                <ToolCard icon="leaf-outline" label="Biology Explorer" />
+                <ToolCard
+                    icon="flask-outline"
+                    label="Periodic Table"
+                    onPress={() => handleToolPress("periodic-table")}
+                />
+                <ToolCard
+                    icon="planet-outline"
+                    label="Virtual Lab"
+                    onPress={() => handleToolPress("virtual-lab")}
+                />
+                <ToolCard
+                    icon="magnet-outline"
+                    label="Physics Visualizer"
+                    onPress={() => handleToolPress("physics-visualizer")}
+                />
+                <ToolCard
+                    icon="leaf-outline"
+                    label="Biology Explorer"
+                    onPress={() => handleToolPress("biology-explorer")}
+                />
             </View>
         </ScrollView>
     );
@@ -46,12 +73,14 @@ export default function Science() {
 function ToolCard({
     icon,
     label,
+    onPress,
 }: {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
+    onPress: () => void;
 }) {
     return (
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={onPress}>
             <Ionicons name={icon} size={24} color="#fff" />
             <Text style={styles.cardText}>{label}</Text>
         </TouchableOpacity>
@@ -74,9 +103,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 16,
         color: Colors.GRAY,
-        textAlign: "center",
         marginVertical: 12,
-        paddingHorizontal: 20,
     },
     toolsContainer: {
         marginTop: 20,
