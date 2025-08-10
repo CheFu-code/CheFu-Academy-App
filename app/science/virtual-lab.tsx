@@ -27,6 +27,8 @@ export default function VirtualLab() {
     );
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+    const [boilingAlertShown, setBoilingAlertShown] = useState(false);
+
     useEffect(() => {
         if (paused) return;
         if (timerRef.current) clearInterval(timerRef.current);
@@ -42,27 +44,35 @@ export default function VirtualLab() {
                     setEnergyUsed((e) => e + 4.2 * waterAmount * rate);
                     newTemp = Math.min(temp + rate, 100);
                 } else if (coolingOn) {
-                    newTemp = Math.max(temp - rate * 1.5, 20); // faster cooling
+                    newTemp = Math.max(temp - rate * 1.5, 20);
                 } else {
-                    newTemp = Math.max(temp - rate * 0.5, 20); // passive cooling
+                    newTemp = Math.max(temp - rate * 0.5, 20);
                 }
 
-                if (newTemp >= 100) {
+                if (newTemp >= 100 && !boilingAlertShown) {
+                    setBoilingAlertShown(true);
                     Vibration.vibrate(500);
                     Alert.alert(
                         "Warning",
                         "Water is boiling! Turn off the heater."
                     );
-                    return;
                 }
 
+                return newTemp;
             });
         }, 1000);
 
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [heaterOn, coolingOn, waterAmount, paused]);
+    }, [heaterOn, coolingOn, waterAmount, paused, boilingAlertShown]);
+
+    // Reset alert when water cools below boiling point
+    useEffect(() => {
+        if (temperature < 100 && boilingAlertShown) {
+            setBoilingAlertShown(false);
+        }
+    }, [temperature]);
 
     const adjustWaterAmount = (change: number) => {
         setWaterAmount((prev) => {
