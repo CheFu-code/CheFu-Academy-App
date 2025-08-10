@@ -99,7 +99,7 @@ android {
 
     namespace = 'com.chefu.chefuacademy'
     defaultConfig {
-    applicationId = 'com.chefu.chefuacademy'
+    applicationId 'com.chefu.chefuacademy'
     minSdkVersion = rootProject.ext.minSdkVersion
     targetSdkVersion = rootProject.ext.targetSdkVersion
     versionCode = 1
