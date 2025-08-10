@@ -92,57 +92,57 @@ if (System.getenv("SENTRY_UPLOAD") == "true") {
 
 
 android {
-    ndkVersion rootProject.ext.ndkVersion
+    ndkVersion = rootProject.ext.ndkVersion
 
-    buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
+    buildToolsVersion = rootProject.ext.buildToolsVersion
+    compileSdk = rootProject.ext.compileSdkVersion
 
-    namespace 'com.chefu.chefuacademy'
+    namespace = 'com.chefu.chefuacademy'
     defaultConfig {
-        applicationId 'com.chefu.chefuacademy'
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.2025.1"
+    applicationId = 'com.chefu.chefuacademy'
+    minSdkVersion = rootProject.ext.minSdkVersion
+    targetSdkVersion = rootProject.ext.targetSdkVersion
+    versionCode = 1
+    versionName = "1.2025.1"
         manifestPlaceholders = [
       appAuthRedirectScheme: "chefuacademy"  // ✅ Set your scheme here
     ]
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storeFile = file('debug.keystore')
+            storePassword = 'android'
+            keyAlias = 'androiddebugkey'
+            keyPassword = 'android'
         }
         release {
-            storeFile file(MYAPP_RELEASE_STORE_FILE)
-            storePassword MYAPP_RELEASE_STORE_PASSWORD
-            keyAlias MYAPP_RELEASE_KEY_ALIAS
-            keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            storeFile = file(MYAPP_RELEASE_STORE_FILE)
+            storePassword = MYAPP_RELEASE_STORE_PASSWORD
+            keyAlias = MYAPP_RELEASE_KEY_ALIAS
+            keyPassword = MYAPP_RELEASE_KEY_PASSWORD
         }
     }
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
-            shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            crunchPngs (findProperty('android.enablePngCrunchInReleaseBuilds')?.toBoolean() ?: true)
+            signingConfig = signingConfigs.release
+            shrinkResources = (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
+            minifyEnabled = enableProguardInReleaseBuilds
+            proguardFiles = [getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"]
+            crunchPngs = (findProperty('android.enablePngCrunchInReleaseBuilds')?.toBoolean() ?: true)
         }
     }
     packagingOptions {
         jniLibs {
-            useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
+            useLegacyPackaging = (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
         }
     }
     androidResources {
-        ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
+    ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
 }
 
