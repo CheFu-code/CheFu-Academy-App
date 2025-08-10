@@ -36,13 +36,44 @@ jobs:
 
       - run: chmod +x android/gradlew
 
-      - name: Build Android debug APK
-        run: cd android && ./gradlew assembleDebug
+      - name: Build Android release APK
+        run: cd android && ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v4
         with:
-          name: chefuacademy-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: chefuacademy-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Build Android release AAB
+        run: cd android && ./gradlew bundleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chefuacademy-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.run_number }}
+          name: Release ${{ github.run_number }}
+          body: |
+            New release of CheFu Academy
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: android/app/build/outputs/bundle/release/app-release.aab
+          asset_name: chefuacademy-release.aab
+          asset_content_type: application/vnd.android.package-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sentry Info
         run: npx sentry-cli info
