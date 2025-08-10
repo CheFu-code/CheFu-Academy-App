@@ -28,7 +28,7 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - run: npm ci
+      - run: npm install --legacy-peer-deps
 
       - run: npm install -g expo-cli
 
