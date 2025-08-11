@@ -14,34 +14,35 @@ if (!admin.apps.length) {
 
 const firestore = admin.firestore();
 
-const token =
-    "eI0GNwPOTR6JoL2rhU5g5l:APA91bGdKKu8EKgMOTgYSv4_gcUmPo-RcD1VI5tpqGl60xKtszkyoA3orqs_CLRfrZG5LSg0uQnhgqaYDTEETDpY3nHw-LnSbln0lLgRlsP4MmboFnnOFIg"; // Replace with actual token
-console.log("📱 Using FCM token:", token);
+// const token =
+//     "eI0GNwPOTR6JoL2rhU5g5l:APA91bGdKKu8EKgMOTgYSv4_gcUmPo-RcD1VI5tpqGl60xKtszkyoA3orqs_CLRfrZG5LSg0uQnhgqaYDTEETDpY3nHw-LnSbln0lLgRlsP4MmboFnnOFIg"; // Replace with actual token
+// console.log("📱 Using FCM token:", token);
 
-// ✅ Notification message
-const message = {
-    notification: {
-        title: "We miss you!",
-        body: "Come back to CheFu Academy – new content awaits 🎓✨",
-    },
-    token,
-    data: {
-        click_action: "FLUTTER_NOTIFICATION_CLICK",
-        url: "https://www.mediafire.com/your-app-link.apk",
-    },
-};
+// // ✅ Notification message
+// const message = {
+//     notification: {
+//         title: "We miss you!",
+//         body: "Come back to CheFu Academy – new content awaits 🎓✨",
+//     },
+//     token,
+//     data: {
+//         click_action: "FLUTTER_NOTIFICATION_CLICK",
+//         url: "https://www.mediafire.com/your-app-link.apk",
+//     },
+// };
 
-console.log("📤 Sending notification with payload:", message);
+// console.log("📤 Sending notification with payload:", message);
 
-admin
-    .messaging()
-    .send(message)
-    .then((response) => {
-        console.log("✅ Successfully sent notification:", response);
-    })
-    .catch((error) => {
-        console.error("❌ Error sending notification:", error);
-    });
+// admin
+//     .messaging()
+//     .send(message)
+//     .then((response) => {
+//         console.log("✅ Successfully sent notification:", response);
+//     })
+//     .catch((error) => {
+//         console.error("❌ Error sending notification:", error);
+//     });
+
 router.post("/save-fcm-token", async (req, res) => {
     console.log("🔔 Save FCM token request received with body:", req.body);
 

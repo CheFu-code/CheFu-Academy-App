@@ -75,6 +75,15 @@ export default function ChapterView() {
                 ? courseSnap.data()
                 : { chapters: [] };
             ToastAndroid.show("Chapter completed!", ToastAndroid.SHORT);
+            
+            setTimeout(() => {
+                ToastAndroid.show(
+                    "You can now access the next chapter.",
+                    ToastAndroid.SHORT
+                );
+            }, 2000);
+
+
             const interstitial = InterstitialAd.createForAdRequest(
                 INTERSTITIAL_AD_UNIT_ID,
                 { requestNonPersonalizedAdsOnly: true }

@@ -1,6 +1,11 @@
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import {
+    doc,
+    FirebaseFirestoreTypes,
+    getDoc,
+    getFirestore,
+} from "@react-native-firebase/firestore";
 import { router } from "expo-router";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { imageAssets } from "../../constant/imageAssets";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -37,6 +42,26 @@ export default function CourseCard({
     enroll?: boolean;
 }) {
     const { userDetail } = useContext(UserDetailContext);
+    const [creatorInfo, setCreatorInfo] =
+        useState<null | FirebaseFirestoreTypes.DocumentData>(null);
+    const firestore = getFirestore();
+
+    useEffect(() => {
+        const fetchCreator = async () => {
+            if (!course?.createdBy) return;
+
+            const userDocRef = doc(firestore, "users", course.createdBy);
+            const userDocSnap = await getDoc(userDocRef);
+
+            const data = userDocSnap.data();
+            if (userDocSnap.exists() && data !== undefined) {
+                setCreatorInfo(data);
+            }
+        };
+
+        fetchCreator();
+    }, [course]);
+
     return (
         <>
             <TouchableOpacity
@@ -52,11 +77,21 @@ export default function CourseCard({
                 style={styles.buttonContainer}
             >
                 {course.banner_image && (
-                    <Image
-                        source={imageAssets[course?.banner_image]}
-                        style={styles.bannerImage}
-                        resizeMode="cover"
-                    />
+                    <>
+                        <Image
+                            source={imageAssets[course?.banner_image]}
+                            style={styles.bannerImage}
+                            resizeMode="cover"
+                        />
+                        <Image
+                            source={
+                                creatorInfo?.profilePicture
+                                    ? { uri: creatorInfo.profilePicture }
+                                    : require("../../assets/images/logo.png")
+                            }
+                            style={styles.creatorProfilePic}
+                        />
+                    </>
                 )}
                 <View
                     style={{
@@ -82,10 +117,10 @@ export default function CourseCard({
                                 {course?.createdOn?.toDate
                                     ? course.createdOn
                                           .toDate()
-                                          .toLocaleDateString("en-US", {
+                                          .toLocaleDateString("en-GB", {
+                                              day: "2-digit",
+                                              month: "2-digit",
                                               year: "numeric",
-                                              month: "long",
-                                              day: "numeric",
                                           })
                                     : ""}
                             </Text>

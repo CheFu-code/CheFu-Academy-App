@@ -21,6 +21,7 @@ import { Colors } from "../constant/Colors";
 import { NetworkProvider, useNetwork } from "../context/NetworkContext";
 import { UserDetailContext } from "../context/UserDetailContext";
 
+
 // ✅ Sentry Init
 Sentry.init({
     dsn: "https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840",
@@ -59,7 +60,7 @@ function LayoutContent() {
     //           "Please install CheFu Academy from Google Play to receive updates.",
     //           [
     //             {
-    //               text: "Go to Play Store",
+    //               text: "Play Store",
     //               onPress: () =>
     //                 Linking.openURL(
     //                   "https://play.google.com/store/apps/details?id=com.chefu.chefuacademy"
