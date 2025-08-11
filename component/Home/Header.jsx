@@ -95,7 +95,7 @@ export default function Header() {
 
     const modalOptions = [
         { label: "Add Course", icon: "add-circle-outline" },
-        { label: "STEM", icon: "sparkles-outline" },
+        // { label: "STEM", icon: "sparkles-outline" },
         { label: "Contact Support", icon: "mail-outline" },
         { label: "Rate our app", icon: "star-outline", color: Colors.YELLOW },
         { label: "Logout", icon: "log-out-outline", color: Colors.RED },
