@@ -90,8 +90,6 @@ export default function Header() {
             );
         } else if (option === "Add Course") {
             router.push("/addCourse");
-        } else if (option === "STEM") {
-            router.push("/STEM");
         }
     };
 
