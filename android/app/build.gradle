@@ -108,6 +108,7 @@ android {
       appAuthRedirectScheme: "chefuacademy"  // ✅ Set your scheme here
     ]
     }
+
     signingConfigs {
         debug {
             storeFile = file('debug.keystore')
