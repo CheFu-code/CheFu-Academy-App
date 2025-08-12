@@ -42,8 +42,8 @@ const styles = StyleSheet.create({
         fontFamily: "outfit",
     },
     lottie: {
-        width: 170,
-        height: 170,
+        width: 180,
+        height: 180,
         marginBottom: 20,
     },
 });

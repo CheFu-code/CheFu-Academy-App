@@ -17,7 +17,6 @@ import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    Alert,
     Linking,
     Platform,
     Pressable,
@@ -27,8 +26,9 @@ import {
     Text,
     ToastAndroid,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
+import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Settings.styles";
@@ -46,8 +46,18 @@ export default function SettingsScreen() {
     const db = getFirestore();
     const auth = getAuth();
     const router = useRouter();
+    const [errorModal, setErrorModal] = useState({
+        visible: false,
+        title: "",
+        message: "",
+    });
+    const [successModal, setSuccessModal] = useState({
+        visible: false,
+        title: "",
+        message: "",
+    });
 
-    const options = ["Report a bug"];
+    const options = ["Report a bug"];  // when i add more options i should uncomment out these styles on the styles file
 
     useEffect(() => {
         async function fetchSettings() {
@@ -105,16 +115,22 @@ export default function SettingsScreen() {
                 const enrolled = await LocalAuthentication.isEnrolledAsync();
 
                 if (!compatible || !enrolled) {
-                    Alert.alert(
-                        "Biometric Unavailable",
-                        "Biometric authentication is not available or not set up on this device."
-                    );
+                    setErrorModal({
+                        visible: true,
+                        title: "Biometric Unavailable",
+                        message:
+                            "Biometric authentication is not available or not set up on this device.",
+                    });
                     return;
                 }
             }
 
             stateSetter(newValue);
-            Alert.alert("Success", `${name} turned ${newValue ? "on" : "off"}`);
+            setSuccessModal({
+                visible: true,
+                title: "Success",
+                message: `${name} has been turned ${newValue ? "on" : "off"}.`,
+            });
 
             try {
                 const user = auth.currentUser;
@@ -138,11 +154,19 @@ export default function SettingsScreen() {
             } catch (error) {
                 setFatalError(error);
                 console.error("Failed to update setting:", error);
-                Alert.alert("Error", "Failed to save setting.");
+                setErrorModal({
+                    visible: true,
+                    title: "Error",
+                    message: "Failed to save settings",
+                });
             }
         } catch (err) {
             setFatalError(err);
-            Alert.alert("Error", "A fatal error occurred in toggleSetting.");
+            setErrorModal({
+                visible: true,
+                title: "Error",
+                message: "An error occurred while toggling the setting.",
+            });
         }
     };
 
@@ -151,7 +175,11 @@ export default function SettingsScreen() {
             setLoading(true);
             const user = auth.currentUser;
             if (!user?.email) {
-                Alert.alert("Error", "User not logged in");
+                setErrorModal({
+                    visible: true,
+                    title: "Error",
+                    message: "User not logged in",
+                });
                 setLoading(false);
                 return;
             }
@@ -160,7 +188,11 @@ export default function SettingsScreen() {
             const docSnap = await getDoc(docRef);
 
             if (!docSnap.exists()) {
-                Alert.alert("Error", "No user data found to export");
+                setErrorModal({
+                    visible: true,
+                    title: "Error",
+                    message: "No user data found to export.",
+                });
                 setLoading(false);
                 return;
             }
@@ -182,7 +214,11 @@ export default function SettingsScreen() {
         } catch (error) {
             setFatalError(error);
             console.error("Export failed", error);
-            Alert.alert("Error", "Failed to export data");
+            setErrorModal({
+                visible: true,
+                title: "Error",
+                message: "Failed to export user data.",
+            });
         } finally {
             setLoading(false);
         }
@@ -197,13 +233,17 @@ export default function SettingsScreen() {
             ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
         } catch (err) {
             setFatalError(err);
-            Alert.alert("Error", "Failed to log out.");
+            setErrorModal({
+                visible: true,
+                title: "Error",
+                message: "Failed to log out. Please try again.",
+            });
         }
         return;
     };
 
     const SHARE_MESSAGE = "Check out CheFu Academy App!";
-    const SHARE_URL = "https://chefu.academy";
+    const SHARE_URL = "https://play.google.com/store/apps/details?id=com.chefu.academy";
 
     const handleShare = async () => {
         try {
@@ -233,9 +273,31 @@ export default function SettingsScreen() {
             }
         } catch (error) {
             setFatalError(error);
-            Alert.alert("Sharing failed", error.message);
+            setErrorModal({
+                visible: true,
+                title: "Sharing Failed",
+                message: "Failed to share content. Please try again.",
+            });
         }
     };
+
+    <AppModal
+        visible={errorModal.visible}
+        title={errorModal.title}
+        message={errorModal.message}
+        confirmText="OK"
+        showCancel={false}
+        onConfirm={() => setErrorModal({ ...errorModal, visible: false })}
+    />;
+
+    <AppModal
+        visible={successModal.visible}
+        title={successModal.title}
+        message={successModal.message}
+        confirmText="OK"
+        showCancel={false}
+        onConfirm={() => setSuccessModal({ ...successModal, visible: false })}
+    />;
 
     const verify = async () => {
         const user = auth.currentUser;
@@ -256,7 +318,11 @@ export default function SettingsScreen() {
             setFatalError(
                 new Error("No user is currently signed in from settings.")
             );
-            Alert.alert("Error", "You're currently not signed in.");
+            setErrorModal({
+                visible: true,
+                title: "Error",
+                message: "You're currently not signed in.",
+            });
         }
     };
     let content;
@@ -325,7 +391,7 @@ export default function SettingsScreen() {
                                         router.push("/chatWithAdmin");
                                         setIsOpen(false);
                                     }}
-                                    style={styles.option}
+                                    style={styles.option} //when i add more options i should uncomment out these styles on the styles file
                                 >
                                     <Text style={styles.optionText}>
                                         {item}
@@ -588,8 +654,8 @@ const SettingItem = ({
                         label === "Log Out"
                             ? "red"
                             : label === "Buy me coffee"
-                              ? "yellow"
-                              : Colors.PRIMARY
+                            ? "yellow"
+                            : Colors.PRIMARY
                     }
                     style={{ marginRight: 12 }}
                 />
@@ -599,8 +665,8 @@ const SettingItem = ({
                         label === "Log Out"
                             ? { color: "red", fontFamily: "outfit-bold" }
                             : label === "Buy me coffee"
-                              ? { color: "yellow", fontFamily: "space-mono" }
-                              : null,
+                            ? { color: "yellow", fontFamily: "space-mono" }
+                            : null,
                     ]}
                 >
                     {label}

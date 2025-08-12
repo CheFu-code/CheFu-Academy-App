@@ -40,8 +40,8 @@ export const styles = StyleSheet.create({
     },
     option: {
         padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: "#444",
+        // borderBottomWidth: 1,
+        // borderBottomColor: "#444", // I will uncomment out this line when i add more options
         textAlign: "center",
     },
     optionText: {

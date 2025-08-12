@@ -70,7 +70,7 @@ const TabLayout = () => {
                 <Tabs.Screen
                     name="home"
                     options={{
-                        tabBarIcon: ({ color, size }) => (
+                        tabBarIcon: ({ color, size, focused }) => (
                             <Ionicons
                                 style={{
                                     marginTop: 25,
