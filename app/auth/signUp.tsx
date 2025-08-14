@@ -1,3 +1,4 @@
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useContext, useState } from "react";
@@ -21,6 +22,20 @@ import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/SignUp.styles";
 import { signUpUser } from "../../utils/authService";
 
+interface SignUpResponse {
+    user: FirebaseAuthTypes.User;
+    userData: {
+        fullname?: string;
+        lastLogin?: Date;
+        updatedAt?: Date;
+        profilePicture?: string | null;
+        provider?: string;
+        [key: string]: unknown;
+    };
+}
+
+type SignUpResponseOrUndefined = SignUpResponse | undefined;
+
 const SignUp = () => {
     const router = useRouter();
     const [fullName, setFullName] = useState("");
@@ -31,8 +46,9 @@ const SignUp = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const validatePassword = (pw) => pw.length >= 6;
+    const validateEmail = (email: string) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validatePassword = (pw: string) => pw.length >= 6;
     const [successModal, setSuccessModal] = useState({
         visible: false,
         title: "",
@@ -58,7 +74,18 @@ const SignUp = () => {
 
         setLoading(true);
         try {
-            const { userData } = await signUpUser(fullName, email, password);
+            const response: SignUpResponseOrUndefined = await signUpUser(
+                fullName,
+                email,
+                password
+            );
+
+            if (!response) {
+                setErrorMsg("Sign up failed. Please try again.");
+                return;
+            }
+
+            const { userData } = response;
             setUserDetail(userData);
             setErrorMsg("");
             setSuccessModal({
@@ -67,14 +94,14 @@ const SignUp = () => {
                 message:
                     "Please check your inbox to verify your email address — and if it’s not there, don’t forget to look in your spam folder.",
             });
-        } catch (error) {
+        } catch (error: any) {
             setErrorMsg(error.message);
         } finally {
             setLoading(false);
         }
     };
 
-    const validateFullName = (name) => {
+    const validateFullName = (name: string) => {
         const isValid = /^[a-zA-Z\s-]{1,20}$/.test(name.trim());
         setFullNameError(!isValid);
         return isValid;
@@ -326,6 +353,9 @@ const SignUp = () => {
                 message={successModal.message}
                 confirmText="OK"
                 showCancel={false}
+                onCancel={() => {
+                    setSuccessModal({ ...successModal, visible: false });
+                }}
                 onConfirm={() => {
                     setSuccessModal({ ...successModal, visible: false });
                     router.replace("/(tabs)/home");

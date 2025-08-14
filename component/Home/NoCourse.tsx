@@ -31,12 +31,16 @@ export default function NoCourse() {
                 onPress={() => router.push("/addCourse")}
                 text={"+ Create new course"}
                 disabled={loading}
+                loading={false}
+                icon={null}
             />
             <Button
                 onPress={() => router.push("/(tabs)/explore")}
                 disabled={loading}
                 text={"Explore existing courses"}
                 type="outline"
+                loading={false}
+                icon={null}
             />
         </View>
     );

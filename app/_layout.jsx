@@ -21,7 +21,6 @@ import { Colors } from "../constant/Colors";
 import { NetworkProvider, useNetwork } from "../context/NetworkContext";
 import { UserDetailContext } from "../context/UserDetailContext";
 
-
 // ✅ Sentry Init
 Sentry.init({
     dsn: "https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840",
@@ -79,8 +78,9 @@ function LayoutContent() {
     useEffect(() => {
         const checkBiometrics = async () => {
             try {
-                const biometricEnabled =
-                    await AsyncStorage.getItem("useBiometrics");
+                const biometricEnabled = await AsyncStorage.getItem(
+                    "useBiometrics"
+                );
                 if (biometricEnabled === "true") {
                     const hasHardware =
                         await LocalAuthentication.hasHardwareAsync();

@@ -1,3 +1,4 @@
+import { Course } from "@/types/course";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
@@ -12,11 +13,15 @@ import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/CourseView.styles";
 
-export default function Chapters({ course }) {
+interface ChaptersProps {
+    course: Course;
+}
+
+export default function Chapters({ course }: ChaptersProps) {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const router = useRouter();
 
-    const isChapterCompleted = (index) => {
+    const isChapterCompleted = (index: number) => {
         if (!Array.isArray(course?.completedChapter)) return false;
         // Compare as strings
         const isCompleted = course.completedChapter.find(

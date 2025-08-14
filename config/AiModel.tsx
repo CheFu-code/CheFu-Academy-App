@@ -1,7 +1,4 @@
-// To run this code you need to install the following dependencies:
-// npm install @google/genai mime
-// npm install -D @types/node
-
+import { Content } from "@/types/ai";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
@@ -54,11 +51,8 @@ export const GenerateTopicsAIModel = [
     },
 ];
 
-// Utility function to generate topics using Google GenAI
-export async function generateTopics(contents) {
+export async function generateTopics(contents: Content[]): Promise<string> {
     try {
-        // Only log when function is called and on error
-        // console.log('[AIModel] generateTopics called');
         if (!ai || !ai.models || !ai.models.generateContent) {
             throw new Error(
                 "GoogleGenAI SDK is not initialized or generateContent is missing"
@@ -77,8 +71,7 @@ export async function generateTopics(contents) {
         ) {
             throw new Error("No candidates/content in Gemini response");
         }
-        // Extract the text from the first candidate
-        const text = response.candidates[0].content.parts[0]?.text || "";
+        const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
         return extractJsonFromText(text);
     } catch (error) {
         console.error("[AIModel ERROR] Error generating topics:", error);
@@ -86,15 +79,12 @@ export async function generateTopics(contents) {
     }
 }
 
-// Utility to clean AI response and extract JSON
-function extractJsonFromText(text) {
+function extractJsonFromText(text: string): string {
     if (!text) return "";
-    // Remove code block markers and trim whitespace
     return text.replace(/^```json[\r\n]+|```$/gi, "").trim();
 }
 
-// Utility function to generate courses using Google GenAI
-export async function generateCourse(contents) {
+export async function generateCourse(contents: Content[]): Promise<string> {
     try {
         if (!ai || !ai.models || !ai.models.generateContent) {
             throw new Error(
@@ -114,8 +104,7 @@ export async function generateCourse(contents) {
         ) {
             throw new Error("No candidates/content in Gemini response");
         }
-        // Extract the text from the first candidate
-        const text = response.candidates[0].content.parts[0]?.text || "";
+        const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
         return extractJsonFromText(text);
     } catch (error) {
         console.error("[AIModel ERROR] Error generating courses:", error);

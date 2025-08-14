@@ -76,12 +76,10 @@ export default function ChapterView() {
                 : { chapters: [] };
             ToastAndroid.show("Chapter completed!", ToastAndroid.SHORT);
 
-            setTimeout(() => {
-                ToastAndroid.show(
-                    "You'll be redirected to the course overview.",
-                    ToastAndroid.SHORT
-                );
-            }, 2000);
+            ToastAndroid.show(
+                "You'll be redirected to the course overview.",
+                ToastAndroid.SHORT
+            );
 
             const interstitial = InterstitialAd.createForAdRequest(
                 INTERSTITIAL_AD_UNIT_ID,

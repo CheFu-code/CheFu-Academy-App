@@ -1,3 +1,5 @@
+import { FirebaseAuthError } from "@/types";
+import { DeviceInfo } from "@/types/DeviceInfo";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
@@ -37,14 +39,12 @@ const SignIn = () => {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [fatalError, setFatalError] = useState(null);
-
+    const [fatalError, setFatalError] = useState<Error | null>(null);
     const auth = getAuth();
     const db = getFirestore();
-
     const SUPPORT_EMAIL = "kurisanimaluleke77@gmail.com";
 
-    const getUserDetail = async (email) => {
+    const getUserDetail = async (email: string) => {
         try {
             const userDocRef = doc(db, "users", email);
             // Update lastLogin to now
@@ -61,7 +61,8 @@ const SignIn = () => {
         }
     };
 
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validateEmail = (email: string) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     const handleSignIn = async () => {
         if (loading) return;
@@ -137,6 +138,10 @@ const SignIn = () => {
                 );
             }
 
+            if (!signedInEmail) {
+                throw new Error("User email is missing");
+            }
+
             await getUserDetail(signedInEmail); // updates userDetail state
 
             router.replace("/(tabs)/home");
@@ -145,14 +150,12 @@ const SignIn = () => {
             const userDocRef = doc(db, "users", signedInEmail);
             const userDoc = await getDoc(userDocRef);
             const userData = userDoc.data();
-
             const previousDevices = userDoc.data()?.trustedDevices || [];
-
             const currentDevice = deviceInfo; // e.g. brand + model + os
 
             // Check if device is new
             const isNewDevice = !previousDevices.some(
-                (d) =>
+                (d: DeviceInfo) =>
                     d.brand === currentDevice.brand &&
                     d.modelName === currentDevice.modelName &&
                     d.osName === currentDevice.osName &&
@@ -185,59 +188,73 @@ const SignIn = () => {
             } else {
                 console.log("no need to send alert email");
             }
-        } catch (e) {
+        } catch (e: unknown) {
             Sentry.captureException(e);
             const contactSupport = () =>
                 Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
-            switch (e.code) {
-                case "auth/operation-not-allowed":
-                    Alert.alert(
-                        "Login Not Enabled",
-                        "Email/password accounts are not enabled. Please contact support.",
-                        [
-                            { text: "Cancel", style: "cancel" },
-                            { text: "Contact Now", onPress: contactSupport },
-                        ]
-                    );
-                    break;
-                case "auth/invalid-credential":
-                    ToastAndroid.show(
-                        "Invalid credentials. Please try again.",
-                        ToastAndroid.SHORT
-                    );
-                    break;
-                case "auth/unknown":
-                    Alert.alert(
-                        "Unknown Error",
-                        "We encountered an unknown error. Please try again later"
-                    );
-                    break;
-                case "auth/network-request-failed":
-                    Alert.alert(
-                        "Network Error",
-                        "Please check your internet connection and try again."
-                    );
-                    break;
-                case "auth/too-many-requests":
-                    Alert.alert(
-                        "Error",
-                        "Too many requests have been made from this device."
-                    );
-                    break;
-                case "auth/internal-error":
-                case "auth/network-request-failed":
-                    Alert.alert(
-                        "Error",
-                        e.message || "Please try again or contact support.",
-                        [
-                            { text: "Cancel", style: "cancel" },
-                            { text: "Contact", onPress: contactSupport },
-                        ]
-                    );
-                    break;
-                default:
-                    Alert.alert("Error", e.message);
-                    break;
+
+            if (typeof e === "object" && e !== null && "code" in e) {
+                const error = e as FirebaseAuthError;
+
+                switch (e.code) {
+                    case "auth/operation-not-allowed":
+                        Alert.alert(
+                            "Login Not Enabled",
+                            "Email/password accounts are not enabled. Please contact support.",
+                            [
+                                { text: "Cancel", style: "cancel" },
+                                {
+                                    text: "Contact Now",
+                                    onPress: contactSupport,
+                                },
+                            ]
+                        );
+                        break;
+                    case "auth/invalid-credential":
+                        ToastAndroid.show(
+                            "Invalid credentials. Please try again.",
+                            ToastAndroid.SHORT
+                        );
+                        break;
+                    case "auth/unknown":
+                        Alert.alert(
+                            "Unknown Error",
+                            "We encountered an unknown error. Please try again later"
+                        );
+                        break;
+                    case "auth/network-request-failed":
+                        Alert.alert(
+                            "Network Error",
+                            "Please check your internet connection and try again."
+                        );
+                        break;
+                    case "auth/too-many-requests":
+                        Alert.alert(
+                            "Error",
+                            "Too many requests have been made from this device."
+                        );
+                        break;
+                    case "auth/internal-error":
+                    case "auth/network-request-failed":
+                        Alert.alert(
+                            "Error",
+                            error.message ||
+                                "Please try again or contact support.",
+                            [
+                                { text: "Cancel", style: "cancel" },
+                                { text: "Contact", onPress: contactSupport },
+                            ]
+                        );
+                        break;
+                    default:
+                        Alert.alert(
+                            "Error",
+                            error.message || "An unexpected error occurred."
+                        );
+                        break;
+                }
+            } else {
+                Alert.alert("Error", "An unexpected error occurred.");
             }
         } finally {
             setLoading(false);
@@ -281,6 +298,7 @@ const SignIn = () => {
                 <Text style={{ color: "red", fontSize: 14, marginBottom: 20 }}>
                     {fatalError?.message || String(fatalError)}
                 </Text>
+
                 <TouchableOpacity
                     onPress={() => setFatalError(null)}
                     style={{

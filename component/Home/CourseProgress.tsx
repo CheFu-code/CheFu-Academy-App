@@ -1,3 +1,4 @@
+import { Course, CourseProgressProps } from "@/types/course";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useState } from "react";
@@ -6,10 +7,13 @@ import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import CourseProgressCard from "../Shared/CourseProgressCard";
 
-export default function CourseProgress({ courseList, enroll = false }) {
+export default function CourseProgress({
+    courseList,
+    enroll = false,
+}: CourseProgressProps) {
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
-    const [loadingId, setLoadingId] = useState(null);
+    const [loadingId, setLoadingId] = useState<string | null>(null);
     const router = useRouter();
 
     useFocusEffect(
@@ -18,7 +22,7 @@ export default function CourseProgress({ courseList, enroll = false }) {
         }, [])
     );
 
-    const handlePress = (item) => {
+    const handlePress = (item: Course) => {
         const id = item.id || item.courseTitle || "";
         setLoadingId(id);
 
@@ -28,7 +32,7 @@ export default function CourseProgress({ courseList, enroll = false }) {
                 pathname: "/courseView",
                 params: {
                     courseParams: JSON.stringify(item),
-                    enroll: enroll,
+                    enroll: enroll.toString(),
                 },
             });
         }, 100);

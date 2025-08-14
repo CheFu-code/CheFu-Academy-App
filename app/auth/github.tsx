@@ -1,4 +1,5 @@
-import { Colors } from "@/constant/Colors";
+import Button from "@/component/Shared/Button";
+import { Ionicons } from "@expo/vector-icons";
 import {
     getAuth,
     GithubAuthProvider,
@@ -13,7 +14,7 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import LottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { styles } from "../../styles/GitHub.styles";
 import { saveUser } from "../../utils/authService";
 
@@ -138,7 +139,7 @@ export default function GitHubAuthScreen() {
                 let name =
                     userData.name && userData.name.trim() !== ""
                         ? userData.name
-                        : (user.displayName ?? userData.login ?? "");
+                        : user.displayName ?? userData.login ?? "";
 
                 let email = user.email ?? userData.email;
 
@@ -179,7 +180,12 @@ export default function GitHubAuthScreen() {
     if (loading) {
         return (
             <View style={styles.container}>
-                <ActivityIndicator size="large" color={Colors.GREEN} />
+                <LottieView
+                    source={require("../../assets/animations/git logo.json")}
+                    autoPlay
+                    loop
+                    style={{ width: 140, height: 140 }}
+                />
                 <Text style={styles.message}>Signing in with GitHub...</Text>
             </View>
         );
@@ -192,7 +198,16 @@ export default function GitHubAuthScreen() {
         return (
             <View style={styles.container}>
                 <Text style={styles.errorText}>Error:</Text>
+                <Text style={styles.message}>{error}</Text>
                 <Text style={styles.message}>Please try again.</Text>
+
+                <Button
+                    disabled={loading}
+                    loading={loading}
+                    text="Try again"
+                    onPress={() => router.replace("/")}
+                    icon={<Ionicons name="refresh" size={20} color="#fff" />}
+                />
             </View>
         );
     }

@@ -26,7 +26,10 @@ export default function PracticeSection() {
                     renderItem={({ item, index }) => (
                         <TouchableOpacity
                             onPress={() =>
-                                router.push("/practice/" + item.name)
+                                router.push({
+                                    pathname: "/practice/[type]", // dynamic route template
+                                    params: { type: item.name }, // provide param to replace [type]
+                                })
                             }
                             style={{
                                 flex: 1,

@@ -1,5 +1,6 @@
 import {
     collection,
+    FirebaseFirestoreTypes,
     getDocs,
     getFirestore,
     orderBy,
@@ -11,7 +12,7 @@ import { Text, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 import CourseList from "../Home/CourseList";
 
-function CourseListByCategory({ category }) {
+function CourseListByCategory({ category }: { category: string }) {
     const [courseList, setCourseList] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -27,8 +28,12 @@ function CourseListByCategory({ category }) {
                 );
                 const snapshot = await getDocs(q);
                 const data = snapshot.docs
-                    .map((doc) => ({ id: doc.id, ...doc.data() }))
-                    .filter((docData) => docData.category === category);
+                    .map(
+                        (
+                            doc: FirebaseFirestoreTypes.QueryDocumentSnapshot
+                        ) => ({ id: doc.id, ...doc.data() })
+                    )
+                    .filter((docData: any) => docData.category === category);
                 if (isMounted) setCourseList(data);
             } catch (error) {
                 console.error("Failed to fetch courses:", error);

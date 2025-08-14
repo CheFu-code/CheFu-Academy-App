@@ -12,7 +12,6 @@ import {
 } from "react";
 import {
     ActivityIndicator,
-    Alert,
     Image,
     Linking,
     Modal,
@@ -23,7 +22,7 @@ import {
     TextInput,
     ToastAndroid,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 
 // --- Icons ---
@@ -36,8 +35,7 @@ import {
     EmailAuthProvider,
     getAuth,
     reauthenticateWithCredential,
-    sendEmailVerification,
-    signOut,
+    sendEmailVerification
 } from "@react-native-firebase/auth";
 import {
     deleteDoc,
@@ -140,32 +138,24 @@ export default function Profile() {
     }, [email, router, refreshData]);
 
     // --- Logout ---
-    const handleLogout = useCallback(() => {
-        console.log("handle logout");
-        Alert.alert("Logout?", "Are you sure you want to log out?", [
-            { text: "Cancel", style: "cancel" },
-            {
-                text: "Logout",
-                style: "destructive",
-                onPress: async () => {
-                    try {
-                        setLoading(true);
-                        await signOut(auth);
-                        await AsyncStorage.removeItem("userDetail");
-                        await AsyncStorage.removeItem(CACHE_KEY);
-                        console.log("async storage removed");
-                        setUserDetail(null);
-                        router.push("/auth/signIn");
-                        showToast("Logged out successfully");
-                    } catch (error) {
-                        Sentry.captureException(error);
-                        showToast("Logout failed");
-                    } finally {
-                        setLoading(false);
-                    }
-                },
-            },
-        ]);
+    const handleLogout = useCallback(async () => {
+        try {
+            setLoading(true);
+            await auth.signOut();
+            await AsyncStorage.removeItem("userDetail");
+            await AsyncStorage.removeItem(CACHE_KEY);
+            setUserDetail(null);
+            ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
+        } catch (err) {
+            setFatalError(err);
+            setErrorModal({
+                visible: true,
+                title: "Error",
+                message: "Failed to log out. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
     }, [auth, router, setUserDetail, showToast]);
 
     // --- Delete Account ---

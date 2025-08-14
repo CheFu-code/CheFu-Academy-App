@@ -1,7 +1,13 @@
+import { Course } from "@/types/course";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth } from "@react-native-firebase/auth";
-import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
+import {
+    doc,
+    FirebaseFirestoreTypes,
+    getDoc,
+    getFirestore,
+} from "@react-native-firebase/firestore";
 import * as Notifications from "expo-notifications";
 import { useContext, useEffect, useState } from "react";
 import {
@@ -16,18 +22,27 @@ import { Colors } from "../../constant/Colors";
 import { imageAssets } from "../../constant/Option";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
+interface CourseProgressCardProps {
+    item: Course;
+    width?: number;
+    loading?: boolean;
+    disabled?: boolean;
+    onPress?: () => void;
+}
+
 export default function CourseProgressCard({
     item,
     width = 230,
     loading = false,
     disabled = false,
-    onPress = null,
-}) {
-    if (!item) return null; // Handle case where item is undefined or null
+    onPress,
+}: CourseProgressCardProps) {
+    if (!item) return null;
     const auth = getAuth();
     const firestore = getFirestore();
     const { userDetail } = useContext(UserDetailContext);
-    const [userData, setUserData] = useState(null); // ← ADD THIS
+    const [userData, setUserData] =
+        useState<FirebaseFirestoreTypes.DocumentData | null>(null);
 
     async function fetchUserFromFirestore() {
         const currentUser = auth.currentUser;
@@ -41,10 +56,15 @@ export default function CourseProgressCard({
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
-            const data = userDocSnap.data();
-            setUserData(data); // ← STORE IT IN STATE
+            const data = userDocSnap.data(); // data: DocumentData | undefined
+            if (data) {
+                setUserData(data);
+            } else {
+                setUserData(null); // fallback, just in case
+            }
         } else {
             console.log("No user document found in Firestore.");
+            setUserData(null);
         }
     }
 
@@ -52,11 +72,11 @@ export default function CourseProgressCard({
         fetchUserFromFirestore();
     }, []);
 
-    const GetCompletedChapters = (course) => {
+    const GetCompletedChapters = (course: Course) => {
         const total = course?.chapters?.length ?? 0;
 
         const completed = course?.completedChapter?.length ?? 0;
-        if (total === 0) return 0; // avoid division by zero
+        if (total === 0) return 0;
         const percentage = completed / total;
         return Math.min(percentage, 1); // ensure it's not > 1
     };
@@ -140,7 +160,11 @@ export default function CourseProgressCard({
                         width: 60,
                         borderRadius: 8,
                     }}
-                    source={imageAssets[item?.banner_image]}
+                    source={
+                        imageAssets[
+                            item?.banner_image as keyof typeof imageAssets
+                        ]
+                    }
                 />
                 <View
                     style={{

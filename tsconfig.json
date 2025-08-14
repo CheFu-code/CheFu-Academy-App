@@ -11,9 +11,10 @@
         "**/*.tsx",
         ".expo/types/**/*.ts",
         "expo-env.d.ts",
-        "app/index.jsx",
+        "app/index.tsx",
         "app/_layout.jsx",
         "app/auth2.jsx",
-        "app/auth.jsx"
+        "app/auth.jsx",
+        "component/Spinner.js"
     ]
 }

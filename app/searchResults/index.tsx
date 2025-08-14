@@ -140,17 +140,20 @@ export default function SearchScreen() {
                 >
                     <AntDesign color={"white"} size={20} name="left" />
                     <Text
+                        numberOfLines={1}
                         style={{
                             color: Colors.WHITE,
                             fontSize: 20,
-                            fontFamily: "outfit",
+                            fontFamily: "outfit-bold",
+                            maxWidth: 320,
                         }}
                     >
                         Results for
                         <Text
+                            numberOfLines={1}
                             style={{
-                                fontFamily: "outfit-bold",
                                 color: Colors.PRIMARY,
+                                fontStyle: "italic",
                             }}
                         >
                             {" "}
@@ -164,16 +167,23 @@ export default function SearchScreen() {
                         style={{
                             alignItems: "center",
                             justifyContent: "center",
+                            marginTop: 50,
                         }}
                     >
+                        <LottieView
+                            source={require("../../assets/animations/Empty box by partho.json")}
+                            autoPlay
+                            loop
+                            style={{ width: 190, height: 190 }}
+                        />
                         <Text
                             style={{
                                 color: Colors.GRAY,
                                 alignItems: "center",
                                 justifyContent: "center",
-                                marginTop: 100,
+                                marginTop: 50,
                                 fontFamily: "outfit-bold",
-                                fontSize: 16,
+                                fontSize: 18,
                                 textAlign: "center",
                             }}
                         >
@@ -182,15 +192,28 @@ export default function SearchScreen() {
                         <Text
                             style={{
                                 color: Colors.GRAY,
-
                                 fontFamily: "outfit",
-                                fontSize: 14,
-                                marginTop: 30,
+                                fontSize: 15,
+                                marginTop: 25,
                             }}
                         >
-                            We couldn't find any courses for your query. Try
-                            browsing by category — for example: Coding, Science,
-                            Engineering, Cooking, etc.
+                            We couldn't find any courses that match your search.
+                            Try exploring by category — and if you still don’t
+                            find what you’re looking for, be the first to{" "}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    router.push("/addCourse");
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        color: Colors.PRIMARY,
+                                        textDecorationLine: "underline",
+                                    }}
+                                >
+                                    create it with our AI
+                                </Text>
+                            </TouchableOpacity>
                         </Text>
                     </View>
                 ) : (

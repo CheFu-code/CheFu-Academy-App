@@ -6,14 +6,12 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.BG_COLOR,
         padding: 20,
-        justifyContent: "center",
+        marginTop: 30,
     },
     heading: {
         fontSize: 24,
         fontFamily: "outfit-bold",
         color: Colors.WHITE,
-        marginBottom: 30,
-        textAlign: "center",
     },
     switchContainer: {
         flexDirection: "row",
@@ -40,13 +38,10 @@ export const styles = StyleSheet.create({
         textAlign: "center",
     },
     backButton: {
-        position: "absolute",
-        top: 40,
-        left: 20,
-        padding: 8,
-        backgroundColor: "gray",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
         zIndex: 10,
-        borderRadius: 20,
     },
     resetButton: {
         backgroundColor: Colors.PRIMARY,

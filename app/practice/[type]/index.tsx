@@ -1,7 +1,9 @@
+import { Course } from "@/types/course";
 import { Ionicons } from "@expo/vector-icons";
 import { getApp } from "@react-native-firebase/app";
 import {
     collection,
+    FirebaseFirestoreTypes,
     getDocs,
     getFirestore,
     orderBy,
@@ -28,10 +30,8 @@ export default function PracticeTypeHomeScreen() {
     const option = PracticeOption.find((item) => item.name === type);
     const { userDetail } = useContext(UserDetailContext);
     const router = useRouter();
-    // (No navigation button found in first 80 lines, skipping UI navigation patch)
-
     const [loading, setLoading] = useState(false);
-    const [courseList, setCourseList] = useState([]);
+    const [courseList, setCourseList] = useState<Course[]>([]);
 
     useEffect(() => {
         if (userDetail) {
@@ -51,11 +51,14 @@ export default function PracticeTypeHomeScreen() {
                 orderBy("createdOn", "desc")
             );
             const querySnapshot = await getDocs(q);
-            const courses = [];
+            const courses: Course[] = [];
 
-            querySnapshot.forEach((doc) => {
-                courses.push({ id: doc.id, ...doc.data() });
-            });
+            querySnapshot.forEach(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
+                    const courseData = doc.data() as Course; // assert type here
+                    courses.push({ ...courseData, id: doc.id });
+                }
+            );
 
             setCourseList(courses);
         } catch (e) {
@@ -75,6 +78,7 @@ export default function PracticeTypeHomeScreen() {
                 flex: 1,
             }}
             data={[]}
+            renderItem={() => null}
             ListHeaderComponent={
                 <View
                     style={{
@@ -92,13 +96,12 @@ export default function PracticeTypeHomeScreen() {
                             borderTopRightRadius: 25,
                             borderTopLeftRadius: 25,
                         }}
-                        source={option.image}
+                        source={option?.image}
                     />
                     <View
                         style={{
                             position: "absolute",
                             padding: 20,
-                            marginTop: 10,
                             display: "flex",
                             flexDirection: "row",
                             gap: 10,

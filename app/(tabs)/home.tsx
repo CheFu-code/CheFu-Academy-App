@@ -30,6 +30,7 @@ import {
 
 import {
     collection,
+    FirebaseFirestoreTypes,
     getDocs,
     getFirestore,
     orderBy,
@@ -40,12 +41,13 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 
+import { Course } from "@/types/course";
 import Header from "../../component/Home/Header";
 import LineLoader from "../../component/Home/LineLoader";
 import AppModal from "../../component/Shared/AppModal";
 
 export default function Home() {
-    const [courseList, setCourseList] = useState([]);
+    const [courseList, setCourseList] = useState<Course[]>([]);
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -151,10 +153,15 @@ export default function Home() {
 
             const querySnapshot = await getDocs(q);
 
-            const courses = querySnapshot.docs.map((doc) => ({
-                ...doc.data(),
-                id: doc.id,
-            }));
+            const courses = querySnapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
+                    const data = doc.data();
+                    return {
+                        ...data,
+                        id: doc.id,
+                    };
+                }
+            );
 
             // Compare new courses with cache to avoid redundant writes
             const cachedCoursesJSON = await AsyncStorage.getItem(CACHE_KEY);
@@ -175,30 +182,37 @@ export default function Home() {
             if (isRefresh) {
                 ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Error fetching courses:", error);
             let errorMessage = "Failed to fetch courses. Please try again.";
 
-            // More concise error handling
-            switch (error.code) {
-                case "firestore/unavailable":
-                    errorMessage =
-                        "Network error. Please check your connection.";
-                    break;
-                case "firestore/permission-denied":
-                    errorMessage =
-                        "You don't have permission to access these courses.";
-                    break;
-                case "auth/user-not-found":
-                    errorMessage =
-                        "User not found. Your account may have been deleted.";
-                    break;
-                case "auth/invalid-email":
-                    errorMessage = "Invalid email address format.";
-                    break;
-                case "auth/too-many-requests":
-                    errorMessage = "Too many requests. Please try again later.";
-                    break;
+            if (
+                typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                typeof (error as any).code === "string"
+            ) {
+                switch ((error as any).code) {
+                    case "firestore/unavailable":
+                        errorMessage =
+                            "Network error. Please check your connection.";
+                        break;
+                    case "firestore/permission-denied":
+                        errorMessage =
+                            "You don't have permission to access these courses.";
+                        break;
+                    case "auth/user-not-found":
+                        errorMessage =
+                            "User not found. Your account may have been deleted.";
+                        break;
+                    case "auth/invalid-email":
+                        errorMessage = "Invalid email address format.";
+                        break;
+                    case "auth/too-many-requests":
+                        errorMessage =
+                            "Too many requests. Please try again later.";
+                        break;
+                }
             }
 
             ToastAndroid.show(errorMessage, ToastAndroid.LONG);
@@ -239,13 +253,24 @@ export default function Home() {
                 title: "Email Verification Sent",
                 message: `Verification email sent to ${user.email}. Check your inbox and spam folder.`,
             });
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Failed to send verification email:", error);
+
             let errorMessage =
                 "Failed to send verification email. Please try again later.";
 
-            if (error.code === "auth/too-many-requests") {
-                errorMessage = "Too many requests. Please try again later.";
+            if (
+                typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                typeof (error as { code?: unknown }).code === "string"
+            ) {
+                if (
+                    (error as { code: string }).code ===
+                    "auth/too-many-requests"
+                ) {
+                    errorMessage = "Too many requests. Please try again later.";
+                }
             }
 
             Alert.alert("Error", errorMessage);
@@ -322,6 +347,7 @@ export default function Home() {
                 }}
                 refreshing={loading}
                 showsVerticalScrollIndicator={false}
+                renderItem={() => null}
                 ListHeaderComponent={
                     <View>
                         <Image
@@ -363,6 +389,9 @@ export default function Home() {
                 onConfirm={() =>
                     setErrorModal((prev) => ({ ...prev, visible: false }))
                 }
+                onCancel={() =>
+                    setErrorModal((prev) => ({ ...prev, visible: false }))
+                }
             />
 
             <AppModal
@@ -372,6 +401,9 @@ export default function Home() {
                 confirmText="OK"
                 showCancel={false}
                 onConfirm={() =>
+                    setVerifyEmail((prev) => ({ ...prev, visible: false }))
+                }
+                onCancel={() =>
                     setVerifyEmail((prev) => ({ ...prev, visible: false }))
                 }
             />

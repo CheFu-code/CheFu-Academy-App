@@ -1,3 +1,4 @@
+import { Course } from "@/types/course";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -14,13 +15,19 @@ import {
 import { Colors } from "../../constant/Colors";
 import { imageAssets } from "../../constant/Option";
 
+interface CourseListProps {
+    courseList: Course[];
+    heading?: string;
+    enroll?: boolean;
+}
+
 export default function CourseList({
     courseList,
     heading = "Courses",
     enroll = false,
-}) {
+}: CourseListProps) {
     const router = useRouter();
-    const [loadingId, setLoadingId] = useState(null);
+    const [loadingId, setLoadingId] = useState<string | null>(null);
 
     useFocusEffect(
         useCallback(() => {
@@ -29,7 +36,7 @@ export default function CourseList({
         }, [])
     );
 
-    const handlePress = (item) => {
+    const handlePress = (item: Course) => {
         const id = item.id || item.courseTitle || "";
         setLoadingId(id);
 
@@ -38,7 +45,7 @@ export default function CourseList({
                 pathname: "/courseView",
                 params: {
                     courseParams: JSON.stringify(item),
-                    enroll: enroll,
+                    enroll: enroll.toString(),
                 },
             });
         }, 10); // 10ms delay to show loading state
@@ -67,7 +74,7 @@ export default function CourseList({
                 }
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}
-                renderItem={({ item, index }) => {
+                renderItem={({ item }: { item: Course }) => {
                     const isLoading =
                         loadingId === (item.id || item.courseTitle || "");
                     return (
@@ -84,15 +91,17 @@ export default function CourseList({
                                     borderRadius: 15,
                                     opacity: loadingId ? 0.5 : 1,
                                 }}
-                                source={imageAssets[item.banner_image]}
+                                source={
+                                    imageAssets[
+                                        item?.banner_image as keyof typeof imageAssets
+                                    ]
+                                }
                             />
                             <Text
                                 style={{
                                     fontFamily: "outfit-bold",
                                     fontSize: 15,
                                     marginTop: 10,
-                                    numberOfLines: 1,
-                                    ellipsizeMode: "tail",
                                     maxWidth: 200,
                                 }}
                                 numberOfLines={1}
@@ -117,7 +126,7 @@ export default function CourseList({
                                 <Text
                                     style={{
                                         fontFamily: "outfit",
-                                        textDecoration: "underline",
+                                        textDecorationLine: "underline",
                                     }}
                                 >
                                     {item?.chapters?.length} Chapters

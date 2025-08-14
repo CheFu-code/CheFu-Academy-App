@@ -16,6 +16,7 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Header.styles";
+type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
 export default function Header() {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -24,7 +25,7 @@ export default function Header() {
     const router = useRouter();
     const auth = getAuth();
     const CACHE_KEY = "@cached_courses";
-    const handleOption = async (option) => {
+    const handleOption = async (option: string) => {
         setShowModal(false);
 
         if (option === "Logout") {
@@ -40,30 +41,46 @@ export default function Header() {
                 );
                 // router.replace("/auth/signIn");
                 router.replace("/");
-            } catch (error) {
-                if (error.code === "auth/no-current-user") {
-                    ToastAndroid.show(
-                        "You're not logged in",
-                        ToastAndroid.SHORT
-                    );
-                } else if (error.code === "auth/user-not-found") {
-                    ToastAndroid.show("User not found", ToastAndroid.SHORT);
-                } else if (error.code === "auth/network-request-failed") {
-                    ToastAndroid.show(
-                        "Network error, please try again",
-                        ToastAndroid.SHORT
-                    );
-                } else if (error.code === "auth/too-many-requests") {
-                    ToastAndroid.show(
-                        "Too many requests, please try again later",
-                        ToastAndroid.SHORT
-                    );
-                } else if (error.code === "auth/operation-not-allowed") {
-                    ToastAndroid.show(
-                        "Operation not allowed",
-                        ToastAndroid.SHORT
-                    );
+            } catch (error: unknown) {
+                if (
+                    typeof error === "object" &&
+                    error !== null &&
+                    "code" in error &&
+                    typeof (error as any).code === "string"
+                ) {
+                    const code = (error as any).code;
+
+                    if (code === "auth/no-current-user") {
+                        ToastAndroid.show(
+                            "You're not logged in",
+                            ToastAndroid.SHORT
+                        );
+                    } else if (code === "auth/user-not-found") {
+                        ToastAndroid.show("User not found", ToastAndroid.SHORT);
+                    } else if (code === "auth/network-request-failed") {
+                        ToastAndroid.show(
+                            "Network error, please try again",
+                            ToastAndroid.SHORT
+                        );
+                    } else if (code === "auth/too-many-requests") {
+                        ToastAndroid.show(
+                            "Too many requests, please try again later",
+                            ToastAndroid.SHORT
+                        );
+                    } else if (code === "auth/operation-not-allowed") {
+                        ToastAndroid.show(
+                            "Operation not allowed",
+                            ToastAndroid.SHORT
+                        );
+                    } else {
+                        ToastAndroid.show(
+                            "An error occurred, please try again",
+                            ToastAndroid.SHORT
+                        );
+                        console.error("Logout error on header:", error);
+                    }
                 } else {
+                    // Unknown error type or no code property
                     ToastAndroid.show(
                         "An error occurred, please try again",
                         ToastAndroid.SHORT
@@ -93,9 +110,12 @@ export default function Header() {
         }
     };
 
-    const modalOptions = [
+    const modalOptions: {
+        label: string;
+        icon: IoniconsName;
+        color?: string;
+    }[] = [
         { label: "Add Course", icon: "add-circle-outline" },
-        // { label: "STEM", icon: "sparkles-outline" },
         { label: "Contact Support", icon: "mail-outline" },
         { label: "Rate our app", icon: "star-outline", color: Colors.YELLOW },
         { label: "Logout", icon: "log-out-outline", color: Colors.RED },

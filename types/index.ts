@@ -3,3 +3,9 @@ export type Message = {
   text: string;
   sender: "user" | "ai";
 };
+
+
+export interface FirebaseAuthError {
+  code?: string;
+  message?: string;
+}

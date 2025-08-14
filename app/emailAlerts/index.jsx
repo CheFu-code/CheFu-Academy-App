@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth } from "@react-native-firebase/auth";
 import {
@@ -118,39 +118,47 @@ export default function EmailAlerts() {
                 onPress={() => router.back()}
                 style={styles.backButton}
             >
-                <Ionicons name="arrow-back" size={24} color={Colors.WHITE} />
+                <AntDesign name="left" size={24} color={Colors.WHITE} />
+                <Text style={styles.heading}>Email Notifications</Text>
             </TouchableOpacity>
-            <Text style={styles.heading}>Email Notifications</Text>
 
-            {renderSwitch(
-                "General Updates",
-                "Receive general app news and tips",
-                "general",
-                preferences,
-                toggle
-            )}
-            {renderSwitch(
-                "Marketing Emails",
-                "Product offers, events, and promotions",
-                "marketing",
-                preferences,
-                toggle
-            )}
-            {renderSwitch(
-                "Activity Alerts",
-                "Be notified when someone interacts with your content",
-                "activity",
-                preferences,
-                toggle
-            )}
-            {renderSwitch(
-                "Security Alerts",
-                "Get alerts for logins and account changes",
-                "security",
-                preferences,
-                toggle
-            )}
-
+            <View
+                style={{
+                    alignItems: "center",
+                    marginBottom: 20,
+                    justifyContent: "center",
+                    marginTop: 100,
+                }}
+            >
+                {renderSwitch(
+                    "General Updates",
+                    "Receive general app news and tips",
+                    "general",
+                    preferences,
+                    toggle
+                )}
+                {renderSwitch(
+                    "Marketing Emails",
+                    "Product offers, events, and promotions",
+                    "marketing",
+                    preferences,
+                    toggle
+                )}
+                {renderSwitch(
+                    "Activity Alerts",
+                    "Be notified when someone interacts with your content",
+                    "activity",
+                    preferences,
+                    toggle
+                )}
+                {renderSwitch(
+                    "Security Alerts",
+                    "Get alerts for logins and account changes",
+                    "security",
+                    preferences,
+                    toggle
+                )}
+            </View>
             <TouchableOpacity
                 disabled={loading}
                 style={[styles.resetButton, { opacity: loading ? 0.5 : 1 }]}
