@@ -7,7 +7,7 @@ import {
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { imageAssets } from "../../constant/imageAssets";
+import { imageAssets } from "../../constant/Option";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/CourseCard.styles";
 
