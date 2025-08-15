@@ -1,7 +1,7 @@
-import { Colors } from "@/constant/Colors";
 import LottieView from "lottie-react-native";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { styles } from "../styles/OfflineScreen.style";
 
 export default function OfflineScreen() {
     return (
@@ -17,33 +17,3 @@ export default function OfflineScreen() {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    icon: {
-        marginBottom: 20,
-    },
-    title: {
-        color: Colors.RED,
-        fontSize: 24,
-        fontFamily: "outfit-bold",
-        marginBottom: 8,
-    },
-    subtitle: {
-        color: "#fff",
-        fontSize: 16,
-        textAlign: "center",
-        fontFamily: "outfit",
-    },
-    lottie: {
-        width: 180,
-        height: 180,
-        marginBottom: 20,
-    },
-});

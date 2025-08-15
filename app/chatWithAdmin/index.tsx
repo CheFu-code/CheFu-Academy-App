@@ -130,7 +130,7 @@ export default function ChatWithAdmin() {
 
             if (!isAdmin && userDetail?.fullname) {
                 await sendNotification(
-                    ADMIN_EMAIL,
+                    userDetail?.email,
                     `New message from ${userDetail.fullname}`,
                     message.trim()
                 );

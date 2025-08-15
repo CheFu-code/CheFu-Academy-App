@@ -171,6 +171,7 @@ export default function GoogleAuthScreen() {
                 <Text style={styles.message}>Please try again.</Text>
 
                 <Button
+                    opacity={loading ? 0.5 : 1}
                     disabled={loading}
                     loading={loading}
                     text="Try again"

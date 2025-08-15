@@ -8,6 +8,7 @@ export default function Button({
     loading,
     disabled,
     icon,
+    opacity,
 }) {
     const isDisabled = loading || disabled;
 
@@ -29,7 +30,8 @@ export default function Button({
                     type === "outline" ? Colors.BG_COLOR : "transparent",
                 opacity: isDisabled ? 0.4 : 1,
                 flexDirection: "row",
-                gap: 8, // ✅ Add spacing between icon and text (supported in RN 0.71+)
+                gap: 8,
+                opacity: isDisabled ? 0.4 : 1,
             }}
         >
             {!loading ? (

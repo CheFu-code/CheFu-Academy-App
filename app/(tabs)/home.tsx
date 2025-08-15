@@ -41,6 +41,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 
+import ErrorModal from "@/component/Shared/ErrorModal";
 import { Course } from "@/types/course";
 import Header from "../../component/Home/Header";
 import LineLoader from "../../component/Home/LineLoader";
@@ -63,6 +64,12 @@ export default function Home() {
     });
 
     const [errorModal, setErrorModal] = useState({
+        visible: false,
+        title: "",
+        message: "",
+    });
+
+    const [errorNewModal, setErrorNewModal] = useState({
         visible: false,
         title: "",
         message: "",
@@ -184,7 +191,7 @@ export default function Home() {
             }
         } catch (error: unknown) {
             console.error("Error fetching courses:", error);
-            let errorMessage = "Failed to fetch courses. Please try again.";
+            let errorMessage = "Failed to refresh. Please try again.";
 
             if (
                 typeof error === "object" &&
@@ -251,7 +258,9 @@ export default function Home() {
             setVerifyEmail({
                 visible: true,
                 title: "Email Verification Sent",
-                message: `Verification email sent to ${user.email}. Check your inbox and spam folder.`,
+                message: `Verification email sent to ${
+                    user?.email ?? "your email"
+                }. Check your inbox and spam folder.`,
             });
         } catch (error: unknown) {
             console.error("Failed to send verification email:", error);
@@ -274,6 +283,11 @@ export default function Home() {
             }
 
             Alert.alert("Error", errorMessage);
+            setErrorNewModal({
+                visible: true,
+                title: "Error",
+                message: errorMessage,
+            });
         } finally {
             setSending(false);
         }
@@ -391,6 +405,15 @@ export default function Home() {
                 }
                 onCancel={() =>
                     setErrorModal((prev) => ({ ...prev, visible: false }))
+                }
+            />
+            <ErrorModal
+                visible={errorNewModal.visible}
+                title={errorNewModal.title}
+                message={errorNewModal.message}
+                confirmText="OK"
+                onConfirm={() =>
+                    setErrorNewModal((prev) => ({ ...prev, visible: false }))
                 }
             />
 

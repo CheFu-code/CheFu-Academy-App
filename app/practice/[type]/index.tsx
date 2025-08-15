@@ -20,7 +20,9 @@ import {
     Text,
     View,
 } from "react-native";
-import CourseListGrid from "../../../component/PracticeScreen/CourseListGrid";
+import CourseListGrid, {
+    AllowedPaths,
+} from "../../../component/PracticeScreen/CourseListGrid";
 import { Colors } from "../../../constant/Colors";
 import { PracticeOption } from "../../../constant/Option";
 import { UserDetailContext } from "../../../context/UserDetailContext";
@@ -142,7 +144,15 @@ export default function PracticeTypeHomeScreen() {
                         />
                     )}
 
-                    <CourseListGrid option={option} courseList={courseList} />
+                    {option && (
+                        <CourseListGrid
+                            option={{
+                                ...option,
+                                path: option.path as AllowedPaths,
+                            }}
+                            courseList={courseList}
+                        />
+                    )}
                 </View>
             }
         />

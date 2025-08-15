@@ -1,18 +1,46 @@
+import { Course } from "@/types/course";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 
-export default function CourseListGrid({ courseList, option }) {
+export type AllowedPaths =
+    | "/courses/details"
+    | "/courses/overview"
+    | "/practice/[type]";
+
+interface CourseListGridProps {
+    courseList: Course[];
+    option: {
+        name: string; 
+        path: AllowedPaths;
+        icon: any;
+    };
+}
+
+export default function CourseListGrid({
+    courseList: courseList,
+    option,
+}: CourseListGridProps) {
     const router = useRouter();
 
-    const onPress = (course) => {
-        router.push({
-            pathname: option.path,
-            params: {
-                courseParams: JSON.stringify(course),
-            },
-        });
+    const onPress = (course: Course) => {
+        if (option.path === "/practice/[type]") {
+            router.push({
+                pathname: option.path,
+                params: {
+                    type: option.name, // ✅ comes from PracticeOption
+                    courseParams: JSON.stringify(course),
+                },
+            } as any);
+        } else {
+            router.push({
+                pathname: option.path,
+                params: {
+                    courseParams: JSON.stringify(course),
+                },
+            } as any);
+        }
     };
 
     return (

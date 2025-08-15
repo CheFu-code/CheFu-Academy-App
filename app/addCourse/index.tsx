@@ -36,8 +36,8 @@ export default function AddCourse() {
     const [loading, setLoading] = useState(false);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [userInput, setUserInput] = useState("");
-    const [topics, setTopics] = useState([]);
-    const [selectedTopic, setSelectedTopic] = useState([]);
+    const [topics, setTopics] = useState<string[]>([]);
+    const [selectedTopic, setSelectedTopic] = useState<string[]>([]);
     const [generatingTopic, setGeneratingTopic] = useState(false);
     const router = useRouter();
     const db = getFirestore();
@@ -143,7 +143,7 @@ export default function AddCourse() {
                 setGeneratingTopic(false);
                 return;
             } else {
-                function safeJsonParse(json) {
+                function safeJsonParse(json: string) {
                     try {
                         return JSON.parse(json);
                     } catch {
@@ -158,6 +158,7 @@ export default function AddCourse() {
                     handleAiError(e, support);
                 }
             }
+            setUserInput("");
         } catch (error) {
             console.error("Error generating topic:", error);
             setErrorModal({
@@ -172,7 +173,7 @@ export default function AddCourse() {
         }
     };
 
-    const onTopicSelect = (topic) => {
+    const onTopicSelect = (topic: string) => {
         const isAlreadyExist = selectedTopic.find((item) => item === topic);
         if (!isAlreadyExist) {
             setSelectedTopic((prev) => [...prev, topic]);
@@ -182,7 +183,7 @@ export default function AddCourse() {
         }
     };
 
-    const isTopicSelected = (topic) => {
+    const isTopicSelected = (topic: string) => {
         const selection = selectedTopic.find((item) => item === topic);
         return selection ? true : false;
     };
@@ -266,8 +267,8 @@ export default function AddCourse() {
                 "Course created successfully!",
                 ToastAndroid.SHORT
             );
-        } catch (e) {
-            console.log("failed course", e.message);
+        } catch (e: unknown) {
+            console.log("failed course", (e as Error).message);
             setErrorModal({
                 visible: true,
                 title: "Error",
@@ -374,7 +375,6 @@ export default function AddCourse() {
                             numberOfLines={3}
                             multiline={true}
                             placeholder="eg: Learn how to bake bread"
-                            color={Colors.GREEN}
                             placeholderTextColor={Colors.GRAY}
                         />
 
@@ -386,6 +386,9 @@ export default function AddCourse() {
                             disabled={generatingTopic || !userInput.trim()}
                             opacity={
                                 generatingTopic || !userInput.trim() ? 0.4 : 1
+                            }
+                            icon={
+                                <Ionicons name="add" size={16} color="#fff" />
                             }
                         />
 
@@ -435,6 +438,8 @@ export default function AddCourse() {
                                     onPress={() => onGenerateCourse()}
                                     text="Generate Course"
                                     disabled={loading}
+                                    icon={null}
+                                    opacity={loading ? 0.4 : 1}
                                 />
                             </View>
                         )}
@@ -449,6 +454,9 @@ export default function AddCourse() {
                 confirmText="OK"
                 showCancel={false}
                 onConfirm={() =>
+                    setErrorModal({ ...errorModal, visible: false })
+                }
+                onCancel={() =>
                     setErrorModal({ ...errorModal, visible: false })
                 }
             />

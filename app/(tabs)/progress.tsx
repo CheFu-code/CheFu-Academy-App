@@ -8,7 +8,6 @@ import CourseProgressCard from "../../component/Shared/CourseProgressCard";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
-// ✅ Modular Firestore API (React Native Firebase)
 import {
     collection,
     getDocs,
@@ -24,7 +23,7 @@ export default function Progress({ enroll = false }) {
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null);
-    const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
+    const [fetching, setFetching] = useState(false); // To prevent multiple fetches
     const router = useRouter();
 
     useFocusEffect(

@@ -39,8 +39,8 @@ export default function Header() {
                     "Logged out successfully",
                     ToastAndroid.SHORT
                 );
-                // router.replace("/auth/signIn");
-                router.replace("/");
+                router.replace("/auth/signIn");
+                // router.replace("/");
             } catch (error: unknown) {
                 if (
                     typeof error === "object" &&
@@ -118,7 +118,7 @@ export default function Header() {
         { label: "Add Course", icon: "add-circle-outline" },
         { label: "Contact Support", icon: "mail-outline" },
         { label: "Rate our app", icon: "star-outline", color: Colors.YELLOW },
-        { label: "Logout", icon: "log-out-outline", color: Colors.RED },
+        // { label: "Logout", icon: "log-out-outline", color: Colors.RED },
     ];
 
     const handleSearch = () => {
