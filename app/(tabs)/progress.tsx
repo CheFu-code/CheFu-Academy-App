@@ -2,14 +2,16 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { FlatList, Image, Text, View } from "react-native";
+import { FlatList, Image, Text, ToastAndroid, View } from "react-native";
 import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
+import { Course } from "@/types/course";
 import {
     collection,
+    FirebaseFirestoreTypes,
     getDocs,
     getFirestore,
     orderBy,
@@ -19,10 +21,10 @@ import {
 import LottieView from "lottie-react-native";
 
 export default function Progress({ enroll = false }) {
-    const [courseList, setCourseList] = useState([]);
+    const [courseList, setCourseList] = useState<Course[]>([]);
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
-    const [loadingId, setLoadingId] = useState(null);
+    const [loadingId, setLoadingId] = useState<string | null>(null);
     const [fetching, setFetching] = useState(false); // To prevent multiple fetches
     const router = useRouter();
 
@@ -57,10 +59,14 @@ export default function Progress({ enroll = false }) {
             );
             const querySnapshot = await getDocs(q);
 
-            const courses = querySnapshot.docs.map((doc) => ({
-                ...doc.data(),
-                id: doc.id,
-            }));
+            const courses = querySnapshot.docs.map(
+                (
+                    doc: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>
+                ) => ({
+                    ...doc.data(),
+                    id: doc.id,
+                })
+            );
 
             setCourseList(courses);
         } catch (error) {
@@ -78,7 +84,7 @@ export default function Progress({ enroll = false }) {
         }
     };
 
-    const handlePress = (item) => {
+    const handlePress = (item: Course) => {
         const id = item.id || item.courseTitle || "";
         setLoadingId(id);
 
@@ -87,7 +93,7 @@ export default function Progress({ enroll = false }) {
                 pathname: "/courseView",
                 params: {
                     courseParams: JSON.stringify(item),
-                    enroll: enroll,
+                    enroll: enroll ? "true" : "false", // ✅ convert boolean to string
                 },
             });
         }, 100);

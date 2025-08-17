@@ -1,13 +1,9 @@
+import { checkDailyLimit } from "@/utils/firestoreUtils";
 import { Ionicons } from "@expo/vector-icons";
 import {
-    collection,
     doc,
-    getDocs,
     getFirestore,
-    query,
-    setDoc,
-    Timestamp,
-    where,
+    setDoc
 } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
@@ -60,37 +56,10 @@ export default function AddCourse() {
             return;
         }
 
-        // Get today's start and end timestamps manually
-        const now = new Date();
-        const startOfDay = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            0,
-            0,
-            0
-        );
-        const endOfDay = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            23,
-            59,
-            59,
-            999
-        );
-
         setGeneratingTopic(true);
 
         try {
-            const courseQuery = query(
-                collection(db, "course"),
-                where("createdBy", "==", userDetail?.email),
-                where("createdOn", ">=", Timestamp.fromDate(startOfDay)),
-                where("createdOn", "<=", Timestamp.fromDate(endOfDay))
-            );
-            const snapshot = await getDocs(courseQuery);
-            const courseCountToday = snapshot.size;
+            const courseCountToday = await checkDailyLimit(userDetail?.email);
 
             if (userDetail?.member === false && courseCountToday >= 3) {
                 setLimitModalVisible(true);
@@ -417,7 +386,7 @@ export default function AddCourse() {
                                                     backgroundColor:
                                                         isTopicSelected(item)
                                                             ? Colors.PRIMARY
-                                                            : null,
+                                                            : undefined,
                                                     color: isTopicSelected(item)
                                                         ? Colors.WHITE
                                                         : Colors.GREEN,

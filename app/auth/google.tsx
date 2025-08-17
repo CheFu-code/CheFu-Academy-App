@@ -11,7 +11,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { styles } from "../../styles/GitHub.styles";
 import { saveUser } from "../../utils/authService";
 
@@ -43,57 +43,45 @@ export default function GoogleAuthScreen() {
     }
 
     const signInWithGoogle = useCallback(async () => {
-        try {
-            setLoading(true);
-            console.log("🔐 Starting Google sign-in...");
+        setLoading(true);
+        setError(null);
 
+        try {
             await GoogleSignin.hasPlayServices({
                 showPlayServicesUpdateDialog: true,
             });
-
             const userInfo = await GoogleSignin.signIn();
-            console.log("✅ Google user info:", userInfo);
-
             const { idToken } = await GoogleSignin.getTokens();
-
             const credential = GoogleAuthProvider.credential(idToken);
+
             const firebaseUserCredential = await signInWithCredential(
                 auth,
                 credential
             );
-
             const user = firebaseUserCredential.user;
+
             if (!user) {
-                console.error("❌ Firebase user is null after sign-in.");
-                Alert.alert(
-                    "Sign-In Error",
-                    "Failed to retrieve user information from Google sign-in. Please try again."
-                );
-                setError(
+                throw new Error(
                     "Failed to retrieve user information from Google sign-in."
                 );
-                router.replace("/");
-                return;
             }
+
             const name = user.displayName ?? "Google User";
             const email = user.email ?? "";
 
-            try {
-                await saveUser(user, name, email);
-            } catch (saveError) {
-                console.warn("⚠️ Failed to save user data:", saveError);
+            const savedData = await saveUser(user, name, email);
+
+            if (!savedData) {
+                throw new Error("Failed to save user data.");
             }
 
             router.replace("/(tabs)/home");
-        } catch (e: unknown) {
-            if (isFirebaseError(e)) {
-                Alert.alert("Sign-In Error", e.message);
-                setError(e.message);
-            } else {
-                Alert.alert("Sign-In Error", "An unknown error occurred.");
-                setError("An unknown error occurred.");
-            }
-            router.replace("/");
+        } catch (err: unknown) {
+            console.error("Google sign-in error:", err);
+            const message = isFirebaseError(err)
+                ? err.message
+                : (err as Error)?.message ?? "An unknown error occurred.";
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -175,7 +163,7 @@ export default function GoogleAuthScreen() {
                     disabled={loading}
                     loading={loading}
                     text="Try again"
-                    onPress={() => router.replace("/")}
+                    onPress={() => signInWithGoogle()}
                     icon={<Ionicons name="refresh" size={20} color="#fff" />}
                 />
             </View>

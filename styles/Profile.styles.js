@@ -114,7 +114,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
-        marginBottom: 20,
+        marginBottom: 10,
     },
 
     inputWithIcon: {
@@ -136,5 +136,14 @@ export const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         fontFamily: "outfit",
+    },
+    forgotPasswordText: {
+        fontFamily: "outfit",
+        fontSize: 14,
+        color: Colors.GRAY,
+        marginBottom: 20,
+        textAlign: "right",
+        textDecorationLine: "underline",
+        fontStyle:"italic"
     },
 });

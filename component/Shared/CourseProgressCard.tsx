@@ -1,4 +1,5 @@
 import { Course } from "@/types/course";
+import { sendNotification } from "@/utils/notifications";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuth } from "@react-native-firebase/auth";
@@ -13,6 +14,7 @@ import { useContext, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Image,
+    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -24,7 +26,7 @@ import { UserDetailContext } from "../../context/UserDetailContext";
 
 interface CourseProgressCardProps {
     item: Course;
-    width?: number;
+    width?: number | string; // Allow both number and string for width
     loading?: boolean;
     disabled?: boolean;
     onPress?: () => void;
@@ -111,18 +113,17 @@ export default function CourseProgressCard({
                     }
                 }
 
-                await Notifications.scheduleNotificationAsync({
-                    content: {
-                        title: "Course Completed!",
-                        body: `You completed all chapters in "${item.courseTitle}"!`,
-                        sound: true,
-                    },
-                    trigger: null,
-                });
+                const userEmail = userDetail?.email;
+                if (userEmail) {
+                    await sendNotification(
+                        userEmail,
+                        "Course Completed! 🎉",
+                        `You completed all chapters in "${item.courseTitle}"`
+                    );
+                }
 
                 await AsyncStorage.setItem(notificationSentKey, "true");
             } else {
-                // console.log(`Course "${item.courseTitle}" not completed yet.`);
             }
         }
 
@@ -143,23 +144,14 @@ export default function CourseProgressCard({
                 padding: 12,
                 backgroundColor: Colors.BG_GRAY,
                 borderRadius: 15,
-                width,
+                width: width as number | undefined,
                 opacity: disabled || loading ? 0.5 : 1,
                 position: "relative",
             }}
         >
-            <View
-                style={{
-                    flexDirection: "row",
-                    gap: 8,
-                }}
-            >
+            <View style={styles.commonStyles}>
                 <Image
-                    style={{
-                        height: 60,
-                        width: 60,
-                        borderRadius: 8,
-                    }}
+                    style={styles.bannerImage}
                     source={
                         imageAssets[
                             item?.banner_image as keyof typeof imageAssets
@@ -172,31 +164,15 @@ export default function CourseProgressCard({
                     }}
                 >
                     <Text
-                        style={{
-                            fontFamily: "outfit-bold",
-                            fontSize: 15,
-                            flexWrap: "wrap",
-                            maxWidth: 140,
-                        }}
+                        style={styles.courseTitle}
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
                         {item?.courseTitle}
                     </Text>
 
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            gap: 5,
-                        }}
-                    >
-                        <Text
-                            style={{
-                                fontFamily: "outfit",
-                                fontSize: 13,
-                            }}
-                        >
+                    <View style={styles.commonStyles}>
+                        <Text style={styles.chapter}>
                             {item?.chapters?.length} Chapters
                         </Text>
 
@@ -223,13 +199,7 @@ export default function CourseProgressCard({
                     width={width - 24}
                 />
 
-                <View
-                    style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 5,
-                    }}
-                >
+                <View style={styles.commonStyles}>
                     {item?.completedChapter?.length ===
                         item.chapters?.length && (
                         <FontAwesome color={"green"} name="flag-checkered" />
@@ -261,22 +231,40 @@ export default function CourseProgressCard({
             </View>
 
             {loading && (
-                <View
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: "rgba(255,255,255,0.5)",
-                        borderRadius: 15,
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                >
+                <View style={styles.activityIndicatorContainer}>
                     <ActivityIndicator size="large" color={Colors.GREEN} />
                 </View>
             )}
         </TouchableOpacity>
     );
 }
+
+export const styles = StyleSheet.create({
+    bannerImage: { height: 60, width: 60, borderRadius: 8 },
+    courseTitle: {
+        fontFamily: "outfit-bold",
+        fontSize: 15,
+        flexWrap: "wrap",
+        maxWidth: "90%",
+    },
+    commonStyles: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 5,
+    },
+    chapter: {
+        fontFamily: "outfit",
+        fontSize: 13,
+    },
+    activityIndicatorContainer: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(255,255,255,0.5)",
+        borderRadius: 15,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+});

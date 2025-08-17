@@ -367,6 +367,7 @@ export default function CourseView() {
                         <Intro
                             course={course}
                             enroll={Array.isArray(enroll) ? enroll[0] : enroll}
+                            
                         />
                         <Chapters course={course} />
                     </View>

@@ -1,5 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import { sendNotification } from "@/utils/notifications";
 import { AntDesign } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
 import dayjs from "dayjs";
@@ -26,34 +27,6 @@ interface ChatMessage {
 
 // Assuming a fixed admin email for notifications. In a real app, this might be fetched dynamically.
 const ADMIN_EMAIL = "kurisanim2@gmail.com"; // REPLACE WITH ACTUAL ADMIN EMAIL
-
-async function sendNotification(
-    userEmail: string,
-    title: string,
-    body: string
-) {
-    try {
-        const response = await fetch(
-            "https://chefu-academy-tmzx.onrender.com/api/sendToUser",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ userEmail, title, body }),
-            }
-        );
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("❌ Failed to send notification:", errorText);
-        } else {
-            console.log("✅ Notification sent successfully!");
-        }
-    } catch (error) {
-        console.error("❌ Error sending notification:", error);
-    }
-}
 
 export default function AdminChat() {
     const { userDetail } = useContext(UserDetailContext);

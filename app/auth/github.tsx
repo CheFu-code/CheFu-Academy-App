@@ -76,7 +76,7 @@ export default function GitHubAuthScreen() {
             setError(`Auth error: ${response.error}`);
         } else if (response?.type === "dismiss") {
             setLoading(false);
-            router.push("/");
+            setError("Sign-in cancelled.");
         }
     }, [response]);
 
@@ -143,7 +143,6 @@ export default function GitHubAuthScreen() {
 
                 let email = user.email ?? userData.email;
 
-                // Fetch primary GitHub email if needed
                 if (!email) {
                     const emailResponse = await fetch(
                         "https://api.github.com/user/emails",
@@ -164,11 +163,17 @@ export default function GitHubAuthScreen() {
 
                 const savedData = await saveUser(user, name, email);
                 console.log("User data saved to Firestore:", savedData);
+
+                if (savedData) {
+                    // ✅ redirect only after user is saved
+                    router.replace("/(tabs)/home");
+                } else {
+                    setError("Failed to save user data.");
+                }
             } catch (e: any) {
                 console.error("Error saving user:", e.message);
+                setError("Error saving user profile.");
             }
-
-            router.replace("/(tabs)/home");
         } catch (e: any) {
             console.error("GitHub sign-in failed:", e.message);
             setError(`GitHub sign-in failed: ${e.message}`);
@@ -202,6 +207,7 @@ export default function GitHubAuthScreen() {
                 <Text style={styles.message}>Please try again.</Text>
 
                 <Button
+                    opacity={loading ? 0.5 : 1}
                     disabled={loading}
                     loading={loading}
                     text="Try again"

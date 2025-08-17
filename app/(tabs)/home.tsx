@@ -1,3 +1,25 @@
+import ErrorModal from "@/component/Shared/ErrorModal";
+import { Course } from "@/types/course";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+    getAuth,
+    onAuthStateChanged,
+    reload,
+    sendEmailVerification,
+} from "@react-native-firebase/auth";
+import {
+    collection,
+    doc,
+    FirebaseFirestoreTypes,
+    getDoc,
+    getDocs,
+    getFirestore,
+    orderBy,
+    query,
+    where,
+} from "@react-native-firebase/firestore";
+import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -10,51 +32,27 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
-
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
+import Header from "../../component/Home/Header";
+import LineLoader from "../../component/Home/LineLoader";
 import NoCourse from "../../component/Home/NoCourse";
 import PracticeSection from "../../component/Home/PracticeSection";
+import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 
-import {
-    getAuth,
-    onAuthStateChanged,
-    reload,
-    sendEmailVerification,
-} from "@react-native-firebase/auth";
-
-import {
-    collection,
-    FirebaseFirestoreTypes,
-    getDocs,
-    getFirestore,
-    orderBy,
-    query,
-    where,
-} from "@react-native-firebase/firestore";
-
-import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-
-import ErrorModal from "@/component/Shared/ErrorModal";
-import { Course } from "@/types/course";
-import Header from "../../component/Home/Header";
-import LineLoader from "../../component/Home/LineLoader";
-import AppModal from "../../component/Shared/AppModal";
-
 export default function Home() {
     const [courseList, setCourseList] = useState<Course[]>([]);
-    const { userDetail } = useContext(UserDetailContext);
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
     const [adLoaded, setAdLoaded] = useState(false);
     const [sending, setSending] = useState(false);
-
+    const router = useRouter();
+    const auth = getAuth();
+    const firestore = getFirestore();
     const CACHE_KEY = "@cached_courses";
 
     const [verifyEmail, setVerifyEmail] = useState({
@@ -75,13 +73,6 @@ export default function Home() {
         message: "",
     });
 
-    const router = useRouter();
-    const auth = getAuth();
-    const firestore = getFirestore();
-
-    // ------------------------------------
-    // AUTH STATE LISTENER & COURSE LOADING
-    // ------------------------------------
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -121,9 +112,6 @@ export default function Home() {
         }
     };
 
-    // -------------------------
-    // FETCH COURSES FROM FIRESTORE
-    // -------------------------
     const fetchCourses = async (isRefresh = false) => {
         if (fetching && !isRefresh) return;
 
@@ -134,21 +122,79 @@ export default function Home() {
             const user = auth.currentUser;
             if (!user) {
                 setCourseList([]);
+                router.replace("/auth/signIn");
                 return;
             }
 
-            // Reload user to get latest email verification status
-            await reload(user);
+            if (!user.email) {
+                console.warn("Signed-in user has no email!");
+                setCourseList([]);
+                router.replace("/auth/signIn");
+                return;
+            }
 
+            await reload(user);
             const refreshedUser = auth.currentUser;
-            if (!refreshedUser || !refreshedUser.email) {
+
+            if (!refreshedUser?.email) {
                 ToastAndroid.show(
-                    "Please try to login again.",
+                    "We detected an issue, please try to login.",
                     ToastAndroid.LONG
                 );
                 setCourseList([]);
                 router.replace("/");
                 return;
+            }
+            if (!userDetail?.email) {
+                const refreshedUser = auth.currentUser;
+
+                if (refreshedUser?.email) {
+                    try {
+                        console.log(
+                            "Fetching user document for:",
+                            refreshedUser.email
+                        );
+                        const userDocRef = doc(
+                            getFirestore(),
+                            "users",
+                            refreshedUser.email
+                        );
+                        const docSnap = await getDoc(userDocRef);
+
+                        if (docSnap.exists()) {
+                            const freshData = {
+                                id: docSnap.id,
+                                ...docSnap.data(),
+                            };
+                            setUserDetail(freshData);
+                        } else {
+                            ToastAndroid.show(
+                                "We couldn't find your user profile. Please login again.",
+                                ToastAndroid.LONG
+                            );
+                            setCourseList([]);
+                            router.replace("/auth/signIn");
+                            return;
+                        }
+                    } catch (err) {
+                        console.error("Error refreshing userDetail:", err);
+                        ToastAndroid.show(
+                            "An error occurred while refreshing your profile.",
+                            ToastAndroid.LONG
+                        );
+                        setCourseList([]);
+                        router.replace("/auth/signIn");
+                        return;
+                    }
+                } else {
+                    ToastAndroid.show(
+                        "No active session found, please login again.",
+                        ToastAndroid.LONG
+                    );
+                    setCourseList([]);
+                    router.replace("/auth/signIn");
+                    return;
+                }
             }
 
             const coursesRef = collection(firestore, "course");
@@ -238,9 +284,6 @@ export default function Home() {
         }, [auth])
     );
 
-    // ---------------------------------------
-    // SEND EMAIL VERIFICATION
-    // ---------------------------------------
     const verify = async () => {
         const user = auth.currentUser;
         if (!user) {
@@ -308,7 +351,7 @@ export default function Home() {
                             transform: [
                                 { translateX: -15 },
                                 { translateY: -15 },
-                            ], // center precisely
+                            ], 
                             zIndex: 1000,
                         }}
                         color={Colors.GREEN}
@@ -325,8 +368,8 @@ export default function Home() {
                             onPress={verify}
                             style={{
                                 backgroundColor: "#FFD700",
-                                padding: 10,
-                                marginTop: Platform.OS === "ios" ? 50 : 35,
+                                padding: 8,
+                                marginTop: Platform.OS === "ios" ? 50 : 30,
                                 borderRadius: 15,
                                 opacity: 0.9,
                             }}

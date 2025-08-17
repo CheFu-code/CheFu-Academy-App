@@ -42,7 +42,6 @@ export default function Button({
                         gap: 6,
                     }}
                 >
-                    {icon && <View style={{ marginRight: 4 }}>{icon}</View>}
                     <Text
                         style={{
                             textAlign: "center",
@@ -52,6 +51,7 @@ export default function Button({
                     >
                         {text}
                     </Text>
+                    {icon && <View>{icon}</View>}
                 </View>
             ) : (
                 <ActivityIndicator
