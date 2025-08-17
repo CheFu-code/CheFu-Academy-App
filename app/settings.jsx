@@ -1,4 +1,4 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { getAuth, sendEmailVerification } from "@react-native-firebase/auth";
 import {
     doc,
@@ -26,12 +26,12 @@ import {
     Text,
     ToastAndroid,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
-import AppModal from "../../component/Shared/AppModal";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/Settings.styles";
+import AppModal from "../component/Shared/AppModal";
+import { Colors } from "../constant/Colors";
+import { UserDetailContext } from "../context/UserDetailContext";
+import { styles } from "../styles/Settings.styles";
 
 export default function SettingsScreen() {
     const [notifications, setNotifications] = useState(true);
@@ -57,7 +57,7 @@ export default function SettingsScreen() {
         message: "",
     });
 
-    const options = ["Report a bug"];  // when i add more options i should uncomment out these styles on the styles file
+    const options = ["Report a bug"]; // when i add more options i should uncomment out these styles on the styles file
 
     useEffect(() => {
         async function fetchSettings() {
@@ -243,7 +243,8 @@ export default function SettingsScreen() {
     };
 
     const SHARE_MESSAGE = "Check out CheFu Academy App!";
-    const SHARE_URL = "https://play.google.com/store/apps/details?id=com.chefu.academy";
+    const SHARE_URL =
+        "https://play.google.com/store/apps/details?id=com.chefu.academy";
 
     const handleShare = async () => {
         try {
@@ -370,7 +371,16 @@ export default function SettingsScreen() {
                 <View style={[styles.container, { paddingTop: 50 }]}>
                     {/* Header + Dropdown Button */}
                     <View style={styles.header}>
-                        <Text style={styles.title}>Settings</Text>
+                        <TouchableOpacity
+                            style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                            }}
+                            onPress={() => router.back()}
+                        >
+                            <AntDesign name="left" size={24} color="#fff" />
+                            <Text style={styles.title}>Settings</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
                             <MaterialIcons
                                 name="unfold-more"
@@ -388,7 +398,9 @@ export default function SettingsScreen() {
                                 <TouchableOpacity
                                     key={index}
                                     onPress={() => {
-                                        router.push("/chatWithAdmin");
+                                        Linking.openURL(
+                                            "mailto:kurisanimaluleke77@gmail.com"
+                                        );
                                         setIsOpen(false);
                                     }}
                                     style={styles.option} //when i add more options i should uncomment out these styles on the styles file
@@ -404,14 +416,10 @@ export default function SettingsScreen() {
                     {/* Settings List */}
                     <ScrollView
                         showsVerticalScrollIndicator={false}
-                        style={styles.container}
+                        style={[styles.container, { marginBottom: 20 }]}
                     >
                         <Text style={styles.heading}>General</Text>
-                        {/* <SettingItem
-              label="Edit Profile"
-              icon="person"
-              onPress={() => router.push("/editProfile")}
-            /> */}
+
                         <SettingItem
                             label="Change Password"
                             icon="lock-closed"
@@ -429,25 +437,6 @@ export default function SettingsScreen() {
                                 size="small"
                                 color={Colors.PRIMARY}
                                 style={{ marginBottom: 10 }}
-                            />
-                        )}
-
-                        {!userDetail?.roles?.includes("admin") && (
-                            <SettingItem
-                                label="Live Support"
-                                icon="chatbubble-ellipses"
-                                onPress={() => {
-                                    if (userDetail?.roles?.includes("admin")) {
-                                        ToastAndroid.show(
-                                            "You're an admin!",
-                                            ToastAndroid.SHORT
-                                        );
-                                        return;
-                                    } else {
-                                        router.push("/chatWithAdmin");
-                                    }
-                                }}
-                                disabled={loading}
                             />
                         )}
 
@@ -573,15 +562,6 @@ export default function SettingsScreen() {
                                     }
                                 />
                             ))}
-
-                        {(userDetail?.email === "kurisanim2@gmail.com" ||
-                            userDetail?.roles?.includes?.("admin")) && (
-                            <SettingItem
-                                label="Admin Chat"
-                                icon="chatbubble-ellipses"
-                                onPress={() => router.push("/chatWithUsers")}
-                            />
-                        )}
 
                         <SettingItem
                             label="Buy me coffee"

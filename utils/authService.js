@@ -96,7 +96,7 @@ export const saveUser = async (user, fullName, email) => {
                 lastLogin: now,
                 provider: userProvider,
                 onboardingComplete: false,
-                roles: ["user"],
+                roles: ["Student"],
                 bio: "",
                 language: "en",
                 country,

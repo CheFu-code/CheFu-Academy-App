@@ -71,12 +71,16 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
 
     const verifyEmail = useCallback(async () => {
         try {
+            setLoading(true);
             const user = auth.currentUser;
             if (!user) return ToastAndroid.show("No user signed in", ToastAndroid.SHORT);
             await sendEmailVerification(user);
             ToastAndroid.show(`Verification email sent to ${user.email}`, ToastAndroid.LONG);
+            setLoading(false);
         } catch (err) {
             Sentry.captureException(err);
+        } finally {
+            setLoading(false);
         }
     }, [auth]);
 

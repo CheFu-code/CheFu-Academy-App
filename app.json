@@ -2,7 +2,7 @@
   "expo": {
     "name": "CheFu Academy",
     "slug": "chefu-academy",
-    "version": "1.2025.1",
+    "version": "1.2025.2",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
     "scheme": "chefu-academy",

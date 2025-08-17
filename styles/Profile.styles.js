@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     header: {
         alignItems: "center",
         paddingTop: Platform.OS === "ios" ? 40 : 20,
-        paddingBottom: 30,
+        paddingBottom: 20,
     },
     avatar: {
         width: 140,
@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
         borderRadius: 100,
         borderWidth: 2,
         marginBottom: 15,
-        marginTop: 30,
+        marginTop: 15,
         objectFit: "contain",
     },
     profileName: {
@@ -31,7 +31,6 @@ export const styles = StyleSheet.create({
         fontSize: 15,
         fontFamily: "outfit",
         color: Colors.GRAY,
-        marginTop: 3,
         maxWidth: 250,
     },
     planStatus: {

@@ -124,6 +124,23 @@ const TabLayout = () => {
                     }}
                 />
                 <Tabs.Screen
+                    name="chats"
+                    options={{
+                        tabBarIcon: ({ color, size }) => (
+                            <Ionicons
+                                style={{
+                                    marginTop: 25,
+                                    height: "100%",
+                                }}
+                                name="chatbubble-ellipses-outline"
+                                size={size}
+                                color={color}
+                            />
+                        ),
+                        tabBarLabel: "Chat",
+                    }}
+                />
+                <Tabs.Screen
                     name="profile"
                     options={{
                         tabBarIcon: ({ color, size }) => (
@@ -138,23 +155,6 @@ const TabLayout = () => {
                             />
                         ),
                         tabBarLabel: "Profile",
-                    }}
-                />
-                <Tabs.Screen
-                    name="settings"
-                    options={{
-                        tabBarIcon: ({ color, size }) => (
-                            <Ionicons
-                                style={{
-                                    marginTop: 25,
-                                    height: "100%",
-                                }}
-                                name="settings-outline"
-                                size={size}
-                                color={color}
-                            />
-                        ),
-                        tabBarLabel: "Settings",
                     }}
                 />
             </Tabs>
