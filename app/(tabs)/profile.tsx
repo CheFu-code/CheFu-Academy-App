@@ -221,8 +221,16 @@ export default function Profile() {
                     >
                         Subscription
                     </Text>
-                    
-                    <View
+
+                    <TouchableOpacity
+                        onPress={() => {
+                            if (userDetail?.member) {
+                                showToast("You are already a member.");
+                                return;
+                            } else {
+                                router.push("/subscription");
+                            }
+                        }}
                         style={{
                             marginLeft: 5,
                             marginTop: 5,
@@ -271,8 +279,7 @@ export default function Profile() {
                                 {member ? "Active Member" : "Free"}
                             </Text>
                         </View>
-                    </View>
-
+                    </TouchableOpacity>
 
                     <Text
                         style={{

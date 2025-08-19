@@ -17,6 +17,7 @@ import {
     orderBy,
     query,
     serverTimestamp,
+    where,
 } from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
@@ -35,7 +36,10 @@ import {
 interface Chat {
     id: string;
     name?: string;
-    lastMessage?: string;
+    lastMessage?: {
+        text: string;
+        sender: string;
+    };
     members?: string[];
     profilePicture?: string;
 }
@@ -56,7 +60,7 @@ const ChatScreen = () => {
             const usersMap: { [id: string]: any } = {};
             for (const chat of chats) {
                 const otherUserId = chat.members?.find(
-                    (id) => id !== userDetail.uid
+                    (id) => id !== userDetail.email
                 );
                 if (!otherUserId) continue;
                 const docSnap = await getDoc(doc(db, "users", otherUserId));
@@ -77,7 +81,7 @@ const ChatScreen = () => {
                     id: doc.id,
                     ...doc.data(),
                 }))
-                .filter((u: User) => u.id !== userDetail.uid);
+                .filter((u: User) => u.id !== userDetail.email);
             setUserList(users);
             setShowUserModal(true);
         } catch (error) {
@@ -87,11 +91,10 @@ const ChatScreen = () => {
 
     const startChat = async (targetName: string, targetId: string) => {
         try {
-            // Check if chat with this member already exists
             const existingChat = chats.find(
                 (c) =>
                     c.members?.includes(targetId) &&
-                    c.members?.includes(userDetail.uid)
+                    c.members?.includes(userDetail.email)
             );
 
             let chatId = existingChat?.id;
@@ -99,12 +102,24 @@ const ChatScreen = () => {
             if (!chatId) {
                 const chatRef = await addDoc(collection(db, "chats"), {
                     name: targetName,
-                    members: [userDetail.uid, targetId],
-                    lastMessage: "",
+                    members: [userDetail.email, targetId],
+                    lastMessage: {
+                        text: "",
+                        sender: "", 
+                        timestamp: serverTimestamp(),
+                    },
                     updatedAt: serverTimestamp(),
                 });
 
                 chatId = chatRef.id;
+
+                const docSnap = await getDoc(doc(db, "users", targetId));
+                if (docSnap.exists()) {
+                    setOtherUsersMap((prev) => ({
+                        ...prev,
+                        [targetId]: docSnap.data(),
+                    }));
+                }
             }
 
             if (!chatId) {
@@ -158,18 +173,36 @@ const ChatScreen = () => {
     };
 
     useEffect(() => {
-        const q = query(collection(db, "chats"), orderBy("updatedAt", "desc"));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const chatData = snapshot.docs.map(
-                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                })
-            ) as Chat[];
-            setChats(chatData);
-        });
+        if (!userDetail?.email) return;
+
+        const q = query(
+            collection(db, "chats"),
+            where("members", "array-contains", userDetail.email), 
+            orderBy("updatedAt", "desc")
+        );
+
+        const unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+                if (!snapshot) {
+                    console.warn("Received null snapshot for chats query");
+                    return;
+                }
+                const chatData = snapshot.docs.map(
+                    (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
+                        id: doc.id,
+                        ...doc.data(),
+                    })
+                ) as Chat[];
+                setChats(chatData);
+            },
+            (error) => {
+                console.error("Firestore snapshot error:", error);
+            }
+        );
+
         return () => unsubscribe();
-    }, []);
+    }, [userDetail?.uid]);
 
     const SectionHeader = ({ title }: { title: string }) => (
         <Text
@@ -178,6 +211,7 @@ const ChatScreen = () => {
                 fontFamily: "outfit-bold",
                 color: Colors.WHITE,
                 marginBottom: 10,
+                alignItems: "center",
             }}
         >
             {title}
@@ -309,11 +343,30 @@ const ChatScreen = () => {
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    backgroundColor: "#cccccc10",
+                    borderRadius: 5,
+                    width: "100%",
+                    height: 28,
                 }}
             >
-                <SectionHeader title="Chats" />
+                <Text
+                    style={{
+                        fontSize: 16,
+                        fontFamily: "outfit-bold",
+                        color: Colors.WHITE,
+                        alignItems: "center",
+                        paddingLeft: 10,
+                    }}
+                >
+                    Chats
+                </Text>
                 <TouchableOpacity onPress={fetchUsers}>
-                    <AntDesign name="plus" size={24} color={Colors.GRAY} />
+                    <AntDesign
+                        style={{ marginRight: 10 }}
+                        name="plus"
+                        size={24}
+                        color={Colors.GRAY}
+                    />
                 </TouchableOpacity>
             </View>
             <ScrollView
@@ -341,7 +394,7 @@ const ChatScreen = () => {
                 ) : (
                     chats.map((chat) => {
                         const otherUserId = chat.members?.find(
-                            (id) => id !== userDetail.uid
+                            (id) => id !== userDetail.email
                         );
                         if (!otherUserId) return null;
                         const otherUserData = otherUsersMap[otherUserId];
@@ -355,7 +408,14 @@ const ChatScreen = () => {
                                         : require("../../assets/images/logo.png")
                                 }
                                 name={otherUserData?.fullname || "Unknown User"}
-                                subtitle={chat.lastMessage || "No messages yet"}
+                                subtitle={
+                                    chat.lastMessage
+                                        ? chat.lastMessage.sender ===
+                                          userDetail.email
+                                            ? `You: ${chat.lastMessage.text}`
+                                            : chat.lastMessage.text
+                                        : "No messages yet"
+                                }
                                 onPress={() =>
                                     router.push({
                                         pathname: "/chat/[chatId]",

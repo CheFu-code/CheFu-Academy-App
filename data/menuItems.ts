@@ -1,11 +1,12 @@
 // /data/menuItems.ts
 import { Router } from "expo-router";
+import { Linking, ToastAndroid } from "react-native";
 
 export const menuItems = (
     router: Router,
-    Linking,
-    ToastAndroid,
-    Colors
+    Linking: Linking,
+    ToastAndroid: ToastAndroid,
+    Colors: any
 ) => [
         {
             label: "Add Course",

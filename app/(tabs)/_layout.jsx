@@ -14,7 +14,7 @@ const TabLayout = () => {
                     tabBarShowLabel: false,
                     tabBarBackground: () => (
                         <BlurView
-                            tint="default" // 'light', 'dark', or 'default'
+                            tint="dark" // 'light', 'dark', or 'default'
                             intensity={100}
                             style={{
                                 flex: 1,
@@ -42,11 +42,6 @@ const TabLayout = () => {
                     tabBarStyle: {
                         paddingBottom: insets.bottom,
                         backgroundColor: "#121212",
-                        borderTopLeftRadius: 50,
-                        borderTopRightRadius: 50,
-                        borderBottomLeftRadius: 50,
-                        borderBottomRightRadius: 50,
-                        height: 60,
                         marginHorizontal: 10,
                         elevation: 5,
                         shadowColor: "#121212",
@@ -56,14 +51,8 @@ const TabLayout = () => {
                         },
                         shadowOpacity: 0.1,
                         shadowRadius: 4,
-                        bottom: 30,
-                        marginBottom: 20,
-                        marginTop: 30,
-                        borderColor: "white",
-                        borderTopWidth: 0.7,
-                        borderLeftWidth: 0.7,
-                        borderRightWidth: 0.7,
-                        borderBottomWidth: 0.7,
+                        borderColor: "red",
+                        borderTopWidth: 0,
                     },
                 }}
             >

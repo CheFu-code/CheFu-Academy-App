@@ -21,6 +21,8 @@ export const PLANS = [
             "Unlimited quizzes",
             "AI-powered explanations",
             "Priority support",
+            "No ads",
+            "Access to exclusive content",
         ],
         popular: true,
     },
