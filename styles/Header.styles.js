@@ -19,14 +19,12 @@ export const styles = StyleSheet.create({
         fontFamily: "outfit-bold",
         fontSize: 24,
         color: "#fff",
-        marginTop: 25,
         maxWidth: 200,
     },
     subText: {
         fontFamily: "space-mono",
         fontSize: 16,
         color: Colors.GREEN,
-        marginTop: 5,
         textAlign: "center",
     },
     modalOverlay: {
@@ -41,7 +39,7 @@ export const styles = StyleSheet.create({
         borderTopRightRadius: 25,
     },
     inputContainer: {
-        marginTop: 20,
+        marginTop: 10,
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: Colors.BG_GRAY,
@@ -84,7 +82,6 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.GRAY,
         borderRadius: 100,
         elevation: 5,
-        marginTop: 15,
     },
     text: {
         fontFamily: "outfit-bold",

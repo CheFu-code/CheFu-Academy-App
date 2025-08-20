@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
 
 export const styles = StyleSheet.create({
@@ -8,7 +8,6 @@ export const styles = StyleSheet.create({
     },
     headerWrapper: {
         padding: 10,
-        marginTop: 30,
         backgroundColor: Colors.BG_COLOR,
     },
     headerText: {
@@ -29,8 +28,7 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_GRAY,
         borderRadius: 12,
         paddingHorizontal: 12,
-        paddingVertical: Platform.OS === "ios" ? 10 : 0,
-        marginBottom: 16,
+        marginBottom: 10,
         elevation: 3,
     },
     textInput: {

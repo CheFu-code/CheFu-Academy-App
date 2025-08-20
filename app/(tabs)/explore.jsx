@@ -18,6 +18,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CourseCard from "../../component/Shared/CourseCard";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -125,7 +126,7 @@ export default function ExploreScreen() {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
             <View style={styles.headerWrapper}>
                 <Text style={styles.headerText}>Explore more courses</Text>
             </View>
@@ -165,7 +166,7 @@ export default function ExploreScreen() {
                         <CourseCard
                             course={item}
                             enroll={true}
-                            style={{ width: "48%", marginBottom: 16 }}
+                            style={{ width: "48%", marginBottom: 10 }}
                         />
                     )}
                     ListEmptyComponent={
@@ -183,6 +184,6 @@ export default function ExploreScreen() {
                     onRefresh={fetchCourses}
                 />
             </View>
-        </View>
+        </SafeAreaView>
     );
 }

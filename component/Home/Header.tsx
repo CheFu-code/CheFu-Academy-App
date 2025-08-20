@@ -13,6 +13,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Header.styles";
@@ -135,7 +136,7 @@ export default function Header() {
     };
 
     return (
-        <View style={styles.headerContainer}>
+        <SafeAreaView style={styles.headerContainer}>
             <View>
                 <View style={styles.subHeaderContainer}>
                     <View
@@ -258,6 +259,6 @@ export default function Header() {
                     </View>
                 </Pressable>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 }

@@ -23,7 +23,7 @@ interface CourseListProps {
 
 export default function CourseList({
     courseList,
-    heading = "Courses",
+    heading = "Your Courses",
     enroll = false,
 }: CourseListProps) {
     const router = useRouter();
@@ -31,7 +31,6 @@ export default function CourseList({
 
     useFocusEffect(
         useCallback(() => {
-            // Clear loadingId when returning to this screen
             setLoadingId(null);
         }, [])
     );

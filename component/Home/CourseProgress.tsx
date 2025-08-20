@@ -51,7 +51,7 @@ export default function CourseProgress({
                     color: Colors.PRIMARY,
                 }}
             >
-                Progress
+                Your Progress
             </Text>
             <FlatList
                 data={courseList}

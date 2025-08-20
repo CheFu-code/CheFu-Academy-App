@@ -1,3 +1,4 @@
+import FeaturedCourses from "@/component/Home/FeaturedCourses";
 import ErrorModal from "@/component/Shared/ErrorModal";
 import { Course } from "@/types/course";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -22,14 +23,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
     Alert,
     FlatList,
     Image,
     Platform,
-    Text,
     ToastAndroid,
-    TouchableOpacity,
     View,
 } from "react-native";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
@@ -275,7 +273,6 @@ export default function Home() {
         }
     };
 
-    // REFRESH ON SCREEN FOCUS
     useFocusEffect(
         useCallback(() => {
             if (auth.currentUser) {
@@ -339,7 +336,7 @@ export default function Home() {
     return (
         <>
             {/* Email verification prompt */}
-            {auth.currentUser &&
+            {/* {auth.currentUser &&
                 !auth.currentUser.emailVerified &&
                 (sending ? (
                     <ActivityIndicator
@@ -358,9 +355,9 @@ export default function Home() {
                         size="small"
                     />
                 ) : (
-                    <View
+                    <SafeAreaView
                         style={{
-                            backgroundColor: Colors.BG_COLOR,
+                            backgroundColor: Colors.BG,
                             padding: 10,
                         }}
                     >
@@ -369,7 +366,6 @@ export default function Home() {
                             style={{
                                 backgroundColor: "#FFD700",
                                 padding: 8,
-                                marginTop: Platform.OS === "ios" ? 50 : 30,
                                 borderRadius: 15,
                                 opacity: 0.9,
                             }}
@@ -386,8 +382,8 @@ export default function Home() {
                                 features.
                             </Text>
                         </TouchableOpacity>
-                    </View>
-                ))}
+                    </SafeAreaView>
+                ))} */}
 
             <Header />
             {loading && <LineLoader />}
@@ -426,6 +422,7 @@ export default function Home() {
                                 <NoCourse />
                             ) : (
                                 <>
+                                    <FeaturedCourses />
                                     <CourseProgress courseList={courseList} />
                                     <PracticeSection />
                                     <CourseList courseList={courseList} />
