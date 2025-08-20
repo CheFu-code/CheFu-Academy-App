@@ -57,17 +57,17 @@ export default function CourseProgress({
                 data={courseList}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) =>
-                    item.id?.toString() ?? Math.random().toString()
+                keyExtractor={(item, index) =>
+                    item.docId || item.id?.toString() || `${item.courseTitle}-${index}`
                 }
                 renderItem={({ item }) => (
                     <CourseProgressCard
                         item={item}
                         onPress={() => handlePress(item)}
-                        disabled={Boolean(loadingId)} // disable all while one is loading
+                        disabled={Boolean(loadingId)}
                         loading={
                             loadingId === (item.id || item.courseTitle || "")
-                        } // show loader on the right one
+                        }
                     />
                 )}
             />

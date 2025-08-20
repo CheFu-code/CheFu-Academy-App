@@ -1,3 +1,4 @@
+import Categories from "@/component/Home/Categories";
 import FeaturedCourses from "@/component/Home/FeaturedCourses";
 import ErrorModal from "@/component/Shared/ErrorModal";
 import { Course } from "@/types/course";
@@ -23,14 +24,18 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     FlatList,
     Image,
     Platform,
+    Text,
     ToastAndroid,
+    TouchableOpacity,
     View,
 } from "react-native";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
@@ -336,7 +341,7 @@ export default function Home() {
     return (
         <>
             {/* Email verification prompt */}
-            {/* {auth.currentUser &&
+            {auth.currentUser &&
                 !auth.currentUser.emailVerified &&
                 (sending ? (
                     <ActivityIndicator
@@ -348,7 +353,7 @@ export default function Home() {
                             transform: [
                                 { translateX: -15 },
                                 { translateY: -15 },
-                            ], 
+                            ],
                             zIndex: 1000,
                         }}
                         color={Colors.GREEN}
@@ -383,7 +388,7 @@ export default function Home() {
                             </Text>
                         </TouchableOpacity>
                     </SafeAreaView>
-                ))} */}
+                ))}
 
             <Header />
             {loading && <LineLoader />}
@@ -423,6 +428,7 @@ export default function Home() {
                             ) : (
                                 <>
                                     <FeaturedCourses />
+                                    <Categories />
                                     <CourseProgress courseList={courseList} />
                                     <PracticeSection />
                                     <CourseList courseList={courseList} />

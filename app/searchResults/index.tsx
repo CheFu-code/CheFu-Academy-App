@@ -235,7 +235,7 @@ export default function SearchScreen() {
                                         color: Colors.WHITE,
                                         fontFamily: "outfit-bold",
                                         textTransform: "capitalize",
-
+                                        marginBottom: 10,
                                         maxWidth: 250,
                                     }}
                                 >
@@ -283,8 +283,7 @@ export default function SearchScreen() {
                                 paddingHorizontal: 10,
                             }}
                             contentContainerStyle={{
-                                paddingBottom: 160,
-                                paddingTop: 10,
+                                paddingBottom: 240,
                             }}
                         />
                     </View>

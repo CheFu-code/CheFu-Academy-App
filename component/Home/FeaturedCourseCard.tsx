@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.WHITE,
         borderRadius: 15,
         marginHorizontal: 5,
-        shadowColor: "#000",
+        shadowColor: Colors.PRIMARY,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: "outfit-bold",
-        fontSize: 16,
+        fontSize: 15,
         color: Colors.BLACK,
         marginBottom: 5,
     },
@@ -104,10 +104,10 @@ const styles = StyleSheet.create({
     detailsContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 10,
+        marginTop: 5,
         borderTopWidth: 1,
         borderTopColor: "#eee",
-        paddingTop: 10,
+        paddingTop: 5,
     },
     detailItem: {
         flexDirection: "row",

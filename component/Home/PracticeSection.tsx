@@ -23,6 +23,7 @@ export default function PracticeSection() {
             <View>
                 <FlatList
                     numColumns={3}
+                    keyExtractor={(item) => item.name}
                     renderItem={({ item, index }) => (
                         <TouchableOpacity
                             onPress={() =>
@@ -36,7 +37,6 @@ export default function PracticeSection() {
                                 margin: 4,
                                 aspectRatio: 1,
                             }}
-                            key={index}
                         >
                             <Image
                                 source={item?.image}
