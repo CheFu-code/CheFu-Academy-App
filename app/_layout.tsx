@@ -14,7 +14,11 @@ import { scheduleDailyNotification } from "./notifications/scheduleLocalNotifica
 
 import useLastSeenTracker from "@/hooks/useLastSeenTracker";
 import { getApp } from "@react-native-firebase/app";
-import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
+import {
+    FirebaseAuthTypes,
+    getAuth,
+    onAuthStateChanged,
+} from "@react-native-firebase/auth";
 import { getMessaging, onMessage } from "@react-native-firebase/messaging";
 import OfflineScreen from "../component/OfflineScreen";
 import { Colors } from "../constant/Colors";
@@ -34,12 +38,14 @@ Sentry.init({
 });
 
 function LayoutContent() {
-    const [userDetail, setUserDetail] = useState();
+    const [userDetail, setUserDetail] = useState<FirebaseAuthTypes.User | null>(
+        null
+    );
     const [authChecked, setAuthChecked] = useState(false);
     const [authSuccess, setAuthSuccess] = useState(false);
     const { isConnected } = useNetwork();
     const router = useRouter();
-    const lastHandledOrderID = useRef(null);
+    const lastHandledOrderID = useRef<string | null>(null);
     const alreadyRedirected = useRef(false);
 
     const [fontsLoaded, fontError] = useFonts({
@@ -80,9 +86,16 @@ function LayoutContent() {
                 } else {
                     setAuthSuccess(true);
                 }
-            } catch (error:) {
-                console.error("Biometric error:", error);
-                Sentry.captureException("Biometric error:", error);
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    Sentry.captureException(error);
+                    console.error("Biometric error:", error.message);
+                } else {
+                    Sentry.captureException(
+                        new Error("Unknown error occurred")
+                    );
+                    console.error("Unknown biometric error:", error);
+                }
                 setAuthSuccess(true);
             } finally {
                 setAuthChecked(true);
@@ -93,20 +106,23 @@ function LayoutContent() {
     }, []);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(getAuth(getApp()), (user) => {
-            if (
-                authChecked &&
-                authSuccess &&
-                !user &&
-                !alreadyRedirected.current
-            ) {
-                alreadyRedirected.current = true;
-                console.warn(
-                    "No authenticated user from layout. Redirecting to welcome screen"
-                );
-                router.replace("/");
+        const auth = getAuth(getApp());
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (authChecked && authSuccess) {
+                if (user) {
+                    setUserDetail(user);
+                } else {
+                    console.log(
+                        "User is not authenticated, redirecting to home"
+                    );
+                    if (!alreadyRedirected.current) {
+                        alreadyRedirected.current = true;
+                        router.replace("/");
+                    }
+                }
             }
         });
+
         return unsubscribe;
     }, [authChecked, authSuccess, router]);
 
@@ -165,10 +181,13 @@ function LayoutContent() {
         });
     }, []);
 
-    const handleDeepLink = (url) => {
+    const handleDeepLink = (url: string) => {
         const parsed = Linking.parse(url);
-        const orderID = parsed.queryParams?.token;
         const planType = parsed.queryParams?.planType || "basic";
+        const orderID =
+            typeof parsed.queryParams?.token === "string"
+                ? parsed.queryParams.token
+                : null;
 
         if (parsed.path === "success") {
             if (orderID && orderID === lastHandledOrderID.current) return;
