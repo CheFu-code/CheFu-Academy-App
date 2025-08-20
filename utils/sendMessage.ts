@@ -4,6 +4,7 @@ type Message = {
     id: string;
     text: string;
     sender: "user" | "ai";
+    senderId: string;
 };
 
 type SendMessageParams = {
@@ -14,6 +15,7 @@ type SendMessageParams = {
     setStopGeneration: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTypingId: React.Dispatch<React.SetStateAction<string | null>>;
     genAI: GoogleGenerativeAI;
+    userDetail: { email: string };
 };
 
 export const sendMessage = async ({
@@ -24,6 +26,7 @@ export const sendMessage = async ({
     setStopGeneration,
     setCurrentTypingId,
     genAI,
+    userDetail,
 }: SendMessageParams) => {
     if (!inputText.trim()) return;
     setIsGenerating(true);
@@ -32,6 +35,7 @@ export const sendMessage = async ({
         id: Date.now().toString(),
         text: inputText.trim(),
         sender: "user",
+        senderId: userDetail.email,
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -42,11 +46,18 @@ export const sendMessage = async ({
         id: typingId,
         text: "",
         sender: "ai",
+        senderId: "ai",
     };
     setMessages((prev) => [...prev, typingMessage]);
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+        const generationConfig = {
+            temperature: 0.7,
+        };
+
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash", generationConfig });
+
 
         const result = await model.generateContent({
             contents: [{ role: "user", parts: [{ text: inputText.trim() }] }],
@@ -89,9 +100,9 @@ export const sendMessage = async ({
             prev.map((msg) =>
                 msg.id === typingId
                     ? {
-                          ...msg,
-                          text: "Our AI is currently overloaded. Please try again in a few seconds.",
-                      }
+                        ...msg,
+                        text: "Our AI is currently overloaded. Please try again in a few seconds.",
+                    }
                     : msg
             )
         );

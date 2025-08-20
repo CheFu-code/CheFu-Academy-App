@@ -8,9 +8,9 @@ import { Stack, useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Text, View } from "react-native";
-import "../app/firebase-background-handler";
-import { requestUserPermission } from "../app/notifications/requestUserPermission";
-import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNotification";
+import "./firebase-background-handler";
+import { requestUserPermission } from "./notifications/requestUserPermission";
+import { scheduleDailyNotification } from "./notifications/scheduleLocalNotification";
 
 import useLastSeenTracker from "@/hooks/useLastSeenTracker";
 import { getApp } from "@react-native-firebase/app";
@@ -49,32 +49,6 @@ function LayoutContent() {
         "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
     });
 
-    // useEffect(() => {
-    //   const checkInstaller = async () => {
-    //     if (Platform.OS === "android") {
-    //       const installer = await DeviceInfo.getInstallerPackageName();
-    //       if (installer !== "com.android.vending") {
-    //         Alert.alert(
-    //           "Get the Official Version",
-    //           "Please install CheFu Academy from Google Play to receive updates.",
-    //           [
-    //             {
-    //               text: "Play Store",
-    //               onPress: () =>
-    //                 Linking.openURL(
-    //                   "https://play.google.com/store/apps/details?id=com.chefu.chefuacademy"
-    //                 ),
-    //             },
-    //             { text: "Cancel", style: "cancel" },
-    //           ]
-    //         );
-    //       }
-    //     }
-    //   };
-
-    //   checkInstaller();
-    // }, []);
-
     useEffect(() => {
         const checkBiometrics = async () => {
             try {
@@ -106,7 +80,7 @@ function LayoutContent() {
                 } else {
                     setAuthSuccess(true);
                 }
-            } catch (error) {
+            } catch (error:) {
                 console.error("Biometric error:", error);
                 Sentry.captureException("Biometric error:", error);
                 setAuthSuccess(true);
