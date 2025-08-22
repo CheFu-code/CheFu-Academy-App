@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",
         width: "100%",
         gap: 5,
+        marginTop: 20,
     },
     greeting: {
         fontFamily: "outfit-bold",

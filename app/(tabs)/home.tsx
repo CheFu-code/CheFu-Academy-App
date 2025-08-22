@@ -1,5 +1,3 @@
-import Categories from "@/component/Home/Categories";
-import FeaturedCourses from "@/component/Home/FeaturedCourses";
 import ErrorModal from "@/component/Shared/ErrorModal";
 import { Course } from "@/types/course";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,11 +26,10 @@ import {
     Alert,
     FlatList,
     Image,
-    Platform,
     Text,
     ToastAndroid,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -419,7 +416,6 @@ export default function Home() {
                         />
                         <View
                             style={{
-                                paddingTop: Platform.OS === "ios" ? 40 : 0,
                                 padding: 15,
                             }}
                         >
@@ -427,8 +423,8 @@ export default function Home() {
                                 <NoCourse />
                             ) : (
                                 <>
-                                    <FeaturedCourses />
-                                    <Categories />
+                                    {/* <FeaturedCourses />
+                                    <Categories /> */}
                                     <CourseProgress courseList={courseList} />
                                     <PracticeSection />
                                     <CourseList courseList={courseList} />

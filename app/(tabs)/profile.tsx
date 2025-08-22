@@ -45,6 +45,7 @@ export default function Profile() {
         planType,
         profilePicture,
         provider,
+        createdAt,
     } = userDetail || {};
 
     const { loading, handleLogout, handleDeleteAccount, verifyEmail } =
@@ -173,9 +174,33 @@ export default function Profile() {
                                 gap: 5,
                             }}
                         >
-                            <Text numberOfLines={1} style={styles.profileName}>
-                                {fullname}
-                            </Text>
+                            <View>
+                                <Text
+                                    numberOfLines={1}
+                                    style={styles.profileName}
+                                >
+                                    {fullname}
+                                </Text>
+                                <Text
+                                    numberOfLines={1}
+                                    style={[
+                                        styles.profileEmail,
+                                        { textAlign: "center" },
+                                    ]}
+                                >
+                                    Joined{" "}
+                                    {createdAt
+                                        ? typeof createdAt.toDate === "function"
+                                            ? createdAt
+                                                  .toDate()
+                                                  .toISOString()
+                                                  .split("T")[0] // 2025-08-20
+                                            : new Date(createdAt)
+                                                  .toISOString()
+                                                  .split("T")[0]
+                                        : "N/A"}
+                                </Text>
+                            </View>
                             {member && (
                                 <Ionicons
                                     color={Colors.GREEN}

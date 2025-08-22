@@ -25,7 +25,6 @@ export const styles = StyleSheet.create({
         fontFamily: "outfit-bold",
         color: Colors.PRIMARY,
         maxWidth: 250,
-        marginBottom: 5,
     },
     profileEmail: {
         fontSize: 15,
