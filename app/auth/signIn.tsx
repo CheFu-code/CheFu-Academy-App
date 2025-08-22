@@ -142,7 +142,7 @@ const SignIn = () => {
                 throw new Error("User email is missing");
             }
 
-            await getUserDetail(signedInEmail); // updates userDetail state
+            await getUserDetail(signedInEmail); 
 
             router.replace("/(tabs)/home");
             ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);

@@ -34,7 +34,7 @@ export interface Course {
     chapters: Chapter[];
     courseTitle: string;
     createdBy: string;
-    createdOn?: FirebaseFirestoreTypes.Timestamp; // ✅ matches Firestore timestamp
+    createdOn?: FirebaseFirestoreTypes.Timestamp; 
     description: string;
     docId: string;
     enrolled: boolean;

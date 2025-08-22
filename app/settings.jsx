@@ -39,7 +39,7 @@ export default function SettingsScreen() {
     const [showVersion, setShowVersion] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const [fetching, setFetching] = useState(false); // Prevent duplicate fetches
+    const [fetching, setFetching] = useState(false); 
     const [fatalError, setFatalError] = useState(null);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const CACHE_KEY = "@cached_courses";

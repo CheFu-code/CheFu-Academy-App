@@ -10,6 +10,7 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
     const auth = getAuth();
     const CACHE_KEY = "@cached_courses";
     const [loading, setLoading] = useState(false);
+    const firestore = getFirestore();
 
     const handleLogout = useCallback(async () => {
         try {
@@ -68,6 +69,7 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
             setLoading(false);
         }
     }, [auth, router, setUserDetail]);
+
 
     const verifyEmail = useCallback(async () => {
         try {

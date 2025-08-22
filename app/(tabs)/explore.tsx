@@ -1,7 +1,9 @@
+import { Course } from "@/types/course";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     collection,
+    FirebaseFirestoreTypes,
     getDocs,
     getFirestore,
     orderBy,
@@ -26,8 +28,8 @@ import { styles } from "../../styles/Explore.styles";
 
 export default function ExploreScreen() {
     const { userDetail } = useContext(UserDetailContext);
-    const [courseData, setCourseData] = useState([]);
-    const [filteredCourses, setFilteredCourses] = useState([]);
+    const [courseData, setCourseData] = useState<Course[]>([]);
+    const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
     const [refreshing, setRefreshing] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
@@ -43,10 +45,12 @@ export default function ExploreScreen() {
             );
             const snapshot = await getDocs(q);
 
-            let data = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
+            let data: Course[] = snapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                })
+            );
 
             // ✅ Exclude courses owned by current user
             data = data.filter(

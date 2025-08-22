@@ -23,7 +23,6 @@ export default function Chapters({ course }: ChaptersProps) {
 
     const isChapterCompleted = (index: number) => {
         if (!Array.isArray(course?.completedChapter)) return false;
-        // Compare as strings
         const isCompleted = course.completedChapter.find(
             (item) => item === index.toString()
         );
@@ -82,9 +81,12 @@ export default function Chapters({ course }: ChaptersProps) {
                                 styles.buttonContainer,
                                 {
                                     opacity:
-                                        completed && userDetail.member === false
+                                        completed &&
+                                        userDetail.member === false &&
+                                        course?.createdBy === userDetail?.email
                                             ? 0.6
                                             : 1,
+
                                     borderColor: completed
                                         ? Colors.GREEN
                                         : "#ccc",
@@ -95,7 +97,11 @@ export default function Chapters({ course }: ChaptersProps) {
                                 <Text
                                     style={[
                                         styles.chapterText,
-                                        completed && { color: Colors.GREEN }, // ✨ dim completed items
+                                        completed &&
+                                        course?.createdBy === userDetail?.email
+                                            ? { color: Colors.GREEN }
+                                            : null,
+                                        // ✨ dim completed items
                                     ]}
                                 >
                                     {index + 1}.
@@ -104,7 +110,10 @@ export default function Chapters({ course }: ChaptersProps) {
                                     style={[
                                         styles.chapterText,
                                         { maxWidth: 210 },
-                                        completed && { color: Colors.GREEN },
+                                        completed &&
+                                        course?.createdBy === userDetail?.email
+                                            ? { color: Colors.GREEN }
+                                            : null,
                                     ]}
                                     numberOfLines={1}
                                     ellipsizeMode="tail"
@@ -112,7 +121,8 @@ export default function Chapters({ course }: ChaptersProps) {
                                     {item?.chapterName}
                                 </Text>
                             </View>
-                            {completed ? (
+                            {completed &&
+                            course?.createdBy === userDetail?.email ? (
                                 <Ionicons
                                     name="checkmark-circle"
                                     size={24}

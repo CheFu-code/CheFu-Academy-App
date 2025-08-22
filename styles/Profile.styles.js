@@ -25,12 +25,15 @@ export const styles = StyleSheet.create({
         fontFamily: "outfit-bold",
         color: Colors.PRIMARY,
         maxWidth: 250,
+        textDecorationLine: "underline",
+        textAlign: "center",
     },
     profileEmail: {
         fontSize: 15,
         fontFamily: "outfit",
         color: Colors.GRAY,
         maxWidth: 250,
+        textAlign: "center",
     },
     planStatus: {
         fontSize: 15,

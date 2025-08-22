@@ -42,7 +42,8 @@ export default function Intro({ course, enroll }: IntroProps) {
 
         try {
             setLoading(true);
-            const docId = Date.now().toString();
+            const emailSafe = userDetail?.email.replace(/[@.]/g, "_");
+            const docId = emailSafe + "_" + Date.now().toString();
             const data = {
                 ...course,
                 createdBy: userDetail?.email,
@@ -154,6 +155,7 @@ export default function Intro({ course, enroll }: IntroProps) {
 
                 {enroll === "true" && course?.createdBy !== userDetail.email ? (
                     <Button
+                        opacity={loading ? 0.5 : 1}
                         text={"Enroll Now"}
                         loading={loading}
                         onPress={onEnrollCourse}
@@ -168,6 +170,7 @@ export default function Intro({ course, enroll }: IntroProps) {
                     />
                 ) : isCourseCompleted ? (
                     <Button
+                        opacity={loading ? 0.5 : 1}
                         text="Completed"
                         disabled={true}
                         loading={false}

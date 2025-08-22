@@ -16,5 +16,5 @@
         "app/auth2.jsx",
         "app/auth.jsx",
         "component/Spinner.js"
-    ]
+, "utils"    ]
 }

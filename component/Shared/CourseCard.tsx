@@ -1,3 +1,4 @@
+import { Course } from "@/types/course";
 import {
     doc,
     FirebaseFirestoreTypes,
@@ -6,33 +7,17 @@ import {
 } from "@react-native-firebase/firestore";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import {
+    Image,
+    StyleProp,
+    Text,
+    TouchableOpacity,
+    View,
+    ViewStyle,
+} from "react-native";
 import { imageAssets } from "../../constant/Option";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/CourseCard.styles";
-
-type Chapter = {
-    topic: string;
-    content: string;
-    example?: string;
-    explain?: string;
-    code?: string;
-};
-
-type Course = {
-    id: string;
-    courseTitle: string;
-    category?: string;
-    banner_image?: string;
-    chapters?: Chapter[];
-    flashcards?: any[];
-    qa?: any[];
-    quiz?: any[];
-    description?: string;
-    price?: number;
-    createdBy: string;
-    createdOn: FirebaseFirestoreTypes.Timestamp;
-};
 
 export default function CourseCard({
     course,
@@ -40,6 +25,7 @@ export default function CourseCard({
 }: {
     course: Course;
     enroll?: boolean;
+    style?: StyleProp<ViewStyle>;
 }) {
     const { userDetail } = useContext(UserDetailContext);
     const [creatorInfo, setCreatorInfo] =
