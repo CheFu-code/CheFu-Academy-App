@@ -97,376 +97,421 @@ export default function Profile() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
+            {!userDetail ? (
                 <View
                     style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        width: "90%",
-                        marginTop: 10,
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
                     }}
                 >
-                    {auth.currentUser?.emailVerified ? (
-                        <Text
-                            style={[
-                                styles.profileEmail,
-                                { color: Colors.GREEN, marginTop: 10 },
-                            ]}
-                        >
-                            Email Verified
-                        </Text>
-                    ) : (
-                        <TouchableOpacity
-                            disabled={loading}
-                            onPress={verifyEmail}
-                        >
-                            <Text
-                                style={[
-                                    styles.profileEmail,
-                                    {
-                                        color: Colors.RED,
-                                        textDecorationLine: "underline",
-                                        marginTop: 10,
-                                    },
-                                ]}
-                            >
-                                Email not verified
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-                    <TouchableOpacity onPress={() => router.push("/settings")}>
-                        <Ionicons
-                            style={{
-                                marginTop: 3,
-                                alignItems: "flex-end",
-                                padding: 10,
-                            }}
-                            name="settings-outline"
-                            size={20}
-                            color={Colors.GRAY}
-                        />
-                    </TouchableOpacity>
+                    <Text style={{ color: Colors.WHITE, fontFamily: "outfit" }}>
+                        You are logged out
+                    </Text>
                 </View>
-                <TouchableOpacity>
-                    <Image
-                        style={[
-                            styles.avatar,
-                            {
-                                borderColor: member
-                                    ? Colors.GREEN
-                                    : Colors.PRIMARY,
-                            },
-                        ]}
-                        source={
-                            ["github.com", "google.com"].includes(provider)
-                                ? { uri: profilePicture }
-                                : require("../../assets/images/logo.png")
-                        }
-                    />
-                </TouchableOpacity>
-
-                {userDetail && (
-                    <>
+            ) : (
+                <>
+                    <View style={styles.header}>
                         <View
                             style={{
                                 flexDirection: "row",
-                                alignItems: "center",
-                                gap: 5,
+                                justifyContent: "space-between",
+                                width: "90%",
+                                marginTop: 10,
                             }}
                         >
-                            <View>
+                            {auth.currentUser?.emailVerified ? (
                                 <Text
-                                    numberOfLines={1}
-                                    style={styles.profileName}
-                                >
-                                    {fullname}
-                                </Text>
-                                <Text
-                                    numberOfLines={1}
                                     style={[
                                         styles.profileEmail,
-                                        { textAlign: "center" },
+                                        { color: Colors.GREEN, marginTop: 10 },
                                     ]}
                                 >
-                                    Joined{" "}
-                                    {createdAt
-                                        ? typeof createdAt.toDate === "function"
-                                            ? createdAt
-                                                  .toDate()
-                                                  .toISOString()
-                                                  .split("T")[0] // 2025-08-20
-                                            : new Date(createdAt)
-                                                  .toISOString()
-                                                  .split("T")[0]
-                                        : "N/A"}
+                                    Email Verified
                                 </Text>
-                            </View>
-                            {member && (
-                                <Ionicons
-                                    color={Colors.GREEN}
-                                    size={20}
-                                    name="checkmark-circle"
-                                />
+                            ) : (
+                                <TouchableOpacity
+                                    disabled={loading}
+                                    onPress={verifyEmail}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.profileEmail,
+                                            {
+                                                color: Colors.RED,
+                                                textDecorationLine: "underline",
+                                                marginTop: 10,
+                                            },
+                                        ]}
+                                    >
+                                        Email not verified
+                                    </Text>
+                                </TouchableOpacity>
                             )}
+                            <TouchableOpacity
+                                onPress={() => router.push("/settings")}
+                            >
+                                <Ionicons
+                                    style={{
+                                        marginTop: 3,
+                                        alignItems: "flex-end",
+                                        padding: 10,
+                                    }}
+                                    name="settings-outline"
+                                    size={20}
+                                    color={Colors.GRAY}
+                                />
+                            </TouchableOpacity>
                         </View>
-
-                        <Text numberOfLines={1} style={styles.profileEmail}>
-                            {email}
-                        </Text>
-
-                        {planType && memberUntil && (
-                            <Text style={styles.expiryText}>
-                                Your plan will expire on{" "}
-                                {new Date(memberUntil).toLocaleDateString()}
-                            </Text>
-                        )}
-                    </>
-                )}
-            </View>
-
-            {/* Scroll Menu */}
-            <ScrollView
-                style={styles.container}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={refreshData}
-                    />
-                }
-            >
-                <View style={styles.menuSection}>
-                    <Text
-                        style={{
-                            color: "white",
-                            fontFamily: "outfit-bold",
-                            fontSize: 18,
-                        }}
-                    >
-                        Subscription
-                    </Text>
-
-                    <TouchableOpacity
-                        onPress={() => {
-                            if (userDetail?.member) {
-                                showToast("You are already a member.");
-                                return;
-                            } else {
-                                router.push("/subscription");
-                            }
-                        }}
-                        style={{
-                            marginLeft: 5,
-                            marginTop: 5,
-                            flexDirection: "row",
-                            alignItems: "center",
-                            gap: 10,
-                            borderWidth: 0.2,
-                            borderColor: Colors.GRAY,
-                            borderRadius: 10,
-                            marginBottom: 25,
-                        }}
-                    >
-                        <View
-                            style={{
-                                padding: 12,
-                                backgroundColor: Colors.GRAY,
-                                borderRadius: 10,
-                                maxWidth: "45%",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Ionicons
-                                name="star-outline"
-                                size={20}
-                                color={Colors.YELLOW}
+                        <TouchableOpacity>
+                            <Image
+                                style={[
+                                    styles.avatar,
+                                    {
+                                        borderColor: member
+                                            ? Colors.GREEN
+                                            : Colors.PRIMARY,
+                                    },
+                                ]}
+                                source={
+                                    ["github.com", "google.com"].includes(
+                                        provider
+                                    )
+                                        ? { uri: profilePicture }
+                                        : require("../../assets/images/logo.png")
+                                }
                             />
-                        </View>
-                        <View>
+                        </TouchableOpacity>
+
+                        {userDetail && (
+                            <>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        gap: 5,
+                                    }}
+                                >
+                                    <View>
+                                        <Text
+                                            numberOfLines={1}
+                                            style={styles.profileName}
+                                        >
+                                            {fullname}
+                                        </Text>
+                                        <Text
+                                            numberOfLines={1}
+                                            style={[
+                                                styles.profileEmail,
+                                                { textAlign: "center" },
+                                            ]}
+                                        >
+                                            Joined{" "}
+                                            {createdAt
+                                                ? typeof createdAt.toDate ===
+                                                  "function"
+                                                    ? createdAt
+                                                          .toDate()
+                                                          .toISOString()
+                                                          .split("T")[0] // 2025-08-20
+                                                    : new Date(createdAt)
+                                                          .toISOString()
+                                                          .split("T")[0]
+                                                : "N/A"}
+                                        </Text>
+                                    </View>
+                                    {member && (
+                                        <Ionicons
+                                            color={Colors.GREEN}
+                                            size={20}
+                                            name="checkmark-circle"
+                                        />
+                                    )}
+                                </View>
+
+                                <Text
+                                    numberOfLines={1}
+                                    style={styles.profileEmail}
+                                >
+                                    {email}
+                                </Text>
+
+                                {planType && memberUntil && (
+                                    <Text style={styles.expiryText}>
+                                        Your plan will expire on{" "}
+                                        {new Date(
+                                            memberUntil
+                                        ).toLocaleDateString()}
+                                    </Text>
+                                )}
+                            </>
+                        )}
+                    </View>
+
+                    {/* Scroll Menu */}
+                    <ScrollView
+                        style={styles.container}
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={refreshData}
+                            />
+                        }
+                    >
+                        <View style={styles.menuSection}>
                             <Text
                                 style={{
                                     color: "white",
                                     fontFamily: "outfit-bold",
-                                    fontSize: 15,
+                                    fontSize: 18,
                                 }}
                             >
-                                {member ? planType : "Free Plan"}
+                                Subscription
                             </Text>
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    if (userDetail?.member) {
+                                        showToast("You are already a member.");
+                                        return;
+                                    } else {
+                                        router.push("/subscription");
+                                    }
+                                }}
+                                style={{
+                                    marginLeft: 5,
+                                    marginTop: 5,
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 10,
+                                    borderWidth: 0.2,
+                                    borderColor: Colors.GRAY,
+                                    borderRadius: 10,
+                                    marginBottom: 25,
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        padding: 12,
+                                        backgroundColor: Colors.GRAY,
+                                        borderRadius: 10,
+                                        maxWidth: "45%",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    <Ionicons
+                                        name="star-outline"
+                                        size={20}
+                                        color={Colors.YELLOW}
+                                    />
+                                </View>
+                                <View>
+                                    <Text
+                                        style={{
+                                            color: "white",
+                                            fontFamily: "outfit-bold",
+                                            fontSize: 15,
+                                        }}
+                                    >
+                                        {member ? planType : "Free Plan"}
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            color: Colors.GRAY,
+                                            fontFamily: "outfit",
+                                            fontSize: 14,
+                                        }}
+                                    >
+                                        {member ? "Active Member" : "Free"}
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+
                             <Text
                                 style={{
-                                    color: Colors.GRAY,
-                                    fontFamily: "outfit",
-                                    fontSize: 14,
+                                    color: "white",
+                                    fontFamily: "outfit-bold",
+                                    fontSize: 18,
                                 }}
                             >
-                                {member ? "Active Member" : "Free"}
+                                Course
                             </Text>
-                        </View>
-                    </TouchableOpacity>
 
-                    <Text
-                        style={{
-                            color: "white",
-                            fontFamily: "outfit-bold",
-                            fontSize: 18,
-                        }}
-                    >
-                        Course
-                    </Text>
+                            {renderedMenuItems.map((item) => (
+                                <TouchableOpacity
+                                    key={item.label}
+                                    style={styles.menuItem}
+                                    onPress={item.onPress}
+                                    disabled={loading}
+                                >
+                                    <Ionicons
+                                        name={
+                                            item.icon as keyof typeof Ionicons.glyphMap
+                                        }
+                                        size={26}
+                                        color={Colors.PRIMARY}
+                                        style={styles.icon}
+                                    />
+                                    <Text style={styles.menuLabel}>
+                                        {item.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
 
-                    {renderedMenuItems.map((item) => (
-                        <TouchableOpacity
-                            key={item.label}
-                            style={styles.menuItem}
-                            onPress={item.onPress}
-                            disabled={loading}
-                        >
-                            <Ionicons
-                                name={
-                                    item.icon as keyof typeof Ionicons.glyphMap
+                            <View style={styles.divider} />
+
+                            {isFreeUser && (
+                                <TouchableOpacity
+                                    style={[styles.menuItem, { marginTop: 5 }]}
+                                    onPress={subscribe}
+                                    disabled={loading}
+                                >
+                                    <SimpleLineIcons
+                                        name="paypal"
+                                        size={20}
+                                        color={Colors.GREEN}
+                                        style={styles.icon}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.menuLabel,
+                                            { color: Colors.GREEN },
+                                        ]}
+                                    >
+                                        Subscribe
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+
+                            <TouchableOpacity
+                                style={[styles.menuItem, { marginTop: 5 }]}
+                                onPress={() =>
+                                    Linking.openURL(url).catch((err) => {
+                                        console.error("URL open failed:", err);
+                                        showToast("Failed to open Google Play");
+                                    })
                                 }
-                                size={26}
-                                color={Colors.PRIMARY}
-                                style={styles.icon}
-                            />
-                            <Text style={styles.menuLabel}>{item.label}</Text>
-                        </TouchableOpacity>
-                    ))}
-
-                    <View style={styles.divider} />
-
-                    {isFreeUser && (
-                        <TouchableOpacity
-                            style={[styles.menuItem, { marginTop: 5 }]}
-                            onPress={subscribe}
-                            disabled={loading}
-                        >
-                            <SimpleLineIcons
-                                name="paypal"
-                                size={20}
-                                color={Colors.GREEN}
-                                style={styles.icon}
-                            />
-                            <Text
-                                style={[
-                                    styles.menuLabel,
-                                    { color: Colors.GREEN },
-                                ]}
                             >
-                                Subscribe
-                            </Text>
-                        </TouchableOpacity>
-                    )}
+                                <Entypo
+                                    name="google-play"
+                                    size={26}
+                                    color={Colors.GREEN}
+                                    style={styles.icon}
+                                />
+                                <Text
+                                    style={[
+                                        styles.menuLabel,
+                                        { color: Colors.GREEN },
+                                    ]}
+                                >
+                                    Check for App Updates
+                                </Text>
+                            </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={[styles.menuItem, { marginTop: 5 }]}
-                        onPress={() =>
-                            Linking.openURL(url).catch((err) => {
-                                console.error("URL open failed:", err);
-                                showToast("Failed to open Google Play");
-                            })
+                            <View style={styles.divider} />
+
+                            <TouchableOpacity
+                                style={[styles.menuItem, { marginTop: 5 }]}
+                                onPress={confirmDeleteAccount}
+                                disabled={loading}
+                            >
+                                <Ionicons
+                                    name="trash-outline"
+                                    size={26}
+                                    color={Colors.RED}
+                                    style={styles.icon}
+                                />
+                                <Text
+                                    style={[
+                                        styles.menuLabel,
+                                        { color: Colors.RED },
+                                    ]}
+                                >
+                                    Delete Account
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.menuItem,
+                                    {
+                                        marginTop: 5,
+                                        opacity: loading ? 0.5 : 1,
+                                    },
+                                ]}
+                                onPress={handleLogout}
+                                disabled={loading}
+                            >
+                                <Ionicons
+                                    name="log-out-outline"
+                                    size={26}
+                                    color={Colors.RED}
+                                    style={styles.icon}
+                                />
+                                <Text
+                                    style={[
+                                        styles.menuLabel,
+                                        {
+                                            color: Colors.RED,
+                                            fontFamily: "outfit-bold",
+                                        },
+                                    ]}
+                                >
+                                    Log Out
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={styles.versionText}>
+                            App Version {Constants.expoConfig?.version ?? "N/A"}
+                        </Text>
+                    </ScrollView>
+
+                    <ConfirmPasswordModal
+                        visible={showPasswordModal}
+                        password={password}
+                        setPassword={setPassword}
+                        showPassword={showPassword}
+                        setShowPassword={setShowPassword}
+                        loading={loading}
+                        onCancel={() => {
+                            setShowPasswordModal(false);
+                            setPassword("");
+                        }}
+                        onConfirm={() => handleDeleteAccount(password)}
+                    />
+
+                    <AppModal
+                        onCancel={null}
+                        visible={modalVisible.visible}
+                        title={modalVisible.title}
+                        message={modalVisible.message}
+                        confirmText="OK"
+                        showCancel={false}
+                        onConfirm={() =>
+                            setModalVisible((prev) => ({
+                                ...prev,
+                                visible: false,
+                            }))
                         }
-                    >
-                        <Entypo
-                            name="google-play"
-                            size={26}
-                            color={Colors.GREEN}
-                            style={styles.icon}
-                        />
-                        <Text
-                            style={[styles.menuLabel, { color: Colors.GREEN }]}
-                        >
-                            Check for App Updates
-                        </Text>
-                    </TouchableOpacity>
+                    />
 
-                    <View style={styles.divider} />
-
-                    <TouchableOpacity
-                        style={[styles.menuItem, { marginTop: 5 }]}
-                        onPress={confirmDeleteAccount}
-                        disabled={loading}
-                    >
-                        <Ionicons
-                            name="trash-outline"
-                            size={26}
-                            color={Colors.RED}
-                            style={styles.icon}
-                        />
-                        <Text style={[styles.menuLabel, { color: Colors.RED }]}>
-                            Delete Account
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[
-                            styles.menuItem,
-                            { marginTop: 5, opacity: loading ? 0.5 : 1 },
-                        ]}
-                        onPress={handleLogout}
-                        disabled={loading}
-                    >
-                        <Ionicons
-                            name="log-out-outline"
-                            size={26}
-                            color={Colors.RED}
-                            style={styles.icon}
-                        />
-                        <Text
-                            style={[
-                                styles.menuLabel,
-                                {
-                                    color: Colors.RED,
-                                    fontFamily: "outfit-bold",
-                                },
-                            ]}
-                        >
-                            Log Out
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={styles.versionText}>
-                    App Version {Constants.expoConfig?.version ?? "N/A"}
-                </Text>
-            </ScrollView>
-
-            <ConfirmPasswordModal
-                visible={showPasswordModal}
-                password={password}
-                setPassword={setPassword}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-                loading={loading}
-                onCancel={() => {
-                    setShowPasswordModal(false);
-                    setPassword("");
-                }}
-                onConfirm={() => handleDeleteAccount(password)}
-            />
-
-            <AppModal
-                onCancel={null}
-                visible={modalVisible.visible}
-                title={modalVisible.title}
-                message={modalVisible.message}
-                confirmText="OK"
-                showCancel={false}
-                onConfirm={() =>
-                    setModalVisible((prev) => ({ ...prev, visible: false }))
-                }
-            />
-
-            <ErrorModal
-                visible={errorModal.visible}
-                title={errorModal.title}
-                message={errorModal.message}
-                onConfirm={() =>
-                    setErrorModal((prev) => ({ ...prev, visible: false }))
-                }
-            />
+                    <ErrorModal
+                        visible={errorModal.visible}
+                        title={errorModal.title}
+                        message={errorModal.message}
+                        onConfirm={() =>
+                            setErrorModal((prev) => ({
+                                ...prev,
+                                visible: false,
+                            }))
+                        }
+                    />
+                </>
+            )}
         </SafeAreaView>
     );
 }

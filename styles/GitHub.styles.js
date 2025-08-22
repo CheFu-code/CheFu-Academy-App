@@ -10,16 +10,17 @@ export const styles = StyleSheet.create({
     },
     message: {
         marginTop: 20,
-        fontSize: 20,
-        color: Colors.PRIMARY,
-        fontFamily: "outfit-bold",
+        fontSize: 16,
+        color: Colors.WHITE,
+        textAlign: "center",
+        fontFamily: "outfit",
     },
     errorText: {
         marginTop: 20,
-        fontSize: 16,
+        fontSize: 20,
         color: "red",
         textAlign: "center",
         marginHorizontal: 20,
-        fontFamily: "outfit",
+        fontFamily: "outfit-bold",
     },
 });
