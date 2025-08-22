@@ -16,7 +16,7 @@ export default {
     - List Content in each chapter along with Description in 5 to 8 lines
     - Do not Just Explain what chapter about, Explain in Detail with Example
     - Also Make Easy, Moderate and Advance Course depends on topics
-    - Add CourseBanner Image from ('/banner1.png','/banner2.png','/banner3.png','/banner4.png','/banner5.png','/banner6.png'), select image randomly
+    - - Add CourseBanner Image from ('/tech-coding.jpg','/science-engineering.png','/business-finance.png','/health-fitness.png','/arts-creativity.png','/language-communication.png','/personal-development.png','/history-culture.png','/math-logic.webp','/education-teaching.webp','/lifestyle-hobbies.webp','/marketing-sales.webp','/design-ux.jpg','/law-government.jpeg','/environment-sustainability.jpg','/photography-videography.jpg','/music-audio.jpg','/food-cooking.jpg','/travel-adventure.jpg','/sports-recreation.jpg','/parenting-family.jpg','/psychology-mental-health.jpg','/writing-literature.webp','/religion-spirituality.webp','/automotive-vehicles.jpg','/real-estate-property.webp','/science-fiction-fantasy.webp','/gaming-esports.webp','/crafts-diy.jpg','/technology-gadgets.png','/investing-trading.jpg','/human-resources-recruiting.jpeg','/economics-policy.webp','/public-speaking-presentation.jpg','/data-science-analytics.jpg','/artificial-intelligence-machine-learning.jpg','/cybersecurity.jpg','/blockchain-cryptocurrency.jpg','/graphic-design.jpg','/animation-motion-graphics.jpg','/interior-design.jpg','/fashion-beauty.jpg','/entrepreneurship.jpg','/customer-service-support.jpg','/project-management.webp','/language-learning.png','/social-media.webp','/career-development.jpg','/sustainability-green-tech.png'), choose image based on category
     - Explain the chapter content as detailed tutorial with list of content
     - Generate 10 Quiz, 10 Flashcard and 10 Questions answer
     - Tag each course to one of the category from :[
@@ -83,10 +83,10 @@ export default {
         chapterName: '',
         content: [
           {
-            topic: '<Topic Name in 2 to 4 worlds ex.(Creating Variables)>'
+            topic: '<Topic Name in 2 to 4 words ex.(Creating Variables)>'
             explain: '< Detailed Explanation in 5 to 8 Lines if required>',
-            code: '<Code example of required else null',
-            example: '< example of required else null'
+            code: '<Code example if required else null>',
+            example: '< example if required else null>'
           },
           
             ...
