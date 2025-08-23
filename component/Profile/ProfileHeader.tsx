@@ -4,9 +4,12 @@ import { UserDetailContext } from "@/context/UserDetailContext";
 import { formatDate } from "@/helpers/formatDate";
 import { useProfileActions } from "@/hooks/useProfileActions";
 import { styles, styles2 } from "@/styles/Profile.styles";
+import { showToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import { getFirestore } from "@react-native-firebase/firestore";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useContext, useState } from "react";
@@ -100,6 +103,52 @@ export const ProfileHeader = ({
         setModalVisible(false);
     };
 
+    const downloadAvatar = async () => {
+        if (!profilePicture) {
+            setError({
+                message: "You don't have a profile picture to download.",
+                visible: true,
+                title: "No Avatar",
+            });
+            return;
+        }
+
+        try {
+            // Request permissions (iOS requires it)
+            const { status } = await MediaLibrary.requestPermissionsAsync();
+            if (status !== "granted") {
+                setError({
+                    message: "Cannot save image without permission.",
+                    visible: true,
+                    title: "Permission Denied",
+                });
+                return;
+            }
+
+            // Download image to cache
+            const fileUri = `${FileSystem.cacheDirectory}avatar.jpg`;
+            const downloadedFile = await FileSystem.downloadAsync(
+                profilePicture,
+                fileUri
+            );
+
+            // Save to media library
+            const asset = await MediaLibrary.createAssetAsync(
+                downloadedFile.uri
+            );
+            await MediaLibrary.createAlbumAsync("CheFu Academy", asset, false);
+
+            showToast("Downloaded successfully");
+        } catch (error) {
+            console.log("Download Avatar Error:", error);
+            setError({
+                message: "Failed to download profile picture. Try again later.",
+                visible: true,
+                title: "Download Error",
+            });
+        }
+    };
+
     return (
         <>
             <View style={styles.header}>
@@ -153,7 +202,11 @@ export const ProfileHeader = ({
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity disabled={loader} onPress={onChangeAvatar}>
+                <TouchableOpacity
+                    disabled={loader}
+                    onPress={onChangeAvatar}
+                    onLongPress={downloadAvatar}
+                >
                     {loader ? (
                         <LottieView
                             source={require("../../assets/animations/changingAvatar.json")}

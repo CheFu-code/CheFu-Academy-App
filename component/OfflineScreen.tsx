@@ -14,6 +14,15 @@ export default function OfflineScreen() {
             />
             <Text style={styles.title}>You're Offline</Text>
             <Text style={styles.subtitle}>Check your internet connection</Text>
+            <Text
+                style={[
+                    styles.subtitle,
+                    { color: "#ccc", fontSize: 14, marginTop: 20 },
+                ]}
+            >
+                Please connect to Wi-Fi or mobile data. Once a connection is
+                detected, this screen will automatically disappear.
+            </Text>
         </View>
     );
 }

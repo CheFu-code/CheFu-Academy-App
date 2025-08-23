@@ -1,5 +1,5 @@
 import { Course } from "@/types/course";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { getApp } from "@react-native-firebase/app";
 import {
     collection,
@@ -13,13 +13,13 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
     FlatList,
     Image,
-    Pressable,
     Text,
-    View,
+    TouchableOpacity,
+    View
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CourseListGrid, {
     AllowedPaths,
 } from "../../../component/PracticeScreen/CourseListGrid";
@@ -71,90 +71,74 @@ export default function PracticeTypeHomeScreen() {
     };
 
     return (
-        <FlatList
-            showsVerticalScrollIndicator={false}
-            onRefresh={() => GetCourseList()}
-            refreshing={loading}
-            style={{
-                backgroundColor: Colors.BG_COLOR,
-                flex: 1,
-            }}
-            data={[]}
-            renderItem={() => null}
-            ListHeaderComponent={
-                <View
+        <>
+            <SafeAreaView
+                style={{
+                    backgroundColor: Colors.BG_COLOR,
+                }}
+            >
+                <Image
                     style={{
-                        backgroundColor: Colors.BG_COLOR,
-                        flex: 1,
-                        marginBottom: 30,
+                        height: 250,
+                        width: "100%",
+                        borderBottomRightRadius: 25,
+                        borderBottomLeftRadius: 25,
+                    }}
+                    source={option?.image}
+                />
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    style={{
+                        position: "absolute",
+                        padding: 10,
+                        display: "flex",
+                        flexDirection: "row",
+                        gap: 10,
+                        alignItems: "center",
+                        marginTop:15
                     }}
                 >
-                    <Image
-                        style={{
-                            height: 300,
-                            width: "100%",
-                            borderBottomRightRadius: 25,
-                            borderBottomLeftRadius: 25,
-                            borderTopRightRadius: 25,
-                            borderTopLeftRadius: 25,
-                        }}
-                        source={option?.image}
+                    <AntDesign
+                        name="left"
+                        size={24}
+                        color={Colors.PRIMARY}
                     />
-                    <View
+                    <Text
                         style={{
-                            position: "absolute",
-                            padding: 20,
-                            display: "flex",
-                            flexDirection: "row",
-                            gap: 10,
-                            alignItems: "center",
-                            marginTop: 27,
+                            fontFamily: "outfit-bold",
+                            fontSize: 25,
+                            color: Colors.PRIMARY,
                         }}
                     >
-                        <Pressable onPress={() => router.back()}>
-                            <Ionicons
-                                style={{
-                                    padding: 3,
-                                    borderRadius: 10,
-                                    backgroundColor: Colors.BG_GRAY,
+                        {type}
+                    </Text>
+                </TouchableOpacity>
+            </SafeAreaView>
+
+            <FlatList
+                showsVerticalScrollIndicator={false}
+                onRefresh={() => GetCourseList()}
+                refreshing={loading}
+                style={{
+                    backgroundColor: Colors.BG_COLOR,
+                    flex: 1,
+                }}
+                data={[]}
+                renderItem={() => null}
+                ListHeaderComponent={
+                    <View style={{ flex: 1 }}>
+                        {option && (
+                            <CourseListGrid
+                                option={{
+                                    ...option,
+                                    path: option.path as AllowedPaths,
                                 }}
-                                name="arrow-back"
-                                size={24}
-                                color={Colors.PRIMARY}
+                                courseList={courseList}
                             />
-                        </Pressable>
-                        <Text
-                            style={{
-                                fontFamily: "outfit-bold",
-                                fontSize: 25,
-                                color: Colors.PRIMARY,
-                            }}
-                        >
-                            {type}
-                        </Text>
+                        )}
                     </View>
-
-                    {loading && (
-                        <ActivityIndicator
-                            size={"large"}
-                            style={{
-                                marginTop: 150,
-                            }}
-                            color={Colors.PRIMARY}
-                        />
-                    )}
-
-                    {option && (
-                        <CourseListGrid
-                            option={{
-                                ...option,
-                                path: option.path as AllowedPaths,
-                            }}
-                            courseList={courseList}
-                        />
-                    )}
-                </View>
-            }
-        />
+                }
+            />
+        </>
     );
 }

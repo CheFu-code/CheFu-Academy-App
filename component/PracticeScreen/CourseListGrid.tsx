@@ -29,7 +29,7 @@ export default function CourseListGrid({
             router.push({
                 pathname: option.path,
                 params: {
-                    type: option.name, // ✅ comes from PracticeOption
+                    type: option.name, 
                     courseParams: JSON.stringify(course),
                 },
             } as any);
@@ -58,7 +58,6 @@ export default function CourseListGrid({
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            justifyContent: "flex-start",
                             padding: 15,
                             backgroundColor: Colors.BG_GRAY,
                             margin: 7,
