@@ -14,7 +14,7 @@ export const changeAvatar = async (setUserDetail: (updater: (prev: any) => any) 
             mediaType: "photo",    // Only allow photos
             compressImageMaxWidth: 1024,     // Resize image max width
             compressImageMaxHeight: 1024,    // Resize image max height
-            compressImageQuality: 0.8,       // Compress image quality (0-1)
+            compressImageQuality: 1,       // Compress image quality (0-1)
             includeBase64: false,            // Return base64 string if true
             includeExif: true,               // Include EXIF metadata
             cropperCircleOverlay: false,     // Circular crop overlay
@@ -56,7 +56,7 @@ export const changeAvatar = async (setUserDetail: (updater: (prev: any) => any) 
 
         setUserDetail((prev) => prev ? { ...prev, profilePicture: downloadURL } : prev);
 
-        showToast("Profile picture updated successfully!");
+        showToast("Profile updated successfully!");
         return downloadURL;
     } catch (error: any) {
         console.error("Error changing avatar:", error);

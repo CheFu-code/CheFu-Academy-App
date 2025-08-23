@@ -143,7 +143,7 @@ export default function ExploreScreen() {
             <View style={{ padding: 15 }}>
                 <View style={styles.inputContainer}>
                     <TextInput
-                        placeholder="Search course or category..."
+                        placeholder="Search course, topic, category..."
                         placeholderTextColor={Colors.BLACK}
                         value={searchTerm}
                         onChangeText={setSearchTerm}

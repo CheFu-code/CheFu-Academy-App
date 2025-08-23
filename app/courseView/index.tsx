@@ -174,7 +174,6 @@ export default function CourseView() {
                 ".pdf";
 
             if (Platform.OS === "android") {
-                // Permission for Android 10 and below
                 const permitted = await ensureLegacyWritePermission();
                 if (!permitted) {
                     ToastAndroid.show(
@@ -205,7 +204,6 @@ export default function CourseView() {
 
                 ToastAndroid.show("Downloaded...", ToastAndroid.SHORT);
             } else {
-                // iOS: Save in app sandbox
                 const destPath = `${FileSystem.documentDirectory}${fileName}`;
                 await FileSystem.copyAsync({ from: uri, to: destPath });
 

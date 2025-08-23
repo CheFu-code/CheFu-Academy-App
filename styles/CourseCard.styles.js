@@ -37,16 +37,18 @@ export const styles = StyleSheet.create({
         fontFamily: "outfit-bold",
         marginRight: 5,
     },
-    creatorProfilePic: {
+    creatorProfilePicWrapper: {
         position: "absolute",
         top: 10, // distance from top of banner
         right: 10, // distance from left of banner
-        width: 40, // size of profile pic
-        height: 40,
-        borderRadius: 20, // makes it round (half of width/height)
-        borderWidth: 2,
-        borderColor: "black", // black border to stand out on banner
-        backgroundColor: "#ccc", // fallback bg color
         zIndex: 10,
+    },
+    creatorProfilePic: {
+        width: 48,
+        height: 48,
+        borderWidth: 2,
+        borderColor: "black",
+        backgroundColor: "#ccc",
+        borderRadius: 24,
     },
 });

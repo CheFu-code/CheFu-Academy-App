@@ -18,6 +18,7 @@ import {
 import { imageAssets } from "../../constant/Option";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/CourseCard.styles";
+import AppModal from "./AppModal";
 
 export default function CourseCard({
     course,
@@ -31,6 +32,11 @@ export default function CourseCard({
     const [creatorInfo, setCreatorInfo] =
         useState<null | FirebaseFirestoreTypes.DocumentData>(null);
     const firestore = getFirestore();
+    const [modal, setModal] = useState({
+        visible: false,
+        title: "",
+        message: "",
+    });
 
     useEffect(() => {
         const fetchCreator = async () => {
@@ -52,13 +58,23 @@ export default function CourseCard({
         <>
             <TouchableOpacity
                 onPress={() => {
-                    router.push({
-                        pathname: "/courseView",
-                        params: {
-                            courseParams: JSON.stringify(course),
-                            enroll: enroll?.toString(),
-                        },
-                    });
+                    if (course?.createdBy === userDetail.email) {
+                        setModal({
+                            visible: true,
+                            title: "Course Owner",
+                            message:
+                                "You are the owner of this course, can we take you to the course progress page?",
+                        });
+                        return;
+                    } else {
+                        router.push({
+                            pathname: "/courseView",
+                            params: {
+                                courseParams: JSON.stringify(course),
+                                enroll: enroll?.toString(),
+                            },
+                        });
+                    }
                 }}
                 style={styles.buttonContainer}
             >
@@ -69,14 +85,26 @@ export default function CourseCard({
                             style={styles.bannerImage}
                             resizeMode="cover"
                         />
-                        <Image
-                            source={
-                                creatorInfo?.profilePicture
-                                    ? { uri: creatorInfo.profilePicture }
-                                    : require("../../assets/images/logo.png")
-                            }
-                            style={styles.creatorProfilePic}
-                        />
+                        <TouchableOpacity
+                            style={styles.creatorProfilePicWrapper}
+                            onPress={() => {
+                                router.push({
+                                    pathname: "/profileView",
+                                    params: {
+                                        userId: course.createdBy,
+                                    },
+                                });
+                            }}
+                        >
+                            <Image
+                                source={
+                                    creatorInfo?.profilePicture
+                                        ? { uri: creatorInfo.profilePicture }
+                                        : require("../../assets/images/logo.png")
+                                }
+                                style={styles.creatorProfilePic}
+                            />
+                        </TouchableOpacity>
                     </>
                 )}
                 <View
@@ -114,6 +142,17 @@ export default function CourseCard({
                     </View>
                 </View>
             </TouchableOpacity>
+
+            <AppModal
+                visible={modal.visible}
+                title={modal.title}
+                message={modal.message}
+                onConfirm={() => {
+                    setModal({ ...modal, visible: false });
+                    router.push("/myCourses");
+                }}
+                onCancel={() => setModal({ ...modal, visible: false })}
+            />
         </>
     );
 }

@@ -1,36 +1,12 @@
 import CourseCard from "@/component/Shared/CourseCard";
 import { Colors } from "@/constant/Colors";
+import { Course } from "@/types/course";
 import { AntDesign } from "@expo/vector-icons";
-import firestore, {
-    FirebaseFirestoreTypes,
-} from "@react-native-firebase/firestore";
+import firestore from "@react-native-firebase/firestore";
 import { router, useLocalSearchParams } from "expo-router";
 import LottieView from "lottie-react-native";
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-
-type Chapter = {
-    topic: string;
-    content: string;
-    example?: string;
-    explain?: string;
-    code?: string;
-};
-
-type Course = {
-    id: string;
-    courseTitle: string;
-    category?: string;
-    banner_image?: string;
-    chapters?: Chapter[];
-    flashcards?: any[];
-    qa?: any[];
-    quiz?: any[];
-    description?: string;
-    price?: number;
-    createdBy: string;
-    createdOn: FirebaseFirestoreTypes.Timestamp;
-};
 
 export default function SearchScreen() {
     const { query } = useLocalSearchParams();
@@ -50,6 +26,7 @@ export default function SearchScreen() {
 
                     return {
                         id: doc.id,
+                        docId: doc.id,
                         courseTitle: data.courseTitle || data.title || "",
                         category: data.category,
                         banner_image: data.banner_image,
@@ -61,6 +38,7 @@ export default function SearchScreen() {
                         price: data.price,
                         createdBy: data.createdBy,
                         createdOn: data.createdOn,
+                        enrolled: data.enrolled,
                     };
                 })
 
