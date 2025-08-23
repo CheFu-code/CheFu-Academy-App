@@ -57,6 +57,7 @@ const ChatScreen = () => {
                 </TouchableOpacity>
             </View>
 
+
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 style={{ flexGrow: 0, marginBottom: 30 }}

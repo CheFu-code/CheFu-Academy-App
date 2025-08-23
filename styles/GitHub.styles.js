@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         color: Colors.WHITE,
         textAlign: "center",
-        fontFamily: "outfit",
+        fontFamily: "outfit-bold",
     },
     errorText: {
         marginTop: 20,

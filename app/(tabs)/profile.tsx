@@ -1,12 +1,3 @@
-// --- Imports ---
-import { useRouter } from "expo-router";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Linking, SafeAreaView, ToastAndroid } from "react-native";
-
-// --- Icons ---
-
-// --- Firebase ---
-
 import ConfirmPasswordModal from "@/component/Profile/ConfirmPasswordModal";
 import LoggedOutMessage from "@/component/Profile/LoggedOutMessage ";
 import { ProfileHeader } from "@/component/Profile/ProfileHeader";
@@ -21,6 +12,9 @@ import { changeAvatar } from "@/utils/changeAvatar";
 import { showToast } from "@/utils/toast";
 import { getAuth } from "@react-native-firebase/auth";
 import { doc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
+import { useRouter } from "expo-router";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Image, Linking, SafeAreaView, ToastAndroid } from "react-native";
 import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
@@ -44,6 +38,7 @@ export default function Profile() {
     const user = auth.currentUser;
 
     const [loader, setLoader] = useState(false);
+    const [loadingName, setLoadingName] = useState(false);
     const { loading, handleLogout, handleDeleteAccount } = useProfileActions(
         userDetail,
         setUserDetail,
@@ -56,7 +51,7 @@ export default function Profile() {
     const isFreeUser = !member;
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
     const { error, setError } = usePickImage();
-    const [avatarURL, setAvatarURL] = useState(profilePicture);
+    const [avatarURL, setAvatarURL] = useState(userDetail?.profilePicture);
     const [modalVisible, setModalVisible] = useState({
         visible: false,
         title: "",
@@ -81,6 +76,10 @@ export default function Profile() {
         }
     }, [email, router, refreshData]);
 
+    useEffect(() => {
+        setAvatarURL(userDetail?.profilePicture);
+    }, [userDetail?.profilePicture]);
+
     const confirmDeleteAccount = useCallback(
         () => setShowPasswordModal(true),
         []
@@ -95,12 +94,18 @@ export default function Profile() {
     }, [member, router, showToast]);
 
     const handleChangeAvatar = async () => {
-        const newURL = await changeAvatar();
-        if (newURL) setAvatarURL(newURL); // update state to re-render Image
+        setLoader(true);
+        try {
+            const newURL = await changeAvatar(setUserDetail);
+            if (newURL) setAvatarURL(newURL);
+            await refreshData();
+        } finally {
+            setLoader(false);
+        }
     };
 
     const updateUserName = async (newName: string) => {
-        setLoader(true);
+        setLoadingName(true);
         try {
             const user = auth.currentUser;
             if (user) {
@@ -124,26 +129,32 @@ export default function Profile() {
 
                 setUserDetail((prev: User) => ({ ...prev, fullname: newName }));
 
-                console.log("Name updated successfully");
+                showToast("Name updated successfully");
             }
-            setLoader(false);
         } catch (error) {
-            setLoader(false);
             console.error("Error updating name:", error);
+            showToast("Error updating name");
+        } finally {
+            setLoadingName(false);
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
+            <Image
+                source={require("../../assets/images/graph.png")}
+                style={{ position: "absolute", width: "100%", height: 500 }}
+            />
             {!userDetail ? (
                 <LoggedOutMessage />
             ) : (
                 <>
                     {userDetail && (
                         <ProfileHeader
+                            loadingName={loadingName}
                             loader={loader}
                             loading={loading}
-                            avatarURL={avatarURL}
+                            profilePicture={avatarURL}
                             fullname={fullname}
                             email={email}
                             member={member}

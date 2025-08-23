@@ -198,14 +198,14 @@ export default function Header() {
                 {/*text input */}
                 <View style={styles.inputContainer}>
                     <TextInput
-                        placeholder="Search for courses..."
+                        placeholder="Search courses, topics, instructors..."
                         placeholderTextColor={Colors.BLACK}
                         autoCorrect={false}
                         value={searchTerm}
                         onChangeText={setSearchTerm}
                         onSubmitEditing={handleSearch}
                         autoCapitalize="none"
-                        style={[styles.text, { flex: 1 }]}
+                        style={[styles.text, { flex: 1, fontFamily:"outfit" }]}
                     />
                     {searchTerm.trim() && (
                         <TouchableOpacity onPress={() => handleSearch()}>

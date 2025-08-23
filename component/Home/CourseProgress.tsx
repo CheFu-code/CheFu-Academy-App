@@ -2,7 +2,7 @@ import { Course, CourseProgressProps } from "@/types/course";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import CourseProgressCard from "../Shared/CourseProgressCard";
@@ -14,6 +14,7 @@ export default function CourseProgress({
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const displayedCourses = courseList.slice(0, 4);
     const router = useRouter();
 
     useFocusEffect(
@@ -39,26 +40,45 @@ export default function CourseProgress({
     };
 
     return (
-        <View
-            style={{
-                marginTop: 10,
-            }}
-        >
-            <Text
+        <View>
+            <View
                 style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: 25,
-                    color: Colors.PRIMARY,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                 }}
             >
-                Your Progress
-            </Text>
+                <Text
+                    style={{
+                        fontFamily: "outfit-bold",
+                        fontSize: 25,
+                        color: Colors.PRIMARY,
+                    }}
+                >
+                    Your Progress
+                </Text>
+                <TouchableOpacity
+                    onPress={() => router.push("/(tabs)/progress")}
+                >
+                    <Text
+                        style={{
+                            fontFamily: "outfit",
+                            color: "white",
+                            fontSize: 15,
+                        }}
+                    >
+                        View All
+                    </Text>
+                </TouchableOpacity>
+            </View>
             <FlatList
-                data={courseList}
+                data={displayedCourses}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) =>
-                    item.docId || item.id?.toString() || `${item.courseTitle}-${index}`
+                    item.docId ||
+                    item.id?.toString() ||
+                    `${item.courseTitle}-${index}`
                 }
                 renderItem={({ item }) => (
                     <CourseProgressCard

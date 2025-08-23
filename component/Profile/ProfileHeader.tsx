@@ -3,17 +3,16 @@ import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { formatDate } from "@/helpers/formatDate";
 import { useProfileActions } from "@/hooks/useProfileActions";
-import { styles } from "@/styles/Profile.styles";
+import { styles, styles2 } from "@/styles/Profile.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import { getFirestore } from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
 import { useContext, useState } from "react";
 import {
     Image,
     Modal,
-    Pressable,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
@@ -22,7 +21,7 @@ import {
 import ErrorModal from "../Shared/ErrorModal";
 
 interface ProfileHeaderProps {
-    avatarURL: string;
+    profilePicture: string;
     fullname: string;
     email: string;
     member: boolean;
@@ -34,10 +33,11 @@ interface ProfileHeaderProps {
     loading: boolean;
     onChangeName: (newName: string) => void;
     loader: boolean;
+    loadingName: boolean;
 }
 
 export const ProfileHeader = ({
-    avatarURL,
+    profilePicture,
     fullname,
     email,
     member,
@@ -48,6 +48,7 @@ export const ProfileHeader = ({
     onChangeAvatar,
     onChangeName,
     loader,
+    loadingName,
 }: ProfileHeaderProps) => {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const router = useRouter();
@@ -147,52 +148,71 @@ export const ProfileHeader = ({
                             }}
                             name="settings-outline"
                             size={20}
-                            color={Colors.GRAY}
+                            color={Colors.WHITE}
                         />
                     </TouchableOpacity>
                 </View>
-                {/**later i wil comment out later */}
-                {/* <TouchableOpacity onPress={handleChangeAvatar}> */}
-                <Pressable>
-                    <Image
-                        style={[
-                            styles.avatar,
-                            {
-                                borderColor: member
-                                    ? Colors.GREEN
-                                    : Colors.PRIMARY,
-                            },
-                        ]}
-                        source={
-                            ["github.com", "google.com"].includes(
-                                userDetail?.provider
-                            )
-                                ? { uri: avatarURL }
-                                : require("../../assets/images/logo.png")
-                        }
-                    />
-                </Pressable>
+
+                <TouchableOpacity disabled={loader} onPress={onChangeAvatar}>
+                    {loader ? (
+                        <LottieView
+                            source={require("../../assets/animations/changingAvatar.json")}
+                            autoPlay
+                            loop
+                            style={styles2.changingAvatar}
+                        />
+                    ) : (
+                        <Image
+                            style={[
+                                styles.avatar,
+                                {
+                                    borderColor: member
+                                        ? Colors.GREEN
+                                        : Colors.PRIMARY,
+                                },
+                            ]}
+                            source={
+                                profilePicture
+                                    ? { uri: profilePicture }
+                                    : require("../../assets/images/logo.png")
+                            }
+                        />
+                    )}
+                </TouchableOpacity>
 
                 {userDetail && (
                     <>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: 5,
-                            }}
-                        >
+                        <View style={styles.common}>
                             <View>
-                                <TouchableOpacity
-                                    onPress={() => setModalVisible(true)}
-                                >
-                                    <Text
-                                        numberOfLines={1}
-                                        style={styles.profileName}
+                                <View style={styles.common}>
+                                    <TouchableOpacity
+                                        disabled={loadingName}
+                                        onPress={() => setModalVisible(true)}
                                     >
-                                        {fullname}
-                                    </Text>
-                                </TouchableOpacity>
+                                        {loadingName ? (
+                                            <LottieView
+                                                source={require("../../assets/animations/changingName.json")}
+                                                autoPlay
+                                                loop
+                                                style={styles2.changingName}
+                                            />
+                                        ) : (
+                                            <Text
+                                                numberOfLines={1}
+                                                style={styles.profileName}
+                                            >
+                                                {fullname}
+                                            </Text>
+                                        )}
+                                    </TouchableOpacity>
+                                    {member && !loadingName && (
+                                        <Ionicons
+                                            color={Colors.PRIMARY}
+                                            size={20}
+                                            name="checkmark-circle"
+                                        />
+                                    )}
+                                </View>
                                 <Text
                                     numberOfLines={1}
                                     style={styles.profileEmail}
@@ -200,13 +220,6 @@ export const ProfileHeader = ({
                                     Joined {formatDate(createdAt)}
                                 </Text>
                             </View>
-                            {member && (
-                                <Ionicons
-                                    color={Colors.GREEN}
-                                    size={20}
-                                    name="checkmark-circle"
-                                />
-                            )}
                         </View>
 
                         <Text numberOfLines={1} style={styles.profileEmail}>
@@ -279,55 +292,3 @@ export const ProfileHeader = ({
         </>
     );
 };
-
-const styles2 = StyleSheet.create({
-    profileName: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "white",
-    },
-    modalBackground: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    modalContainer: {
-        width: "80%",
-        backgroundColor: "#222",
-        borderRadius: 10,
-        padding: 20,
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "white",
-        marginBottom: 15,
-    },
-    input: {
-        backgroundColor: "#333",
-        color: "white",
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 20,
-    },
-    buttons: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        gap: 10,
-    },
-    buttonCancel: {
-        padding: 10,
-        backgroundColor: "#555",
-        borderRadius: 8,
-    },
-    buttonSave: {
-        padding: 10,
-        backgroundColor: "#4CAF50",
-        borderRadius: 8,
-    },
-    buttonText: {
-        color: "white",
-        fontWeight: "bold",
-    },
-});

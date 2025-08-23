@@ -19,13 +19,14 @@ import {
     where,
 } from "@react-native-firebase/firestore";
 import LottieView from "lottie-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Progress({ enroll = false }) {
     const [courseList, setCourseList] = useState<Course[]>([]);
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
-    const [fetching, setFetching] = useState(false); // To prevent multiple fetches
+    const [fetching, setFetching] = useState(false); 
     const router = useRouter();
 
     useFocusEffect(
@@ -93,7 +94,7 @@ export default function Progress({ enroll = false }) {
                 pathname: "/courseView",
                 params: {
                     courseParams: JSON.stringify(item),
-                    enroll: enroll ? "true" : "false", // ✅ convert boolean to string
+                    enroll: enroll ? "true" : "false", 
                 },
             });
         }, 100);
@@ -138,14 +139,12 @@ export default function Progress({ enroll = false }) {
                 source={require("../../assets/images/graph.png")}
                 style={{ position: "absolute", width: "100%", height: 500 }}
             />
-            <View style={{ flex: 1, padding: 25 }}>
+            <SafeAreaView style={{ flex: 1, padding: 15 }}>
                 <Text
                     style={{
                         fontFamily: "outfit-bold",
                         fontSize: 24,
                         color: Colors.PRIMARY,
-                        marginBottom: 20,
-                        marginTop: 30,
                         letterSpacing: 1,
                     }}
                 >
@@ -177,7 +176,7 @@ export default function Progress({ enroll = false }) {
                 ) : (
                     !loading && <NoCourse />
                 )}
-            </View>
+            </SafeAreaView>
         </View>
     );
 }

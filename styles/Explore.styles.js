@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_GRAY,
         borderRadius: 12,
         paddingHorizontal: 12,
-        marginBottom: 10,
+        marginBottom: 5,
         elevation: 3,
     },
     textInput: {

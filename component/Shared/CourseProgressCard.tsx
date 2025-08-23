@@ -140,7 +140,7 @@ export default function CourseProgressCard({
             onPress={onPress}
             disabled={disabled || loading}
             style={{
-                margin: 7,
+                margin: 5,
                 padding: 12,
                 backgroundColor: Colors.BG_GRAY,
                 borderRadius: 15,

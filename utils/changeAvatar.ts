@@ -1,8 +1,10 @@
 import { getAuth } from "@react-native-firebase/auth";
+import { doc, getFirestore, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import ImagePicker from "react-native-image-crop-picker";
+import { showToast } from "./toast";
 
-export const changeAvatar = async () => {
+export const changeAvatar = async (setUserDetail: (updater: (prev: any) => any) => void) => {
     try {
         // 1. Pick a single image
         const image = await ImagePicker.openPicker({
@@ -29,7 +31,7 @@ export const changeAvatar = async () => {
         const auth = getAuth();
         const user = auth.currentUser;
         if (!user) throw new Error("No user logged in");
-
+        showToast("Updating...");
         const path = `avatars/${user.uid}.jpg`;
 
         // 3. Upload the file to Firebase Storage
@@ -41,10 +43,32 @@ export const changeAvatar = async () => {
         // 5. Update Firebase Auth profile
         await user.updateProfile({ photoURL: downloadURL });
 
-        console.log("Avatar updated successfully!", downloadURL);
+        const db = getFirestore();
+
+        if (!user.email) {
+            throw new Error("User email not available");
+        }
+
+        await updateDoc(doc(db, "users", user.email), {
+            profilePicture: downloadURL,
+            updatedAt: serverTimestamp(),
+        });
+
+        setUserDetail((prev) => prev ? { ...prev, profilePicture: downloadURL } : prev);
+
+        showToast("Profile picture updated successfully!");
         return downloadURL;
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error changing avatar:", error);
+
+        if (error.message.includes("User cancelled image selection")) {
+            showToast("Image selection cancelled.");
+        } else if (error.message.includes("ssl") || error.message.includes("Connection reset")) {
+            showToast("Network error. Please check your connection and try again.");
+        } else {
+            showToast("Error changing avatar. Please try again.");
+        }
+
         return null;
     }
 };

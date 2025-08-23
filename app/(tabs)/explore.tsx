@@ -14,6 +14,7 @@ import LottieView from "lottie-react-native";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
     FlatList,
+    Image,
     Text,
     TextInput,
     ToastAndroid,
@@ -131,8 +132,12 @@ export default function ExploreScreen() {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+            <Image
+                source={require("../../assets/images/graph.png")}
+                style={{ position: "absolute", width: "100%", height: 500 }}
+            />
             <View style={styles.headerWrapper}>
-                <Text style={styles.headerText}>Explore more courses</Text>
+                <Text style={styles.headerText}>Explore courses</Text>
             </View>
 
             <View style={{ padding: 15 }}>
@@ -162,8 +167,7 @@ export default function ExploreScreen() {
                     keyExtractor={(item) => item.id}
                     numColumns={2}
                     contentContainerStyle={{
-                        paddingBottom: 160,
-                        paddingTop: 5,
+                        paddingBottom: 90,
                     }}
                     columnWrapperStyle={{ justifyContent: "space-between" }}
                     renderItem={({ item }) => (

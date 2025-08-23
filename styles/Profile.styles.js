@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
     profileEmail: {
         fontSize: 15,
         fontFamily: "outfit",
-        color: Colors.GRAY,
+        color: Colors.WHITE,
         maxWidth: 250,
         textAlign: "center",
     },
@@ -39,6 +39,7 @@ export const styles = StyleSheet.create({
         fontSize: 15,
         fontFamily: "outfit",
         marginTop: 5,
+        color: Colors.WHITE,
     },
     menuSection: {
         paddingHorizontal: 20,
@@ -145,6 +146,71 @@ export const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: "right",
         textDecorationLine: "underline",
-        fontStyle:"italic"
+        fontStyle: "italic",
+    },
+    common: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 5,
+    },
+});
+
+export const styles2 = StyleSheet.create({
+    profileName: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "white",
+    },
+    modalBackground: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalContainer: {
+        width: "80%",
+        backgroundColor: "#222",
+        borderRadius: 10,
+        padding: 20,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "white",
+        marginBottom: 15,
+    },
+    input: {
+        backgroundColor: "#333",
+        color: "white",
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 20,
+    },
+    buttons: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        gap: 10,
+    },
+    buttonCancel: {
+        padding: 10,
+        backgroundColor: "#555",
+        borderRadius: 8,
+    },
+    buttonSave: {
+        padding: 10,
+        backgroundColor: "#4CAF50",
+        borderRadius: 8,
+    },
+    buttonText: {
+        color: "white",
+        fontWeight: "bold",
+    },
+    changingName: {
+        width: 100,
+        height: 70,
+    },
+    changingAvatar: {
+        width: 200,
+        height: 200,
     },
 });

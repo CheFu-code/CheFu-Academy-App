@@ -29,7 +29,7 @@ import {
     Text,
     ToastAndroid,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
 import { SafeAreaView } from "react-native-safe-area-context";
