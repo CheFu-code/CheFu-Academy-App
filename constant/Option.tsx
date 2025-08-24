@@ -129,6 +129,85 @@ export const CourseCategory = [
     "Sustainability & Green Tech",
 ];
 
+export const VideoCategory = [
+    { label: "Tech & Coding", value: "Tech & Coding" },
+    { label: "Business & Finance", value: "Business & Finance" },
+    { label: "Health & Fitness", value: "Health & Fitness" },
+    { label: "Science & Engineering", value: "Science & Engineering" },
+    { label: "Arts & Creativity", value: "Arts & Creativity" },
+    { label: "Language & Communication", value: "Language & Communication" },
+    { label: "Personal Development", value: "Personal Development" },
+    { label: "History & Culture", value: "History & Culture" },
+    { label: "Math & Logic", value: "Math & Logic" },
+    { label: "Education & Teaching", value: "Education & Teaching" },
+    { label: "Lifestyle & Hobbies", value: "Lifestyle & Hobbies" },
+    { label: "Marketing & Sales", value: "Marketing & Sales" },
+    { label: "Design & UX", value: "Design & UX" },
+    { label: "Law & Government", value: "Law & Government" },
+    {
+        label: "Environment & Sustainability",
+        value: "Environment & Sustainability",
+    },
+    { label: "Photography & Videography", value: "Photography & Videography" },
+    { label: "Music & Audio", value: "Music & Audio" },
+    { label: "Food & Cooking", value: "Food & Cooking" },
+    { label: "Travel & Adventure", value: "Travel & Adventure" },
+    { label: "Sports & Recreation", value: "Sports & Recreation" },
+    { label: "Parenting & Family", value: "Parenting & Family" },
+    {
+        label: "Psychology & Mental Health",
+        value: "Psychology & Mental Health",
+    },
+    { label: "Writing & Literature", value: "Writing & Literature" },
+    { label: "Religion & Spirituality", value: "Religion & Spirituality" },
+    { label: "Automotive & Vehicles", value: "Automotive & Vehicles" },
+    { label: "Real Estate & Property", value: "Real Estate & Property" },
+    { label: "Science Fiction & Fantasy", value: "Science Fiction & Fantasy" },
+    { label: "Gaming & Esports", value: "Gaming & Esports" },
+    { label: "Crafts & DIY", value: "Crafts & DIY" },
+    { label: "Technology & Gadgets", value: "Technology & Gadgets" },
+    { label: "Investing & Trading", value: "Investing & Trading" },
+    {
+        label: "Human Resources & Recruiting",
+        value: "Human Resources & Recruiting",
+    },
+    { label: "Economics & Policy", value: "Economics & Policy" },
+    {
+        label: "Public Speaking & Presentation",
+        value: "Public Speaking & Presentation",
+    },
+    { label: "Data Science & Analytics", value: "Data Science & Analytics" },
+    {
+        label: "Artificial Intelligence & Machine Learning",
+        value: "Artificial Intelligence & Machine Learning",
+    },
+    { label: "Cybersecurity", value: "Cybersecurity" },
+    {
+        label: "Blockchain & Cryptocurrency",
+        value: "Blockchain & Cryptocurrency",
+    },
+    { label: "Graphic Design", value: "Graphic Design" },
+    {
+        label: "Animation & Motion Graphics",
+        value: "Animation & Motion Graphics",
+    },
+    { label: "Interior Design", value: "Interior Design" },
+    { label: "Fashion & Beauty", value: "Fashion & Beauty" },
+    { label: "Entrepreneurship", value: "Entrepreneurship" },
+    {
+        label: "Customer Service & Support",
+        value: "Customer Service & Support",
+    },
+    { label: "Project Management", value: "Project Management" },
+    { label: "Language Learning", value: "Language Learning" },
+    { label: "Social Media", value: "Social Media" },
+    { label: "Career Development", value: "Career Development" },
+    {
+        label: "Sustainability & Green Tech",
+        value: "Sustainability & Green Tech",
+    },
+];
+
 export const ProfileMenu = [
     {
         name: "Add Course",

@@ -167,7 +167,6 @@ export default function Header() {
                         )}
                     </View>
 
-                    {/**show more options */}
                     {userDetail && (
                         <TouchableOpacity onPress={() => setShowModal(true)}>
                             <Feather
@@ -227,7 +226,7 @@ export default function Header() {
                     style={styles.modalOverlay}
                 >
                     <View style={styles.modalSheet}>
-                        <Text style={styles.modalTitle}>Settings</Text>
+                        <Text style={styles.modalTitle}>Options</Text>
 
                         {modalOptions.map(({ label, icon, color }) => (
                             <TouchableOpacity

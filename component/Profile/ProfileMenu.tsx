@@ -5,7 +5,12 @@ import { menuItems, url } from "@/data/menuItems";
 import { useRefreshProfile } from "@/hooks/useRefreshProfile";
 import { styles } from "@/styles/Profile.styles";
 import { showToast } from "@/utils/toast";
-import { Entypo, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
+import {
+    Entypo,
+    Ionicons,
+    MaterialCommunityIcons,
+    SimpleLineIcons,
+} from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import { useContext, useMemo } from "react";
@@ -42,7 +47,7 @@ export const ProfileMenu = ({
     const { email, member, planType } = userDetail || {};
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
     const router = useRouter();
-
+    const isAdmin = userDetail?.roles?.includes("admin");
     const renderedMenuItems = useMemo(
         () => menuItems(router, Linking, ToastAndroid, Colors),
         [router]
@@ -191,6 +196,27 @@ export const ProfileMenu = ({
                     </Text>
                 </TouchableOpacity>
 
+                {isAdmin && (
+                    <TouchableOpacity
+                        style={[styles.menuItem, { marginTop: 5 }]}
+                        onPress={() =>
+                            router.push("/admin/upload-video")
+                        }
+                    >
+                        <MaterialCommunityIcons
+                            name="video"
+                            size={26}
+                            color={Colors.GREEN}
+                            style={styles.icon}
+                        />
+                        <Text
+                            style={[styles.menuLabel, { color: Colors.GREEN }]}
+                        >
+                            Upload Videos
+                        </Text>
+                    </TouchableOpacity>
+                )}
+
                 <View style={styles.divider} />
 
                 <TouchableOpacity
@@ -241,7 +267,7 @@ export const ProfileMenu = ({
             </View>
 
             <Text style={styles.versionText}>
-                App Version {Constants.expoConfig?.version ?? "N/A"}
+                Version {Constants.expoConfig?.version ?? "N/A"}
             </Text>
         </ScrollView>
     );
