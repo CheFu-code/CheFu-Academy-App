@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/react-native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { useEffect } from "react";
 import "./firebase-background-handler";
 
 import FontErrorScreen from "@/component/FontErrorScreen";
@@ -9,6 +10,7 @@ import { useDeepLinking } from "@/hooks/useDeepLinking";
 import { useFirebaseAuthObserver } from "@/hooks/useFirebaseAuthObserver";
 import useLastSeenTracker from "@/hooks/useLastSeenTracker";
 import { useNotifications } from "@/hooks/useNotifications";
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import OfflineScreen from "../component/OfflineScreen";
 import { Colors } from "../constant/Colors";
 import { NetworkProvider, useNetwork } from "../context/NetworkContext";
@@ -27,6 +29,31 @@ Sentry.init({
     ],
 });
 
+const useProtectedRoute = (
+    userDetail: FirebaseAuthTypes.User | null | undefined,
+    authChecked: boolean
+) => {
+    const segments = useSegments();
+    const router = useRouter();
+
+    useEffect(() => {
+        // Wait until the auth state is actually checked before redirecting.
+        if (!authChecked) {
+            return;
+        }
+
+        const inAuthGroup = segments[0] === "auth";
+
+        if (userDetail && inAuthGroup) {
+            // User is signed in and on an auth screen, redirect to home.
+            router.replace("/(tabs)/home");
+        } else if (!userDetail && !inAuthGroup) {
+            // User is not signed in and not on a protected screen, redirect to sign in.
+            router.replace("/auth/signIn");
+        }
+    }, [userDetail, segments, authChecked, router]);
+};
+
 function LayoutContent() {
     const { isConnected } = useNetwork();
 
@@ -42,6 +69,8 @@ function LayoutContent() {
         authChecked,
         authSuccess
     );
+
+    useProtectedRoute(userDetail, authChecked);
 
     useLastSeenTracker();
     useNotifications();
