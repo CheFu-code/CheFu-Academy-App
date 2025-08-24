@@ -28,7 +28,7 @@ export const imageAssets: Record<string, any> = {
     // "/banner6.png": require("../assets/images/banner6.png"),
     "/tech-coding.jpg": require("../assets/images/tech-coding.jpg"),
     "/science-engineering.png": require("../assets/images/science-engineering.png"),
-    "/business-finance.png": require("../assets/images/business-finance.png"),
+    "/business-finance.jpg": require("../assets/images/business-finance.jpg"),
     "/health-fitness.png": require("../assets/images/health-fitness.png"),
     "/arts-creativity.png": require("../assets/images/arts-creativity.png"),
     "/language-communication.png": require("../assets/images/language-communication.png"),

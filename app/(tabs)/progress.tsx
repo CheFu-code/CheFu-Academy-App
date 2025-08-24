@@ -2,13 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
-import {
-    FlatList,
-    Image,
-    Text,
-    ToastAndroid,
-    View
-} from "react-native";
+import { FlatList, Image, Text, ToastAndroid, View } from "react-native";
 import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
 import { Colors } from "../../constant/Colors";
@@ -130,7 +124,7 @@ export default function Progress({ enroll = false }) {
                 source={require("../../assets/images/graph.png")}
                 style={{ position: "absolute", width: "100%", height: 500 }}
             />
-            <View style={{ flex: 1 }}>
+            <View>
                 <Text style={styles.headerText}>Course Progress</Text>
 
                 {courseList.length > 0 ? (

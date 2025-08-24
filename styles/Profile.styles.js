@@ -151,7 +151,7 @@ export const styles = StyleSheet.create({
     common: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 5,
+        gap: 2,
     },
 });
 
