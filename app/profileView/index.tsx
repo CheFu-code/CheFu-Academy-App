@@ -104,7 +104,15 @@ export default function ProfileView() {
     if (loading) {
         return (
             <SafeAreaView style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={Colors.PRIMARY} />
+                <ActivityIndicator
+                    style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flex: 1,
+                    }}
+                    size="large"
+                    color={Colors.PRIMARY}
+                />
             </SafeAreaView>
         );
     }

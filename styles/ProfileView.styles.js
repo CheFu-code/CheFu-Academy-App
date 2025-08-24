@@ -53,6 +53,7 @@ export const styles = StyleSheet.create({
     loadingContainer: {
         flex: 1,
         backgroundColor: Colors.BG_COLOR,
+        
     },
     box: {
         borderColor: Colors.WHITE,

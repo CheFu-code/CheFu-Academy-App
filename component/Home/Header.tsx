@@ -158,12 +158,8 @@ export default function Header() {
                             )}
                         </Text>
 
-                        {/**checkmark icon */}
                         {userDetail?.member === true && (
                             <Ionicons
-                                style={{
-                                    marginTop: 25,
-                                }}
                                 color={Colors.PRIMARY}
                                 size={20}
                                 name="checkmark-circle"
@@ -205,7 +201,7 @@ export default function Header() {
                         onChangeText={setSearchTerm}
                         onSubmitEditing={handleSearch}
                         autoCapitalize="none"
-                        style={[styles.text, { flex: 1, fontFamily:"outfit" }]}
+                        style={[styles.text, { flex: 1, fontFamily: "outfit" }]}
                     />
                     {searchTerm.trim() && (
                         <TouchableOpacity onPress={() => handleSearch()}>

@@ -63,8 +63,9 @@ export default function CourseProgress({
                     <Text
                         style={{
                             fontFamily: "outfit",
-                            color: "white",
-                            fontSize: 15,
+                            fontSize: 14,
+                            color: Colors.PRIMARY,
+                            textDecorationLine: "underline",
                         }}
                     >
                         View All

@@ -1,6 +1,8 @@
 import { Colors } from "@/constant/Colors";
+import { imageAssets } from "@/constant/Option";
+import { UserDetailContext } from "@/context/UserDetailContext";
 import { Course } from "@/types/course";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { getAuth } from "@react-native-firebase/auth";
 import {
     collection,
@@ -8,22 +10,24 @@ import {
     getDocs,
     getFirestore,
     query,
-    where
+    where,
 } from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
-    StyleSheet,
+    Image,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { styles } from "../../styles/MyCourses.styles";
 
 export default function MyCourses() {
     const router = useRouter();
+    const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(true);
     const [myCourses, setMyCourses] = useState<Course[]>([]);
 
@@ -36,8 +40,8 @@ export default function MyCourses() {
 
                 const db = getFirestore();
                 const q = query(
-                    collection(db, "courses"),
-                    where("createdBy", "==", user.uid)
+                    collection(db, "course"),
+                    where("createdBy", "==", user.email)
                 );
                 const snap = await getDocs(q);
 
@@ -58,6 +62,13 @@ export default function MyCourses() {
         fetchMyCourses();
     }, []);
 
+    const isCourseComplete = (course: Course) => {
+        const totalChapters = course.chapters?.length || 0;
+        const completedChapters = course.completedChapter?.length || 0;
+
+        return totalChapters > 0 && totalChapters === completedChapters;
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
@@ -74,7 +85,7 @@ export default function MyCourses() {
                 <ActivityIndicator
                     size="large"
                     color={Colors.PRIMARY}
-                    style={{ marginTop: 20 }}
+                    style={styles.loader}
                 />
             ) : myCourses.length === 0 ? (
                 <View style={styles.emptyBox}>
@@ -83,76 +94,88 @@ export default function MyCourses() {
                     </Text>
                 </View>
             ) : (
-                <FlatList
-                    data={myCourses}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={styles.courseCard}
-                            onPress={() =>
-                                router.push({
-                                    pathname: "/courseView",
-                                    params: {
-                                        courseParams: JSON.stringify(item),
-                                        enroll: "true",
-                                    },
-                                })
-                            }
-                        >
-                            <Text style={styles.courseTitle}>
-                                {item.courseTitle}
-                            </Text>
-                            <Text style={styles.courseCategory}>
-                                {item.category}
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-                />
+                <>
+                    <FlatList
+                        numColumns={2}
+                        data={myCourses}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
+                                style={styles.courseCard}
+                                onPress={() =>
+                                    router.push({
+                                        pathname: "/courseView",
+                                        params: {
+                                            courseParams: JSON.stringify(item),
+                                            enroll: "true",
+                                        },
+                                    })
+                                }
+                            >
+                                {item.banner_image && (
+                                    <>
+                                        <Image
+                                            source={
+                                                imageAssets[item?.banner_image]
+                                            }
+                                            style={styles.bannerImage}
+                                            resizeMode="cover"
+                                        />
+
+                                        {isCourseComplete(item) && (
+                                            <Ionicons
+                                                size={24}
+                                                color={Colors.GREEN}
+                                                name="checkmark-circle"
+                                                style={styles.checkmark}
+                                            />
+                                        )}
+                                    </>
+                                )}
+
+                                <View style={styles.detailsContainer}>
+                                    <Text
+                                        numberOfLines={3}
+                                        style={styles.courseTitle}
+                                    >
+                                        {item.courseTitle}
+                                    </Text>
+
+                                    <View style={styles.chapterContainer}>
+                                        <Text style={styles.chapter}>
+                                            Chapters:{" "}
+                                            {item.chapters?.length || 0}
+                                        </Text>
+
+                                        <Text
+                                            numberOfLines={1}
+                                            style={styles.time}
+                                        >
+                                            {item?.createdOn?.toDate
+                                                ? item.createdOn
+                                                      .toDate()
+                                                      .toLocaleDateString(
+                                                          "en-GB",
+                                                          {
+                                                              day: "2-digit",
+                                                              month: "2-digit",
+                                                              year: "numeric",
+                                                          }
+                                                      )
+                                                : ""}
+                                        </Text>
+                                    </View>
+                                    {isCourseComplete(item) && (
+                                        <Text style={styles.completedBadge}>
+                                            Completed
+                                        </Text>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                    />
+                </>
             )}
         </SafeAreaView>
     );
 }
-
-export const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-        padding: 16,
-    },
-    backButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 16,
-    },
-    backButtonText: {
-        color: Colors.WHITE,
-        fontSize: 18,
-        fontFamily: "outfit-bold",
-    },
-    emptyBox: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    emptyText: {
-        color: Colors.GRAY,
-        fontSize: 16,
-        fontFamily: "outfit",
-    },
-    courseCard: {
-        backgroundColor: Colors.GRAY,
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 12,
-    },
-    courseTitle: {
-        fontSize: 18,
-        color: Colors.WHITE,
-        fontFamily: "outfit-medium",
-    },
-    courseCategory: {
-        fontSize: 14,
-        color: Colors.GRAY,
-    },
-});

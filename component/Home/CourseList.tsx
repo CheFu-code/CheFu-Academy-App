@@ -28,6 +28,7 @@ export default function CourseList({
 }: CourseListProps) {
     const router = useRouter();
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const displayedCourses = courseList.slice(0, 4);
 
     useFocusEffect(
         useCallback(() => {
@@ -53,21 +54,23 @@ export default function CourseList({
     return (
         <View
             style={{
-                // marginTop: 15,
                 pointerEvents: loadingId ? "none" : "auto",
             }}
         >
-            <Text
+            <View
                 style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: 25,
-                    color: Colors.PRIMARY,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                 }}
             >
-                {heading}
-            </Text>
+                <Text style={styles.heading}>{heading}</Text>
+                <TouchableOpacity onPress={() => router.push("/myCourses")}>
+                    <Text style={styles.viewAll}>View All</Text>
+                </TouchableOpacity>
+            </View>
             <FlatList
-                data={courseList}
+                data={displayedCourses}
                 keyExtractor={(item, index) =>
                     item.id?.toString() || item.courseTitle || index.toString()
                 }
@@ -78,7 +81,6 @@ export default function CourseList({
                         loadingId === (item.id || item.courseTitle || "");
                     return (
                         <TouchableOpacity
-                            // key={item.id || index}
                             style={styles.courseContainer}
                             onPress={() => handlePress(item)}
                             disabled={Boolean(loadingId)}
@@ -167,5 +169,16 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.GREEN,
         margin: 6,
         borderRadius: 15,
+    },
+    heading: {
+        fontFamily: "outfit-bold",
+        fontSize: 25,
+        color: Colors.PRIMARY,
+    },
+    viewAll: {
+        fontFamily: "outfit",
+        fontSize: 14,
+        color: Colors.PRIMARY,
+        textDecorationLine: "underline",
     },
 });

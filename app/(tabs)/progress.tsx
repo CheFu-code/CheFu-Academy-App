@@ -2,7 +2,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { FlatList, Image, Text, ToastAndroid, View } from "react-native";
+import {
+    FlatList,
+    Image,
+    Text,
+    ToastAndroid,
+    View
+} from "react-native";
 import NoCourse from "../../component/Home/NoCourse";
 import CourseProgressCard from "../../component/Shared/CourseProgressCard";
 import { Colors } from "../../constant/Colors";
@@ -20,13 +26,14 @@ import {
 } from "@react-native-firebase/firestore";
 import LottieView from "lottie-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { styles } from "../../styles/Progress.styles";
 
 export default function Progress({ enroll = false }) {
     const [courseList, setCourseList] = useState<Course[]>([]);
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
-    const [fetching, setFetching] = useState(false); 
+    const [fetching, setFetching] = useState(false);
     const router = useRouter();
 
     useFocusEffect(
@@ -94,7 +101,7 @@ export default function Progress({ enroll = false }) {
                 pathname: "/courseView",
                 params: {
                     courseParams: JSON.stringify(item),
-                    enroll: enroll ? "true" : "false", 
+                    enroll: enroll ? "true" : "false",
                 },
             });
         }, 100);
@@ -102,14 +109,7 @@ export default function Progress({ enroll = false }) {
 
     if (loading && courseList.length === 0) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: Colors.BG_COLOR,
-                }}
-            >
+            <View style={styles.loadingContainer}>
                 <LottieView
                     autoPlay
                     loop
@@ -119,37 +119,19 @@ export default function Progress({ enroll = false }) {
                         height: 150,
                     }}
                 />
-                <Text
-                    style={{
-                        marginTop: 10,
-                        fontFamily: "outfit-bold",
-                        fontSize: 16,
-                        color: Colors.PRIMARY,
-                    }}
-                >
-                    Loading your progress...
-                </Text>
+                <Text style={styles.loadingText}>Loading your progress...</Text>
             </View>
         );
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
             <Image
                 source={require("../../assets/images/graph.png")}
                 style={{ position: "absolute", width: "100%", height: 500 }}
             />
-            <SafeAreaView style={{ flex: 1, padding: 15 }}>
-                <Text
-                    style={{
-                        fontFamily: "outfit-bold",
-                        fontSize: 24,
-                        color: Colors.PRIMARY,
-                        letterSpacing: 1,
-                    }}
-                >
-                    Course Progress
-                </Text>
+            <View style={{ flex: 1 }}>
+                <Text style={styles.headerText}>Course Progress</Text>
 
                 {courseList.length > 0 ? (
                     <FlatList
@@ -172,11 +154,12 @@ export default function Progress({ enroll = false }) {
                                 />
                             );
                         }}
+                        contentContainerStyle={{ padding: 10 }}
                     />
                 ) : (
                     !loading && <NoCourse />
                 )}
-            </SafeAreaView>
-        </View>
+            </View>
+        </SafeAreaView>
     );
 }
