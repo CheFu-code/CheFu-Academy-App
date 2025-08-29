@@ -10,6 +10,9 @@ export type Video = {
     uploadedAt: FirebaseFirestoreTypes.Timestamp;
     category: string;
     visibility: "public" | "private";
+    duration: number;   // in seconds
+    views: number;      // view count
+    topics: string[];
 };
 
 export type VideoCardProps = {
@@ -29,7 +32,25 @@ export type UploadFormProps = {
     category: string | null;
     setCategory: (cat: string | null) => void;
     visibility: string | null;
-    setVisibility: (vis: string | null) => void;
+    setVisibility: React.Dispatch<React.SetStateAction<"public" | "private" | null>>;
     loading: boolean;
     setLoading: (loading: boolean) => void;
+    duration: number;
+    setDuration: (d: number) => void;
+    views: number;
+    setViews: (views: number) => void;
+    topics: string[];
+    setTopics: (topics: string[]) => void;
 };
+
+export type UserReviews = {
+    id: string;
+    videoId: string;
+    email: string;
+    userId: string;
+    rating: number; // 1 to 5
+    comment: string;
+    createdAt: FirebaseFirestoreTypes.Timestamp | FirebaseFirestoreTypes.FieldValue;
+    username: string;
+    avatar: string;
+}

@@ -35,7 +35,8 @@ export const styles = StyleSheet.create({
         fontSize: 10,
         color: Colors.BLACK,
         fontFamily: "outfit-bold",
-        marginRight: 5,
+        justifyContent: "flex-end",
+        right: 5,
     },
     creatorProfilePicWrapper: {
         position: "absolute",

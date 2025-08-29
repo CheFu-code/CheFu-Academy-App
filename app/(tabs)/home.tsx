@@ -1,4 +1,5 @@
 import ErrorModal from "@/component/Shared/ErrorModal";
+import VideoCardHomeScreen from "@/component/Video/VideoCardHomeScreen";
 import { Course } from "@/types/course";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -428,6 +429,7 @@ export default function Home() {
                                     <CourseProgress courseList={courseList} />
                                     <PracticeSection />
                                     <CourseList courseList={courseList} />
+                                    <VideoCardHomeScreen />
                                 </>
                             )}
                         </View>

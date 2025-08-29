@@ -1,14 +1,16 @@
 import { Colors } from "@/constant/Colors";
 import { VideoCategory } from "@/constant/Option";
 import { UploadFormProps } from "@/types/video";
-import React from "react";
+import React, { useState } from "react";
 import {
     ActivityIndicator,
     ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
+    View,
 } from "react-native";
+import { createThumbnail } from "react-native-create-thumbnail";
 import { Dropdown } from "react-native-element-dropdown";
 import ImagePicker from "react-native-image-crop-picker";
 import { styles } from "../../styles/UploadVideo.styles";
@@ -29,7 +31,22 @@ export default function UploadForm({
     setVisibility,
     loading,
     setLoading,
+    duration,
+    setDuration,
+    views,
+    setViews,
+    topics,
+    setTopics,
 }: UploadFormProps) {
+    const [newTopic, setNewTopic] = useState("");
+
+    const addTopic = () => {
+        const topic = newTopic.trim();
+        if (topic && !topics.includes(topic)) {
+            setTopics([...topics, topic]);
+            setNewTopic("");
+        }
+    };
     const pickVideo = async () => {
         setLoading(true);
         try {
@@ -39,6 +56,12 @@ export default function UploadForm({
             });
             if (res && res.path) {
                 setVideoUri(res.path);
+
+                const info: any = await createThumbnail({ url: res.path });
+
+                if (info?.duration) {
+                    setDuration(Math.floor(info.duration / 1000));
+                }
             }
         } catch (err) {
             console.log("Video picking cancelled or failed:", err);
@@ -51,12 +74,10 @@ export default function UploadForm({
         setLoading(true);
         try {
             const res = await ImagePicker.openPicker({
-                width: 500, // Crop width
-                height: 500, // Crop height
                 cropping: true, // Enable cropping
                 mediaType: "photo", // Only allow photos
-                compressImageMaxWidth: 1024, // Resize image max width
-                compressImageMaxHeight: 1024, // Resize image max height
+                // compressImageMaxWidth: 1024, // Resize image max width
+                // compressImageMaxHeight: 1024, // Resize image max height
                 compressImageQuality: 1, // Compress image quality (0-1)
                 includeBase64: false, // Return base64 string if true
                 includeExif: true, // Include EXIF metadata
@@ -97,6 +118,62 @@ export default function UploadForm({
                 onChangeText={setTitle}
             />
             <TextInput
+                style={styles.input}
+                placeholder="Add a topic"
+                placeholderTextColor={Colors.WHITE}
+                value={newTopic}
+                onChangeText={setNewTopic}
+                onSubmitEditing={addTopic}
+            />
+            {newTopic.trim() && (
+                <TouchableOpacity
+                    style={[styles.button, { marginVertical: 10 }]}
+                    onPress={addTopic}
+                >
+                    <Text style={styles.buttonText}>Add Topic</Text>
+                </TouchableOpacity>
+            )}
+
+            {/* {topics.length > 0 && (
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={{ marginBottom: 20, marginTop: 10 }}
+                >
+                    {topics.map((t) => (
+                        <View key={t} style={styles.topicBadge}>
+                            <Text style={styles.topicText}>{t}</Text>
+                        </View>
+                    ))}
+                </ScrollView>
+            )} */}
+            <View
+                style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    marginTop: 20,
+                }}
+            >
+                {topics.map((t) => (
+                    <TouchableOpacity
+                        key={t}
+                        style={[
+                            styles.topicBadge,
+                            {
+                                backgroundColor: "green",
+                                marginVertical: 3,
+                            },
+                        ]}
+                        onPress={() =>
+                            setTopics(topics.filter((topic) => topic !== t))
+                        }
+                    >
+                        <Text style={styles.topicText}>{t} ✕</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+
+            <TextInput
                 multiline
                 style={styles.input2}
                 placeholder="Write a description"
@@ -104,30 +181,31 @@ export default function UploadForm({
                 value={description}
                 onChangeText={setDescription}
             />
-
-            <Dropdown
-                style={styles.dropdown}
-                placeholder="Select a category"
-                placeholderStyle={styles.placeholder}
-                data={VideoCategory}
-                labelField="label"
-                valueField="value"
-                value={category}
-                onChange={(item) => setCategory(item.value)}
-            />
-            <Dropdown
-                style={styles.dropdown}
-                placeholder="Set visibility"
-                placeholderStyle={styles.placeholder}
-                data={[
-                    { label: "Public", value: "public" },
-                    { label: "Private", value: "private" },
-                ]}
-                labelField="label"
-                valueField="value"
-                value={visibility}
-                onChange={(item) => setVisibility(item.value)}
-            />
+            <View style={styles.dropdownContainer}>
+                <Dropdown
+                    style={styles.dropdown}
+                    placeholder="Select a category"
+                    placeholderStyle={styles.placeholder}
+                    data={VideoCategory}
+                    labelField="label"
+                    valueField="value"
+                    value={category}
+                    onChange={(item) => setCategory(item.value)}
+                />
+                <Dropdown
+                    style={styles.dropdown}
+                    placeholder="Set visibility"
+                    placeholderStyle={styles.placeholder}
+                    data={[
+                        { label: "Public", value: "public" },
+                        { label: "Private", value: "private" },
+                    ]}
+                    labelField="label"
+                    valueField="value"
+                    value={visibility}
+                    onChange={(item) => setVisibility(item.value)}
+                />
+            </View>
 
             {!videoUri && (
                 <TouchableOpacity

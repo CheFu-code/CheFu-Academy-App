@@ -2,7 +2,12 @@ import CourseCard from "@/component/Shared/CourseCard";
 import { Colors } from "@/constant/Colors";
 import { Course } from "@/types/course";
 import { AntDesign } from "@expo/vector-icons";
-import firestore from "@react-native-firebase/firestore";
+import {
+    collection,
+    FirebaseFirestoreTypes,
+    getDocs,
+    getFirestore,
+} from "@react-native-firebase/firestore";
 import { router, useLocalSearchParams } from "expo-router";
 import LottieView from "lottie-react-native";
 import React, { useEffect, useState } from "react";
@@ -13,17 +18,17 @@ export default function SearchScreen() {
     const [results, setResults] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const category = results[0]?.category;
+    const db = getFirestore();
 
-    const fetchCourses = async () => {
+    const fetchCourses = async (query: string | string[]) => {
         try {
             const term = Array.isArray(query) ? query[0] : query || "";
 
-            const snapshot = await firestore().collection("course").get();
+            const snapshot = await getDocs(collection(db, "course"));
 
-            const filtered = snapshot.docs
-                .map((doc) => {
+            const filtered: Course[] = snapshot.docs
+                .map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
                     const data = doc.data();
-
                     return {
                         id: doc.id,
                         docId: doc.id,
@@ -41,9 +46,8 @@ export default function SearchScreen() {
                         enrolled: data.enrolled,
                     };
                 })
-
                 .filter(
-                    (course) =>
+                    (course: Course) =>
                         course.courseTitle
                             ?.toLowerCase()
                             .includes(term.toLowerCase()) ||
@@ -61,7 +65,7 @@ export default function SearchScreen() {
     };
 
     useEffect(() => {
-        fetchCourses();
+        fetchCourses(query);
     }, [query]);
 
     if (loading)

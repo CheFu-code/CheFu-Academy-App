@@ -1,10 +1,13 @@
 import { Colors } from "@/constant/Colors";
 import { styles } from "@/styles/ProfileView.styles";
+import { Course } from "@/types/course";
 import { User } from "@/types/user";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import {
     collection,
+    doc,
     FirebaseFirestoreTypes,
+    getDoc,
     getDocs,
     getFirestore,
     query,
@@ -23,52 +26,53 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileView() {
-    const { userId } = useLocalSearchParams<{ userId: string }>();
     const router = useRouter();
-    const [userData, setUserData] = useState<User | null>(null);
+    const { userId } = useLocalSearchParams<{ userId: string }>();
     const [loading, setLoading] = useState(true);
+    const [userData, setUserData] = useState<User | null>(null);
     const [progress, setProgress] = useState(0);
     const [coursesCount, setCoursesCount] = useState(0);
     const [completedCount, setCompletedCount] = useState(0);
     const [completedChaptersCount, setCompletedChaptersCount] = useState(0);
+    const db = getFirestore();
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userDoc = await getFirestore()
-                    .collection("users")
-                    .doc(userId)
-                    .get();
+                // Get user document
+                const userRef = doc(db, "users", userId);
+                const userSnap = await getDoc(userRef);
 
-                if (userDoc.exists()) {
-                    setUserData(userDoc.data() as User);
+                if (userSnap.exists()) {
+                    setUserData(userSnap.data() as User);
                 } else {
                     setUserData(null);
                 }
 
-                // Fetch courses created by this user
-                const coursesSnap = await getDocs(
-                    query(
-                        collection(getFirestore(), "course"),
-                        where("createdBy", "==", userId)
-                    )
+                // Get courses created by this user
+                const coursesQuery = query(
+                    collection(db, "course"),
+                    where("createdBy", "==", userId)
                 );
+                const coursesSnap = await getDocs(coursesQuery);
+
                 setCoursesCount(coursesSnap.size);
 
                 let completedCourses = 0;
                 let completedChapters = 0;
-                let totalChapters = 0; // total chapters across all courses
+                let totalChapters = 0;
 
                 coursesSnap.forEach(
-                    (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
-                        const course = doc.data();
+                    (
+                        docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>
+                    ) => {
+                        const course = docSnap.data();
                         const courseChapters = course.chapters?.length || 0;
                         const completedChaptersInCourse =
                             course.completedChapter?.length || 0;
 
                         totalChapters += courseChapters;
 
-                        // Count fully completed courses
                         if (
                             courseChapters > 0 &&
                             completedChaptersInCourse === courseChapters
@@ -76,7 +80,6 @@ export default function ProfileView() {
                             completedCourses += 1;
                         }
 
-                        // Count completed chapters
                         completedChapters += completedChaptersInCourse;
                     }
                 );
@@ -84,13 +87,11 @@ export default function ProfileView() {
                 setCompletedCount(completedCourses);
                 setCompletedChaptersCount(completedChapters);
 
-                // Calculate progress percentage
                 const progressPercent =
                     totalChapters > 0
                         ? Math.round((completedChapters / totalChapters) * 100)
                         : 0;
-
-                setProgress(progressPercent); // you'll need a state for progress
+                setProgress(progressPercent);
             } catch (err) {
                 console.log("Error fetching user data:", err);
             } finally {

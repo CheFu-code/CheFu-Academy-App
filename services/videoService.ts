@@ -1,6 +1,18 @@
 import { Video } from "@/types/video";
 import { getAuth } from "@react-native-firebase/auth";
-import { collection, doc, FirebaseFirestoreTypes, getDocs, getFirestore, orderBy, query, serverTimestamp, setDoc, where } from "@react-native-firebase/firestore";
+import {
+    collection,
+    doc,
+    FirebaseFirestoreTypes,
+    getDoc,
+    getDocs,
+    getFirestore,
+    orderBy,
+    query,
+    serverTimestamp,
+    setDoc,
+    where,
+} from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import uuid from "react-native-uuid";
 
@@ -10,7 +22,11 @@ export const uploadVideo = async (
     videoUri: string,
     thumbnailUri: string,
     category: string,
-    visibility: string
+    visibility: "public" | "private",
+    duration: number,
+    views: number = 0, // default to 0 if not provided
+    topics: string[],
+
 ) => {
     const db = getFirestore();
     const auth = getAuth();
@@ -34,6 +50,9 @@ export const uploadVideo = async (
         uploadedBy: user.email,
         uploadedAt: serverTimestamp(),
         visibility,
+        duration,
+        views,
+        topics,
     });
 
     return true;
@@ -49,10 +68,45 @@ export const fetchVideos = async (): Promise<Video[]> => {
     const db = getFirestore();
     const q = query(
         collection(db, "videos"),
-        where("visibility", "==", "public"),
+        where("visibility", "==", "public"), // ✅ usually show only public
         orderBy("uploadedAt", "desc")
     );
 
     const snap = await getDocs(q);
     return snap.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => doc.data() as Video);
 };
+
+export const fetchVideoById = async (videoId: string): Promise<Video | null> => {
+    const db = getFirestore();
+    try {
+        const docRef = doc(db, "videos", videoId);
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+            console.log("Video not found");
+            return null;
+        }
+
+        const data = docSnap.data();
+        if (!data) return null;
+
+        return {
+            id: docSnap.id,
+            title: data.title,
+            description: data.description,
+            videoURL: data.videoURL,
+            thumbnailURL: data.thumbnailURL,
+            uploadedBy: data.uploadedBy,
+            uploadedAt: data.uploadedAt, // Firestore Timestamp
+            category: data.category,
+            visibility: data.visibility,
+            duration: data.duration ?? 0,
+            views: data.views ?? 0,
+            topics: data.topics ?? [],
+        } as Video;
+    } catch (error) {
+        console.error("Error fetching video:", error);
+        return null;
+    }
+};
+

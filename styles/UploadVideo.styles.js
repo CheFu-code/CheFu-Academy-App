@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 12,
         marginTop: 10,
-        color: Colors.YELLOW,
+        color: Colors.BLACK,
         fontFamily: "outfit",
         fontSize: 16,
     },
@@ -42,10 +42,10 @@ export const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 12,
         marginTop: 10,
-        color: Colors.YELLOW,
+        color: Colors.BLACK,
         fontFamily: "outfit",
         fontSize: 16,
-        height: 150,
+        height: 100,
         textAlign: "justify",
     },
     form: {
@@ -55,9 +55,14 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_GRAY,
         borderRadius: 10,
         paddingHorizontal: 12,
-        paddingVertical: 14,
+        paddingVertical: 10,
         borderRadius: 10,
-        marginTop: 15,
+        marginTop: 10,
+        width:"60%"
+    },
+    dropdownContainer: {
+        marginTop: 35,
+        alignItems: "flex-end",
     },
     dropdownPlaceholder: {
         color: Colors.LIGHT_GRAY,
@@ -91,5 +96,16 @@ export const styles = StyleSheet.create({
     placeholder: {
         fontFamily: "outfit",
         fontSize: 16,
+    },
+    topicBadge: {
+        backgroundColor: Colors.GRAY,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 15,
+        marginRight: 10,
+    },
+    topicText: {
+        color: Colors.WHITE,
+        fontSize: 14,
     },
 });

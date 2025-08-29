@@ -10,7 +10,7 @@ import { useDeepLinking } from "@/hooks/useDeepLinking";
 import { useFirebaseAuthObserver } from "@/hooks/useFirebaseAuthObserver";
 import useLastSeenTracker from "@/hooks/useLastSeenTracker";
 import { useNotifications } from "@/hooks/useNotifications";
-import { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import { UserDetail } from "@/types/UserDetail";
 import OfflineScreen from "../component/OfflineScreen";
 import { Colors } from "../constant/Colors";
 import { NetworkProvider, useNetwork } from "../context/NetworkContext";
@@ -30,7 +30,7 @@ Sentry.init({
 });
 
 const useProtectedRoute = (
-    userDetail: FirebaseAuthTypes.User | null | undefined,
+    userDetail: UserDetail | null | undefined,
     authChecked: boolean
 ) => {
     const segments = useSegments();
@@ -71,7 +71,6 @@ function LayoutContent() {
     );
 
     useProtectedRoute(userDetail, authChecked);
-
     useLastSeenTracker();
     useNotifications();
     useDeepLinking();
