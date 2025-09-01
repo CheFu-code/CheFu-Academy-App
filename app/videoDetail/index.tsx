@@ -1,7 +1,6 @@
 import AppModal from "@/component/Shared/AppModal";
 import Button from "@/component/Shared/Button";
 import OverView from "@/component/VideoDetail/OverView";
-import Resources from "@/component/VideoDetail/Resources";
 import Reviews from "@/component/VideoDetail/Reviews";
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
@@ -63,7 +62,9 @@ export default function VideoDetail() {
     const uploadedAtText = video?.uploadedAt?.toDate().toLocaleDateString();
 
     const [activeTab, setActiveTab] = useState<
-        "Overview" | "Resources" | "Reviews"
+        | "Overview"
+        // "Resources" |
+        | "Reviews"
     >("Overview");
 
     const [showDeleteModal, setShowDeleteModal] = useState({
@@ -76,8 +77,8 @@ export default function VideoDetail() {
         switch (activeTab) {
             case "Overview":
                 return <OverView video={video} />;
-            case "Resources":
-                return <Resources video={video} />;
+            // case "Resources":
+            // return <Resources video={video} />;
             case "Reviews":
                 return <Reviews video={video} />;
             default:
@@ -299,7 +300,9 @@ export default function VideoDetail() {
                 reportedAt: serverTimestamp(),
             });
 
+            setReportReason("");
             showToast("Video reported successfully!");
+            setShowReportModal(false);
         } catch (error) {
             console.error("Report failed:", error);
             showToast("Failed to report video.");
@@ -447,7 +450,11 @@ export default function VideoDetail() {
 
                 {/* Tabs */}
                 <View style={styles.section}>
-                    {["Overview", "Resources", "Reviews"].map((tab) => (
+                    {[
+                        "Overview",
+                        // "Resources",
+                        "Reviews",
+                    ].map((tab) => (
                         <TouchableOpacity
                             key={tab}
                             style={[
@@ -604,20 +611,48 @@ export default function VideoDetail() {
                         <View
                             style={{
                                 flexDirection: "row",
-                                justifyContent: "space-between",
+                                alignItems: "center",
+                                gap: 12,
+                                justifyContent: "flex-end",
                             }}
                         >
                             <TouchableOpacity
+                                disabled={reporting}
                                 onPress={() => setShowReportModal(false)}
                             >
-                                <Text style={{ color: Colors.GRAY }}>
+                                <Text
+                                    style={{
+                                        color: Colors.GRAY,
+                                        opacity: reporting ? 0.5 : 1,
+                                    }}
+                                >
                                     Cancel
                                 </Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={handleReport}>
-                                <Text style={{ color: Colors.RED }}>
-                                    Report
-                                </Text>
+                            <TouchableOpacity
+                                style={{
+                                    backgroundColor: Colors.LIGHT_RED,
+                                    padding: 8,
+                                    borderRadius: 8,
+                                }}
+                                disabled={reporting}
+                                onPress={handleReport}
+                            >
+                                {reporting ? (
+                                    <ActivityIndicator
+                                        size={"small"}
+                                        color={Colors.GREEN}
+                                    />
+                                ) : (
+                                    <Text
+                                        style={{
+                                            color: Colors.RED,
+                                            opacity: reporting ? 0.5 : 1,
+                                        }}
+                                    >
+                                        Report
+                                    </Text>
+                                )}
                             </TouchableOpacity>
                         </View>
                     </View>
