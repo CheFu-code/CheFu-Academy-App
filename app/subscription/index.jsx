@@ -49,7 +49,7 @@ export default function SubscriptionWall() {
                               ? "15.00"
                               : "6.00",
                     planType: selectedPlan,
-                    return_url: returnUrl, // ✅ add this
+                    return_url: returnUrl, 
                 }),
             });
 

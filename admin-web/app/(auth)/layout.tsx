@@ -51,7 +51,7 @@ export default function AuthLayout({
                 <div className="text-balance text-center text-xs text-muted-foreground">
                     By clicking continue you agree to our{" "}
                     <Link
-                        href={"/terms"}
+                        href={"/settings/terms-service"}
                         className="hover:text-primary hover:underline font-medium"
                     >
                         Terms of Service

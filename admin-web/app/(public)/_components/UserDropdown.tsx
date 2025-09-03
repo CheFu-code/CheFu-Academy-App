@@ -49,7 +49,7 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                             alt="Profile image"
                         />
                         <AvatarFallback>
-                            {user?.fullname?.[0] || "U"}
+                            {user?.fullname?.[0] || "CA"}
                         </AvatarFallback>
                     </Avatar>
                     <ChevronDownIcon

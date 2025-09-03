@@ -55,7 +55,7 @@ export default function CourseProgress({
                         color: Colors.PRIMARY,
                     }}
                 >
-                    Your Progress
+                    My Progress
                 </Text>
                 <TouchableOpacity
                     onPress={() => router.push("/(tabs)/progress")}

@@ -23,7 +23,7 @@ interface CourseListProps {
 
 export default function CourseList({
     courseList,
-    heading = "Your Courses",
+    heading = "My Courses",
     enroll = false,
 }: CourseListProps) {
     const router = useRouter();

@@ -20,6 +20,7 @@ export interface User {
     roles: string[];
     subscriptionStatus: string;
     uid: string;
+    memberUntil?: FirebaseFirestoreTypes.Timestamp;
     emailPreferences: {
         activity: boolean;
         general: boolean;
@@ -40,6 +41,7 @@ export interface User {
         screenWidth: number;
         totalMemory: number;
     };
+
 }
 
 

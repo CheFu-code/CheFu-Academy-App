@@ -11,7 +11,7 @@ admin.initializeApp({
 
 const router = express.Router();
 
-const PAYPAL_API = "https://api-m.paypal.com"; // Live (Production)
+const PAYPAL_API = "https://api-m.paypal.com"; 
 const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 if (!CLIENT_ID || !CLIENT_SECRET) {
@@ -144,7 +144,7 @@ router.post("/capture-order", async (req, res) => {
         const db = admin.firestore();
 
         const emailSafe = email.replace(/[@.]/g, "_"); // Replace unsafe characters
-        const id = `${emailSafe}_${orderID}`; // Join with underscore
+        const id = `${emailSafe}_${orderID}`; 
 
         await db.collection("payments").doc(id).set({
             email,

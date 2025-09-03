@@ -1,3 +1,4 @@
+import TrackUser from "@/components/TrackUser";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import type { Metadata } from "next";
@@ -35,6 +36,7 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
+                    <TrackUser />
                     {children}
                     <Toaster />
                 </ThemeProvider>

@@ -6,23 +6,27 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { getCoursesForLoggedInUser } from "@/lib/getCoursesForLoggedInUser";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { getCourses } from "@/lib/getCourses";
 import { Course } from "@/types/course";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function CoursesPage() {
     const [courses, setCourses] = useState<Course[]>([]);
+    const { user, loading } = useAuthUser();
+    const router = useRouter();
 
     useEffect(() => {
         (async () => {
-            const data = await getCoursesForLoggedInUser();
+            const data = await getCourses();
             setCourses(data);
         })();
     }, []);
 
     return (
         <div className="min-h-screen px-4 py-8">
-            <h1 className="text-3xl font-bold mb-6 text-center">My Courses</h1>
+            <h1 className="text-3xl font-bold mb-6 text-center">Courses</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {courses.length > 0 ? (
