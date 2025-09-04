@@ -48,17 +48,33 @@ export default function LoginForm() {
 
                 toast.success("Login successful!");
                 router.replace("/courses"); // redirect after login
-            } catch (error: any) {
-                if (error.code === "auth/popup-closed-by-user") {
-                    toast.error("Login cancelled by user.");
-                } else if (error.code === "auth/invalid-credential") {
-                    toast.error(
-                        "Invalid credentials. Check your Google OAuth setup."
-                    );
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    console.error("Google login failed:", error);
+
+                    // Some Firebase auth errors come as objects with `code`
+                    const firebaseError = error as {
+                        code?: string;
+                        message?: string;
+                    };
+
+                    if (firebaseError.code === "auth/popup-closed-by-user") {
+                        toast.error("Login cancelled by user.");
+                    } else if (
+                        firebaseError.code === "auth/invalid-credential"
+                    ) {
+                        toast.error(
+                            "Invalid credentials. Check your Google OAuth setup."
+                        );
+                    } else {
+                        toast.error(
+                            "Google login failed. Please try again later."
+                        );
+                    }
                 } else {
-                    toast.error("Google login failed. Please try again later.");
+                    console.error("Unknown error during Google login:", error);
+                    toast.error("Unexpected error occurred. Please try again.");
                 }
-                console.error("Google login failed:", error);
             }
         });
     };

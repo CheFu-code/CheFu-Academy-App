@@ -19,7 +19,7 @@ export default function Page({ children }: { children: React.ReactNode }) {
         if (!loading && !user) {
             router.replace("/login");
         }
-    }, [loading, user]);
+    }, [loading, user, router]);
 
     return (
         <div className="[--header-height:calc(--spacing(14))]">
