@@ -100,7 +100,6 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { User } from "@/types/user";
 
 export const schema = z.object({
     id: z.number(),
@@ -353,8 +352,10 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
     );
 }
 
-export function DataTable({ user: initialData }: { user: User }) {
-    const [data, setData] = React.useState<User[]>([]);
+type TableRow = z.infer<typeof schema>;
+
+export function DataTable({ user: initialData }: { user: TableRow }) {
+    const [data, setData] = React.useState<TableRow[]>([]);
     const [rowSelection, setRowSelection] = React.useState({});
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
