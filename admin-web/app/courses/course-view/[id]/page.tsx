@@ -81,7 +81,9 @@ const CourseView = ({ course: initialCourse }: { course?: Course }) => {
     if (loading)
         return (
             <div className="text-center font-bold mt-9 justify-center items-center flex-col flex h-full">
-                <p className="animate-bounce text-green-500">Loading course...</p>
+                <p className="animate-bounce text-green-500">
+                    Loading course...
+                </p>
                 <Loader className="inline-block ml-2 animate-spin" />
             </div>
         );
@@ -158,7 +160,7 @@ const CourseView = ({ course: initialCourse }: { course?: Course }) => {
                                     {chapter.chapterName}
                                 </CardTitle>
                                 <CardDescription className="text-xs text-muted-foreground line-clamp-3">
-                                    {chapter.content[0]?.explain}
+                                    {chapter.content[0]?.explain as string}
                                 </CardDescription>
                                 {isCompleted && (
                                     <Badge

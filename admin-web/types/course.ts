@@ -8,7 +8,10 @@ export interface Flashcard {
 }
 
 export interface ChapterContentItem {
-    [key: string]: unknown;
+    topic?: string;
+    explain?: string;
+    code?: string;
+    example?: string;
 }
 
 export interface Chapter {
@@ -34,7 +37,7 @@ export interface Course {
     chapters: Chapter[];
     courseTitle: string;
     createdBy: string;
-    createdOn?: FirebaseFirestoreTypes.Timestamp; 
+    createdOn?: FirebaseFirestoreTypes.Timestamp;
     description: string;
     docId: string;
     enrolled: boolean;
