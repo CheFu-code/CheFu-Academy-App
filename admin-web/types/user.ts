@@ -1,4 +1,4 @@
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 
 export interface User {
     id: string;
@@ -7,20 +7,20 @@ export interface User {
     profilePicture?: string;
     bio?: string;
     country?: string;
-    createdAt: FirebaseFirestoreTypes.Timestamp;
-    updatedAt: FirebaseFirestoreTypes.Timestamp;
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
     fcmToken?: string;
     isVerified: boolean;
     language: string;
-    lastLogin: FirebaseFirestoreTypes.Timestamp;
-    lastSeen: FirebaseFirestoreTypes.Timestamp;
+    lastLogin: Timestamp;
+    lastSeen: Timestamp;
     member: boolean;
     onboardingComplete: boolean;
     provider: string;
     roles: string[];
     subscriptionStatus: string;
     uid: string;
-    memberUntil?: FirebaseFirestoreTypes.Timestamp;
+    memberUntil?: Timestamp;
     emailPreferences: {
         activity: boolean;
         general: boolean;

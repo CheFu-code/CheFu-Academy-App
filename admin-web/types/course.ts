@@ -1,6 +1,6 @@
 // app/types/course.ts
 
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 
 export interface Flashcard {
     front: string;
@@ -37,7 +37,7 @@ export interface Course {
     chapters: Chapter[];
     courseTitle: string;
     createdBy: string;
-    createdOn?: FirebaseFirestoreTypes.Timestamp;
+    createdOn?: Timestamp;
     description: string;
     docId: string;
     enrolled: boolean;
