@@ -58,7 +58,7 @@ export default function AuthLayout({
                     </Link>{" "}
                     and{" "}
                     <Link
-                        href={"/settings/privacy"}
+                        href={"/settings/privacy-policy"}
                         className="hover:text-primary hover:underline font-medium"
                     >
                         Privacy Policy
