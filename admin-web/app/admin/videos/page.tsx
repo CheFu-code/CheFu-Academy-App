@@ -12,7 +12,7 @@ const VideosCreationPage = () => {
                 </Link>
             </div>
 
-            <div>here we'll display all videos</div>
+            <div>here we&apos;ll display all videos</div>
         </>
     );
 };

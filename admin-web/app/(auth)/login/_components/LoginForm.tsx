@@ -26,7 +26,6 @@ export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailPending, startEmailTransition] = useTransition();
-    const [githubPending, startGithubTransition] = useTransition();
     const [googlePending, startGoogleTransition] = useTransition();
     const router = useRouter();
 

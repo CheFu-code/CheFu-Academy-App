@@ -8,7 +8,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import UserDropdown from "./UserDropdown";
 
@@ -34,7 +33,6 @@ const navigationItems = [
 export default function Navbar() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true); // <-- track loading
-    const router = useRouter();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {

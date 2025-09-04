@@ -249,7 +249,7 @@ const Terms = () => {
                                     </li>
                                     <li>Phone: +27 (60) 603-1205</li>
                                     <li>
-                                        Address: 145 CheFu's Street, Dinga,
+                                        Address: 145 CheFu&apos;s Street, Dinga,
                                         South Africa
                                     </li>
                                 </ul>

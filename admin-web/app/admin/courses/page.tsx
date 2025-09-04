@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div>
-                here we'll display all courses
+                here we&apos;ll display all courses
             </div>
         </>
     );

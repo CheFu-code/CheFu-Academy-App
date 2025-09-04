@@ -57,9 +57,14 @@ const SecurityTab = () => {
             await user.delete();
             alert("Your account has been deleted.");
             setOpenDelete(false);
-        } catch (error: any) {
-            console.error("Error deleting account:", error);
-            alert(error.message || "Failed to delete account.");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Error deleting account:", error);
+                alert(error.message || "Failed to delete account.");
+            } else {
+                console.error("Unexpected error:", error);
+                alert("Failed to delete account.");
+            }
         } finally {
             setLoadingDelete(false);
             setDeletePassword("");
@@ -86,13 +91,14 @@ const SecurityTab = () => {
 
             alert("Your password has been updated.");
             setOpenChange(false);
-        } catch (error: any) {
-            console.error("Error updating password:", error);
-            alert(error.message || "Failed to change password.");
-        } finally {
-            setLoadingChange(false);
-            setCurrentPassword("");
-            setNewPassword("");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Error updating password:", error);
+                alert(error.message || "Failed to change password.");
+            } else {
+                console.error("Unexpected error:", error);
+                alert("Failed to change password.");
+            }
         }
     };
 
@@ -127,7 +133,8 @@ const SecurityTab = () => {
                                     <span className="text-red-500 font-medium text-xs">
                                         Note: Changing your password will log
                                         out all other devices currently signed
-                                        in with this account. This helps you keep your account secure.
+                                        in with this account. This helps you
+                                        keep your account secure.
                                     </span>
                                 </DialogDescription>
                             </DialogHeader>

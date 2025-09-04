@@ -14,7 +14,7 @@ const Support = () => {
         <div className="max-w-3xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
             <h1 className="text-2xl sm:text-3xl font-bold">Support</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-                We're here to help. Find answers to common questions or reach
+                We&apos;re here to help. Find answers to common questions or reach
                 out to us directly.
             </p>
 
@@ -51,7 +51,7 @@ const Support = () => {
                                     <AccordionContent>
                                         <p className="text-xs sm:text-sm text-muted-foreground">
                                             Navigate to your billing settings
-                                            and select "Upgrade." You can add a
+                                            and select &quot;Upgrade.&quot; You can add a
                                             new card or update existing
                                             information.
                                         </p>
@@ -64,7 +64,7 @@ const Support = () => {
                                     </AccordionTrigger>
                                     <AccordionContent>
                                         <p className="text-xs sm:text-sm text-muted-foreground">
-                                            You don't need to manually cancel
+                                            You don&apos;t need to manually cancel
                                             your subscription. Your access will
                                             continue until the end of your
                                             current billing period. After that,

@@ -103,7 +103,7 @@ export default function CompletedLessons() {
         return (
             <div className="flex items-center justify-center h-full p-4">
                 <p className="font-bold text-base sm:text-lg">
-                    You haven't completed any course yet.
+                    You haven&apos;t completed any course yet.
                 </p>
             </div>
         );

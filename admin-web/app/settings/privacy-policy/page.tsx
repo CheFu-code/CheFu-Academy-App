@@ -134,7 +134,7 @@ const PrivacyPolicy = () => {
                         {/* Children */}
                         <AccordionItem value="children">
                             <AccordionTrigger>
-                                Children's Privacy
+                                Children&apos;s Privacy
                             </AccordionTrigger>
                             <AccordionContent>
                                 <p className="text-sm text-muted-foreground">
@@ -171,7 +171,7 @@ const PrivacyPolicy = () => {
                                     <li>Email: chefu.inc@gmail.com</li>
                                     <li>Phone: +27 (60) 603-1205</li>
                                     <li>
-                                        Address: 145 CheFu's Street, Dinga,
+                                        Address: 145 CheFu&apos;s Street, Dinga,
                                         South Africa
                                     </li>
                                 </ul>
