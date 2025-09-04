@@ -51,14 +51,14 @@ export default function AuthLayout({
                 <div className="text-balance text-center text-xs text-muted-foreground">
                     By clicking continue you agree to our{" "}
                     <Link
-                        href={"/settings/terms-service"}
+                        href={"/terms-service"}
                         className="hover:text-primary hover:underline font-medium"
                     >
                         Terms of Service
                     </Link>{" "}
                     and{" "}
                     <Link
-                        href={"/settings/privacy-policy"}
+                        href={"/privacy-policy"}
                         className="hover:text-primary hover:underline font-medium"
                     >
                         Privacy Policy
