@@ -8,7 +8,7 @@ export interface Flashcard {
 }
 
 export interface ChapterContentItem {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export interface Chapter {
