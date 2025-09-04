@@ -33,7 +33,6 @@ import {
     View,
 } from "react-native";
 import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
-import { SafeAreaView } from "react-native-safe-area-context";
 import CourseList from "../../component/Home/CourseList";
 import CourseProgress from "../../component/Home/CourseProgress";
 import Header from "../../component/Home/Header";
@@ -358,7 +357,7 @@ export default function Home() {
                         size="small"
                     />
                 ) : (
-                    <SafeAreaView
+                    <View
                         style={{
                             backgroundColor: Colors.BG,
                             padding: 10,
@@ -385,7 +384,7 @@ export default function Home() {
                                 features.
                             </Text>
                         </TouchableOpacity>
-                    </SafeAreaView>
+                    </View>
                 ))}
 
             <Header />

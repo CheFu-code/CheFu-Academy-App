@@ -142,7 +142,7 @@ const SignIn = () => {
                 throw new Error("User email is missing");
             }
 
-            await getUserDetail(signedInEmail); 
+            await getUserDetail(signedInEmail);
 
             router.replace("/(tabs)/home");
             ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
@@ -427,25 +427,20 @@ const SignIn = () => {
                             </Text>
                         </Pressable>
 
-                        <View style={styles.iconsContainer}>
-                            <TouchableOpacity onPress={() => gitHub()}>
-                                <AntDesign
-                                    style={styles.icons}
-                                    size={24}
-                                    color={"white"}
-                                    name="github"
-                                />
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => google()}>
-                                <AntDesign
-                                    style={styles.icons}
-                                    name="google"
-                                    size={24}
-                                    color={"white"}
-                                />
-                            </TouchableOpacity>
-                        </View>
+                        {/* <View style={styles.iconsContainer}> */}
+                        <TouchableOpacity
+                            style={styles.iconsContainer}
+                            onPress={() => google()}
+                        >
+                            <AntDesign
+                                style={styles.icons}
+                                name="google"
+                                size={24}
+                                color={"white"}
+                            />
+                            <Text>Google</Text>
+                        </TouchableOpacity>
+                        {/* </View> */}
 
                         <TouchableOpacity
                             style={[

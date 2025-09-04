@@ -49,15 +49,16 @@ export default function Index() {
                     <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
 
-                <View style={styles.iconsContainer}>
-                    <TouchableOpacity onPress={navigateGitHub}>
-                        <AntDesign name="github" size={30} color="#000" />
-                    </TouchableOpacity>
+                {/* <View style={styles.iconsContainer}> */}
 
-                    <TouchableOpacity onPress={navigateGoogle}>
-                        <AntDesign name="google" size={30} color="#fff" />
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                    style={styles.iconsContainer}
+                    onPress={navigateGoogle}
+                >
+                    <AntDesign name="google" size={30} color="#fff" />
+                    <Text>Google</Text>
+                </TouchableOpacity>
+                {/* </View> */}
 
                 <TouchableOpacity
                     disabled={loading}
