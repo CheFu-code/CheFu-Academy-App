@@ -44,7 +44,6 @@ export default function LoginForm() {
 
                 // You can get user info if needed
                 const user = result.user;
-                console.log("Logged in user:", user);
 
                 toast.success("Login successful!");
                 router.replace("/courses"); // redirect after login
