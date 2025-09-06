@@ -1,20 +1,19 @@
+import { auth, db } from "@/lib/firebase";
 import { Video } from "@/types/video";
-import { getAuth } from "@react-native-firebase/auth";
 import {
     collection,
     doc,
-    FirebaseFirestoreTypes,
     getDoc,
     getDocs,
-    getFirestore,
     orderBy,
     query,
+    QueryDocumentSnapshot,
     serverTimestamp,
     setDoc,
     where,
-} from "@react-native-firebase/firestore";
-import storage from "@react-native-firebase/storage";
-import uuid from "react-native-uuid";
+} from "firebase/firestore";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 export const uploadVideo = async (
     title: string,
@@ -23,21 +22,22 @@ export const uploadVideo = async (
     thumbnailUri: string,
     category: string,
     visibility: "public" | "private",
+    level: "beginner" | "advance",
     duration: number,
-    views: number = 0, 
-    topics: string[],
-
+    views: number = 0,
+    topics: string[]
 ) => {
-    const db = getFirestore();
-    const auth = getAuth();
     const user = auth.currentUser;
     if (!user) throw new Error("Not authenticated");
 
-    const videoId = uuid.v4().toString();
+    const videoId = uuidv4().toString();
 
     // Upload video and thumbnail
     const videoURL = await uploadFile(videoUri, `videos/${videoId}/video.mp4`);
-    const thumbnailURL = await uploadFile(thumbnailUri, `videos/${videoId}/thumbnail.jpg`);
+    const thumbnailURL = await uploadFile(
+        thumbnailUri,
+        `videos/${videoId}/thumbnail.jpg`
+    );
 
     // Save Firestore metadata
     await setDoc(doc(db, "videos", videoId), {
@@ -51,6 +51,7 @@ export const uploadVideo = async (
         uploadedAt: serverTimestamp(),
         visibility,
         duration,
+        level,
         views,
         topics,
     });
@@ -58,26 +59,42 @@ export const uploadVideo = async (
     return true;
 };
 
-const uploadFile = async (uri: string, path: string): Promise<string> => {
-    const reference = storage().ref(path);
-    await reference.putFile(uri);
-    return await reference.getDownloadURL();
+export const uploadFile = async (
+    fileOrUri: File | string,
+    path: string
+): Promise<string> => {
+    const storage = getStorage();
+    const fileRef = ref(storage, path);
+
+    let data: Blob;
+
+    if (typeof fileOrUri === "string") {
+        // It's a URI → fetch blob
+        const response = await fetch(fileOrUri);
+        data = await response.blob();
+    } else {
+        // It's already a File
+        data = fileOrUri;
+    }
+
+    await uploadBytes(fileRef, data);
+    return await getDownloadURL(fileRef);
 };
 
 export const fetchVideos = async (): Promise<Video[]> => {
-    const db = getFirestore();
     const q = query(
         collection(db, "videos"),
-        where("visibility", "==", "public"), // ✅ usually show only public
+        where("visibility", "==", "public"),
         orderBy("uploadedAt", "desc")
     );
 
     const snap = await getDocs(q);
-    return snap.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => doc.data() as Video);
+    return snap.docs.map((doc: QueryDocumentSnapshot) => doc.data() as Video);
 };
 
-export const fetchVideoById = async (videoId: string): Promise<Video | null> => {
-    const db = getFirestore();
+export const fetchVideoById = async (
+    videoId: string
+): Promise<Video | null> => {
     try {
         const docRef = doc(db, "videos", videoId);
         const docSnap = await getDoc(docRef);
@@ -100,6 +117,7 @@ export const fetchVideoById = async (videoId: string): Promise<Video | null> => 
             uploadedAt: data.uploadedAt, // Firestore Timestamp
             category: data.category,
             visibility: data.visibility,
+            level: data.level,
             duration: data.duration ?? 0,
             views: data.views ?? 0,
             topics: data.topics ?? [],
@@ -109,4 +127,3 @@ export const fetchVideoById = async (videoId: string): Promise<Video | null> => 
         return null;
     }
 };
-

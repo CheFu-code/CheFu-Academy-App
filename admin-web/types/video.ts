@@ -1,3 +1,4 @@
+import { VideoCategoryValues } from "@/constants/Options";
 import { FieldValue, Timestamp } from "firebase/firestore";
 import { z } from "zod";
 
@@ -7,16 +8,17 @@ import { z } from "zod";
 export const VideoSchema = z.object({
     id: z.string().optional(), // id often comes from Firestore
     title: z.string().min(1, "Title is required"),
-    description: z.string().optional(),
+    description: z.string().min(1, "Description is required"),
     videoURL: z.string().url("Must be a valid URL"),
     thumbnailURL: z.string().url("Must be a valid URL"),
     uploadedBy: z.string(),
     uploadedAt: z.any(), // required
-    category: z.string(),
+    category: z.enum(VideoCategoryValues, { message: "Category is required" }),
     visibility: z.enum(["public", "private"]),
+    level: z.string().min(1, "Level is required"),
     duration: z.number().nonnegative(),
     views: z.number().nonnegative(),
-    topics: z.array(z.string()),
+    topics: z.array(z.string().min(1, "Topic is required")),
 });
 
 // ------------------
@@ -33,9 +35,9 @@ export type VideoCardProps = {
 };
 
 export type UploadFormProps = {
-    videoUri: string | null;
+    videoUri: File | null;
     setVideoUri: (uri: string | null) => void;
-    thumbnailUri: string | null;
+    thumbnailUri: File | null;
     setThumbnailUri: (uri: string | null) => void;
     title: string;
     setTitle: (text: string) => void;
@@ -47,6 +49,8 @@ export type UploadFormProps = {
     setVisibility: React.Dispatch<
         React.SetStateAction<"public" | "private" | null>
     >;
+    level: "advance" | "beginner" | null;
+    setLevel: React.Dispatch<React.SetStateAction<"advance" |"beginner"| null>>;
     loading: boolean;
     setLoading: (loading: boolean) => void;
     duration: number;
@@ -68,3 +72,16 @@ export type UserReviews = {
     username: string;
     avatar: string;
 };
+
+
+export interface UploaderState {
+    id: string | null,
+    file: File | null,
+    uploading: boolean,
+    progress: number,
+    key?: string,
+    isDeleting: boolean,
+    error: boolean,
+    objectUrl?: string,
+    fileType: "image" | "video"
+}

@@ -134,19 +134,6 @@ export default function UploadForm({
                 </TouchableOpacity>
             )}
 
-            {/* {topics.length > 0 && (
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={{ marginBottom: 20, marginTop: 10 }}
-                >
-                    {topics.map((t) => (
-                        <View key={t} style={styles.topicBadge}>
-                            <Text style={styles.topicText}>{t}</Text>
-                        </View>
-                    ))}
-                </ScrollView>
-            )} */}
             <View
                 style={{
                     flexDirection: "row",
