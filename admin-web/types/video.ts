@@ -35,9 +35,9 @@ export type VideoCardProps = {
 };
 
 export type UploadFormProps = {
-    videoUri: File | null;
+    videoUri: string | null;
     setVideoUri: (uri: string | null) => void;
-    thumbnailUri: File | null;
+    thumbnailUri: string | null;
     setThumbnailUri: (uri: string | null) => void;
     title: string;
     setTitle: (text: string) => void;

@@ -31,7 +31,7 @@ import {
     VideoCategoryValues,
     VisibilityOptions,
 } from "@/constants/Options";
-import { uploadVideo } from "@/services/videoService";
+import { uploadFile, uploadVideo } from "@/services/videoService";
 import {
     UploaderState,
     UploadFormProps,
@@ -111,7 +111,17 @@ const UploadVideoPage = ({
     }
 
     const handleUpload = async () => {
-        if (!fileState.file || !title || !description || topics.length === 0)
+        if (
+            !fileState.file ||
+            !title ||
+            !description ||
+            topics.length === 0 ||
+            !videoUri ||
+            !thumbnailUri ||
+            !category ||
+            !visibility ||
+            !level
+        )
             return;
 
         try {
