@@ -57,7 +57,9 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 30,
+        gap: 10,
+        backgroundColor: Colors.BG,
+        borderRadius: 12,
     },
     icons: {
         textAlign: "center",

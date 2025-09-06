@@ -67,7 +67,9 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        gap: 30,
+        gap: 10,
         marginVertical: 15,
+        backgroundColor: Colors.BG,
+        borderRadius: 12,
     },
 });

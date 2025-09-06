@@ -56,7 +56,15 @@ export default function Index() {
                     onPress={navigateGoogle}
                 >
                     <AntDesign name="google" size={30} color="#fff" />
-                    <Text>Google</Text>
+                    <Text
+                        style={{
+                            fontSize: 16,
+                            fontFamily: "outfit",
+                            color: "white",
+                        }}
+                    >
+                        Google
+                    </Text>
                 </TouchableOpacity>
                 {/* </View> */}
 

@@ -438,7 +438,15 @@ const SignIn = () => {
                                 size={24}
                                 color={"white"}
                             />
-                            <Text>Google</Text>
+                            <Text
+                                style={{
+                                    fontSize: 16,
+                                    fontFamily: "outfit",
+                                    color: "white",
+                                }}
+                            >
+                                Google
+                            </Text>
                         </TouchableOpacity>
                         {/* </View> */}
 
