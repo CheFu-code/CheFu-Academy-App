@@ -3,9 +3,10 @@ import { styles } from "@/styles/WelcomeScreen.styles";
 import { useRouter } from "expo-router";
 import { Pressable, Text } from "react-native";
 import { Colors } from "../constant/Colors";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export const TermsText = ({ disabled = false }: { disabled?: boolean }) => {
-    const router = useRouter();
+    const { safePush } = useSafeNavigation()
     return (
         <Pressable disabled={disabled}>
             <Text style={styles.conditions}>
@@ -15,7 +16,7 @@ export const TermsText = ({ disabled = false }: { disabled?: boolean }) => {
                         color: Colors.YELLOW,
                         textDecorationLine: "underline",
                     }}
-                    onPress={() => router.push("/terms")}
+                    onPress={() => safePush("/terms")}
                 >
                     Terms of Service
                 </Text>{" "}
@@ -25,7 +26,7 @@ export const TermsText = ({ disabled = false }: { disabled?: boolean }) => {
                         color: Colors.YELLOW,
                         textDecorationLine: "underline",
                     }}
-                    onPress={() => router.push("/privacy")}
+                    onPress={() => safePush("/privacy")}
                 >
                     Privacy Policy
                 </Text>

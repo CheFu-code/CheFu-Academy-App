@@ -58,7 +58,7 @@ export default function CourseCard({
         <>
             <TouchableOpacity
                 onPress={() => {
-                    if (course?.createdBy === userDetail.email) {
+                    if (course?.createdBy === userDetail?.email) {
                         setModal({
                             visible: true,
                             title: "Course Owner",
@@ -122,11 +122,11 @@ export default function CourseCard({
                         <Text style={styles.chapter}>
                             Chapters: {course.chapters?.length || 0}
                         </Text>
-                        {course?.createdBy === userDetail.email && (
+                        {course?.createdBy === userDetail?.email && (
                             <Text>Owner</Text>
                         )}
 
-                        {course?.createdBy !== userDetail.email && (
+                        {course?.createdBy !== userDetail?.email && (
                             <Text numberOfLines={1} style={styles.time}>
                                 {course?.createdOn?.toDate
                                     ? course.createdOn

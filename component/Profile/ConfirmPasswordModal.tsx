@@ -1,4 +1,5 @@
 import { Colors } from "@/constant/Colors";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { styles } from "@/styles/Profile.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -33,7 +34,7 @@ export default function ConfirmPasswordModal({
     onConfirm,
     loading,
 }: ConfirmPasswordModalProps) {
-    const router = useRouter();
+    const { safePush } = useSafeNavigation()
     return (
         <Modal transparent visible={visible} animationType="slide">
             <View style={styles.modalOverlay}>
@@ -63,13 +64,13 @@ export default function ConfirmPasswordModal({
                     </View>
 
                     <TouchableOpacity
-                        onPress={() => router.push("/auth/forgotPassword")}
+                        onPress={() => safePush("/auth/forgotPassword")}
                     >
                         <Text style={styles.forgotPasswordText}>
                             Forgot Password?
                         </Text>
                     </TouchableOpacity>
-                    
+
                     <View style={styles.modalButtons}>
                         <TouchableOpacity
                             style={[

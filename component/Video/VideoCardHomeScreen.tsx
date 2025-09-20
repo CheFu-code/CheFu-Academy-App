@@ -10,11 +10,12 @@ import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { styles } from "../../styles/VideoCardHomeScreen.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 const STORAGE_KEY = "videos_cache";
 
 export default function VideoCardHomeScreen() {
-    const router = useRouter();
+    const { safeBack, safePush, safeReplace } = useSafeNavigation()
     const [videos, setVideos] = useState<Video[]>([]);
     const [selectedCategory, setSelectedCategory] = useState("");
 
@@ -51,19 +52,19 @@ export default function VideoCardHomeScreen() {
     const handleCategoryPress = useCallback(
         (category: string) => {
             setSelectedCategory(category);
-            router.push({
+            safePush({
                 pathname: "/searchResults",
                 params: { query: category },
             });
         },
-        [router]
+        [setSelectedCategory, safePush]
     );
 
     const renderVideoCard = ({ item }: { item: Video }) => (
         <TouchableOpacity
             style={styles.cardWrapper}
             onPress={() =>
-                router.push({
+                safePush({
                     pathname: "/videoDetail",
                     params: { id: item.id },
                 })

@@ -24,9 +24,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "../../styles/MyCourses.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function MyCourses() {
-    const router = useRouter();
+    const { safeBack, safePush } = useSafeNavigation()
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(true);
     const [myCourses, setMyCourses] = useState<Course[]>([]);
@@ -73,7 +74,7 @@ export default function MyCourses() {
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => safeBack()}
                 style={styles.backButton}
             >
                 <AntDesign name="left" size={24} color={Colors.WHITE} />
@@ -103,7 +104,7 @@ export default function MyCourses() {
                             <TouchableOpacity
                                 style={styles.courseCard}
                                 onPress={() =>
-                                    router.push({
+                                    safePush({
                                         pathname: "/courseView",
                                         params: {
                                             courseParams: JSON.stringify(item),
@@ -153,15 +154,15 @@ export default function MyCourses() {
                                         >
                                             {item?.createdOn?.toDate
                                                 ? item.createdOn
-                                                      .toDate()
-                                                      .toLocaleDateString(
-                                                          "en-GB",
-                                                          {
-                                                              day: "2-digit",
-                                                              month: "2-digit",
-                                                              year: "numeric",
-                                                          }
-                                                      )
+                                                    .toDate()
+                                                    .toLocaleDateString(
+                                                        "en-GB",
+                                                        {
+                                                            day: "2-digit",
+                                                            month: "2-digit",
+                                                            year: "numeric",
+                                                        }
+                                                    )
                                                 : ""}
                                         </Text>
                                     </View>

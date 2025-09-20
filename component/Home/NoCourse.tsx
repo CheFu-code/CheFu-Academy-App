@@ -2,9 +2,10 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, Text, View } from "react-native";
 import Button from "../Shared/Button";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function NoCourse() {
-    const router = useRouter();
+    const { safePush } = useSafeNavigation()
     const [loading, setLoading] = useState(false);
 
     return (
@@ -28,19 +29,21 @@ export default function NoCourse() {
             </Text>
 
             <Button
-                onPress={() => router.push("/addCourse")}
+                onPress={() => safePush("/addCourse")}
                 text={"+ Create new course"}
                 disabled={loading}
                 loading={false}
                 icon={null}
+                opacity={loading ? 0.5 : 1}
             />
             <Button
-                onPress={() => router.push("/(tabs)/explore")}
+                onPress={() => safePush("/(tabs)/explore")}
                 disabled={loading}
                 text={"Explore existing courses"}
                 type="outline"
                 loading={false}
                 icon={null}
+                opacity={loading ? 0.5 : 1}
             />
         </View>
     );

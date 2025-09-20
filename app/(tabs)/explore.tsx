@@ -26,6 +26,7 @@ import CourseCard from "../../component/Shared/CourseCard";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Explore.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function ExploreScreen() {
     const { userDetail } = useContext(UserDetailContext);
@@ -34,8 +35,7 @@ export default function ExploreScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
-
+    const { safePush, safeReplace } = useSafeNavigation()
     const fetchCourses = useCallback(async () => {
         setRefreshing(true);
         try {
@@ -90,7 +90,7 @@ export default function ExploreScreen() {
             return;
         }
 
-        router.push({
+        safePush({
             pathname: "/searchResults",
             params: { query: searchTerm.trim() },
         });

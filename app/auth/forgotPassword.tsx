@@ -15,11 +15,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import ErrorModal from "../../component/Shared/ErrorModal";
 import { Colors } from "../../constant/Colors";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
+    const { safeBack } = useSafeNavigation()
     const auth = getAuth();
     const [successModalVisible, setSuccessModalVisible] = useState({
         visible: false,
@@ -151,7 +152,7 @@ const ForgotPassword = () => {
 
                 <TouchableOpacity
                     onPress={() => {
-                        router.back();
+                        safeBack;
                     }}
                     style={styles.cancel}
                 >
@@ -182,7 +183,7 @@ const ForgotPassword = () => {
                         ...successModalVisible,
                         visible: false,
                     });
-                    router.back();
+                    safeBack;
                 }}
             />
         </>

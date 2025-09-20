@@ -7,9 +7,10 @@ import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { Platform, ToastAndroid } from "react-native";
 import { UserDetailContext } from "../context/UserDetailContext";
+import { useSafeNavigation } from "./useSafeNavigation";
 
 export const useLoadUser = () => {
-    const router = useRouter();
+    const { safeReplace } = useSafeNavigation()
     const { setUserDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(true);
 
@@ -30,7 +31,7 @@ export const useLoadUser = () => {
                     const userData = JSON.parse(storedUser);
                     setUserDetail(userData);
                     setLoading(false);
-                    router.replace("/(tabs)/home");
+                    safeReplace("/(tabs)/home");
                     return;
                 }
 
@@ -59,7 +60,7 @@ export const useLoadUser = () => {
 
                             setUserDetail(userData);
                             await AsyncStorage.setItem("userDetail", JSON.stringify(userData));
-                            router.replace("/(tabs)/home");
+                            safeReplace("/(tabs)/home");
                         }
 
                         setLoading(false);
@@ -81,7 +82,7 @@ export const useLoadUser = () => {
         }
 
         loadUser();
-    }, [router, setUserDetail]);
+    }, [safeReplace, setUserDetail]);
 
     return { loading };
 };

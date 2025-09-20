@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { styles } from "../../styles/MessageList";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function ChatWithAI() {
     const { userDetail } = useContext(UserDetailContext);
@@ -27,7 +28,7 @@ export default function ChatWithAI() {
     const [currentTypingId, setCurrentTypingId] = useState<string | null>(null);
 
     const scrollViewRef = useRef<ScrollView>(null);
-    const router = useRouter();
+    const { safeBack } = useSafeNavigation()
     const insets = useSafeAreaInsets();
 
     // Initialize Google Generative AI client
@@ -76,7 +77,7 @@ export default function ChatWithAI() {
                         }}
                     >
                         <TouchableOpacity
-                            onPress={() => router.back()}
+                            onPress={safeBack}
                             style={{ marginRight: 12 }}
                         >
                             <AntDesign
@@ -165,12 +166,12 @@ export default function ChatWithAI() {
                             key={msg.id}
                             style={[
                                 styles.messageRow,
-                                msg.senderId === userDetail.email
+                                msg.senderId === userDetail?.email
                                     ? { justifyContent: "flex-end" }
                                     : { justifyContent: "flex-start" },
                             ]}
                         >
-                            {msg.senderId !== userDetail.email && (
+                            {msg.senderId !== userDetail?.email && (
                                 <Image
                                     source={require("../../assets/images/logo.png")}
                                     style={styles.avatar}
@@ -180,7 +181,7 @@ export default function ChatWithAI() {
                             <View
                                 style={[
                                     styles.messageBubble,
-                                    msg.senderId === userDetail.email
+                                    msg.senderId === userDetail?.email
                                         ? styles.userMessage
                                         : styles.adminMessage,
                                 ]}

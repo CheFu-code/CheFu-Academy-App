@@ -523,7 +523,7 @@ export default function SubscriptionAndBilling() {
                             fontSize: 12,
                         }}
                     >
-                        Email: {userDetail.email}
+                        Email: {userDetail?.email}
                     </Text>
                     <Text style={styles.sectionTitle}>
                         Total Payments: {paymentHistory.length}

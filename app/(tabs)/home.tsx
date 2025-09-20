@@ -21,7 +21,7 @@ import {
 } from "@react-native-firebase/firestore";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -42,6 +42,8 @@ import PracticeSection from "../../component/Home/PracticeSection";
 import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import Categories from "@/component/Home/Categories";
 
 export default function Home() {
     const [courseList, setCourseList] = useState<Course[]>([]);
@@ -50,9 +52,10 @@ export default function Home() {
     const [fetching, setFetching] = useState(false);
     const [adLoaded, setAdLoaded] = useState(false);
     const [sending, setSending] = useState(false);
-    const router = useRouter();
+    const { safeReplace } = useSafeNavigation();
     const auth = getAuth();
     const firestore = getFirestore();
+    const flatListRef = useRef<FlatList>(null);
     const CACHE_KEY = "@cached_courses";
 
     const [verifyEmail, setVerifyEmail] = useState({
@@ -79,12 +82,12 @@ export default function Home() {
                 loadCachedCoursesThenFetch();
             } else {
                 setCourseList([]);
-                router.replace("/auth/signIn");
+                safeReplace("/auth/signIn");
             }
         });
 
         return unsubscribe;
-    }, [auth, router]);
+    }, [auth, safeReplace]);
 
     // Load cached courses then fetch fresh in background without waiting for it
     const loadCachedCoursesThenFetch = async () => {
@@ -122,14 +125,14 @@ export default function Home() {
             const user = auth.currentUser;
             if (!user) {
                 setCourseList([]);
-                router.replace("/auth/signIn");
+                safeReplace("/auth/signIn");
                 return;
             }
 
             if (!user.email) {
                 console.warn("Signed-in user has no email!");
                 setCourseList([]);
-                router.replace("/auth/signIn");
+                safeReplace("/auth/signIn");
                 return;
             }
 
@@ -142,7 +145,7 @@ export default function Home() {
                     ToastAndroid.LONG
                 );
                 setCourseList([]);
-                router.replace("/");
+                safeReplace("/");
                 return;
             }
             if (!userDetail?.email) {
@@ -173,7 +176,7 @@ export default function Home() {
                                 ToastAndroid.LONG
                             );
                             setCourseList([]);
-                            router.replace("/auth/signIn");
+                            safeReplace("/auth/signIn");
                             return;
                         }
                     } catch (err) {
@@ -183,7 +186,7 @@ export default function Home() {
                             ToastAndroid.LONG
                         );
                         setCourseList([]);
-                        router.replace("/auth/signIn");
+                        safeReplace("/auth/signIn");
                         return;
                     }
                 } else {
@@ -192,7 +195,7 @@ export default function Home() {
                         ToastAndroid.LONG
                     );
                     setCourseList([]);
-                    router.replace("/auth/signIn");
+                    safeReplace("/auth/signIn");
                     return;
                 }
             }
@@ -387,10 +390,19 @@ export default function Home() {
                     </View>
                 ))}
 
-            <Header />
+            <Header
+                onPress={() => {
+                    flatListRef.current?.scrollToOffset({
+                        offset: 0,
+                        animated: true,
+                    });
+                }}
+            />
+
             {loading && <LineLoader />}
 
             <FlatList
+                ref={flatListRef}
                 data={courseList}
                 keyExtractor={(item) => item.id}
                 style={{ backgroundColor: Colors.BG_COLOR }}
@@ -414,24 +426,24 @@ export default function Home() {
                             source={require("../../assets/images/graph.png")}
                             resizeMode="cover"
                         />
-                        <View
-                            style={{
-                                padding: 15,
-                            }}
-                        >
+                        <>
                             {courseList.length === 0 ? (
                                 <NoCourse />
                             ) : (
                                 <>
-                                    {/* <FeaturedCourses />
-                                    <Categories /> */}
                                     <CourseProgress courseList={courseList} />
-                                    <PracticeSection />
-                                    <CourseList courseList={courseList} />
-                                    <VideoCardHomeScreen />
+
+                                    <View style={{ padding: 10 }}>
+                                        {/* <Categories /> */}
+                                        <PracticeSection />
+
+                                        <CourseList courseList={courseList} />
+
+                                        <VideoCardHomeScreen />
+                                    </View>
                                 </>
                             )}
-                        </View>
+                        </>
                     </View>
                 }
             />

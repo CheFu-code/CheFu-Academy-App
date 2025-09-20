@@ -4,9 +4,10 @@ import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { styles } from "../../styles/About.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function About() {
-    const router = useRouter();
+    const { safeBack, safePush, safeReplace } = useSafeNavigation()
     const [backDisabled, setBackDisabled] = useState(false);
     const COPYRIGHT = `© ${new Date().getFullYear()} CheFu Inc. All rights reserved.`;
 
@@ -24,8 +25,8 @@ export default function About() {
                     onPress={() => {
                         if (backDisabled) return;
                         setBackDisabled(true);
-                        if (router && typeof router.back === "function")
-                            router.back();
+                        if (safeBack && typeof safeBack === "function")
+                            safeBack();
                         setTimeout(() => setBackDisabled(false), 1000);
                     }}
                     accessible={true}

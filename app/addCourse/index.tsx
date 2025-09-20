@@ -27,15 +27,16 @@ import Prompt from "../../constant/Prompt";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/AddCourse";
 import { handleAiError } from "../../utils/errorUtils";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function AddCourse() {
     const [loading, setLoading] = useState(false);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const { safeReplace, safePush, safeBack } = useSafeNavigation()
     const [userInput, setUserInput] = useState("");
     const [topics, setTopics] = useState<string[]>([]);
     const [selectedTopic, setSelectedTopic] = useState<string[]>([]);
     const [generatingTopic, setGeneratingTopic] = useState(false);
-    const router = useRouter();
     const db = getFirestore();
     const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
     const [limitModalVisible, setLimitModalVisible] = useState(false);
@@ -157,7 +158,7 @@ export default function AddCourse() {
         return selection ? true : false;
     };
 
-    const support = "kurisanimaluleke77@gmail.com";
+    const support = "chefu.inc@gmail.com";
 
     const onGenerateCourse = async () => {
         if (loading) return; // Prevent double submission
@@ -231,7 +232,7 @@ export default function AddCourse() {
                 })
             );
 
-            router.replace("/(tabs)/home");
+            safeReplace("/(tabs)/home");
             ToastAndroid.show(
                 "Course created successfully!",
                 ToastAndroid.SHORT
@@ -264,7 +265,7 @@ export default function AddCourse() {
                             style={{ width: 150, height: 150 }}
                         />
                         <Text style={styles.modalTitle}>
-                            Let’s find what matters most to you.
+                            Generating Topics.
                         </Text>
                         <Text style={styles.modalSubtext}>
                             Our AI is working to deliver personalized learning
@@ -291,8 +292,7 @@ export default function AddCourse() {
                             Let the Genius Work
                         </Text>
                         <Text style={styles.modalSubtext}>
-                            CheFu Inc.’s powerful AI is engineering your course
-                            — intelligently, efficiently, and uniquely for you.
+                            Powered by CheFu Inc., our advanced AI is crafting your course with precision, efficiency, and a personalized touch—designed exclusively for you.
                         </Text>
                     </View>
                 </View>
@@ -306,7 +306,7 @@ export default function AddCourse() {
                 <View style={styles.container}>
                     <Pressable
                         onPress={() => {
-                            if (!loading) router.back();
+                            if (!loading) safeBack;
                         }}
                     >
                         <Ionicons
@@ -440,7 +440,7 @@ export default function AddCourse() {
                 onCancel={() => setLimitModalVisible(false)}
                 onConfirm={() => {
                     setLimitModalVisible(false);
-                    router.push("/subscription");
+                    safePush("/subscription");
                 }}
             />
         </>

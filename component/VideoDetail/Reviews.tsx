@@ -32,14 +32,16 @@ import {
     View,
 } from "react-native";
 import { styles } from "../../styles/Reviews.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 type Props = {
     video: Video | null;
+    enrolled: boolean;
 };
 
 dayjs.extend(relativeTime);
 
-export default function Reviews({ video }: Props) {
+export default function Reviews({ video, enrolled }: Props) {
     const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [editReviewModal, setEditReviewModal] = useState(false);
@@ -49,7 +51,7 @@ export default function Reviews({ video }: Props) {
     const [reviews, setReviews] = useState<UserReviews[]>([]);
     const [loading, setLoading] = useState(false);
     const [rating, setRating] = useState(0);
-    const router = useRouter();
+    const { safeBack, safePush } = useSafeNavigation()
     const auth = getAuth();
     const db = getFirestore();
 
@@ -269,6 +271,14 @@ export default function Reviews({ video }: Props) {
                                     );
                                     return;
                                 }
+
+                                if (!enrolled) {
+                                    showToast(
+                                        "You must be enrolled to review this video"
+                                    );
+                                    return;
+                                }
+
                                 setAddReviewModal(true);
                             }}
                             style={styles.addRating}
@@ -298,7 +308,7 @@ export default function Reviews({ video }: Props) {
                                 <View style={styles.reviewContainer}>
                                     <TouchableOpacity
                                         onPress={() => {
-                                            router.push({
+                                            safePush({
                                                 pathname: "/profileView",
                                                 params: {
                                                     userId: rev.email,
@@ -323,10 +333,10 @@ export default function Reviews({ video }: Props) {
                                         <View>
                                             <Text style={styles.date}>
                                                 {rev.createdAt &&
-                                                "toDate" in rev.createdAt
+                                                    "toDate" in rev.createdAt
                                                     ? dayjs(
-                                                          rev.createdAt.toDate()
-                                                      ).fromNow()
+                                                        rev.createdAt.toDate()
+                                                    ).fromNow()
                                                     : "Just now"}
                                             </Text>
                                             <View style={styles.deleteButton}>
@@ -352,20 +362,20 @@ export default function Reviews({ video }: Props) {
                                                 </TouchableOpacity>
                                                 {rev.userId ===
                                                     userDetail?.uid && (
-                                                    <TouchableOpacity
-                                                        onPress={() => {
-                                                            setDeleteReviewModal(
-                                                                true
-                                                            );
-                                                        }}
-                                                    >
-                                                        <MaterialIcons
-                                                            name="delete-outline"
-                                                            size={18}
-                                                            color="red"
-                                                        />
-                                                    </TouchableOpacity>
-                                                )}
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                setDeleteReviewModal(
+                                                                    true
+                                                                );
+                                                            }}
+                                                        >
+                                                            <MaterialIcons
+                                                                name="delete-outline"
+                                                                size={18}
+                                                                color="red"
+                                                            />
+                                                        </TouchableOpacity>
+                                                    )}
                                             </View>
                                         </View>
                                     </View>

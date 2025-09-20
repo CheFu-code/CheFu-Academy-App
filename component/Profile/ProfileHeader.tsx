@@ -22,6 +22,7 @@ import {
     View,
 } from "react-native";
 import ErrorModal from "../Shared/ErrorModal";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 interface ProfileHeaderProps {
     profilePicture: string;
@@ -54,7 +55,7 @@ export const ProfileHeader = ({
     loadingName,
 }: ProfileHeaderProps) => {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const router = useRouter();
+    const { safePush } = useSafeNavigation()
     const auth = getAuth();
     const firestore = getFirestore();
     const [modalVisible, setModalVisible] = useState(false);
@@ -62,7 +63,7 @@ export const ProfileHeader = ({
     const { loading, verifyEmail } = useProfileActions(
         userDetail,
         setUserDetail,
-        router
+        safePush
     );
     const [error, setError] = useState({
         message: "",
@@ -188,7 +189,7 @@ export const ProfileHeader = ({
                             </Text>
                         </TouchableOpacity>
                     )}
-                    <TouchableOpacity onPress={() => router.push("/settings")}>
+                    <TouchableOpacity onPress={() => safePush("/settings")}>
                         <Ionicons
                             style={{
                                 marginTop: 3,

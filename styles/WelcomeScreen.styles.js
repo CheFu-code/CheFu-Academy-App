@@ -71,5 +71,6 @@ export const styles = StyleSheet.create({
         marginVertical: 15,
         backgroundColor: Colors.BG,
         borderRadius: 12,
+        paddingVertical:10
     },
 });

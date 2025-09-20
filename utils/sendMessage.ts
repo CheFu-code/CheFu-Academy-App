@@ -35,7 +35,7 @@ export const sendMessage = async ({
         id: Date.now().toString(),
         text: inputText.trim(),
         sender: "user",
-        senderId: userDetail.email,
+        senderId: userDetail?.email,
     };
 
     setMessages((prev) => [...prev, userMessage]);

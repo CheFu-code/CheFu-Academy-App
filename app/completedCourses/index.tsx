@@ -1,5 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { styles } from "@/styles/CompletedCourse.styles";
 import { Course } from "@/types/course";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -22,7 +23,7 @@ import {
 } from "react-native";
 
 const CompletedChapters = () => {
-    const router = useRouter();
+    const { safeReplace, safeBack } = useSafeNavigation()
     const { userDetail } = useContext(UserDetailContext);
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
@@ -30,10 +31,10 @@ const CompletedChapters = () => {
     useEffect(() => {
         const fetchCompleted = async () => {
             if (!userDetail?.email) {
-                router.replace("/auth/signIn");
+                safeReplace("/auth/signIn");
                 return;
             }
-            
+
             try {
                 const db = getFirestore();
 
@@ -110,7 +111,7 @@ const CompletedChapters = () => {
     return (
         <View style={styles.container}>
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={safeBack}
                 style={styles.button}
             >
                 <AntDesign name="left" size={24} color={Colors.WHITE} />

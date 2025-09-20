@@ -16,10 +16,11 @@ import {
 import { Colors } from "../../constant/Colors";
 import { PLANS } from "../../constant/plans";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { useSafeNavigation } from "../../hooks/useSafeNavigation";
 
 export default function SubscriptionWall() {
     const [selectedPlan, setSelectedPlan] = useState("pro");
-    const router = useRouter();
+    const {safeBack}=useSafeNavigation()
     const [loading, setLoading] = useState(false);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
@@ -87,8 +88,8 @@ export default function SubscriptionWall() {
                 <Pressable
                     disabled={loading}
                     onPress={() => {
-                        if (router && typeof router.back === "function")
-                            router.back();
+                        if (router && typeof safeBack === "function")
+                            safeBack;
                     }}
                     accessible={true}
                     accessibilityLabel="Go back"

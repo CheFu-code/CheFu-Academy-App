@@ -1,10 +1,11 @@
 // hooks/useSocialAuthNavigation.ts
 import { useRouter } from "expo-router";
+import { useSafeNavigation } from "./useSafeNavigation";
 
 export const useSocialAuthNavigation = () => {
-  const router = useRouter();
+  const { safePush } = useSafeNavigation()
   return {
-    navigateGitHub: () => router.push("/auth/github"),
-    navigateGoogle: () => router.push("/auth/google"),
+    navigateGitHub: () => safePush("/auth/github"),
+    navigateGoogle: () => safePush("/auth/google"),
   };
 };

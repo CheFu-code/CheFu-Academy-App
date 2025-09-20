@@ -3,6 +3,7 @@ import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { menuItems, url } from "@/data/menuItems";
 import { useRefreshProfile } from "@/hooks/useRefreshProfile";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { styles } from "@/styles/Profile.styles";
 import { showToast } from "@/utils/toast";
 import {
@@ -12,7 +13,7 @@ import {
     SimpleLineIcons,
 } from "@expo/vector-icons";
 import Constants from "expo-constants";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import { useContext, useMemo } from "react";
 import {
     Linking,
@@ -43,10 +44,10 @@ export const ProfileMenu = ({
     confirmDeleteAccount,
     avatarURL,
 }: ProfileMenuProps) => {
+    const { safePush } = useSafeNavigation()
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { email, member, planType } = userDetail || {};
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
-    const router = useRouter();
     const isAdmin = userDetail?.roles?.includes("admin");
     const renderedMenuItems = useMemo(
         () => menuItems(router, Linking, ToastAndroid, Colors),
@@ -200,7 +201,7 @@ export const ProfileMenu = ({
                     <TouchableOpacity
                         style={[styles.menuItem, { marginTop: 5 }]}
                         onPress={() =>
-                            router.push("/admin/upload-video")
+                            safePush("/admin/upload-video")
                         }
                     >
                         <MaterialCommunityIcons

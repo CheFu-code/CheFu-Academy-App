@@ -6,16 +6,17 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import CourseProgressCard from "../Shared/CourseProgressCard";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function CourseProgress({
     courseList,
     enroll = false,
 }: CourseProgressProps) {
     const { userDetail } = useContext(UserDetailContext);
+    const { safePush } = useSafeNavigation()
     const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const displayedCourses = courseList.slice(0, 4);
-    const router = useRouter();
 
     useFocusEffect(
         useCallback(() => {
@@ -27,16 +28,13 @@ export default function CourseProgress({
         const id = item.id || item.courseTitle || "";
         setLoadingId(id);
 
-        // Add a small delay so loading state can show before navigation
-        setTimeout(() => {
-            router.push({
-                pathname: "/courseView",
-                params: {
-                    courseParams: JSON.stringify(item),
-                    enroll: enroll.toString(),
-                },
-            });
-        }, 100);
+        safePush({
+            pathname: "/courseView",
+            params: {
+                courseParams: JSON.stringify(item),
+                enroll: enroll.toString(),
+            },
+        });
     };
 
     return (
@@ -46,6 +44,7 @@ export default function CourseProgress({
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    padding: 10
                 }}
             >
                 <Text
@@ -53,12 +52,13 @@ export default function CourseProgress({
                         fontFamily: "outfit-bold",
                         fontSize: 25,
                         color: Colors.PRIMARY,
+
                     }}
                 >
                     My Progress
                 </Text>
                 <TouchableOpacity
-                    onPress={() => router.push("/(tabs)/progress")}
+                    onPress={() => safePush("/(tabs)/progress")}
                 >
                     <Text
                         style={{

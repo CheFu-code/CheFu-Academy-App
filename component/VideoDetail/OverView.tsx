@@ -14,24 +14,7 @@ type Props = {
 };
 
 export default function OverView({ video }: Props) {
-    const [instructor, setInstructor] = useState<User | null>(null);
     const db = getFirestore();
-
-    useEffect(() => {
-        if (!video?.uploadedBy) return;
-
-        // listen to uploader's profile
-        const unsubscribe = onSnapshot(
-            doc(db, "users", video.uploadedBy), // 👈 docId is the uploader's email
-            (docSnap) => {
-                if (docSnap.exists()) {
-                    setInstructor(docSnap.data() as User);
-                }
-            }
-        );
-
-        return () => unsubscribe();
-    }, [video?.uploadedBy]);
 
     return (
         <View>
@@ -53,9 +36,9 @@ export default function OverView({ video }: Props) {
             <Text style={[styles.header, { marginTop: 16 }]}>Instructor</Text>
 
             <View style={styles.profilePictureContainer}>
-                {instructor?.profilePicture ? (
+                {video?.thumbnailURL ? (
                     <Image
-                        source={{ uri: instructor.profilePicture }}
+                        source={{ uri: video?.thumbnailURL }}
                         style={styles.instructorImage}
                     />
                 ) : (
@@ -74,10 +57,10 @@ export default function OverView({ video }: Props) {
                 )}
                 <View>
                     <Text style={styles.instructorName}>
-                        {instructor?.fullname || instructor?.email || "Unknown"}
+                        {video?.instructorCompany || "Unknown"}
                     </Text>
                     <Text style={{ fontFamily: "outfit", fontSize: 14 }}>
-                        Full Stack Developer
+                        {video?.instructorName || "Unknown"}
                     </Text>
                 </View>
             </View>

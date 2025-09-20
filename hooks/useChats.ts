@@ -25,7 +25,7 @@ export const useChats = () => {
         if (!userDetail?.email) return;
         const q = query(
             collection(db, "chats"),
-            where("members", "array-contains", userDetail.email),
+            where("members", "array-contains", userDetail?.email),
             orderBy("updatedAt", "desc")
         );
         const unsubscribe = onSnapshot(q, snapshot => {
@@ -39,7 +39,7 @@ export const useChats = () => {
         const fetchOtherUsers = async () => {
             const usersMap: { [id: string]: any } = {};
             for (const chat of chats) {
-                const otherUserId = chat.members?.find(id => id !== userDetail.email);
+                const otherUserId = chat.members?.find(id => id !== userDetail?.email);
                 if (!otherUserId) continue;
                 const docSnap = await getDoc(doc(db, "users", otherUserId));
                 if (docSnap.exists()) usersMap[otherUserId] = docSnap.data();
@@ -51,11 +51,11 @@ export const useChats = () => {
 
     const startChat = async (targetName: string, targetId: string) => {
         try {
-            let chatId = chats.find(c => c.members?.includes(targetId) && c.members?.includes(userDetail.email))?.id;
+            let chatId = chats.find(c => c.members?.includes(targetId) && c.members?.includes(userDetail?.email))?.id;
             if (!chatId) {
                 const chatRef = await addDoc(collection(db, "chats"), {
                     name: targetName,
-                    members: [userDetail.email, targetId],
+                    members: [userDetail?.email, targetId],
                     lastMessage: { text: "", sender: "", timestamp: serverTimestamp() },
                     updatedAt: serverTimestamp(),
                 });

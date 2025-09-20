@@ -29,9 +29,10 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/SignIn.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 const SignIn = () => {
-    const router = useRouter();
+    const { safePush, safeReplace } = useSafeNavigation()
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -144,7 +145,7 @@ const SignIn = () => {
 
             await getUserDetail(signedInEmail);
 
-            router.replace("/(tabs)/home");
+            safeReplace("/(tabs)/home");
             ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
 
             const userDocRef = doc(db, "users", signedInEmail);
@@ -239,7 +240,7 @@ const SignIn = () => {
                         Alert.alert(
                             "Error",
                             error.message ||
-                                "Please try again or contact support.",
+                            "Please try again or contact support.",
                             [
                                 { text: "Cancel", style: "cancel" },
                                 { text: "Contact", onPress: contactSupport },
@@ -317,11 +318,11 @@ const SignIn = () => {
     }
 
     const gitHub = () => {
-        router.push("/auth/github");
+        safePush("/auth/github");
     };
 
     const google = () => {
-        router.push("/auth/google");
+        safePush("/auth/google");
     };
 
     return (
@@ -414,7 +415,7 @@ const SignIn = () => {
                         ) : null}
 
                         <Pressable
-                            onPress={() => router.push("/auth/forgotPassword")}
+                            onPress={() => safePush("/auth/forgotPassword")}
                             style={{ alignSelf: "flex-end", marginTop: 10 }}
                         >
                             <Text
@@ -427,7 +428,6 @@ const SignIn = () => {
                             </Text>
                         </Pressable>
 
-                        {/* <View style={styles.iconsContainer}> */}
                         <TouchableOpacity
                             style={styles.iconsContainer}
                             onPress={() => google()}
@@ -443,12 +443,12 @@ const SignIn = () => {
                                     fontSize: 16,
                                     fontFamily: "outfit",
                                     color: "white",
+
                                 }}
                             >
                                 Google
                             </Text>
                         </TouchableOpacity>
-                        {/* </View> */}
 
                         <TouchableOpacity
                             style={[
@@ -475,7 +475,7 @@ const SignIn = () => {
                                 Don't have an account?{" "}
                             </Text>
                             <Pressable
-                                onPress={() => router.replace("/auth/signUp")}
+                                onPress={() => safeReplace("/auth/signUp")}
                             >
                                 <Text
                                     style={{

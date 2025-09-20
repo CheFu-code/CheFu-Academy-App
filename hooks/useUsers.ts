@@ -13,7 +13,7 @@ export const useUsers = () => {
         const snapshot = await getDocs(collection(db, "users"));
         const users: User[] = snapshot.docs
             .map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }))
-            .filter((u: User) => u.id !== userDetail.email);
+            .filter((u: User) => u.id !== userDetail?.email);
         setUserList(users);
     };
 

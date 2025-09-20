@@ -9,9 +9,10 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Video from "react-native-video";
 import { styles } from "../../styles/UploadVideo.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function UploadVideo() {
-    const router = useRouter();
+    const { safeBack,safeReplace } = useSafeNavigation()
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState<string | null>(null);
@@ -52,7 +53,7 @@ export default function UploadVideo() {
                 topics
             );
             showToast("Video uploaded successfully!");
-            router.replace("/(tabs)/home");
+            safeReplace("/(tabs)/home");
         } catch (err: any) {
             console.error(err);
             showToast("Upload failed!");
@@ -68,7 +69,7 @@ export default function UploadVideo() {
     return (
         <SafeAreaView style={styles.container}>
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={safeBack}
                 style={styles.backButton}
             >
                 <AntDesign name="left" size={24} color={Colors.WHITE} />

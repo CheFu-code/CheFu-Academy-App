@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../constant/Colors";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export type AllowedPaths =
     | "/courses/details"
@@ -12,7 +13,7 @@ export type AllowedPaths =
 interface CourseListGridProps {
     courseList: Course[];
     option: {
-        name: string; 
+        name: string;
         path: AllowedPaths;
         icon: any;
     };
@@ -22,19 +23,18 @@ export default function CourseListGrid({
     courseList: courseList,
     option,
 }: CourseListGridProps) {
-    const router = useRouter();
-
+    const { safePush, safeReplace } = useSafeNavigation()
     const onPress = (course: Course) => {
         if (option.path === "/practice/[type]") {
-            router.push({
+            safePush({
                 pathname: option.path,
                 params: {
-                    type: option.name, 
+                    type: option.name,
                     courseParams: JSON.stringify(course),
                 },
             } as any);
         } else {
-            router.push({
+            safePush({
                 pathname: option.path,
                 params: {
                     courseParams: JSON.stringify(course),

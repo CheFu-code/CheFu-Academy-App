@@ -13,13 +13,13 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 import FeaturedCourseCard from "./FeaturedCourseCard";
 import FeaturedCourseSkeleton from "./FeaturedCourseSkeleton";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function FeaturedCourses() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const db = getFirestore();
-    const router = useRouter();
-
+    const { safePush } = useSafeNavigation()
     useEffect(() => {
         const fetchFeaturedCourses = async () => {
             setLoading(true);
@@ -44,11 +44,11 @@ export default function FeaturedCourses() {
     }, []);
 
     const handlePress = (item: Course) => {
-        router.push({
+        safePush({
             pathname: "/courseView",
             params: {
                 courseParams: JSON.stringify(item),
-                enroll: false.toString(), 
+                enroll: false.toString(),
             },
         });
     };

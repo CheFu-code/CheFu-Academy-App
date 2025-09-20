@@ -4,10 +4,10 @@ import { StartChatModal } from "@/component/chatScreen/StartChatModal";
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { useChats } from "@/hooks/useChats";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { useUsers } from "@/hooks/useUsers";
 import { styles } from "@/styles/ChatScreen.styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import React, { useContext, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -16,13 +16,12 @@ const ChatScreen = () => {
     const { chats, otherUsersMap, startChat, deleteChat } = useChats();
     const { userList, fetchUsers } = useUsers();
     const [showUserModal, setShowUserModal] = useState(false);
-    const router = useRouter();
-
+    const { safePush } = useSafeNavigation()
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerText}>Chat</Text>
-                <TouchableOpacity onPress={() => router.push("/settings")}>
+                <TouchableOpacity onPress={() => safePush("/settings")}>
                     <Ionicons
                         name="settings-outline"
                         size={20}
@@ -33,10 +32,10 @@ const ChatScreen = () => {
 
             <SectionHeader title="AI Tutor" />
             <ChatItem
-                imageSource={require("../../assets/images/logo.png")}
+                imageSource={require("../../assets/images/avatar.jpg")}
                 name="CheFu AI"
                 subtitle="Ask me anything"
-                onPress={() => router.push("/ai/chefu-ai")}
+                onPress={() => safePush("/ai/chefu-ai")}
                 showCheck={true}
             />
 
@@ -69,7 +68,7 @@ const ChatScreen = () => {
                 ) : (
                     chats.map((chat) => {
                         const otherUserId = chat.members?.find(
-                            (id) => id !== userDetail.email
+                            (id) => id !== userDetail?.email
                         );
                         const otherUserData = otherUsersMap[otherUserId || ""];
 
@@ -79,19 +78,19 @@ const ChatScreen = () => {
                                 imageSource={
                                     otherUserData?.profilePicture
                                         ? { uri: otherUserData.profilePicture }
-                                        : require("../../assets/images/logo.png")
+                                        : require("../../assets/images/avatar.jpg")
                                 }
                                 name={otherUserData?.fullname || "Unknown User"}
                                 subtitle={
                                     chat.lastMessage
                                         ? chat.lastMessage.sender ===
-                                          userList[0]?.id
+                                            userList[0]?.id
                                             ? `You: ${chat.lastMessage.text}`
                                             : chat.lastMessage.text
                                         : "No messages yet"
                                 }
                                 onPress={() =>
-                                    router.push({
+                                    safePush({
                                         pathname: "/chat/[chatId]",
                                         params: { chatId: chat.id },
                                     })

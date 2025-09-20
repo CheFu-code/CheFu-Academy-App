@@ -21,6 +21,7 @@ import {
 import LottieView from "lottie-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "../../styles/Progress.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function Progress({ enroll = false }) {
     const [courseList, setCourseList] = useState<Course[]>([]);
@@ -28,8 +29,7 @@ export default function Progress({ enroll = false }) {
     const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [fetching, setFetching] = useState(false);
-    const router = useRouter();
-
+    const { safePush, safeReplace } = useSafeNavigation()
     useFocusEffect(
         useCallback(() => {
             setLoadingId(null);
@@ -56,7 +56,7 @@ export default function Progress({ enroll = false }) {
             const courseRef = collection(db, "course");
             const q = query(
                 courseRef,
-                where("createdBy", "==", userDetail.email),
+                where("createdBy", "==", userDetail?.email),
                 orderBy("createdOn", "desc")
             );
             const querySnapshot = await getDocs(q);
@@ -90,15 +90,13 @@ export default function Progress({ enroll = false }) {
         const id = item.id || item.courseTitle || "";
         setLoadingId(id);
 
-        setTimeout(() => {
-            router.push({
-                pathname: "/courseView",
-                params: {
-                    courseParams: JSON.stringify(item),
-                    enroll: enroll ? "true" : "false",
-                },
-            });
-        }, 100);
+        safePush({
+            pathname: "/courseView",
+            params: {
+                courseParams: JSON.stringify(item),
+                enroll: enroll ? "true" : "false",
+            },
+        });
     };
 
     if (loading && courseList.length === 0) {

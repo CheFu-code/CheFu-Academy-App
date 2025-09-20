@@ -21,6 +21,7 @@ import RNFS from "react-native-fs";
 import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { styles } from "../../styles/Download.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 type DownloadItem = {
     id: string;
@@ -30,8 +31,8 @@ type DownloadItem = {
 };
 
 export default function DownloadScreen() {
+    const { safeBack, safePush } = useSafeNavigation()
     const [downloads, setDownloads] = useState<DownloadItem[]>([]);
-    const router = useRouter();
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [itemToDelete, setItemToDelete] = useState<DownloadItem | null>(null);
     const [shareModal, setShareModal] = useState({
@@ -157,8 +158,8 @@ export default function DownloadScreen() {
         <View style={styles.container}>
             <Pressable
                 onPress={() => {
-                    if (router && typeof router.back === "function")
-                        router.back();
+                    if (safeBack && typeof safeBack === "function")
+                        safeBack();
                 }}
                 accessible={true}
                 accessibilityLabel="Go back"

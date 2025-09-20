@@ -13,6 +13,7 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import Button from "../Shared/Button";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 interface IntroProps {
     course: Course;
@@ -21,11 +22,11 @@ interface IntroProps {
 
 export default function Intro({ course, enroll }: IntroProps) {
     const { userDetail } = useContext(UserDetailContext);
+    const { safeReplace } = useSafeNavigation()
     const [loading, setLoading] = useState(false);
     const [showFull, setShowFull] = useState(false);
     const maxLines = showFull ? undefined : 4;
     const db = getFirestore();
-    const router = useRouter();
 
     const isCourseCompleted =
         Array.isArray(course?.completedChapter) &&
@@ -53,7 +54,7 @@ export default function Intro({ course, enroll }: IntroProps) {
 
             await setDoc(doc(db, "course", docId), data);
 
-            router.replace({
+            safeReplace({
                 pathname: "/courseView",
                 params: {
                     courseParams: JSON.stringify(data),
@@ -153,7 +154,7 @@ export default function Intro({ course, enroll }: IntroProps) {
                     )}
                 </ScrollView>
 
-                {enroll === "true" && course?.createdBy !== userDetail.email ? (
+                {enroll === "true" && course?.createdBy !== userDetail?.email ? (
                     <Button
                         opacity={loading ? 0.5 : 1}
                         text={"Enroll Now"}
@@ -174,7 +175,7 @@ export default function Intro({ course, enroll }: IntroProps) {
                         text="Completed"
                         disabled={true}
                         loading={false}
-                        onPress={() => {}}
+                        onPress={() => { }}
                         icon={
                             <Ionicons
                                 name="checkmark-circle"

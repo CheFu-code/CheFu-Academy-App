@@ -17,6 +17,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import { styles } from "../../styles/GitHub.styles";
 import { saveUser } from "../../utils/authService";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -28,7 +29,7 @@ const discovery = {
 export default function GitHubAuthScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
+    const { safeReplace } = useSafeNavigation()
     const auth = getAuth();
 
     const codeVerifierRef = useRef<string | null | undefined>(null);
@@ -53,7 +54,7 @@ export default function GitHubAuthScreen() {
         if (request) {
             codeVerifierRef.current = request.codeVerifier ?? null;
             promptAsync()
-                .then((result) => {})
+                .then((result) => { })
                 .catch((err) => {
                     console.error("promptAsync error:", err);
                 });
@@ -166,7 +167,7 @@ export default function GitHubAuthScreen() {
 
                 if (savedData) {
                     // ✅ redirect only after user is saved
-                    router.replace("/(tabs)/home");
+                    safeReplace("/(tabs)/home");
                 } else {
                     setError("Failed to save user data.");
                 }
@@ -211,7 +212,7 @@ export default function GitHubAuthScreen() {
                     disabled={loading}
                     loading={loading}
                     text="Try again"
-                    onPress={() => router.replace("/")}
+                    onPress={() => safeReplace("/")}
                     icon={<Ionicons name="refresh" size={20} color="#fff" />}
                 />
             </View>

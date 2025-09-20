@@ -1,6 +1,6 @@
 import { showToast } from "@/utils/toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { deleteUser, EmailAuthProvider, getAuth, reauthenticateWithCredential, sendEmailVerification } from "@react-native-firebase/auth";
+import { deleteUser, EmailAuthProvider, getAuth, reauthenticateWithCredential, sendEmailVerification, signOut } from "@react-native-firebase/auth";
 import { deleteDoc, doc, getDoc, getFirestore, setDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useCallback, useState } from "react";
@@ -15,7 +15,7 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
     const handleLogout = useCallback(async () => {
         try {
             setLoading(true);
-            await auth.signOut();
+            await signOut(auth);
             await AsyncStorage.removeItem("userDetail");
             await AsyncStorage.removeItem(CACHE_KEY);
             setUserDetail(null);

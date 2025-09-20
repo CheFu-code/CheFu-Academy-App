@@ -16,6 +16,7 @@ import { Colors } from "../constant/Colors";
 import { NetworkProvider, useNetwork } from "../context/NetworkContext";
 import { UserDetailContext } from "../context/UserDetailContext";
 import { useBiometricAuth } from "../hooks/useBiometricAuth";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 // ✅ Sentry Init
 Sentry.init({
@@ -34,8 +35,7 @@ const useProtectedRoute = (
     authChecked: boolean
 ) => {
     const segments = useSegments();
-    const router = useRouter();
-
+    const { safeReplace } = useSafeNavigation()
     useEffect(() => {
         // Wait until the auth state is actually checked before redirecting.
         if (!authChecked) {
@@ -46,12 +46,12 @@ const useProtectedRoute = (
 
         if (userDetail && inAuthGroup) {
             // User is signed in and on an auth screen, redirect to home.
-            router.replace("/(tabs)/home");
+            safeReplace("/(tabs)/home");
         } else if (!userDetail && !inAuthGroup) {
             // User is not signed in and not on a protected screen, redirect to sign in.
-            router.replace("/auth/signIn");
+            safeReplace("/auth/signIn");
         }
-    }, [userDetail, segments, authChecked, router]);
+    }, [userDetail, segments, authChecked, safeReplace]);
 };
 
 function LayoutContent() {

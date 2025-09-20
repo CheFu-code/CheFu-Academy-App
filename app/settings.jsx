@@ -11,7 +11,7 @@ import * as LocalAuthentication from "expo-local-authentication";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as Sharing from "expo-sharing";
-
+import {useSafeNavigation} from "../hooks/useSafeNavigation"
 import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -45,7 +45,7 @@ export default function SettingsScreen() {
     const CACHE_KEY = "@cached_courses";
     const db = getFirestore();
     const auth = getAuth();
-    const router = useRouter();
+    const {safePush, safeBack, safeReplace}=useSafeNavigation()
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: "",
@@ -377,7 +377,7 @@ export default function SettingsScreen() {
                                 flexDirection: "row",
                                 alignItems: "center",
                             }}
-                            onPress={() => router.back()}
+                            onPress={safeBack}
                         >
                             <AntDesign name="left" size={24} color="#fff" />
                             <Text style={styles.title}>Settings</Text>
@@ -424,7 +424,7 @@ export default function SettingsScreen() {
                         <SettingItem
                             label="Change Password"
                             icon="lock-closed"
-                            onPress={() => router.push("/changePassword")}
+                            onPress={() => safePush("/changePassword")}
                         />
                         <SettingItem
                             label="Export My Data"
@@ -458,14 +458,14 @@ export default function SettingsScreen() {
                         <SettingItem
                             label="Email Alerts"
                             icon="mail"
-                            onPress={() => router.push("/emailAlerts")}
+                            onPress={() => safePush("/emailAlerts")}
                         />
 
                         <Text style={styles.heading}>Privacy & Security</Text>
                         <SettingItem
                             label="Privacy Policy"
                             icon="shield-checkmark"
-                            onPress={() => router.push("/privacy")}
+                            onPress={() => safePush("/privacy")}
                         />
                         <SettingItem
                             label="Enable Biometric Lock"
@@ -483,13 +483,13 @@ export default function SettingsScreen() {
                         <SettingItem
                             label="Permissions"
                             icon="lock-open"
-                            onPress={() => router.push("/permissions")}
+                            onPress={() => safePush("/permissions")}
                         />
 
                         <SettingItem
                             label="Trusted Devices"
                             icon="hardware-chip"
-                            onPress={() => router.push("/trustedDevices")}
+                            onPress={() => safePush("/trustedDevices")}
                             disabled={loading}
                         />
 
@@ -497,7 +497,7 @@ export default function SettingsScreen() {
                         <SettingItem
                             label="About this App"
                             icon="information-circle-outline"
-                            onPress={() => router.push("/about")}
+                            onPress={() => safePush("/about")}
                         />
                         <SettingItem
                             label="Help & Support"
@@ -511,7 +511,7 @@ export default function SettingsScreen() {
                         <SettingItem
                             label="Terms of Service"
                             icon="document-text-outline"
-                            onPress={() => router.push("/about")}
+                            onPress={() => safePush("/about")}
                         />
                         <SettingItem
                             label="App Version"
@@ -540,7 +540,7 @@ export default function SettingsScreen() {
                                 label="Subscription & Billing"
                                 icon="card-outline"
                                 onPress={() =>
-                                    router.push("/subscriptionAndBilling")
+                                    safePush("/subscriptionAndBilling")
                                 }
                             />
                         )}
@@ -568,7 +568,7 @@ export default function SettingsScreen() {
                             label="Buy me coffee"
                             icon="exit"
                             onPress={async () => {
-                                router.push("/buyMeCoffee");
+                                safePush("/buyMeCoffee");
                             }}
                         />
                         <SettingItem
@@ -576,7 +576,7 @@ export default function SettingsScreen() {
                             icon="exit-outline"
                             onPress={async () => {
                                 await logOut();
-                                router.replace("/auth/signIn");
+                                safeReplace("/auth/signIn");
                             }}
                         />
                     </ScrollView>

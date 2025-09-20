@@ -1,4 +1,5 @@
 import { Colors } from "@/constant/Colors";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { styles } from "@/styles/ProfileView.styles";
 import { Course } from "@/types/course";
 import { User } from "@/types/user";
@@ -26,7 +27,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileView() {
-    const router = useRouter();
+    const { safeBack } = useSafeNavigation()
     const { userId } = useLocalSearchParams<{ userId: string }>();
     const [loading, setLoading] = useState(true);
     const [userData, setUserData] = useState<User | null>(null);
@@ -123,7 +124,7 @@ export default function ProfileView() {
             <SafeAreaView style={styles.loadingContainer}>
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => router.back()}
+                    onPress={() => safeBack()}
                 >
                     <AntDesign name="left" size={24} color={Colors.WHITE} />
                     <Text style={styles.backText}>Back</Text>
@@ -153,7 +154,7 @@ export default function ProfileView() {
                 style={{ position: "absolute", width: "100%", height: 500 }}
             />
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => safeBack()}
                 style={styles.header}
             >
                 <AntDesign name="left" size={24} color={Colors.WHITE} />

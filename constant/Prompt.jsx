@@ -7,6 +7,7 @@ export default {
     - Make sure it is related to description
     - Output will be ARRAY of String in JSON FORMAT only
     - Do not add any plain text in output,
+    - Do not include any explanations, markdown, or text outside the JSON object.
     `,
     // - Chapter Explain in HTML Form, (Code example if required), add line break if required!
     COURSE: dedent`: As you are coaching teacher
@@ -117,5 +118,3 @@ export default {
 ]
     `,
 };
-
-//  - Add CourseBanner Image from ('/tech_coding.png','/science_engineering.png','/business_finance.png','/health_fitness.png','/arts_creativity.png','/language_communication.png','/personal_development.png','/history_culture.png','/math_logic.png','/education_teaching.png','/lifestyle_hobbies.png','/marketing_sales.png','/design_ux.png','/law_government.png','/environment_sustainability.png','/photography_videography.png','/music_audio.png','/food_cooking.png','/travel_adventure.png','/sports_recreation.png','/parenting_family.png','/psychology_mental_health.png','/writing_literature.png','/religion_spirituality.png','/automotive_vehicles.png','/real_estate_property.png', '/science_fiction_fantasy.png','/gaming_esports.png','/crafts_diy.png','/technology_gadgets.png','/investing_trading.png','/human_resources_recruiting.png','/economics_policy.png','/public_speaking_presentation.png','/data_science_analytics.png','/artificial_intelligence_machine_learning.png','/cybersecurity.png','/blockchain_cryptocurrency.png','/graphic_design.png','/animation_motion_graphics.png','/interior_design.png','/fashion_beauty.png','/entrepreneurship.png','/customer_service_support.png','/project_management.png','/language_learning.png','/social_media.png','/career_development.png','/sustainability_green_tech.png'), choose image based on category

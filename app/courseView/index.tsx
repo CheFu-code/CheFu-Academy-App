@@ -38,10 +38,11 @@ import { Colors } from "../../constant/Colors";
 import { imageAssets } from "../../constant/Option";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/CourseView";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function CourseView() {
     const { courseParams, enroll } = useLocalSearchParams();
-    const router = useRouter();
+    const { safeReplace, safePush } = useSafeNavigation()
     const firestore = getFirestore();
     const [course, setCourse] = useState<Course>({
         id: "",
@@ -157,7 +158,7 @@ export default function CourseView() {
                 );
                 setDownloaded(true);
                 setLoading(false);
-                router.push("/download");
+                safePush("/download");
                 return;
             }
 
@@ -227,7 +228,7 @@ export default function CourseView() {
             }
 
             setDownloaded(true);
-            router.push("/download");
+            safePush("/download");
         } catch (err) {
             ToastAndroid.show("Download failed", ToastAndroid.SHORT);
             console.error(err);
@@ -286,7 +287,7 @@ export default function CourseView() {
 
             <TouchableOpacity
                 disabled={loading}
-                onPress={() => router.replace("/(tabs)/home")}
+                onPress={() => safeReplace("/(tabs)/home")}
                 style={styles.backButton}
             >
                 <Ionicons size={24} color={Colors.BLACK} name="arrow-back" />
@@ -365,7 +366,7 @@ export default function CourseView() {
                         <Intro
                             course={course}
                             enroll={Array.isArray(enroll) ? enroll[0] : enroll}
-                            
+
                         />
                         <Chapters course={course} />
                     </View>

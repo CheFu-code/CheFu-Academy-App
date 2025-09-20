@@ -3,6 +3,8 @@ import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 export type Video = {
     id: string;
     title: string;
+    instructorCompany: string;
+    instructorName: string;
     description: string;
     videoURL: string;
     thumbnailURL: string;
@@ -10,6 +12,7 @@ export type Video = {
     uploadedAt: FirebaseFirestoreTypes.Timestamp;
     category: string;
     visibility: "public" | "private";
+    level: "beginner" | "advance";
     duration: number;   // in seconds
     views: number;      // view count
     topics: string[];
@@ -27,12 +30,18 @@ export type UploadFormProps = {
     setThumbnailUri: (uri: string | null) => void;
     title: string;
     setTitle: (text: string) => void;
+    instructorCompany: string;
+    setInstructorCompany: (text: string) => void;
+    instructorName: string;
+    setInstructorName: (text: string) => void;
     description: string;
     setDescription: (text: string) => void;
     category: string | null;
     setCategory: (cat: string | null) => void;
     visibility: string | null;
     setVisibility: React.Dispatch<React.SetStateAction<"public" | "private" | null>>;
+    level: "advance" | "beginner" | null;
+    setLevel: React.Dispatch<React.SetStateAction<"advance" | "beginner" | null>>;
     loading: boolean;
     setLoading: (loading: boolean) => void;
     duration: number;

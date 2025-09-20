@@ -1,17 +1,17 @@
 import { Colors } from "@/constant/Colors";
 import { categories } from "@/data/categories";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function Categories() {
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const router = useRouter();
-
+    const { safePush } = useSafeNavigation()
     const handleCategoryPress = useCallback(
         (category: string) => {
             setSelectedCategory(category);
-            router.push({
+            safePush({
                 pathname: "/searchResults",
                 params: {
                     query: category === "All" ? "" : category,
@@ -19,16 +19,16 @@ export default function Categories() {
                 },
             });
         },
-        [router]
+        [safePush]
     );
 
     const handleViewAll = useCallback(() => {
         // This can navigate to a dedicated screen for all categories later
-        router.push({
+        safePush({
             pathname: "/searchResults",
             params: { query: "", title: "All Categories" },
         });
-    }, [router]);
+    }, [safePush]);
 
     const renderCategoryChip = (item: string) => {
         const isSelected = selectedCategory === item;

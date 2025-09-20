@@ -10,15 +10,14 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
     },
     card: {
-        borderRadius: 10,
         overflow: "hidden",
         alignItems: "center",
         width: "100%",
     },
     thumbnail: {
-        // width: width - 40,
         height: 200,
-        borderRadius: 10,
+        borderTopLeftRadius:10,
+        borderTopRightRadius:10,
         backgroundColor: Colors.GRAY,
         width: "100%",
     },
@@ -43,7 +42,7 @@ export const styles = StyleSheet.create({
     category: {
         position: "absolute",
         top: 10,
-        left: 15,
+        left: 10,
         zIndex: 10,
         backgroundColor: Colors.GREEN,
         padding: 5,

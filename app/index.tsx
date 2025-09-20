@@ -7,9 +7,10 @@ import { useRouter } from "expo-router";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../constant/Colors";
 import { styles } from "../styles/WelcomeScreen.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function Index() {
-    const router = useRouter();
+    const { safePush } = useSafeNavigation()
     const { loading } = useLoadUser();
     const { navigateGitHub, navigateGoogle } = useSocialAuthNavigation();
     useImmersiveMode();
@@ -44,7 +45,7 @@ export default function Index() {
                 <TouchableOpacity
                     disabled={loading}
                     style={styles.button}
-                    onPress={() => router.push("/auth/signUp")}
+                    onPress={() => safePush("/auth/signUp")}
                 >
                     <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
@@ -70,7 +71,7 @@ export default function Index() {
 
                 <TouchableOpacity
                     disabled={loading}
-                    onPress={() => router.push("/auth/signIn")}
+                    onPress={() => safePush("/auth/signIn")}
                     style={[
                         styles.button2,
                         { backgroundColor: Colors.PRIMARY },

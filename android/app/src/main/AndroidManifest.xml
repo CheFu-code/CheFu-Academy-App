@@ -37,7 +37,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="chefu-academy"/>
         <data android:scheme="exp+chefu-academy"/>
-        <data android:scheme="https" android:host="chefu-academy.vercel.app" />
+        <data android:scheme="https" android:host="chefu-academy.vercel.app"/>
       </intent-filter>
       <intent-filter data-generated="true">
         <action android:name="android.intent.action.VIEW"/>

@@ -5,6 +5,7 @@ import Reviews from "@/component/VideoDetail/Reviews";
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { formatDuration } from "@/helpers/formatDateVideoCard";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { fetchVideoById } from "@/services/videoService";
 import { styles } from "@/styles/VideoDetail.styles";
 import { Video } from "@/types/video";
@@ -12,9 +13,11 @@ import { showToast } from "@/utils/toast";
 import {
     AntDesign,
     Feather,
+    FontAwesome,
     FontAwesome5,
     MaterialIcons,
 } from "@expo/vector-icons";
+import { getAuth } from "@react-native-firebase/auth";
 import {
     deleteDoc,
     doc,
@@ -25,6 +28,12 @@ import {
     setDoc,
     updateDoc,
 } from "@react-native-firebase/firestore";
+import {
+    deleteObject,
+    getStorage,
+    ref,
+    refFromURL,
+} from "@react-native-firebase/storage";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -44,7 +53,8 @@ import { Video as VideoView } from "react-native-video";
 
 export default function VideoDetail() {
     const db = getFirestore();
-    const router = useRouter();
+    const auth = getAuth();
+    const { safeReplace, safeBack } = useSafeNavigation();
     const { id } = useLocalSearchParams();
     const { userDetail } = useContext(UserDetailContext);
     const [video, setVideo] = useState<Video | null>(null);
@@ -58,6 +68,7 @@ export default function VideoDetail() {
     const [showOptions, setShowOptions] = useState(false);
     const [downloading, setDownloading] = useState(false);
     const [reportReason, setReportReason] = useState("");
+    const [uploaderName, setUploaderName] = useState<string | null>(null);
     const [showReportModal, setShowReportModal] = useState(false);
     const uploadedAtText = video?.uploadedAt?.toDate().toLocaleDateString();
 
@@ -80,7 +91,7 @@ export default function VideoDetail() {
             // case "Resources":
             // return <Resources video={video} />;
             case "Reviews":
-                return <Reviews video={video} />;
+                return <Reviews video={video} enrolled={enrolled} />;
             default:
                 return null;
         }
@@ -95,6 +106,24 @@ export default function VideoDetail() {
         loadVideo();
     }, [id]);
 
+    useEffect(() => {
+        const fetchUploaderName = async () => {
+            if (!video?.uploadedBy) return;
+
+            const userRef = doc(getFirestore(), "users", video.uploadedBy);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                setUploaderName(data?.fullname ?? video.uploadedBy);
+            } else {
+                setUploaderName(video.uploadedBy); // fallback to email
+            }
+        };
+
+        fetchUploaderName();
+    }, [video]);
+
     const handleEnroll = async () => {
         setEnrolling(true);
         if (!userDetail) {
@@ -106,14 +135,13 @@ export default function VideoDetail() {
             setEnrolling(false);
             return;
         }
-        if (!video) return;
 
         try {
             // user enrollments collection
             const ref = doc(
                 db,
                 "users",
-                userDetail.email,
+                userDetail?.email,
                 "enrollments",
                 video.id
             );
@@ -125,13 +153,11 @@ export default function VideoDetail() {
                 enrolledAt: serverTimestamp(),
             });
 
-            // increment video views count
             const videoRef = doc(db, "videos", video.id);
             await updateDoc(videoRef, {
                 views: increment(1),
             });
 
-            // also update local state so UI reflects immediately
             setVideo((prev) =>
                 prev ? { ...prev, views: (prev.views || 0) + 1 } : prev
             );
@@ -147,7 +173,13 @@ export default function VideoDetail() {
 
     useEffect(() => {
         if (!userDetail || !video) return;
-        const ref = doc(db, "users", userDetail.email, "enrollments", video.id);
+        const ref = doc(
+            db,
+            "users",
+            userDetail?.email,
+            "enrollments",
+            video.id
+        );
         getDoc(ref).then((docSnap) => {
             if (docSnap.exists()) setEnrolled(true);
         });
@@ -158,7 +190,7 @@ export default function VideoDetail() {
         const favRef = doc(
             db,
             "users",
-            userDetail.email,
+            userDetail?.email,
             "favorites",
             video.id
         );
@@ -184,18 +216,16 @@ export default function VideoDetail() {
             const favRef = doc(
                 db,
                 "users",
-                userDetail.email,
+                userDetail?.email,
                 "favorites",
                 video.id
             );
 
             if (favorite) {
-                // already favorite → remove
                 await deleteDoc(favRef);
                 setFavorite(false);
                 showToast("Removed from favorites.");
             } else {
-                // add to favorites
                 await setDoc(favRef, {
                     videoId: video.id,
                     title: video.title,
@@ -256,16 +286,30 @@ export default function VideoDetail() {
 
     const handleDeleteVideo = async () => {
         if (!video) return;
+        if (!auth.currentUser) {
+            showToast("You must be logged in to delete video");
+            return;
+        }
 
         try {
             setDeleting(true);
             showToast("Deleting video...");
 
-            // Delete video from database
-            const videoRef = doc(db, "videos", video.id);
-            await deleteDoc(videoRef);
+            const storage = getStorage();
 
-            router.replace("/(tabs)/home");
+            // ✅ Pass both storage and the download URL
+            const videoRef = refFromURL(storage, video.videoURL);
+            const thumbnailRef = refFromURL(storage, video.thumbnailURL);
+
+            // Delete files from Storage
+            await deleteObject(videoRef);
+            await deleteObject(thumbnailRef);
+
+            // Delete Firestore document
+            const docRef = doc(getFirestore(), "videos", video.id);
+            await deleteDoc(docRef);
+
+            safeReplace("/(tabs)/home");
             showToast("Video deleted successfully!");
         } catch (error) {
             console.error("Delete failed:", error);
@@ -289,13 +333,13 @@ export default function VideoDetail() {
             const reportRef = doc(
                 db,
                 "reports",
-                `${video.id}_${userDetail.email}`
+                `${video.id}_${userDetail?.email}`
             );
 
             await setDoc(reportRef, {
                 videoId: video.id,
                 title: video.title,
-                reportedBy: userDetail.email,
+                reportedBy: userDetail?.email,
                 reason: reportReason,
                 reportedAt: serverTimestamp(),
             });
@@ -338,10 +382,7 @@ export default function VideoDetail() {
                     padding: 10,
                 }}
             >
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => router.back()}
-                >
+                <TouchableOpacity style={styles.backButton} onPress={safeBack}>
                     <AntDesign name="left" size={24} color={Colors.BLACK} />
                     <Text style={styles.backText}>Back</Text>
                 </TouchableOpacity>
@@ -410,10 +451,22 @@ export default function VideoDetail() {
             )}
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={styles.title}>{video.title}</Text>
-                <Text style={styles.uploadedBy}>by {video.uploadedBy}</Text>
+                <Text style={styles.uploadedBy}>
+                    by{" "}
+                    <Text style={{ fontFamily: "outfit-bold" }}>
+                        {uploaderName || video.uploadedBy}
+                    </Text>
+                </Text>
 
                 <View style={styles.durationContainer}>
-                    <Text style={styles.uploadedAt}>{uploadedAtText}</Text>
+                    <View style={styles.durationInfo}>
+                        <FontAwesome
+                            name="calendar"
+                            size={14}
+                            color={Colors.BLACK}
+                        />
+                        <Text style={styles.uploadedAt}>{uploadedAtText}</Text>
+                    </View>
                     <View style={[styles.durationInfo, { left: 40 }]}>
                         <AntDesign
                             name="clockcircleo"
@@ -439,7 +492,10 @@ export default function VideoDetail() {
                     <View style={styles.box}>
                         <Text style={styles.level}>Level</Text>
                         <Text style={styles.commonText}>
-                            Beginner to Advanced
+                            {video?.level
+                                ? video.level.charAt(0).toUpperCase() +
+                                  video.level.slice(1)
+                                : "N/A"}
                         </Text>
                     </View>
                     <View style={styles.box}>

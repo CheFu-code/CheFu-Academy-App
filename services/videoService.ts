@@ -18,6 +18,7 @@ import uuid from "react-native-uuid";
 
 export const uploadVideo = async (
     title: string,
+    instructor:string,
     description: string,
     videoUri: string,
     thumbnailUri: string,
@@ -43,6 +44,7 @@ export const uploadVideo = async (
     await setDoc(doc(db, "videos", videoId), {
         id: videoId,
         title,
+        instructor,
         description,
         videoURL,
         thumbnailURL,
@@ -68,7 +70,7 @@ export const fetchVideos = async (): Promise<Video[]> => {
     const db = getFirestore();
     const q = query(
         collection(db, "videos"),
-        where("visibility", "==", "public"), // ✅ usually show only public
+        where("visibility", "==", "public"), 
         orderBy("uploadedAt", "desc")
     );
 
@@ -93,13 +95,16 @@ export const fetchVideoById = async (videoId: string): Promise<Video | null> => 
         return {
             id: docSnap.id,
             title: data.title,
+            instructorCompany: data.instructorCompany,
+            instructorName: data.instructorName,
             description: data.description,
             videoURL: data.videoURL,
             thumbnailURL: data.thumbnailURL,
             uploadedBy: data.uploadedBy,
-            uploadedAt: data.uploadedAt, // Firestore Timestamp
+            uploadedAt: data.uploadedAt, 
             category: data.category,
             visibility: data.visibility,
+            level: data.level ?? "beginner", 
             duration: data.duration ?? 0,
             views: data.views ?? 0,
             topics: data.topics ?? [],

@@ -1,9 +1,10 @@
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
+import { useSafeNavigation } from "./useSafeNavigation";
 
 export function useDeepLinking() {
-    const router = useRouter();
+    const { safeReplace, safePush } = useSafeNavigation()
     const lastHandledOrderID = useRef<string | null>(null);
 
     const handleDeepLink = (url: string) => {
@@ -18,12 +19,12 @@ export function useDeepLinking() {
             if (orderID && orderID === lastHandledOrderID.current) return;
             lastHandledOrderID.current = orderID;
 
-            router.replace({
+            safeReplace({
                 pathname: "/subscription/success",
                 params: { token: orderID, planType },
             });
         } else if (parsed.path === "cancel") {
-            router.push("/subscription/cancel");
+            safePush("/subscription/cancel");
         }
     };
 

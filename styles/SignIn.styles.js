@@ -56,10 +56,11 @@ export const styles = StyleSheet.create({
     iconsContainer: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "center",
         gap: 10,
         backgroundColor: Colors.BG,
         borderRadius: 12,
+        paddingHorizontal: 10,
     },
     icons: {
         textAlign: "center",

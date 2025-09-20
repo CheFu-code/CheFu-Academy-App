@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { imageAssets } from "../../constant/Option";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 interface CourseListProps {
     courseList: Course[];
@@ -26,7 +27,7 @@ export default function CourseList({
     heading = "My Courses",
     enroll = false,
 }: CourseListProps) {
-    const router = useRouter();
+    const { safePush } = useSafeNavigation()
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const displayedCourses = courseList.slice(0, 4);
 
@@ -41,7 +42,7 @@ export default function CourseList({
         setLoadingId(id);
 
         setTimeout(() => {
-            router.push({
+            safePush({
                 pathname: "/courseView",
                 params: {
                     courseParams: JSON.stringify(item),
@@ -55,6 +56,7 @@ export default function CourseList({
         <View
             style={{
                 pointerEvents: loadingId ? "none" : "auto",
+                marginHorizontal:-10
             }}
         >
             <View
@@ -62,10 +64,11 @@ export default function CourseList({
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    marginHorizontal:10
                 }}
             >
                 <Text style={styles.heading}>{heading}</Text>
-                <TouchableOpacity onPress={() => router.push("/myCourses")}>
+                <TouchableOpacity onPress={() => safePush("/myCourses")}>
                     <Text style={styles.viewAll}>View All</Text>
                 </TouchableOpacity>
             </View>
@@ -94,7 +97,7 @@ export default function CourseList({
                                 }}
                                 source={
                                     imageAssets[
-                                        item?.banner_image as keyof typeof imageAssets
+                                    item?.banner_image as keyof typeof imageAssets
                                     ]
                                 }
                             />

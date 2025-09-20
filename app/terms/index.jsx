@@ -10,12 +10,13 @@ import {
     View,
 } from "react-native";
 import { Colors } from "../../constant/Colors";
+import {useSafeNavigation} from "../../hooks/useSafeNavigation"
 
-const CONTACT_EMAIL = "kurisanimaluleke77@gmail.com";
+const CONTACT_EMAIL = "chefu.inc@gmail.com";
 const LAST_UPDATED = new Date(2025, 6, 10); // July is month 6 (0-indexed)
 
 export default function TermsOfService() {
-    const router = useRouter();
+    const {safeBack} = useSafeNavigation()
     const scrollRef = useRef(null);
 
     useEffect(() => {
@@ -36,7 +37,7 @@ export default function TermsOfService() {
                 style={styles.backButton}
                 onPress={() => {
                     if (router && typeof router.back === "function")
-                        router.back();
+                        safeBack;
                 }}
                 accessible={true}
                 accessibilityLabel="Go back"

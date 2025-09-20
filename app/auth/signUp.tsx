@@ -21,6 +21,7 @@ import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/SignUp.styles";
 import { signUpUser } from "../../utils/authService";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 interface SignUpResponse {
     user: FirebaseAuthTypes.User;
@@ -37,12 +38,12 @@ interface SignUpResponse {
 type SignUpResponseOrUndefined = SignUpResponse | undefined;
 
 const SignUp = () => {
-    const router = useRouter();
     const [fullName, setFullName] = useState("");
     const [fullNameError, setFullNameError] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { setUserDetail } = useContext(UserDetailContext);
+    const { safeReplace, safePush } = useSafeNavigation()
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -268,9 +269,9 @@ const SignUp = () => {
                                     {
                                         opacity:
                                             loading ||
-                                            !email ||
-                                            !password ||
-                                            !fullName
+                                                !email ||
+                                                !password ||
+                                                !fullName
                                                 ? 0.4
                                                 : 1,
                                     },
@@ -304,7 +305,7 @@ const SignUp = () => {
 
                                 <Pressable
                                     onPress={() =>
-                                        router.replace("/auth/signIn")
+                                        safeReplace("/auth/signIn")
                                     }
                                 >
                                     <Text
@@ -326,7 +327,7 @@ const SignUp = () => {
                                             color: Colors.YELLOW,
                                             textDecorationLine: "underline",
                                         }}
-                                        onPress={() => router.push("/terms")}
+                                        onPress={() => safePush("/terms")}
                                     >
                                         Terms of Service
                                     </Text>{" "}
@@ -336,7 +337,7 @@ const SignUp = () => {
                                             color: Colors.YELLOW,
                                             textDecorationLine: "underline",
                                         }}
-                                        onPress={() => router.push("/privacy")}
+                                        onPress={() => safePush("/privacy")}
                                     >
                                         Privacy Policy
                                     </Text>
@@ -358,7 +359,7 @@ const SignUp = () => {
                 }}
                 onConfirm={() => {
                     setSuccessModal({ ...successModal, visible: false });
-                    router.replace("/(tabs)/home");
+                    safeReplace("/(tabs)/home");
                 }}
             />
         </>

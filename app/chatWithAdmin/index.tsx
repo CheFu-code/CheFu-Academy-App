@@ -1,5 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { AntDesign } from "@expo/vector-icons";
 import firestore, {
     FirebaseFirestoreTypes,
@@ -56,8 +57,8 @@ async function sendNotification(
 }
 
 export default function ChatWithAdmin() {
+    const { safePush, safeBack } = useSafeNavigation()
     const { userDetail } = useContext(UserDetailContext);
-    const router = useRouter();
     const [message, setMessage] = useState("");
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const { width } = Dimensions.get("window");
@@ -148,7 +149,7 @@ export default function ChatWithAdmin() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={safeBack}
                 style={{
                     flexDirection: "row",
                     alignItems: "center",

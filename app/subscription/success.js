@@ -11,6 +11,7 @@ import {
 import Button from "../../component/Shared/Button";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
+import { useSafeNavigation } from "../../hooks/useSafeNavigation";
 
 export default function SuccessScreen() {
     const [receipt, setReceipt] = useState(null);
@@ -19,8 +20,7 @@ export default function SuccessScreen() {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [loader, setLoader] = useState(false);
     const captureCalled = useRef(false);
-
-    const router = useRouter();
+const {safePush,safeReplace}=useSafeNavigation()
     const params = useLocalSearchParams();
     const orderID = params.token;
     // Defensive: fallback to empty string if userDetail is not loaded
@@ -123,7 +123,7 @@ export default function SuccessScreen() {
     useEffect(() => {
         if (receipt) {
             if (countdown === 0) {
-                router.replace("/subscriptionAndBilling");
+                safeReplace("/subscriptionAndBilling");
             }
             const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
             return () => clearTimeout(timer);
@@ -174,7 +174,7 @@ export default function SuccessScreen() {
                     <ActivityIndicator size={"small"} color={Colors.PRIMARY} />
                 ) : (
                     <Button
-                        onPress={() => router.push("/subscription")}
+                        onPress={() => safePush("/subscription")}
                         text={"Try again"}
                         loading={loader}
                         disabled={loader}
@@ -182,7 +182,7 @@ export default function SuccessScreen() {
                 )}
 
                 <Button
-                    onPress={() => router.push("/")}
+                    onPress={() => safePush("/")}
                     text={"Home"}
                     loading={loader}
                     disabled={loader}

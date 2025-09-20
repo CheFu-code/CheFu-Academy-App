@@ -54,7 +54,7 @@ export default function CourseProgressCard({
             return;
         }
 
-        const userDocRef = doc(firestore, "users", userDetail.email); // using email as doc ID
+        const userDocRef = doc(firestore, "users", userDetail?.email); // using email as doc ID
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {

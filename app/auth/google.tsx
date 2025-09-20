@@ -14,11 +14,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { styles } from "../../styles/GitHub.styles";
 import { saveUser } from "../../utils/authService";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function GoogleAuthScreen() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
+    const { safePush, safeReplace } = useSafeNavigation()
     const auth = getAuth();
 
     useEffect(() => {
@@ -75,7 +76,7 @@ export default function GoogleAuthScreen() {
                 throw new Error("Failed to save user data.");
             }
 
-            router.replace("/(tabs)/home");
+            safeReplace("/(tabs)/home");
         } catch (err: unknown) {
             console.error("Google sign-in error:", err);
             const message = isFirebaseError(err)
@@ -85,7 +86,7 @@ export default function GoogleAuthScreen() {
         } finally {
             setLoading(false);
         }
-    }, [auth, router]);
+    }, [auth, safeReplace]);
 
     const linkEmailPasswordToCurrentUser = React.useCallback(
         async (

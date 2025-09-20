@@ -8,6 +8,7 @@ import {
 import { Timestamp } from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
+import { useSafeNavigation } from "./useSafeNavigation";
 
 // 🔹 Map Firebase User → UserDetail
 function mapFirebaseUserToUserDetail(user: FirebaseAuthTypes.User): UserDetail {
@@ -57,7 +58,7 @@ function mapFirebaseUserToUserDetail(user: FirebaseAuthTypes.User): UserDetail {
 
 export function useFirebaseAuthObserver(authChecked: boolean, authSuccess: boolean) {
     const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
-    const router = useRouter();
+    const { safeBack, safePush, safeReplace } = useSafeNavigation()
     const alreadyRedirected = useRef(false);
 
     useEffect(() => {
@@ -73,13 +74,13 @@ export function useFirebaseAuthObserver(authChecked: boolean, authSuccess: boole
                 if (!alreadyRedirected.current) {
                     alreadyRedirected.current = true;
                     console.log("User is not authenticated, redirecting to welcome screen");
-                    router.replace("/");
+                    safeReplace("/");
                 }
             }
         });
 
         return unsubscribe;
-    }, [authChecked, authSuccess, router]);
+    }, [authChecked, authSuccess, safeReplace]);
 
     return { userDetail, setUserDetail };
 }

@@ -12,16 +12,17 @@ import { changeAvatar } from "@/utils/changeAvatar";
 import { showToast } from "@/utils/toast";
 import { getAuth } from "@react-native-firebase/auth";
 import { doc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Image, Linking, SafeAreaView, ToastAndroid } from "react-native";
 import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Profile.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function Profile() {
-    const router = useRouter();
+    const { safePush, safeReplace } = useSafeNavigation()
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const {
         email,
@@ -70,11 +71,11 @@ export default function Profile() {
 
     useEffect(() => {
         if (!email) {
-            router.replace("/auth/signIn");
+            safeReplace("/auth/signIn");
         } else {
             refreshData();
         }
-    }, [email, router, refreshData]);
+    }, [email, safeReplace, refreshData]);
 
     useEffect(() => {
         setAvatarURL(userDetail?.profilePicture);
@@ -89,9 +90,9 @@ export default function Profile() {
         if (member === true) {
             showToast("You are already a member.");
         } else {
-            router.push("/subscription");
+            safePush("/subscription");
         }
-    }, [member, router, showToast]);
+    }, [member, safePush, showToast]);
 
     const handleChangeAvatar = async () => {
         setLoader(true);

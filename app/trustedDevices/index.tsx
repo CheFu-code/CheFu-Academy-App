@@ -41,7 +41,7 @@ export default function TrustedDevices() {
         if (!userDetail?.email) return;
 
         try {
-            const snapshot = await getDoc(doc(db, "users", userDetail.email)); // 👈 wrap with doc()
+            const snapshot = await getDoc(doc(db, "users", userDetail?.email)); // 👈 wrap with doc()
             if (snapshot.exists()) {
                 const data = snapshot.data();
                 setUserDetail({ ...userDetail, ...data });
@@ -94,7 +94,7 @@ export default function TrustedDevices() {
                                         )
                                 );
                             await updateDoc(
-                                doc(db, "users", userDetail.email),
+                                doc(db, "users", userDetail?.email),
                                 {
                                     trustedDevices: filteredDevices,
                                 }

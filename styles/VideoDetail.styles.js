@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
         marginTop: 10,
     },
     enrollContainer: {
-        marginBottom: 20,
+        marginBottom: 10,
         marginHorizontal: 12,
     },
     options: {

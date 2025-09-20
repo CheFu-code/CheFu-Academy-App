@@ -1,12 +1,12 @@
 import { Colors } from "@/constant/Colors";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 export default function ChatHeader({ otherUser, lastSeen, setShowModal }: any) {
-    const router = useRouter();
-
+    const { safeBack } = useSafeNavigation()
     return (
         <View
             style={{
@@ -26,7 +26,7 @@ export default function ChatHeader({ otherUser, lastSeen, setShowModal }: any) {
                 }}
             >
                 <TouchableOpacity
-                    onPress={() => router.back()}
+                    onPress={safeBack}
                     style={{ marginRight: 12 }}
                 >
                     <AntDesign name="left" size={24} color={Colors.WHITE} />

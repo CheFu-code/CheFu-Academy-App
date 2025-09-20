@@ -25,6 +25,7 @@ import * as Progress from "react-native-progress";
 import Button from "../../component/Shared/Button";
 import { Colors } from "../../constant/Colors";
 import { styles } from "../../styles/ChapterView.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 interface Chapter {
     topic: string;
@@ -46,7 +47,7 @@ export default function ChapterView() {
     const [loader, setLoader] = useState(false);
     const [copied, setCopied] = useState(false);
     const [copying, setCopying] = useState(false);
-    const router = useRouter();
+    const { safeBack, safeReplace } = useSafeNavigation()
     const maxLines = showFull ? undefined : 5;
     const db = getFirestore();
     let chapters: Chapters = { content: [] };
@@ -105,7 +106,7 @@ export default function ChapterView() {
                 }
                 if (type === AdEventType.CLOSED || type === AdEventType.ERROR) {
                     unsubscribe();
-                    router.replace({
+                    safeReplace({
                         pathname: "/courseView",
                         params: {
                             courseParams: JSON.stringify(courseObject),
@@ -139,7 +140,7 @@ export default function ChapterView() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.backButtonContainer}>
-                <Pressable disabled={loader} onPress={() => router.back()}>
+                <Pressable disabled={loader} onPress={safeBack}>
                     <Ionicons
                         style={{
                             padding: 3,
@@ -227,7 +228,7 @@ export default function ChapterView() {
 
                     {chapters?.content?.[currentPage]?.explain &&
                         chapters?.content?.[currentPage]?.explain?.length >
-                            200 && (
+                        200 && (
                             <TouchableOpacity
                                 onPress={() => setShowFull(!showFull)}
                             >

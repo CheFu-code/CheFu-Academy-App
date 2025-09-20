@@ -1,6 +1,6 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth } from "@react-native-firebase/auth";
+import { getAuth, signOut } from "@react-native-firebase/auth";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
@@ -16,13 +16,14 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Header.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
-export default function Header() {
+export default function Header({ onPress }: { onPress?: () => void }) {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
-    const router = useRouter();
+    const { safePush, safeReplace } = useSafeNavigation();
     const auth = getAuth();
     const CACHE_KEY = "@cached_courses";
     const handleOption = async (option: string) => {
@@ -30,7 +31,7 @@ export default function Header() {
 
         if (option === "Logout") {
             try {
-                await auth.signOut();
+                await signOut(auth);
                 await AsyncStorage.removeItem("userDetail");
                 await AsyncStorage.removeItem(CACHE_KEY);
                 console.log("async storage removed");
@@ -39,8 +40,7 @@ export default function Header() {
                     "Logged out successfully",
                     ToastAndroid.SHORT
                 );
-                router.replace("/auth/signIn");
-                // router.replace("/");
+                safeReplace("/auth/signIn");
             } catch (error: unknown) {
                 if (
                     typeof error === "object" &&
@@ -100,13 +100,13 @@ export default function Header() {
                 );
             });
         } else if (option === "View Profile") {
-            router.push("/(tabs)/profile");
+            safePush("/(tabs)/profile");
         } else if (option === "Contact Support") {
             Linking.openURL(
                 "mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here."
             );
         } else if (option === "Add Course") {
-            router.push("/addCourse");
+            safePush("/addCourse");
         }
     };
 
@@ -127,7 +127,7 @@ export default function Header() {
             return;
         }
 
-        router.push({
+        safePush({
             pathname: "/searchResults",
             params: { query: searchTerm.trim() },
         });
@@ -138,7 +138,8 @@ export default function Header() {
         <View style={styles.headerContainer}>
             <View>
                 <View style={styles.subHeaderContainer}>
-                    <View
+                    <Pressable
+                        onPress={onPress}
                         style={{
                             flexDirection: "row",
                             alignItems: "center",
@@ -165,7 +166,7 @@ export default function Header() {
                                 name="checkmark-circle"
                             />
                         )}
-                    </View>
+                    </Pressable>
 
                     {userDetail && (
                         <TouchableOpacity onPress={() => setShowModal(true)}>

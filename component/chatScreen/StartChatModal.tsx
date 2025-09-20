@@ -62,7 +62,7 @@ export const StartChatModal:React.FC<StartChatModalProps> = ({ visible, onClose,
                                 source={
                                     item.profilePicture
                                         ? { uri: item.profilePicture }
-                                        : require("../../assets/images/logo.png")
+                                        : require("../../assets/images/avatar.jpg")
                                 }
                                 style={{
                                     width: 40,

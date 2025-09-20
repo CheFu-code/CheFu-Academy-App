@@ -2,14 +2,12 @@ import { useRouter } from "expo-router";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 import { PracticeOption } from "../../constant/Option";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function PracticeSection() {
-    const router = useRouter();
+    const { safePush } = useSafeNavigation()
     return (
         <View
-            style={{
-                marginTop: 10,
-            }}
         >
             <Text
                 style={{
@@ -27,7 +25,7 @@ export default function PracticeSection() {
                     renderItem={({ item, index }) => (
                         <TouchableOpacity
                             onPress={() =>
-                                router.push({
+                                safePush({
                                     pathname: "/practice/[type]", // dynamic route template
                                     params: { type: item.name }, // provide param to replace [type]
                                 })

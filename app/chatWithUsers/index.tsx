@@ -1,4 +1,5 @@
 import { Colors } from "@/constant/Colors";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { AntDesign } from "@expo/vector-icons";
 import firestore, {
     FirebaseFirestoreTypes,
@@ -31,8 +32,7 @@ interface UserChat {
 export default function ChatWithUsers() {
     const [userChats, setUserChats] = useState<UserChat[]>([]);
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
-
+    const { safeBack ,safePush} = useSafeNavigation()
     useEffect(() => {
         const unsubscribe = firestore()
             .collection("chats")
@@ -142,7 +142,7 @@ export default function ChatWithUsers() {
                 { merge: true }
             );
 
-        router.push({
+        safePush({
             pathname: "/adminChat" as any,
             params: { selectedUserId: userId },
         });
@@ -176,8 +176,8 @@ export default function ChatWithUsers() {
                     <Text style={styles.timestamp}>
                         {item.lastMessageTimestamp
                             ? dayjs(item.lastMessageTimestamp.toDate()).fromNow(
-                                  true
-                              )
+                                true
+                            )
                             : ""}
                     </Text>
                 </View>
@@ -191,7 +191,7 @@ export default function ChatWithUsers() {
     return (
         <View style={styles.container}>
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => safeBack()}
                 style={styles.header}
             >
                 <AntDesign color={"white"} name="left" size={24} />

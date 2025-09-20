@@ -12,6 +12,7 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/CourseView.styles";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 interface ChaptersProps {
     course: Course;
@@ -19,8 +20,7 @@ interface ChaptersProps {
 
 export default function Chapters({ course }: ChaptersProps) {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const router = useRouter();
-
+    const { safePush } = useSafeNavigation()
     const isChapterCompleted = (index: number) => {
         if (!Array.isArray(course?.completedChapter)) return false;
         const isCompleted = course.completedChapter.find(
@@ -67,7 +67,7 @@ export default function Chapters({ course }: ChaptersProps) {
                                     return;
                                 }
 
-                                router.push({
+                                safePush({
                                     pathname: "/chapterView",
                                     params: {
                                         chapterParams: JSON.stringify(item),
@@ -82,8 +82,8 @@ export default function Chapters({ course }: ChaptersProps) {
                                 {
                                     opacity:
                                         completed &&
-                                        userDetail.member === false &&
-                                        course?.createdBy === userDetail?.email
+                                            userDetail.member === false &&
+                                            course?.createdBy === userDetail?.email
                                             ? 0.6
                                             : 1,
 
@@ -98,7 +98,7 @@ export default function Chapters({ course }: ChaptersProps) {
                                     style={[
                                         styles.chapterText,
                                         completed &&
-                                        course?.createdBy === userDetail?.email
+                                            course?.createdBy === userDetail?.email
                                             ? { color: Colors.GREEN }
                                             : null,
                                         // ✨ dim completed items
@@ -111,7 +111,7 @@ export default function Chapters({ course }: ChaptersProps) {
                                         styles.chapterText,
                                         { maxWidth: 210 },
                                         completed &&
-                                        course?.createdBy === userDetail?.email
+                                            course?.createdBy === userDetail?.email
                                             ? { color: Colors.GREEN }
                                             : null,
                                     ]}
@@ -122,7 +122,7 @@ export default function Chapters({ course }: ChaptersProps) {
                                 </Text>
                             </View>
                             {completed &&
-                            course?.createdBy === userDetail?.email ? (
+                                course?.createdBy === userDetail?.email ? (
                                 <Ionicons
                                     name="checkmark-circle"
                                     size={24}

@@ -98,7 +98,7 @@ export default function ChatDetailScreen() {
     const lastSeen = useRelativeTime(otherUser?.lastSeen);
 
     const sendMessage = async () => {
-        if (!userDetail || !userDetail.email) {
+        if (!userDetail || !userDetail?.email) {
             showToast("User not authenticated");
             return;
         }
@@ -109,7 +109,7 @@ export default function ChatDetailScreen() {
             setNewMessage("");
             await addDoc(collection(db, "chats", chatId, "messages"), {
                 text: newMessage.trim(),
-                senderId: userDetail.email,
+                senderId: userDetail?.email,
                 createdAt: serverTimestamp(),
                 type: "text",
             });
@@ -117,7 +117,7 @@ export default function ChatDetailScreen() {
             await updateDoc(doc(db, "chats", chatId), {
                 lastMessage: {
                     text: newMessage.trim(),
-                    sender: userDetail.email,
+                    sender: userDetail?.email,
                     timestamp: serverTimestamp(),
                 },
                 updatedAt: serverTimestamp(),

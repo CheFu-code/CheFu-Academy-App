@@ -26,12 +26,13 @@ import CourseListGrid, {
 import { Colors } from "../../../constant/Colors";
 import { PracticeOption } from "../../../constant/Option";
 import { UserDetailContext } from "../../../context/UserDetailContext";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function PracticeTypeHomeScreen() {
     const { type } = useLocalSearchParams();
+    const { safeBack } = useSafeNavigation()
     const option = PracticeOption.find((item) => item.name === type);
     const { userDetail } = useContext(UserDetailContext);
-    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [courseList, setCourseList] = useState<Course[]>([]);
 
@@ -49,7 +50,7 @@ export default function PracticeTypeHomeScreen() {
             const db = getFirestore(getApp());
             const q = query(
                 collection(db, "course"),
-                where("createdBy", "==", userDetail.email),
+                where("createdBy", "==", userDetail?.email),
                 orderBy("createdOn", "desc")
             );
             const querySnapshot = await getDocs(q);
@@ -87,7 +88,7 @@ export default function PracticeTypeHomeScreen() {
                     source={option?.image}
                 />
                 <TouchableOpacity
-                    onPress={() => router.back()}
+                    onPress={() => safeBack()}
                     style={{
                         position: "absolute",
                         padding: 10,
@@ -95,7 +96,7 @@ export default function PracticeTypeHomeScreen() {
                         flexDirection: "row",
                         gap: 10,
                         alignItems: "center",
-                        marginTop:15
+                        marginTop: 15
                     }}
                 >
                     <AntDesign

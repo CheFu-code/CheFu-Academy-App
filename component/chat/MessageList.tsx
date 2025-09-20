@@ -25,12 +25,12 @@ export default function MessageList({
                         key={msg.id}
                         style={[
                             styles.messageRow,
-                            msg.senderId === userDetail.email
+                            msg.senderId === userDetail?.email
                                 ? { justifyContent: "flex-end" }
                                 : { justifyContent: "flex-start" },
                         ]}
                     >
-                        {msg.senderId !== userDetail.email && (
+                        {msg.senderId !== userDetail?.email && (
                             <Image
                                 source={
                                     otherUser?.profilePicture
@@ -44,7 +44,7 @@ export default function MessageList({
                         <View
                             style={[
                                 styles.messageBubble,
-                                msg.senderId === userDetail.email
+                                msg.senderId === userDetail?.email
                                     ? styles.userMessage
                                     : styles.adminMessage,
                             ]}
