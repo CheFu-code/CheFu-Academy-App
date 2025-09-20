@@ -37,9 +37,8 @@ export const styles = StyleSheet.create({
     },
     section: {
         backgroundColor: Colors.BG_GRAY,
-        padding: 8,
+        padding: 2,
         borderRadius: 8,
-        marginVertical: 8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",

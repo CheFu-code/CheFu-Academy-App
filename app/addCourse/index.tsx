@@ -1,10 +1,6 @@
 import { checkDailyLimit } from "@/utils/firestoreUtils";
 import { Ionicons } from "@expo/vector-icons";
-import {
-    doc,
-    getFirestore,
-    setDoc
-} from "@react-native-firebase/firestore";
+import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -28,11 +24,12 @@ import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/AddCourse";
 import { handleAiError } from "../../utils/errorUtils";
 import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import ErrorModal from "@/component/Shared/ErrorModal";
 
 export default function AddCourse() {
     const [loading, setLoading] = useState(false);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const { safeReplace, safePush, safeBack } = useSafeNavigation()
+    const { safeReplace, safePush, safeBack } = useSafeNavigation();
     const [userInput, setUserInput] = useState("");
     const [topics, setTopics] = useState<string[]>([]);
     const [selectedTopic, setSelectedTopic] = useState<string[]>([]);
@@ -249,6 +246,8 @@ export default function AddCourse() {
         }
     };
 
+    const watchRewaredAd = () => {};
+
     if (generatingTopic) {
         return (
             <Modal
@@ -292,7 +291,9 @@ export default function AddCourse() {
                             Let the Genius Work
                         </Text>
                         <Text style={styles.modalSubtext}>
-                            Powered by CheFu Inc., our advanced AI is crafting your course with precision, efficiency, and a personalized touch—designed exclusively for you.
+                            Powered by CheFu Inc., our advanced AI is crafting
+                            your course with precision, efficiency, and a
+                            personalized touch—designed exclusively for you.
                         </Text>
                     </View>
                 </View>
@@ -416,16 +417,12 @@ export default function AddCourse() {
                 </ScrollView>
             </View>
 
-            <AppModal
+            <ErrorModal
                 visible={errorModal.visible}
                 title={errorModal.title}
                 message={errorModal.message}
                 confirmText="OK"
-                showCancel={false}
                 onConfirm={() =>
-                    setErrorModal({ ...errorModal, visible: false })
-                }
-                onCancel={() =>
                     setErrorModal({ ...errorModal, visible: false })
                 }
             />
@@ -433,14 +430,14 @@ export default function AddCourse() {
             <AppModal
                 visible={limitModalVisible}
                 title="Daily Limit Reached"
-                message="Free users can only create up to 3 courses per day. Upgrade to unlock unlimited access."
+                message="Free users can create up to 3 courses per day. Upgrade for unlimited access, or watch a rewarded ad to create one additional course."
                 confirmText="Upgrade"
                 cancelText="Cancel"
                 confirmColor={Colors.GREEN}
                 onCancel={() => setLimitModalVisible(false)}
                 onConfirm={() => {
                     setLimitModalVisible(false);
-                    safePush("/subscription");
+                    watchRewaredAd();
                 }}
             />
         </>

@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.chefu.chefuacademy",
+            "sha256_cert_fingerprints": [
+                "6f:99:14:7e:62:2a:71:5f:7d:af:37:b9:f4:27:a1:26:00:d2:64:54:83:3e:f8:a3:ac:dd:cd:31:20:eb:3b:58"
+            ]
+        }
+    }
+]
