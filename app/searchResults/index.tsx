@@ -1,4 +1,5 @@
 import CourseCard from '@/component/Shared/CourseCard';
+import Loading from '@/component/Shared/Loading';
 import { Colors } from '@/constant/Colors';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
@@ -76,37 +77,7 @@ export default function SearchScreen() {
         fetchCourses(query);
     }, [query, fetchCourses]);
 
-    if (loading)
-        return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: Colors.BG_COLOR,
-                }}
-            >
-                <LottieView
-                    autoPlay
-                    loop
-                    source={require('../../assets/animations/Loading.json')}
-                    style={{
-                        width: 150,
-                        height: 150,
-                    }}
-                />
-                <Text
-                    style={{
-                        marginTop: 10,
-                        fontFamily: 'outfit-bold',
-                        fontSize: 16,
-                        color: Colors.PRIMARY,
-                    }}
-                >
-                    Finding courses you&apos;ll love...
-                </Text>
-            </View>
-        );
+    if (loading) return <Loading message="Hang tight, we’re finding the best courses for you..." />;
 
     return (
         <View style={{ flex: 1, padding: 20 }}>

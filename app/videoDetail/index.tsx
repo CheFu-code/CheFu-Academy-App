@@ -16,6 +16,7 @@ import {
     Feather,
     FontAwesome,
     FontAwesome5,
+    Ionicons,
     MaterialIcons,
 } from '@expo/vector-icons';
 import { getAuth } from '@react-native-firebase/auth';
@@ -503,15 +504,32 @@ export default function VideoDetail() {
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={styles.title}>{video.title}</Text>
-                <Text style={styles.uploadedBy}>
-                    by{' '}
-                    <Text style={{ fontFamily: 'outfit-bold' }}>
-                        {uploaderName || video.uploadedBy}
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 3,
+                    }}
+                >
+                    <Text style={styles.uploadedBy}>
+                        by{' '}
+                        <Text style={{ fontFamily: 'outfit-bold' }}>
+                            {uploaderName || video.uploadedBy}
+                        </Text>
                     </Text>
-                </Text>
+                    {video.uploadedBy === 'YouTube' ? (
+                        <AntDesign name="youtube" size={14} color={'red'} />
+                    ) : (
+                        <Ionicons
+                            name="checkmark-circle"
+                            color={Colors.PRIMARY}
+                            size={14}
+                        />
+                    )}
+                </View>
 
                 <View style={styles.durationContainer}>
-                    <View style={styles.durationInfo}>
+                    <View style={[styles.durationInfo, { left: 5 }]}>
                         {video?.uploadedBy !== 'YouTube' && (
                             <>
                                 <FontAwesome
@@ -633,19 +651,6 @@ export default function VideoDetail() {
                         shadowOffset: { width: 0, height: 2 },
                     }}
                 >
-                    {/* <TouchableOpacity
-                        onPress={() => {
-                            setShowOptions(false);
-                            handleFavorite();
-                        }}
-                    >
-                        <Text style={{ padding: 8 }}>
-                            {favorite
-                                ? "Remove from Favorites"
-                                : "Add to Favorites"}
-                        </Text>
-                    </TouchableOpacity> */}
-
                     {userDetail?.roles.includes('admin') && (
                         <TouchableOpacity
                             onPress={() => {

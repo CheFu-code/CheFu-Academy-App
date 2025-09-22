@@ -36,7 +36,7 @@ export default function Loading({
             <Text
                 style={{
                     marginTop: 10,
-                    fontFamily: 'outfit-bold',
+                    fontFamily: 'outfit',
                     fontSize: 16,
                     color: Colors.PRIMARY,
                 }}

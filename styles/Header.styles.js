@@ -1,37 +1,37 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "../constant/Colors";
+import { StyleSheet } from 'react-native';
+import { Colors } from '../constant/Colors';
 
 export const styles = StyleSheet.create({
     headerContainer: {
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: Colors.BG,
         padding: 10,
     },
     subHeaderContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: "100%",
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
         gap: 5,
         // marginTop: 20,
     },
     greeting: {
-        fontFamily: "outfit-bold",
-        fontSize: 24,
-        color: "#fff",
+        fontFamily: 'outfit-bold',
+        fontSize: 20,
+        color: '#fff',
         maxWidth: 200,
     },
     subText: {
-        fontFamily: "space-mono",
+        fontFamily: 'space-mono',
         fontSize: 16,
         color: Colors.GREEN,
-        textAlign: "center",
+        textAlign: 'center',
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        justifyContent: "flex-end",
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
     },
     modalSheet: {
         backgroundColor: Colors.BG_COLOR,
@@ -41,25 +41,25 @@ export const styles = StyleSheet.create({
     },
     inputContainer: {
         marginTop: 10,
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: Colors.BG_GRAY,
         borderRadius: 20,
         paddingHorizontal: 15,
-        width: "100%",
+        width: '100%',
     },
     modalTitle: {
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         fontSize: 20,
         color: Colors.PRIMARY,
         marginBottom: 15,
     },
     modalItem: {
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingVertical: 14,
         paddingHorizontal: 10,
-        backgroundColor: "#222",
+        backgroundColor: '#222',
         borderRadius: 10,
         marginBottom: 12,
         elevation: 2,
@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
         marginRight: 16,
     },
     modalText: {
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
         fontSize: 16,
         color: Colors.PRIMARY,
     },
@@ -80,11 +80,13 @@ export const styles = StyleSheet.create({
     },
     showMoreIcon: {
         padding: 5,
-        backgroundColor: Colors.GRAY,
+        backgroundColor: Colors.BG2,
         borderRadius: 15,
+        borderWidth: 0.1,
+        borderColor: Colors.BG_GRAY,
     },
     text: {
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         color: Colors.GREEN,
     },
 });

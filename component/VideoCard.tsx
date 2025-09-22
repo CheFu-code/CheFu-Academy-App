@@ -1,29 +1,27 @@
-// components/VideoCard.tsx
+import React, { memo } from 'react';
+import { TouchableOpacity, View, Image, Text } from 'react-native';
 import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import dayjs from 'dayjs';
-import { Colors } from '@/constant/Colors';
 import { formatDuration } from '@/helpers/formatDateVideoCard';
 import { formatYouTubeDuration } from '@/services/videoService';
 import { formatViews } from '@/utils/formatViews';
+import { Colors } from '@/constant/Colors';
 import { Video } from '@/types/video';
-import { TouchableOpacity, View, Text, Image } from 'react-native';
 import { styles } from '@/styles/VideoCardHomeScreen.styles';
+import { useRenderTextWithLinks } from '@/helpers/detectLinks';
 
-interface VideoCardProps {
+interface Props {
     item: Video;
-    onPressCategory: (category: string) => void;
-    onPressVideo: (video: Video) => void;
+    onPress: (item: Video) => void;
+    onCategoryPress: (category: string) => void;
 }
 
-export default function VideoCard({
-    item,
-    onPressCategory,
-    onPressVideo,
-}: VideoCardProps) {
+const VideoCard: React.FC<Props> = ({ item, onPress, onCategoryPress }) => {
+    const { renderTextWithLinks } = useRenderTextWithLinks();
     return (
         <TouchableOpacity
             style={styles.cardWrapper}
-            onPress={() => onPressVideo(item)}
+            onPress={() => onPress(item)}
         >
             <View style={styles.card}>
                 {item.thumbnailURL && (
@@ -38,11 +36,12 @@ export default function VideoCard({
                 {item.title}
             </Text>
             <Text numberOfLines={3} style={styles.description}>
-                {item.description}
+                {item?.description
+                    ? renderTextWithLinks(item.description)
+                    : 'No description available.'}
             </Text>
-
             <TouchableOpacity
-                onPress={() => onPressCategory(item.category)}
+                onPress={() => onCategoryPress(item.category)}
                 style={styles.category}
             >
                 <View
@@ -60,13 +59,24 @@ export default function VideoCard({
             </TouchableOpacity>
 
             <View style={styles.durationContainer}>
-                <Text style={styles.uploadedAt}>
-                    {item.uploadedBy !== 'YouTube'
-                        ? item.uploadedAt && 'toDate' in item.uploadedAt
-                            ? dayjs(item.uploadedAt.toDate()).fromNow()
-                            : 'Just now'
-                        : item.uploadedBy}
-                </Text>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 3,
+                    }}
+                >
+                    <Text style={styles.uploadedAt}>
+                        {item.uploadedBy !== 'YouTube'
+                            ? item.uploadedAt && 'toDate' in item.uploadedAt
+                                ? dayjs(item.uploadedAt.toDate()).fromNow()
+                                : 'Just now'
+                            : item.uploadedBy}
+                    </Text>
+                    {item.uploadedBy === 'YouTube' && (
+                        <AntDesign name="youtube" color={'red'} size={15} />
+                    )}
+                </View>
                 <View style={[styles.durationInfo, { left: 40 }]}>
                     <AntDesign
                         name="clockcircleo"
@@ -88,4 +98,6 @@ export default function VideoCard({
             </View>
         </TouchableOpacity>
     );
-}
+};
+
+export default memo(VideoCard);

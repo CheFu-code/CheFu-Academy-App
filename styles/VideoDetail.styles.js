@@ -1,18 +1,18 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "../constant/Colors";
+import { StyleSheet } from 'react-native';
+import { Colors } from '../constant/Colors';
 
 export const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: Colors.WHITE },
     video: {
-        width: "100%",
+        width: '100%',
         height: 300,
-        backgroundColor: "#000",
+        backgroundColor: '#000',
         marginTop: 10,
     },
     image: {
-        width: "100%",
+        width: '100%',
         height: 200,
-        backgroundColor: "#000",
+        backgroundColor: '#000',
         marginTop: 10,
     },
     enrollContainer: {
@@ -22,16 +22,16 @@ export const styles = StyleSheet.create({
     options: {
         color: Colors.BLACK,
         fontSize: 14,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
     },
     tabButton: {
-        alignItems: "center",
+        alignItems: 'center',
         borderRadius: 8,
         paddingVertical: 4,
         paddingHorizontal: 12,
     },
     tabButtonActive: {
-        backgroundColor: "white",
+        backgroundColor: 'white',
         borderWidth: 0.2,
         borderColor: Colors.BLACK,
     },
@@ -39,9 +39,9 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_GRAY,
         padding: 2,
         borderRadius: 8,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         borderWidth: 0.5,
         borderColor: Colors.GRAY,
         marginHorizontal: 12,
@@ -49,13 +49,13 @@ export const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         marginVertical: 8,
         marginHorizontal: 12,
     },
     description: {
         fontSize: 16,
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
         marginBottom: 20,
         marginHorizontal: 12,
     },
@@ -63,62 +63,63 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.GREEN,
         padding: 12,
         borderRadius: 8,
-        alignItems: "center",
+        alignItems: 'center',
     },
     enrollText: {
         color: Colors.WHITE,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         fontSize: 16,
     },
     loader: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     backText: {
         color: Colors.BLACK,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         fontSize: 18,
     },
     backButton: {
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 10,
     },
     uploadedBy: {
         fontSize: 14,
-        fontFamily: "outfit",
-        marginHorizontal: 12,
+        fontFamily: 'outfit',
+        marginLeft: 10,
+        
     },
     durationInfo: {
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 5,
     },
     duration: {
         color: Colors.BLACK,
         fontSize: 14,
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
     },
     durationContainer: {
         paddingHorizontal: 6,
         marginTop: 25,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         marginBottom: 8,
     },
     uploadedAt: {
         color: Colors.BLACK,
         fontSize: 14,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
     },
     common: {
-        flexDirection: "row",
-        justifyContent: "space-between",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginHorizontal: 12,
         marginTop: 8,
-        alignItems: "center",
+        alignItems: 'center',
     },
     box: {
         backgroundColor: Colors.BG_GRAY,
@@ -132,12 +133,12 @@ export const styles = StyleSheet.create({
     },
     level: {
         fontSize: 16,
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
         color: Colors.BLACK,
     },
     commonText: {
         fontSize: 16,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         color: Colors.BLACK,
     },
 });

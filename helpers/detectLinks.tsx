@@ -1,6 +1,5 @@
-import { Text, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
 import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import { Text } from "react-native";
 
 export const useRenderTextWithLinks = () => {
     const { safePush } = useSafeNavigation();

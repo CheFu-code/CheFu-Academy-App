@@ -1,12 +1,12 @@
-import { Course } from "@/types/course";
+import { Course } from '@/types/course';
 import {
     doc,
     FirebaseFirestoreTypes,
     getDoc,
     getFirestore,
-} from "@react-native-firebase/firestore";
-import { router } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+} from '@react-native-firebase/firestore';
+import { router } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     Image,
     StyleProp,
@@ -14,11 +14,11 @@ import {
     TouchableOpacity,
     View,
     ViewStyle,
-} from "react-native";
-import { imageAssets } from "../../constant/Option";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/CourseCard.styles";
-import AppModal from "./AppModal";
+} from 'react-native';
+import { imageAssets } from '../../constant/Option';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import { styles } from '../../styles/CourseCard.styles';
+import AppModal from './AppModal';
 
 export default function CourseCard({
     course,
@@ -34,15 +34,15 @@ export default function CourseCard({
     const firestore = getFirestore();
     const [modal, setModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
 
     useEffect(() => {
         const fetchCreator = async () => {
             if (!course?.createdBy) return;
 
-            const userDocRef = doc(firestore, "users", course.createdBy);
+            const userDocRef = doc(firestore, 'users', course.createdBy);
             const userDocSnap = await getDoc(userDocRef);
 
             const data = userDocSnap.data();
@@ -52,7 +52,7 @@ export default function CourseCard({
         };
 
         fetchCreator();
-    }, [course]);
+    }, [course, firestore]);
 
     return (
         <>
@@ -61,14 +61,15 @@ export default function CourseCard({
                     if (course?.createdBy === userDetail?.email) {
                         setModal({
                             visible: true,
-                            title: "Course Owner",
+                            title: 'Course Owner',
                             message:
-                                "You are the owner of this course, can we take you to the course progress page?",
+                                "You're the owner of this course. We'll take you to your courses screen.",
                         });
+
                         return;
                     } else {
                         router.push({
-                            pathname: "/courseView",
+                            pathname: '/courseView',
                             params: {
                                 courseParams: JSON.stringify(course),
                                 enroll: enroll?.toString(),
@@ -89,7 +90,7 @@ export default function CourseCard({
                             style={styles.creatorProfilePicWrapper}
                             onPress={() => {
                                 router.push({
-                                    pathname: "/profileView",
+                                    pathname: '/profileView',
                                     params: {
                                         userId: course.createdBy,
                                     },
@@ -100,7 +101,7 @@ export default function CourseCard({
                                 source={
                                     creatorInfo?.profilePicture
                                         ? { uri: creatorInfo.profilePicture }
-                                        : require("../../assets/images/logo.png")
+                                        : require('../../assets/images/logo.png')
                                 }
                                 style={styles.creatorProfilePic}
                             />
@@ -110,7 +111,7 @@ export default function CourseCard({
                 <View
                     style={{
                         flex: 1,
-                        justifyContent: "space-between",
+                        justifyContent: 'space-between',
                         minHeight: 80,
                     }}
                 >
@@ -131,12 +132,12 @@ export default function CourseCard({
                                 {course?.createdOn?.toDate
                                     ? course.createdOn
                                           .toDate()
-                                          .toLocaleDateString("en-GB", {
-                                              day: "2-digit",
-                                              month: "2-digit",
-                                              year: "numeric",
+                                          .toLocaleDateString('en-GB', {
+                                              day: '2-digit',
+                                              month: '2-digit',
+                                              year: 'numeric',
                                           })
-                                    : ""}
+                                    : ''}
                             </Text>
                         )}
                     </View>
@@ -149,7 +150,7 @@ export default function CourseCard({
                 message={modal.message}
                 onConfirm={() => {
                     setModal({ ...modal, visible: false });
-                    router.push("/myCourses");
+                    router.push('/myCourses');
                 }}
                 onCancel={() => setModal({ ...modal, visible: false })}
             />

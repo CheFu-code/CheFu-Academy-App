@@ -1,7 +1,14 @@
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { showToast } from '@/utils/toast';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, signOut } from '@react-native-firebase/auth';
-import { useRouter } from 'expo-router';
+import {
+    doc,
+    getFirestore,
+    serverTimestamp,
+    setDoc,
+} from '@react-native-firebase/firestore';
 import { useContext, useState } from 'react';
 import {
     Linking,
@@ -16,15 +23,7 @@ import {
 import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Header.styles';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import AddVideoModal from './AddVideoModal';
-import {
-    doc,
-    getFirestore,
-    serverTimestamp,
-    setDoc,
-} from '@react-native-firebase/firestore';
-import { showToast } from '@/utils/toast';
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function Header({ onPress }: { onPress?: () => void }) {
@@ -213,7 +212,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                         {userDetail?.member === true && (
                             <Ionicons
                                 color={Colors.PRIMARY}
-                                size={20}
+                                size={15}
                                 name="checkmark-circle"
                             />
                         )}
@@ -224,7 +223,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                             <Feather
                                 style={styles.showMoreIcon}
                                 name="more-horizontal"
-                                size={27}
+                                size={18}
                                 color={'white'}
                             />
                         </TouchableOpacity>
@@ -235,7 +234,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     <Text
                         numberOfLines={1}
                         ellipsizeMode={'tail'}
-                        style={styles.text}
+                        style={[styles.text, { fontSize: 14 }]}
                     >
                         Expand your knowledge with our courses
                     </Text>
