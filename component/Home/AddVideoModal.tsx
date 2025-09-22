@@ -9,12 +9,12 @@ import {
     TouchableOpacity,
     ActivityIndicator,
 } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { showToast } from '@/utils/toast';
-import Button from '../Shared/Button';
 import axios from 'axios';
-import { Ionicons } from '@expo/vector-icons';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { VideoCategory } from '@/data/categories';
+import { Colors } from '@/constant/Colors';
 
 export default function AddVideoModal({
     visible,
@@ -29,8 +29,14 @@ export default function AddVideoModal({
     const [loading, setLoading] = useState(false);
     const [videoData, setVideoData] = useState<any>(null);
 
-    const handleFetchInfo = async () => {
-        if (typeof url !== 'string' || !url.trim()) {
+    // Dropdown state
+    const [categoryOpen, setCategoryOpen] = useState(false);
+    const [categoryValue, setCategoryValue] = useState<string>(
+        VideoCategory[0].value,
+    ); // default to first category
+
+    const handleFetchInfo = useCallback(async () => {
+        if (!url.trim()) {
             showToast('Invalid YouTube URL');
             return;
         }
@@ -40,8 +46,6 @@ export default function AddVideoModal({
             const match = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/);
             if (match) {
                 const videoId = match[1];
-
-                // Replace with your YouTube API key
                 const API_KEY = 'AIzaSyDslnFAex5WgQcEmnFw1SysNBdJbkuehzY';
                 const res = await axios.get(
                     `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${API_KEY}`,
@@ -53,6 +57,7 @@ export default function AddVideoModal({
                         videoId,
                         title: snippet.title,
                         thumbnailURL: snippet.thumbnails.high.url,
+                        // removed category here
                     };
                     setVideoData(data);
                     setUrl('');
@@ -68,29 +73,22 @@ export default function AddVideoModal({
         } finally {
             setLoading(false);
         }
-    };
-
-    useEffect(() => {
-        if (typeof url !== 'string' || !url.trim()) return;
-        const match = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/);
-        if (match) handleFetchInfo();
     }, [url]);
 
     const handleSave = () => {
-        setLoading(true);
-        try {
-            if (videoData) {
-                onSave(videoData);
-                setUrl('');
-                setVideoData(null);
-                onClose();
-            }
-        } catch (error) {
-            console.log('error saving video:  ', error);
-        } finally {
-            setLoading(false);
+        if (videoData) {
+            onSave({ ...videoData, category: categoryValue });
+            setUrl('');
+            setVideoData(null);
+            onClose();
         }
     };
+
+    useEffect(() => {
+        if (!url.trim()) return;
+        const match = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/);
+        if (match) handleFetchInfo();
+    }, [url, handleFetchInfo]);
 
     return (
         <Modal visible={visible} animationType="slide" transparent>
@@ -102,8 +100,21 @@ export default function AddVideoModal({
                         onChangeText={setUrl}
                         placeholder="https://www.youtube.com/watch?v=..."
                         style={styles.input}
-                        placeholderTextColor={Colors.BLACK}
+                        placeholderTextColor={Colors.GRAY}
                     />
+
+                    <Text style={styles.label}>Select Category:</Text>
+                    <DropDownPicker
+                        open={categoryOpen}
+                        value={categoryValue}
+                        items={[...VideoCategory]}
+                        setOpen={setCategoryOpen}
+                        setValue={setCategoryValue}
+                        containerStyle={{ width: '100%', marginBottom: 12 }}
+                        style={{ borderColor: '#ccc', backgroundColor: '#fff' }}
+                        listMode="SCROLLVIEW"
+                    />
+
                     {loading && (
                         <ActivityIndicator size="small" color="black" />
                     )}
@@ -117,10 +128,7 @@ export default function AddVideoModal({
                             <Text style={styles.title}>{videoData.title}</Text>
 
                             {loading ? (
-                                <ActivityIndicator
-                                    size={'small'}
-                                    color={'black'}
-                                />
+                                <ActivityIndicator size="small" color="black" />
                             ) : (
                                 <Button2
                                     title="Save video"

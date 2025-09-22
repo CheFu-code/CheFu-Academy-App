@@ -30,6 +30,7 @@ export type YouTubeVideo = {
     instructorName: string;        // channel name
     instructorCompany: string;     // optional creative name
     channelTitle: string;          // add this for TypeScript
+    category: string
 };
 
 

@@ -77,13 +77,24 @@ export default function VideoCardHomeScreen() {
             </TouchableOpacity>
 
             <View style={styles.durationContainer}>
-                <Text style={styles.uploadedAt}>
-                    {item.uploadedBy !== 'YouTube'
-                        ? item.uploadedAt && 'toDate' in item.uploadedAt
-                            ? dayjs(item.uploadedAt.toDate()).fromNow()
-                            : 'Just now'
-                        : item.uploadedBy}
-                </Text>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 3,
+                    }}
+                >
+                    <Text style={styles.uploadedAt}>
+                        {item.uploadedBy !== 'YouTube'
+                            ? item.uploadedAt && 'toDate' in item.uploadedAt
+                                ? dayjs(item.uploadedAt.toDate()).fromNow()
+                                : 'Just now'
+                            : item.uploadedBy}
+                    </Text>
+                    {item.uploadedBy === 'YouTube' && (
+                        <AntDesign name="youtube" color={'red'} size={15} />
+                    )}
+                </View>
                 <View style={[styles.durationInfo, { left: 40 }]}>
                     <AntDesign
                         name="clockcircleo"

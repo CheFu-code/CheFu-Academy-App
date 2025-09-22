@@ -41,6 +41,7 @@ export function useVideos() {
         try {
             const backendVideos = await fetchVideos();
             const ytVideosRaw = await fetchYouTubeVideos();
+
             const ytVideos: Video[] = ytVideosRaw.map((v) => ({
                 id: v.videoId,
                 title: v.title,
@@ -49,7 +50,7 @@ export function useVideos() {
                 duration: parseYouTubeDuration(v.duration),
                 views: v.views,
                 publishedAt: v.publishedAt,
-                category: "YouTube",
+                category: v.category || "YouTube",
                 uploadedAt: v.createdAt,
                 instructorName: v.channelTitle || "Unknown Channel",
                 instructorCompany: v.channelTitle ? `${v.channelTitle}` : "",

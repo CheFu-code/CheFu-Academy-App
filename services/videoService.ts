@@ -152,23 +152,31 @@ export const fetchYouTubeVideos = async (): Promise<YouTubeVideo[]> => {
         const q = query(videosCol, orderBy("createdAt", "desc"));
         const snapshot = await getDocs(q);
 
-        const videoIds = snapshot.docs
-            .map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => doc.data().videoId)
-            .filter(Boolean);
-
         const videos = await Promise.all(
-            videoIds.map((id: string) => fetchYouTubeVideoDetails(id))
+            snapshot.docs.map(async (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
+                const firestoreData = doc.data() as Partial<YouTubeVideo>; // may include category
+                if (!firestoreData.videoId) return null; // skip invalid docs
+                const ytDetails = await fetchYouTubeVideoDetails(firestoreData.videoId);
+
+                if (!ytDetails) return null;
+
+                return {
+                    ...ytDetails,
+                    category: firestoreData.category ?? "YouTube",
+                } as YouTubeVideo;
+
+
+            })
         );
 
-        const validVideos = videos.filter(Boolean) as YouTubeVideo[];
-
-        return validVideos;
+        return videos.filter(Boolean) as YouTubeVideo[];
 
     } catch (error) {
         console.error("Error fetching YouTube videos:", error);
         return [];
     }
 };
+
 
 export const formatYouTubeDuration = (duration: string): string => {
     const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);

@@ -1,8 +1,8 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth, signOut } from "@react-native-firebase/auth";
-import { useRouter } from "expo-router";
-import { useContext, useState } from "react";
+import { Feather, Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth, signOut } from '@react-native-firebase/auth';
+import { useRouter } from 'expo-router';
+import { useContext, useState } from 'react';
 import {
     Linking,
     Modal,
@@ -12,113 +12,113 @@ import {
     ToastAndroid,
     TouchableOpacity,
     View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/Header.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import AddVideoModal from "./AddVideoModal";
+} from 'react-native';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import { styles } from '../../styles/Header.styles';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import AddVideoModal from './AddVideoModal';
 import {
     doc,
     getFirestore,
     serverTimestamp,
     setDoc,
-} from "@react-native-firebase/firestore";
-import { showToast } from "@/utils/toast";
-type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
+} from '@react-native-firebase/firestore';
+import { showToast } from '@/utils/toast';
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function Header({ onPress }: { onPress?: () => void }) {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [showModal, setShowModal] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const { safePush, safeReplace } = useSafeNavigation();
     const db = getFirestore();
     const auth = getAuth();
-    const CACHE_KEY = "@cached_courses";
+    const CACHE_KEY = '@cached_courses';
     const handleOption = async (option: string) => {
         setShowModal(false);
 
-        if (option === "Logout") {
+        if (option === 'Logout') {
             try {
                 await signOut(auth);
-                await AsyncStorage.removeItem("userDetail");
+                await AsyncStorage.removeItem('userDetail');
                 await AsyncStorage.removeItem(CACHE_KEY);
-                console.log("async storage removed");
+                console.log('async storage removed');
                 setUserDetail(null);
                 ToastAndroid.show(
-                    "Logged out successfully",
-                    ToastAndroid.SHORT
+                    'Logged out successfully',
+                    ToastAndroid.SHORT,
                 );
-                safeReplace("/auth/signIn");
+                safeReplace('/auth/signIn');
             } catch (error: unknown) {
                 if (
-                    typeof error === "object" &&
+                    typeof error === 'object' &&
                     error !== null &&
-                    "code" in error &&
-                    typeof (error as any).code === "string"
+                    'code' in error &&
+                    typeof (error as any).code === 'string'
                 ) {
                     const code = (error as any).code;
 
-                    if (code === "auth/no-current-user") {
+                    if (code === 'auth/no-current-user') {
                         ToastAndroid.show(
                             "You're not logged in",
-                            ToastAndroid.SHORT
+                            ToastAndroid.SHORT,
                         );
-                    } else if (code === "auth/user-not-found") {
-                        ToastAndroid.show("User not found", ToastAndroid.SHORT);
-                    } else if (code === "auth/network-request-failed") {
+                    } else if (code === 'auth/user-not-found') {
+                        ToastAndroid.show('User not found', ToastAndroid.SHORT);
+                    } else if (code === 'auth/network-request-failed') {
                         ToastAndroid.show(
-                            "Network error, please try again",
-                            ToastAndroid.SHORT
+                            'Network error, please try again',
+                            ToastAndroid.SHORT,
                         );
-                    } else if (code === "auth/too-many-requests") {
+                    } else if (code === 'auth/too-many-requests') {
                         ToastAndroid.show(
-                            "Too many requests, please try again later",
-                            ToastAndroid.SHORT
+                            'Too many requests, please try again later',
+                            ToastAndroid.SHORT,
                         );
-                    } else if (code === "auth/operation-not-allowed") {
+                    } else if (code === 'auth/operation-not-allowed') {
                         ToastAndroid.show(
-                            "Operation not allowed",
-                            ToastAndroid.SHORT
+                            'Operation not allowed',
+                            ToastAndroid.SHORT,
                         );
                     } else {
                         ToastAndroid.show(
-                            "An error occurred, please try again",
-                            ToastAndroid.SHORT
+                            'An error occurred, please try again',
+                            ToastAndroid.SHORT,
                         );
-                        console.error("Logout error on header:", error);
+                        console.error('Logout error on header:', error);
                     }
                 } else {
                     // Unknown error type or no code property
                     ToastAndroid.show(
-                        "An error occurred, please try again",
-                        ToastAndroid.SHORT
+                        'An error occurred, please try again',
+                        ToastAndroid.SHORT,
                     );
-                    console.error("Logout error on header:", error);
+                    console.error('Logout error on header:', error);
                 }
             }
-        } else if (option === "Rate our app") {
+        } else if (option === 'Rate our app') {
             // Handle rate our app action
             const url =
-                "https://play.google.com/store/apps/details?id=com.chefu.chefuacademy";
+                'https://play.google.com/store/apps/details?id=com.chefu.chefuacademy';
             Linking.openURL(url).catch((err) => {
-                console.error("Failed to open URL:", err);
+                console.error('Failed to open URL:', err);
                 ToastAndroid.show(
-                    "Failed to open Google Play store",
-                    ToastAndroid.SHORT
+                    'Failed to open Google Play store',
+                    ToastAndroid.SHORT,
                 );
             });
-        } else if (option === "View Profile") {
-            safePush("/(tabs)/profile");
-        } else if (option === "Contact Support") {
+        } else if (option === 'View Profile') {
+            safePush('/(tabs)/profile');
+        } else if (option === 'Contact Support') {
             Linking.openURL(
-                "mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here."
+                'mailto:kurisanimaluleke77@gmail.com?subject=Support Request&body=Please describe your issue here.',
             );
-        } else if (option === "Add Course") {
-            safePush("/addCourse");
-        } else if (option === "Favorite Videos") {
-            safePush("/favoriteVideos");
+        } else if (option === 'Add Course') {
+            safePush('/addCourse');
+        } else if (option === 'Favorite Videos') {
+            safePush('/favoriteVideos');
         }
     };
 
@@ -127,42 +127,43 @@ export default function Header({ onPress }: { onPress?: () => void }) {
         icon: IoniconsName;
         color?: string;
     }[] = [
-        { label: "Add Course", icon: "add-circle-outline" },
-        { label: "Favorite Videos", icon: "heart" },
-        { label: "Contact Support", icon: "mail-outline" },
-        { label: "Rate our app", icon: "star-outline", color: Colors.YELLOW },
+        { label: 'Add Course', icon: 'add-circle-outline' },
+        { label: 'Favorite Videos', icon: 'heart' },
+        { label: 'Contact Support', icon: 'mail-outline' },
+        { label: 'Rate our app', icon: 'star-outline', color: Colors.YELLOW },
     ];
 
     const handleSearch = () => {
         if (!searchTerm.trim()) {
-            ToastAndroid.show("Please enter a search term", ToastAndroid.SHORT);
+            ToastAndroid.show('Please enter a search term', ToastAndroid.SHORT);
             return;
         }
 
         safePush({
-            pathname: "/searchResults",
+            pathname: '/searchResults',
             params: { query: searchTerm.trim() },
         });
-        setSearchTerm("");
+        setSearchTerm('');
     };
 
     const handleSaveVideo = async (videoData: any) => {
         if (!videoData || !videoData.videoId) return;
 
         try {
-            const videoRef = doc(db, "youTubeVideos", videoData.videoId);
+            const videoRef = doc(db, 'youTubeVideos', videoData.videoId);
 
             await setDoc(videoRef, {
                 title: videoData.title,
                 thumbnailURL: videoData.thumbnailURL,
                 videoId: videoData.videoId,
                 createdAt: serverTimestamp(),
+                category: videoData.category,
             });
 
-            showToast("Video saved successfully!");
+            showToast('Video saved successfully!');
         } catch (error) {
-            console.error("Error saving video:", error);
-            showToast("Failed to save video");
+            console.error('Error saving video:', error);
+            showToast('Failed to save video');
         }
     };
 
@@ -183,7 +184,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                 >
                     <Pressable
                         onLongPress={() => {
-                            if (userDetail?.roles.includes("admin")) {
+                            if (userDetail?.roles.includes('admin')) {
                                 setModalVisible(true);
                             } else {
                                 return;
@@ -191,19 +192,19 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                         }}
                         onPress={onPress}
                         style={{
-                            flexDirection: "row",
-                            alignItems: "center",
+                            flexDirection: 'row',
+                            alignItems: 'center',
                             gap: 5,
                         }}
                     >
                         <Text
                             numberOfLines={1}
-                            ellipsizeMode={"tail"}
+                            ellipsizeMode={'tail'}
                             style={styles.greeting}
                         >
                             Hello
                             {userDetail?.fullname && (
-                                <Text style={{ fontFamily: "outfit-bold" }}>
+                                <Text style={{ fontFamily: 'outfit-bold' }}>
                                     , {userDetail.fullname}
                                 </Text>
                             )}
@@ -224,7 +225,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                                 style={styles.showMoreIcon}
                                 name="more-horizontal"
                                 size={27}
-                                color={"white"}
+                                color={'white'}
                             />
                         </TouchableOpacity>
                     )}
@@ -233,7 +234,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                 <View>
                     <Text
                         numberOfLines={1}
-                        ellipsizeMode={"tail"}
+                        ellipsizeMode={'tail'}
                         style={styles.text}
                     >
                         Expand your knowledge with our courses
@@ -250,7 +251,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                         onChangeText={setSearchTerm}
                         onSubmitEditing={handleSearch}
                         autoCapitalize="none"
-                        style={[styles.text, { flex: 1, fontFamily: "outfit" }]}
+                        style={[styles.text, { flex: 1, fontFamily: 'outfit' }]}
                     />
                     {searchTerm.trim() && (
                         <TouchableOpacity onPress={() => handleSearch()}>
