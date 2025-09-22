@@ -1,23 +1,24 @@
-import AppModal from "@/component/Shared/AppModal";
-import Button from "@/component/Shared/Button";
-import OverView from "@/component/VideoDetail/OverView";
-import Reviews from "@/component/VideoDetail/Reviews";
-import { Colors } from "@/constant/Colors";
-import { UserDetailContext } from "@/context/UserDetailContext";
-import { formatDuration } from "@/helpers/formatDateVideoCard";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { fetchVideoById } from "@/services/videoService";
-import { styles } from "@/styles/VideoDetail.styles";
-import { Video } from "@/types/video";
-import { showToast } from "@/utils/toast";
+import AppModal from '@/component/Shared/AppModal';
+import Button from '@/component/Shared/Button';
+import OverView from '@/component/VideoDetail/OverView';
+import Reviews from '@/component/VideoDetail/Reviews';
+import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { formatDuration } from '@/helpers/formatDateVideoCard';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { fetchVideoById, formatYouTubeDuration } from '@/services/videoService';
+import { styles } from '@/styles/VideoDetail.styles';
+import { Video } from '@/types/video';
+import { formatViews } from '@/utils/formatViews';
+import { showToast } from '@/utils/toast';
 import {
     AntDesign,
     Feather,
     FontAwesome,
     FontAwesome5,
     MaterialIcons,
-} from "@expo/vector-icons";
-import { getAuth } from "@react-native-firebase/auth";
+} from '@expo/vector-icons';
+import { getAuth } from '@react-native-firebase/auth';
 import {
     deleteDoc,
     doc,
@@ -27,17 +28,16 @@ import {
     serverTimestamp,
     setDoc,
     updateDoc,
-} from "@react-native-firebase/firestore";
+} from '@react-native-firebase/firestore';
 import {
     deleteObject,
     getStorage,
-    ref,
     refFromURL,
-} from "@react-native-firebase/storage";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+} from '@react-native-firebase/storage';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -47,15 +47,16 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Video as VideoView } from "react-native-video";
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Video as VideoView } from 'react-native-video';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 export default function VideoDetail() {
     const db = getFirestore();
     const auth = getAuth();
     const { safeReplace, safeBack } = useSafeNavigation();
-    const { id } = useLocalSearchParams();
+    const { id, ytVideo } = useLocalSearchParams();
     const { userDetail } = useContext(UserDetailContext);
     const [video, setVideo] = useState<Video | null>(null);
     const [adding, setAdding] = useState(false);
@@ -67,30 +68,30 @@ export default function VideoDetail() {
     const [reporting, setReporting] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const [downloading, setDownloading] = useState(false);
-    const [reportReason, setReportReason] = useState("");
+    const [reportReason, setReportReason] = useState('');
     const [uploaderName, setUploaderName] = useState<string | null>(null);
     const [showReportModal, setShowReportModal] = useState(false);
     const uploadedAtText = video?.uploadedAt?.toDate().toLocaleDateString();
 
     const [activeTab, setActiveTab] = useState<
-        | "Overview"
+        | 'Overview'
         // "Resources" |
-        | "Reviews"
-    >("Overview");
+        | 'Reviews'
+    >('Overview');
 
     const [showDeleteModal, setShowDeleteModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
 
     const renderTabContent = () => {
         switch (activeTab) {
-            case "Overview":
+            case 'Overview':
                 return <OverView video={video} />;
             // case "Resources":
             // return <Resources video={video} />;
-            case "Reviews":
+            case 'Reviews':
                 return <Reviews video={video} enrolled={enrolled} />;
             default:
                 return null;
@@ -98,19 +99,21 @@ export default function VideoDetail() {
     };
 
     useEffect(() => {
-        const loadVideo = async () => {
-            const data = await fetchVideoById(id as string);
-            setVideo(data);
+        if (ytVideo) {
+            setVideo(JSON.parse(ytVideo as string));
             setLoading(false);
-        };
-        loadVideo();
-    }, [id]);
+        } else if (id) {
+            fetchVideoById(id as string)
+                .then((data) => setVideo(data))
+                .finally(() => setLoading(false));
+        }
+    }, [id, ytVideo]);
 
     useEffect(() => {
         const fetchUploaderName = async () => {
             if (!video?.uploadedBy) return;
 
-            const userRef = doc(getFirestore(), "users", video.uploadedBy);
+            const userRef = doc(getFirestore(), 'users', video.uploadedBy);
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
@@ -127,7 +130,7 @@ export default function VideoDetail() {
     const handleEnroll = async () => {
         setEnrolling(true);
         if (!userDetail) {
-            showToast("Please log in to enroll.");
+            showToast('Please log in to enroll.');
             setEnrolling(false);
             return;
         }
@@ -140,10 +143,10 @@ export default function VideoDetail() {
             // user enrollments collection
             const ref = doc(
                 db,
-                "users",
+                'users',
                 userDetail?.email,
-                "enrollments",
-                video.id
+                'enrollments',
+                video.id,
             );
 
             await setDoc(ref, {
@@ -153,19 +156,19 @@ export default function VideoDetail() {
                 enrolledAt: serverTimestamp(),
             });
 
-            const videoRef = doc(db, "videos", video.id);
+            const videoRef = doc(db, 'videos', video.id);
             await updateDoc(videoRef, {
                 views: increment(1),
             });
 
             setVideo((prev) =>
-                prev ? { ...prev, views: (prev.views || 0) + 1 } : prev
+                prev ? { ...prev, views: (prev.views || 0) + 1 } : prev,
             );
 
-            showToast("You have successfully enrolled!");
+            showToast('You have successfully enrolled!');
         } catch (err) {
-            console.error("Enrollment failed:", err);
-            showToast("Something went wrong while enrolling.");
+            console.error('Enrollment failed:', err);
+            showToast('Something went wrong while enrolling.');
         } finally {
             setEnrolling(false);
         }
@@ -175,34 +178,34 @@ export default function VideoDetail() {
         if (!userDetail || !video) return;
         const ref = doc(
             db,
-            "users",
+            'users',
             userDetail?.email,
-            "enrollments",
-            video.id
+            'enrollments',
+            video.id,
         );
         getDoc(ref).then((docSnap) => {
             if (docSnap.exists()) setEnrolled(true);
         });
-    }, [video]);
+    }, [video, db, userDetail]);
 
     useEffect(() => {
         if (!userDetail || !video) return;
         const favRef = doc(
             db,
-            "users",
+            'users',
             userDetail?.email,
-            "favorites",
-            video.id
+            'favorites',
+            video.id,
         );
         getDoc(favRef).then((docSnap) => {
             if (docSnap.exists()) setFavorite(true);
         });
-    }, [video, userDetail]);
+    }, [video, userDetail, db]);
 
     const handleFavorite = async () => {
         setAdding(true);
         if (!userDetail) {
-            showToast("Please log in to add favorites.");
+            showToast('Please log in to add favorites.');
             setAdding(false);
             return;
         }
@@ -215,16 +218,16 @@ export default function VideoDetail() {
         try {
             const favRef = doc(
                 db,
-                "users",
+                'users',
                 userDetail?.email,
-                "favorites",
-                video.id
+                'favorites',
+                video.id,
             );
 
             if (favorite) {
                 await deleteDoc(favRef);
                 setFavorite(false);
-                showToast("Removed from favorites.");
+                showToast('Removed from favorites.');
             } else {
                 await setDoc(favRef, {
                     videoId: video.id,
@@ -233,11 +236,11 @@ export default function VideoDetail() {
                     addedAt: serverTimestamp(),
                 });
                 setFavorite(true);
-                showToast("Added to favorites!");
+                showToast('Added to favorites!');
             }
         } catch (err) {
-            console.error("Favorite toggle failed:", err);
-            showToast("Something went wrong while updating favorites.");
+            console.error('Favorite toggle failed:', err);
+            showToast('Something went wrong while updating favorites.');
         } finally {
             setAdding(false);
         }
@@ -246,19 +249,19 @@ export default function VideoDetail() {
     const handleDownload = async () => {
         if (!video) return;
         if (userDetail.member === false) {
-            showToast("Only members can download videos.");
-            showToast("Please upgrade your membership.");
+            showToast('Only members can download videos.');
+            showToast('Please upgrade your membership.');
             return;
         }
 
         try {
             setDownloading(true);
-            showToast("Downloading...");
+            showToast('Downloading...');
 
             // Request permission to save to gallery (for iOS/Android)
             const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-                showToast("Permission denied to save file.");
+            if (status !== 'granted') {
+                showToast('Permission denied to save file.');
                 setDownloading(false);
                 return;
             }
@@ -269,16 +272,16 @@ export default function VideoDetail() {
             // Download video
             const { uri } = await FileSystem.downloadAsync(
                 video.videoURL,
-                fileUri
+                fileUri,
             );
 
             // Save to gallery / camera roll
             await MediaLibrary.createAssetAsync(uri);
 
-            showToast("Video downloaded successfully!");
+            showToast('Video downloaded successfully!');
         } catch (error) {
-            console.error("Download failed:", error);
-            showToast("Failed to download video.");
+            console.error('Download failed:', error);
+            showToast('Failed to download video.');
         } finally {
             setDownloading(false);
         }
@@ -287,33 +290,36 @@ export default function VideoDetail() {
     const handleDeleteVideo = async () => {
         if (!video) return;
         if (!auth.currentUser) {
-            showToast("You must be logged in to delete video");
+            showToast('You must be logged in to delete video');
             return;
         }
 
         try {
             setDeleting(true);
-            showToast("Deleting video...");
+            showToast('Deleting video...');
 
-            const storage = getStorage();
+            const db = getFirestore();
 
-            // ✅ Pass both storage and the download URL
-            const videoRef = refFromURL(storage, video.videoURL);
-            const thumbnailRef = refFromURL(storage, video.thumbnailURL);
+            if (video.uploadedBy === 'YouTube') {
+                const docRef = doc(db, 'youTubeVideos', video.id);
+                await deleteDoc(docRef);
+            } else {
+                const storage = getStorage();
+                const videoRef = refFromURL(storage, video.videoURL);
+                const thumbnailRef = refFromURL(storage, video.thumbnailURL);
 
-            // Delete files from Storage
-            await deleteObject(videoRef);
-            await deleteObject(thumbnailRef);
+                await deleteObject(videoRef);
+                await deleteObject(thumbnailRef);
 
-            // Delete Firestore document
-            const docRef = doc(getFirestore(), "videos", video.id);
-            await deleteDoc(docRef);
+                const docRef = doc(db, 'videos', video.id);
+                await deleteDoc(docRef);
+            }
 
-            safeReplace("/(tabs)/home");
-            showToast("Video deleted successfully!");
+            safeReplace('/(tabs)/home');
+            showToast('Video deleted successfully!');
         } catch (error) {
-            console.error("Delete failed:", error);
-            showToast("Failed to delete video.");
+            console.error('Delete failed:', error);
+            showToast('Failed to delete video.');
         } finally {
             setDeleting(false);
         }
@@ -321,19 +327,19 @@ export default function VideoDetail() {
 
     const handleReport = async () => {
         if (!video || !userDetail) {
-            showToast("Please log in to report this video.");
+            showToast('Please log in to report this video.');
             return;
         }
 
         try {
             setReporting(true);
-            showToast("Reporting video...");
+            showToast('Reporting video...');
 
             // Firestore "reports" collection
             const reportRef = doc(
                 db,
-                "reports",
-                `${video.id}_${userDetail?.email}`
+                'reports',
+                `${video.id}_${userDetail?.email}`,
             );
 
             await setDoc(reportRef, {
@@ -344,12 +350,12 @@ export default function VideoDetail() {
                 reportedAt: serverTimestamp(),
             });
 
-            setReportReason("");
-            showToast("Video reported successfully!");
+            setReportReason('');
+            showToast('Video reported successfully!');
             setShowReportModal(false);
         } catch (error) {
-            console.error("Report failed:", error);
-            showToast("Failed to report video.");
+            console.error('Report failed:', error);
+            showToast('Failed to report video.');
         } finally {
             setReporting(false);
         }
@@ -367,9 +373,27 @@ export default function VideoDetail() {
 
     if (!video) {
         return (
-            <View style={styles.loader}>
-                <Text style={styles.title}>Oops! Video not found</Text>
-            </View>
+            <SafeAreaView
+                style={{
+                    flex: 1,
+                    backgroundColor: Colors.BG_COLOR,
+                }}
+            >
+                <TouchableOpacity
+                    onPress={safeBack}
+                    style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}
+                >
+                    <AntDesign name="left" color={'white'} size={20} />
+                    <Text style={{ color: Colors.WHITE, fontSize: 18 }}>
+                        Back
+                    </Text>
+                </TouchableOpacity>
+                <View style={styles.loader}>
+                    <Text style={[styles.title, { color: 'white' }]}>
+                        Oops! Video not found
+                    </Text>
+                </View>
+            </SafeAreaView>
         );
     }
 
@@ -377,8 +401,8 @@ export default function VideoDetail() {
         <SafeAreaView style={styles.container}>
             <View
                 style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
                     padding: 10,
                 }}
             >
@@ -388,40 +412,46 @@ export default function VideoDetail() {
                 </TouchableOpacity>
 
                 <View style={styles.backButton}>
-                    <TouchableOpacity
-                        disabled={adding}
-                        onPress={handleFavorite}
-                    >
-                        {adding ? (
-                            <ActivityIndicator
-                                size="small"
-                                color={Colors.GREEN}
-                            />
-                        ) : (
-                            <AntDesign
-                                name={favorite ? "heart" : "hearto"}
-                                size={24}
-                                color={favorite ? Colors.RED : Colors.BLACK}
-                            />
-                        )}
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={handleDownload}
-                        disabled={downloading}
-                    >
-                        {downloading ? (
-                            <ActivityIndicator
-                                size="small"
-                                color={Colors.GREEN}
-                            />
-                        ) : (
-                            <Feather
-                                name="download-cloud"
-                                size={24}
-                                color={Colors.BLACK}
-                            />
-                        )}
-                    </TouchableOpacity>
+                    {video.uploadedBy !== 'YouTube' && (
+                        <>
+                            <TouchableOpacity
+                                disabled={adding}
+                                onPress={handleFavorite}
+                            >
+                                {adding ? (
+                                    <ActivityIndicator
+                                        size="small"
+                                        color={Colors.GREEN}
+                                    />
+                                ) : (
+                                    <AntDesign
+                                        name={favorite ? 'heart' : 'hearto'}
+                                        size={24}
+                                        color={
+                                            favorite ? Colors.RED : Colors.BLACK
+                                        }
+                                    />
+                                )}
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={handleDownload}
+                                disabled={downloading}
+                            >
+                                {downloading ? (
+                                    <ActivityIndicator
+                                        size="small"
+                                        color={Colors.GREEN}
+                                    />
+                                ) : (
+                                    <Feather
+                                        name="download-cloud"
+                                        size={24}
+                                        color={Colors.BLACK}
+                                    />
+                                )}
+                            </TouchableOpacity>
+                        </>
+                    )}
 
                     <TouchableOpacity
                         onPress={() => setShowOptions((prev) => !prev)}
@@ -435,37 +465,65 @@ export default function VideoDetail() {
                 </View>
             </View>
 
-            {enrolled ? (
-                <VideoView
-                    source={{ uri: video.videoURL }}
-                    style={styles.video}
-                    controls
-                    resizeMode="contain"
-                />
-            ) : (
-                <Image
-                    source={{ uri: video.thumbnailURL }}
-                    style={styles.image}
-                    resizeMode="contain"
-                />
-            )}
+            {(() => {
+                const isYouTube = video.uploadedBy === 'YouTube';
+                let videoId: string | null = null;
+
+                if (isYouTube) {
+                    videoId = video.id; // ✅ Use the ID directly
+
+                    return (
+                        <YoutubePlayer
+                            height={230}
+                            play={true}
+                            videoId={videoId}
+                        />
+                    );
+                }
+
+                if (enrolled) {
+                    return (
+                        <VideoView
+                            source={{ uri: video.videoURL }}
+                            style={styles.video}
+                            controls
+                            resizeMode="contain"
+                        />
+                    );
+                }
+
+                return (
+                    <Image
+                        source={{ uri: video.thumbnailURL }}
+                        style={styles.image}
+                        resizeMode="contain"
+                    />
+                );
+            })()}
+
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={styles.title}>{video.title}</Text>
                 <Text style={styles.uploadedBy}>
-                    by{" "}
-                    <Text style={{ fontFamily: "outfit-bold" }}>
+                    by{' '}
+                    <Text style={{ fontFamily: 'outfit-bold' }}>
                         {uploaderName || video.uploadedBy}
                     </Text>
                 </Text>
 
                 <View style={styles.durationContainer}>
                     <View style={styles.durationInfo}>
-                        <FontAwesome
-                            name="calendar"
-                            size={14}
-                            color={Colors.BLACK}
-                        />
-                        <Text style={styles.uploadedAt}>{uploadedAtText}</Text>
+                        {video?.uploadedBy !== 'YouTube' && (
+                            <>
+                                <FontAwesome
+                                    name="calendar"
+                                    size={14}
+                                    color={Colors.BLACK}
+                                />
+                                <Text style={styles.uploadedAt}>
+                                    {uploadedAtText}
+                                </Text>
+                            </>
+                        )}
                     </View>
                     <View style={[styles.durationInfo, { left: 40 }]}>
                         <AntDesign
@@ -474,7 +532,9 @@ export default function VideoDetail() {
                             color={Colors.BLACK}
                         />
                         <Text style={styles.duration}>
-                            {formatDuration(video.duration)}
+                            {typeof video.duration === 'string'
+                                ? formatYouTubeDuration(video.duration)
+                                : formatDuration(video.duration)}{' '}
                         </Text>
                     </View>
                     <View style={[styles.durationInfo, { maxWidth: 100 }]}>
@@ -484,7 +544,7 @@ export default function VideoDetail() {
                             color={Colors.BLACK}
                         />
                         <Text numberOfLines={1} style={styles.duration}>
-                            {video.views}
+                            {formatViews(video.views)}
                         </Text>
                     </View>
                 </View>
@@ -495,7 +555,7 @@ export default function VideoDetail() {
                             {video?.level
                                 ? video.level.charAt(0).toUpperCase() +
                                   video.level.slice(1)
-                                : "N/A"}
+                                : 'N/A'}
                         </Text>
                     </View>
                     <View style={styles.box}>
@@ -507,9 +567,9 @@ export default function VideoDetail() {
                 {/* Tabs */}
                 <View style={styles.section}>
                     {[
-                        "Overview",
+                        'Overview',
                         // "Resources",
-                        "Reviews",
+                        'Reviews',
                     ].map((tab) => (
                         <TouchableOpacity
                             key={tab}
@@ -537,35 +597,37 @@ export default function VideoDetail() {
                     {renderTabContent()}
                 </View>
             </ScrollView>
-            <View style={styles.enrollContainer}>
-                <Button
-                    opacity={enrolling ? 0.5 : 1}
-                    text={enrolled ? "Enrolled" : "Enroll Now"}
-                    onPress={handleEnroll}
-                    type="fill"
-                    loading={enrolling}
-                    disabled={enrolling || enrolled}
-                    icon={
-                        <AntDesign
-                            name="playcircleo"
-                            size={20}
-                            color={Colors.WHITE}
-                        />
-                    }
-                />
-            </View>
+            {!enrolled && video.uploadedBy !== 'YouTube' && (
+                <View style={styles.enrollContainer}>
+                    <Button
+                        opacity={enrolling ? 0.5 : 1}
+                        text={enrolled ? 'Enrolled' : 'Enroll Now'}
+                        onPress={handleEnroll}
+                        type="fill"
+                        loading={enrolling}
+                        disabled={enrolling || enrolled}
+                        icon={
+                            <AntDesign
+                                name="playcircleo"
+                                size={20}
+                                color={Colors.WHITE}
+                            />
+                        }
+                    />
+                </View>
+            )}
 
             {showOptions && (
                 <View
                     style={{
-                        position: "absolute",
+                        position: 'absolute',
                         top: 60,
                         right: 10,
                         backgroundColor: Colors.WHITE,
                         borderRadius: 8,
                         padding: 10,
                         elevation: 5, // Android shadow
-                        shadowColor: "#000", // iOS shadow
+                        shadowColor: '#000', // iOS shadow
                         shadowOpacity: 0.2,
                         shadowRadius: 4,
                         shadowOffset: { width: 0, height: 2 },
@@ -584,27 +646,27 @@ export default function VideoDetail() {
                         </Text>
                     </TouchableOpacity> */}
 
-                    {userDetail?.roles.includes("admin") && (
+                    {userDetail?.roles.includes('admin') && (
                         <TouchableOpacity
                             onPress={() => {
                                 setShowOptions(false);
                                 setShowDeleteModal({
                                     visible: true,
-                                    title: "Delete Video",
+                                    title: 'Delete Video',
                                     message:
-                                        "Are you sure you want to delete this video?",
+                                        'Are you sure you want to delete this video?',
                                 });
                             }}
                             style={{
                                 borderBottomWidth: 0.5,
                                 borderColor: Colors.GRAY,
-                                width: "100%",
+                                width: '100%',
                             }}
                         >
                             <Text
                                 style={{
                                     padding: 8,
-                                    color: "red",
+                                    color: 'red',
                                 }}
                             >
                                 Delete
@@ -627,14 +689,14 @@ export default function VideoDetail() {
                 <View
                     style={{
                         flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     }}
                 >
                     <View
                         style={{
-                            width: "80%",
+                            width: '80%',
                             backgroundColor: Colors.WHITE,
                             borderRadius: 8,
                             padding: 20,
@@ -643,7 +705,7 @@ export default function VideoDetail() {
                         <Text
                             style={{
                                 fontSize: 18,
-                                fontWeight: "bold",
+                                fontWeight: 'bold',
                                 marginBottom: 10,
                             }}
                         >
@@ -666,10 +728,10 @@ export default function VideoDetail() {
                         />
                         <View
                             style={{
-                                flexDirection: "row",
-                                alignItems: "center",
+                                flexDirection: 'row',
+                                alignItems: 'center',
                                 gap: 12,
-                                justifyContent: "flex-end",
+                                justifyContent: 'flex-end',
                             }}
                         >
                             <TouchableOpacity
@@ -696,7 +758,7 @@ export default function VideoDetail() {
                             >
                                 {reporting ? (
                                     <ActivityIndicator
-                                        size={"small"}
+                                        size={'small'}
                                         color={Colors.GREEN}
                                     />
                                 ) : (

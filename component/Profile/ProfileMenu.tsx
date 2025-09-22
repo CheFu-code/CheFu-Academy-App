@@ -44,7 +44,7 @@ export const ProfileMenu = ({
     confirmDeleteAccount,
     avatarURL,
 }: ProfileMenuProps) => {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { email, member, planType } = userDetail || {};
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
@@ -196,27 +196,6 @@ export const ProfileMenu = ({
                         Check for App Updates
                     </Text>
                 </TouchableOpacity>
-
-                {isAdmin && (
-                    <TouchableOpacity
-                        style={[styles.menuItem, { marginTop: 5 }]}
-                        onPress={() =>
-                            safePush("/admin/upload-video")
-                        }
-                    >
-                        <MaterialCommunityIcons
-                            name="video"
-                            size={26}
-                            color={Colors.GREEN}
-                            style={styles.icon}
-                        />
-                        <Text
-                            style={[styles.menuLabel, { color: Colors.GREEN }]}
-                        >
-                            Upload Videos
-                        </Text>
-                    </TouchableOpacity>
-                )}
 
                 <View style={styles.divider} />
 

@@ -18,6 +18,21 @@ export type Video = {
     topics: string[];
 };
 
+export type YouTubeVideo = {
+    createdAt: FirebaseFirestoreTypes.Timestamp;
+    thumbnailURL: string;
+    title: string;
+    videoId: string;
+    description: string;
+    duration: string;
+    views: number;
+    publishedAt: Date;
+    instructorName: string;        // channel name
+    instructorCompany: string;     // optional creative name
+    channelTitle: string;          // add this for TypeScript
+};
+
+
 export type VideoCardProps = {
     video: Video;
     onPress?: () => void;
@@ -62,4 +77,12 @@ export type UserReviews = {
     createdAt: FirebaseFirestoreTypes.Timestamp | FirebaseFirestoreTypes.FieldValue;
     username: string;
     avatar: string;
+}
+
+export interface FavoriteCourse {
+    videoId: string;
+    title: string;
+    thumbnailURL: string;
+    addedAt: FirebaseFirestoreTypes.Timestamp;
+    uploadedBy: string
 }

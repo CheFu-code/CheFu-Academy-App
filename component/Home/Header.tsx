@@ -17,13 +17,23 @@ import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Header.styles";
 import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import AddVideoModal from "./AddVideoModal";
+import {
+    doc,
+    getFirestore,
+    serverTimestamp,
+    setDoc,
+} from "@react-native-firebase/firestore";
+import { showToast } from "@/utils/toast";
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
 export default function Header({ onPress }: { onPress?: () => void }) {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [modalVisible, setModalVisible] = useState(false);
     const { safePush, safeReplace } = useSafeNavigation();
+    const db = getFirestore();
     const auth = getAuth();
     const CACHE_KEY = "@cached_courses";
     const handleOption = async (option: string) => {
@@ -107,6 +117,8 @@ export default function Header({ onPress }: { onPress?: () => void }) {
             );
         } else if (option === "Add Course") {
             safePush("/addCourse");
+        } else if (option === "Favorite Videos") {
+            safePush("/favoriteVideos");
         }
     };
 
@@ -116,9 +128,9 @@ export default function Header({ onPress }: { onPress?: () => void }) {
         color?: string;
     }[] = [
         { label: "Add Course", icon: "add-circle-outline" },
+        { label: "Favorite Videos", icon: "heart" },
         { label: "Contact Support", icon: "mail-outline" },
         { label: "Rate our app", icon: "star-outline", color: Colors.YELLOW },
-        // { label: "Logout", icon: "log-out-outline", color: Colors.RED },
     ];
 
     const handleSearch = () => {
@@ -134,11 +146,49 @@ export default function Header({ onPress }: { onPress?: () => void }) {
         setSearchTerm("");
     };
 
+    const handleSaveVideo = async (videoData: any) => {
+        if (!videoData || !videoData.videoId) return;
+
+        try {
+            const videoRef = doc(db, "youTubeVideos", videoData.videoId);
+
+            await setDoc(videoRef, {
+                title: videoData.title,
+                thumbnailURL: videoData.thumbnailURL,
+                videoId: videoData.videoId,
+                createdAt: serverTimestamp(),
+            });
+
+            showToast("Video saved successfully!");
+        } catch (error) {
+            console.error("Error saving video:", error);
+            showToast("Failed to save video");
+        }
+    };
+
     return (
         <View style={styles.headerContainer}>
             <View>
-                <View style={styles.subHeaderContainer}>
+                <View
+                    style={[
+                        styles.subHeaderContainer,
+                        {
+                            marginTop:
+                                auth.currentUser &&
+                                !auth.currentUser.emailVerified
+                                    ? 0
+                                    : 20,
+                        },
+                    ]}
+                >
                     <Pressable
+                        onLongPress={() => {
+                            if (userDetail?.roles.includes("admin")) {
+                                setModalVisible(true);
+                            } else {
+                                return;
+                            }
+                        }}
                         onPress={onPress}
                         style={{
                             flexDirection: "row",
@@ -180,7 +230,6 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     )}
                 </View>
 
-                {/*Expand knowledge with our courses */}
                 <View>
                     <Text
                         numberOfLines={1}
@@ -254,6 +303,12 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     </View>
                 </Pressable>
             </Modal>
+
+            <AddVideoModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onSave={handleSaveVideo}
+            />
         </View>
     );
 }

@@ -363,14 +363,14 @@ export default function Home() {
                     <View
                         style={{
                             backgroundColor: Colors.BG,
-                            padding: 10,
+                            paddingTop: 22,
                         }}
                     >
                         <TouchableOpacity
                             onPress={verify}
                             style={{
                                 backgroundColor: "#FFD700",
-                                padding: 8,
+                                padding: 5,
                                 borderRadius: 15,
                                 opacity: 0.9,
                             }}

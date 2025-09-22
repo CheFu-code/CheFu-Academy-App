@@ -89,7 +89,7 @@ export default function SubscriptionWall() {
                     disabled={loading}
                     onPress={() => {
                         if (router && typeof safeBack === "function")
-                            safeBack;
+                            safeBack();
                     }}
                     accessible={true}
                     accessibilityLabel="Go back"

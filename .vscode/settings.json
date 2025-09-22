@@ -1,8 +1,9 @@
 {
     "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit",
-        "source.organizeImports": "explicit",
-        "source.sortMembers": "explicit"
+        "source.fixAll": "always",          // only run "fix all" if you explicitly trigger it
+        "source.organizeImports": "always", // organize imports only on explicit save action
+        "source.sortMembers": "always",     // sort members (if plugin supports it) only on explicit save
+        "source.fixAll.eslint": "always"          // ESLint fixes (including unused imports if plugin is installed)
     },
     "cSpell.words": [
         "appspot",
@@ -28,5 +29,11 @@
         "RNFB",
         "scikit",
         "Skus"
+    ],
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
     ]
 }

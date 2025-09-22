@@ -25,6 +25,12 @@ import { styles } from "../../styles/AddCourse";
 import { handleAiError } from "../../utils/errorUtils";
 import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import ErrorModal from "@/component/Shared/ErrorModal";
+import {
+    AdEventType,
+    RewardedAd,
+    RewardedAdEventType,
+} from "react-native-google-mobile-ads";
+import { showToast } from "@/utils/toast";
 
 export default function AddCourse() {
     const [loading, setLoading] = useState(false);
@@ -36,13 +42,18 @@ export default function AddCourse() {
     const [generatingTopic, setGeneratingTopic] = useState(false);
     const db = getFirestore();
     const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
+    const REWARDED_AD_UNIT_ID = "ca-app-pub-8952058057579255/8646813913";
     const [limitModalVisible, setLimitModalVisible] = useState(false);
+    const [extraCourseUnlocked, setExtraCourseUnlocked] = useState(false);
+    const support = "chefu.inc@gmail.com";
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: "",
         message: "",
     });
-
+    const rewardedAd = RewardedAd.createForAdRequest(REWARDED_AD_UNIT_ID, {
+        requestNonPersonalizedAdsOnly: true,
+    });
     const generateTopic = async () => {
         if (generatingTopic) return; // Prevent double submission
         if (!userInput.trim()) {
@@ -58,8 +69,11 @@ export default function AddCourse() {
 
         try {
             const courseCountToday = await checkDailyLimit(userDetail?.email);
-
-            if (userDetail?.member === false && courseCountToday >= 3) {
+            if (
+                userDetail?.member === false &&
+                courseCountToday >= 3 &&
+                !extraCourseUnlocked
+            ) {
                 setLimitModalVisible(true);
                 setGeneratingTopic(false);
                 setUserInput("");
@@ -155,8 +169,6 @@ export default function AddCourse() {
         return selection ? true : false;
     };
 
-    const support = "chefu.inc@gmail.com";
-
     const onGenerateCourse = async () => {
         if (loading) return; // Prevent double submission
         if (!selectedTopic.length) {
@@ -246,7 +258,38 @@ export default function AddCourse() {
         }
     };
 
-    const watchRewaredAd = () => {};
+    const watchRewardedAd = () => {
+        showToast("Your ad is loading. It will be ready shortly.");
+        rewardedAd.load();
+
+        const unsubscribe = rewardedAd.addAdEventListener(
+            RewardedAdEventType.LOADED,
+            () => {
+                rewardedAd.show();
+            }
+        );
+
+        rewardedAd.addAdEventListener(
+            RewardedAdEventType.EARNED_REWARD,
+            (reward) => {
+                setExtraCourseUnlocked(true);
+                showToast("You earned 1 extra course!");
+            }
+        );
+
+        rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
+            console.error("Ad failed to load:", error);
+            Alert.alert(
+                "Ad Error",
+                "Failed to load rewarded ad. Try again later."
+            );
+        });
+
+        // Remove listeners when done
+        return () => {
+            unsubscribe();
+        };
+    };
 
     if (generatingTopic) {
         return (
@@ -307,7 +350,7 @@ export default function AddCourse() {
                 <View style={styles.container}>
                     <Pressable
                         onPress={() => {
-                            if (!loading) safeBack;
+                            if (!loading) safeBack();
                         }}
                     >
                         <Ionicons
@@ -431,13 +474,13 @@ export default function AddCourse() {
                 visible={limitModalVisible}
                 title="Daily Limit Reached"
                 message="Free users can create up to 3 courses per day. Upgrade for unlimited access, or watch a rewarded ad to create one additional course."
-                confirmText="Upgrade"
+                confirmText="Watch Ad"
                 cancelText="Cancel"
                 confirmColor={Colors.GREEN}
                 onCancel={() => setLimitModalVisible(false)}
                 onConfirm={() => {
                     setLimitModalVisible(false);
-                    watchRewaredAd();
+                    watchRewardedAd();
                 }}
             />
         </>

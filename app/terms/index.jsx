@@ -37,7 +37,7 @@ export default function TermsOfService() {
                 style={styles.backButton}
                 onPress={() => {
                     if (router && typeof router.back === "function")
-                        safeBack;
+                        safeBack();
                 }}
                 accessible={true}
                 accessibilityLabel="Go back"

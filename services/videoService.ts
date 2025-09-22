@@ -1,4 +1,4 @@
-import { Video } from "@/types/video";
+import { Video, YouTubeVideo } from "@/types/video";
 import { getAuth } from "@react-native-firebase/auth";
 import {
     collection,
@@ -14,18 +14,19 @@ import {
     where,
 } from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
+import axios from "axios";
 import uuid from "react-native-uuid";
 
 export const uploadVideo = async (
     title: string,
-    instructor:string,
+    instructor: string,
     description: string,
     videoUri: string,
     thumbnailUri: string,
     category: string,
     visibility: "public" | "private",
     duration: number,
-    views: number = 0, 
+    views: number = 0,
     topics: string[],
 
 ) => {
@@ -70,7 +71,7 @@ export const fetchVideos = async (): Promise<Video[]> => {
     const db = getFirestore();
     const q = query(
         collection(db, "videos"),
-        where("visibility", "==", "public"), 
+        where("visibility", "==", "public"),
         orderBy("uploadedAt", "desc")
     );
 
@@ -101,10 +102,10 @@ export const fetchVideoById = async (videoId: string): Promise<Video | null> => 
             videoURL: data.videoURL,
             thumbnailURL: data.thumbnailURL,
             uploadedBy: data.uploadedBy,
-            uploadedAt: data.uploadedAt, 
+            uploadedAt: data.uploadedAt,
             category: data.category,
             visibility: data.visibility,
-            level: data.level ?? "beginner", 
+            level: data.level ?? "beginner",
             duration: data.duration ?? 0,
             views: data.views ?? 0,
             topics: data.topics ?? [],
@@ -115,3 +116,74 @@ export const fetchVideoById = async (videoId: string): Promise<Video | null> => 
     }
 };
 
+const fetchYouTubeVideoDetails = async (videoId: string) => {
+    const YOUTUBE_API_KEY = 'AIzaSyDslnFAex5WgQcEmnFw1SysNBdJbkuehzY'
+    try {
+        const res = await axios.get(
+            `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${YOUTUBE_API_KEY}`
+        );
+
+        if (res.data.items.length === 0) return null;
+
+        const video = res.data.items[0];
+        const channelTitle = video.snippet.channelTitle || "";
+        return {
+            videoId: video.id,
+            title: video.snippet.title,
+            description: video.snippet.description,
+            thumbnailURL: video.snippet.thumbnails.high.url,
+            duration: video.contentDetails.duration,
+            views: parseInt(video.statistics.viewCount, 10) || 0,
+            publishedAt: new Date(video.snippet.publishedAt),
+            instructorName: channelTitle,
+            instructorCompany: `${channelTitle}`,
+            channelTitle: video.snippet.channelTitle,
+        };
+    } catch (err) {
+        console.error(`Error fetching details for videoId ${videoId}:`, err);
+        return null;
+    }
+};
+
+export const fetchYouTubeVideos = async (): Promise<YouTubeVideo[]> => {
+    try {
+        const db = getFirestore();
+        const videosCol = collection(db, "youTubeVideos");
+        const q = query(videosCol, orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+
+        const videoIds = snapshot.docs
+            .map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => doc.data().videoId)
+            .filter(Boolean);
+
+        const videos = await Promise.all(
+            videoIds.map((id: string) => fetchYouTubeVideoDetails(id))
+        );
+
+        const validVideos = videos.filter(Boolean) as YouTubeVideo[];
+
+        return validVideos;
+
+    } catch (error) {
+        console.error("Error fetching YouTube videos:", error);
+        return [];
+    }
+};
+
+export const formatYouTubeDuration = (duration: string): string => {
+    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+
+    if (!match) return "0:00";
+
+    const hours = parseInt(match[1] || "0", 10);
+    const minutes = parseInt(match[2] || "0", 10);
+    const seconds = parseInt(match[3] || "0", 10);
+
+    const pad = (num: number) => num.toString().padStart(2, "0");
+
+    if (hours > 0) {
+        return `${hours}:${pad(minutes)}:${pad(seconds)}`;
+    } else {
+        return `${minutes}:${pad(seconds)}`;
+    }
+};

@@ -152,7 +152,7 @@ const ForgotPassword = () => {
 
                 <TouchableOpacity
                     onPress={() => {
-                        safeBack;
+                        safeBack();
                     }}
                     style={styles.cancel}
                 >
@@ -183,7 +183,7 @@ const ForgotPassword = () => {
                         ...successModalVisible,
                         visible: false,
                     });
-                    safeBack;
+                    safeBack();
                 }}
             />
         </>
