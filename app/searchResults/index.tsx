@@ -1,87 +1,95 @@
-import CourseCard from "@/component/Shared/CourseCard";
-import { Colors } from "@/constant/Colors";
-import { Course } from "@/types/course";
-import { AntDesign } from "@expo/vector-icons";
+import CourseCard from '@/component/Shared/CourseCard';
+import { Colors } from '@/constant/Colors';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { AntDesign } from '@expo/vector-icons';
 import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
     getFirestore,
-} from "@react-native-firebase/firestore";
-import { router, useLocalSearchParams } from "expo-router";
-import LottieView from "lottie-react-native";
-import React, { useEffect, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+} from '@react-native-firebase/firestore';
+import { useLocalSearchParams } from 'expo-router';
+import LottieView from 'lottie-react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SearchScreen() {
     const { query } = useLocalSearchParams();
+    const { safePush, safeBack } = useSafeNavigation();
     const [results, setResults] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const category = results[0]?.category;
     const db = getFirestore();
 
-    const fetchCourses = async (query: string | string[]) => {
-        try {
-            const term = Array.isArray(query) ? query[0] : query || "";
+    const fetchCourses = useCallback(
+        async (query: string | string[]) => {
+            try {
+                const term = Array.isArray(query) ? query[0] : query || '';
 
-            const snapshot = await getDocs(collection(db, "course"));
+                const snapshot = await getDocs(collection(db, 'course'));
 
-            const filtered: Course[] = snapshot.docs
-                .map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
-                    const data = doc.data();
-                    return {
-                        id: doc.id,
-                        docId: doc.id,
-                        courseTitle: data.courseTitle || data.title || "",
-                        category: data.category,
-                        banner_image: data.banner_image,
-                        chapters: data.chapters,
-                        flashcards: data.flashcards,
-                        qa: data.qa,
-                        quiz: data.quiz,
-                        description: data.description,
-                        price: data.price,
-                        createdBy: data.createdBy,
-                        createdOn: data.createdOn,
-                        enrolled: data.enrolled,
-                    };
-                })
-                .filter(
-                    (course: Course) =>
-                        course.courseTitle
-                            ?.toLowerCase()
-                            .includes(term.toLowerCase()) ||
-                        course.category
-                            ?.toLowerCase()
-                            .includes(term.toLowerCase())
-                );
+                const filtered: Course[] = snapshot.docs
+                    .map(
+                        (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
+                            const data = doc.data();
+                            return {
+                                id: doc.id,
+                                docId: doc.id,
+                                courseTitle:
+                                    data.courseTitle || data.title || '',
+                                category: data.category,
+                                banner_image: data.banner_image,
+                                chapters: data.chapters,
+                                flashcards: data.flashcards,
+                                qa: data.qa,
+                                quiz: data.quiz,
+                                description: data.description,
+                                price: data.price,
+                                createdBy: data.createdBy,
+                                createdOn: data.createdOn,
+                                enrolled: data.enrolled,
+                            };
+                        },
+                    )
+                    .filter(
+                        (course: Course) =>
+                            course.courseTitle
+                                ?.toLowerCase()
+                                .includes(term.toLowerCase()) ||
+                            course.category
+                                ?.toLowerCase()
+                                .includes(term.toLowerCase()),
+                    );
 
-            setResults(filtered);
-        } catch (e) {
-            console.error("Search error:", e);
-        } finally {
-            setLoading(false);
-        }
-    };
+                setResults(filtered);
+            } catch (e) {
+                console.error('Search error:', e);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [db],
+    );
 
     useEffect(() => {
         fetchCourses(query);
-    }, [query]);
+    }, [query, fetchCourses]);
 
     if (loading)
         return (
             <View
                 style={{
                     flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     backgroundColor: Colors.BG_COLOR,
                 }}
             >
                 <LottieView
                     autoPlay
                     loop
-                    source={require("../../assets/animations/Loading.json")}
+                    source={require('../../assets/animations/Loading.json')}
                     style={{
                         width: 150,
                         height: 150,
@@ -90,12 +98,12 @@ export default function SearchScreen() {
                 <Text
                     style={{
                         marginTop: 10,
-                        fontFamily: "outfit-bold",
+                        fontFamily: 'outfit-bold',
                         fontSize: 16,
                         color: Colors.PRIMARY,
                     }}
                 >
-                    Finding courses you'll love...
+                    Finding courses you&apos;ll love...
                 </Text>
             </View>
         );
@@ -108,25 +116,23 @@ export default function SearchScreen() {
                 }}
             >
                 <TouchableOpacity
-                    onPress={() => {
-                        router.back();
-                    }}
+                    onPress={safeBack}
                     style={{
-                        flexDirection: "row",
-                        alignItems: "center",
+                        flexDirection: 'row',
+                        alignItems: 'center',
                         gap: 8,
                         borderBottomWidth: 1,
                         borderBottomColor: Colors.PRIMARY,
                         paddingBottom: 20,
                     }}
                 >
-                    <AntDesign color={"white"} size={20} name="left" />
+                    <AntDesign color={'white'} size={20} name="left" />
                     <Text
                         numberOfLines={1}
                         style={{
                             color: Colors.WHITE,
                             fontSize: 20,
-                            fontFamily: "outfit-bold",
+                            fontFamily: 'outfit-bold',
                             maxWidth: 320,
                         }}
                     >
@@ -135,11 +141,11 @@ export default function SearchScreen() {
                             numberOfLines={1}
                             style={{
                                 color: Colors.PRIMARY,
-                                fontStyle: "italic",
+                                fontStyle: 'italic',
                             }}
                         >
-                            {" "}
-                            "{query}"
+                            {' '}
+                            &quot;{query}&quot;
                         </Text>
                     </Text>
                 </TouchableOpacity>
@@ -147,13 +153,13 @@ export default function SearchScreen() {
                 {results.length === 0 ? (
                     <View
                         style={{
-                            alignItems: "center",
-                            justifyContent: "center",
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             marginTop: 50,
                         }}
                     >
                         <LottieView
-                            source={require("../../assets/animations/Empty box by partho.json")}
+                            source={require('../../assets/animations/Empty box by partho.json')}
                             autoPlay
                             loop
                             style={{ width: 190, height: 190 }}
@@ -161,12 +167,12 @@ export default function SearchScreen() {
                         <Text
                             style={{
                                 color: Colors.GRAY,
-                                alignItems: "center",
-                                justifyContent: "center",
+                                alignItems: 'center',
+                                justifyContent: 'center',
                                 marginTop: 50,
-                                fontFamily: "outfit-bold",
+                                fontFamily: 'outfit-bold',
                                 fontSize: 18,
-                                textAlign: "center",
+                                textAlign: 'center',
                             }}
                         >
                             No courses were found.
@@ -174,23 +180,23 @@ export default function SearchScreen() {
                         <Text
                             style={{
                                 color: Colors.GRAY,
-                                fontFamily: "outfit",
+                                fontFamily: 'outfit',
                                 fontSize: 15,
                                 marginTop: 25,
                             }}
                         >
-                            We couldn't find any courses that match your search.
-                            Try exploring by category — and if you still don’t
-                            find what you’re looking for, be the first to{" "}
+                            We couldn&apos;t find any courses that match your
+                            search. Try exploring by category — and if you still
+                            don’t find what you’re looking for, be the first to{' '}
                             <TouchableOpacity
                                 onPress={() => {
-                                    router.push("/addCourse");
+                                    safePush('/addCourse');
                                 }}
                             >
                                 <Text
                                     style={{
                                         color: Colors.PRIMARY,
-                                        textDecorationLine: "underline",
+                                        textDecorationLine: 'underline',
                                     }}
                                 >
                                     create it with our AI
@@ -202,21 +208,21 @@ export default function SearchScreen() {
                     <View>
                         <View
                             style={{
-                                flexDirection: "row",
-                                justifyContent: "space-between",
-                                alignItems: "center",
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
                                 marginTop: 20,
                             }}
                         >
                             {category && (
                                 <Text
                                     numberOfLines={1}
-                                    ellipsizeMode={"tail"}
+                                    ellipsizeMode={'tail'}
                                     style={{
                                         fontSize: 18,
                                         color: Colors.WHITE,
-                                        fontFamily: "outfit-bold",
-                                        textTransform: "capitalize",
+                                        fontFamily: 'outfit-bold',
+                                        textTransform: 'capitalize',
                                         marginBottom: 10,
                                         maxWidth: 250,
                                     }}
@@ -228,20 +234,20 @@ export default function SearchScreen() {
                             {results.length > 0 && (
                                 <View
                                     style={{
-                                        alignItems: "center",
-                                        justifyContent: "center",
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
                                     }}
                                 >
                                     <Text
                                         style={{
-                                            fontFamily: "outfit",
-                                            color: "white",
+                                            fontFamily: 'outfit',
+                                            color: 'white',
                                         }}
                                     >
-                                        found:{" "}
+                                        found:{' '}
                                         <Text
                                             style={{
-                                                fontFamily: "outfit-bold",
+                                                fontFamily: 'outfit-bold',
                                                 color: Colors.PRIMARY,
                                             }}
                                         >
@@ -261,7 +267,7 @@ export default function SearchScreen() {
                                 <CourseCard course={item} enroll={true} />
                             )}
                             columnWrapperStyle={{
-                                justifyContent: "space-between",
+                                justifyContent: 'space-between',
                                 paddingHorizontal: 10,
                             }}
                             contentContainerStyle={{

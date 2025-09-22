@@ -1,9 +1,9 @@
-import { Colors } from "@/constant/Colors";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { styles } from "@/styles/ProfileView.styles";
-import { Course } from "@/types/course";
-import { User } from "@/types/user";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Colors } from '@/constant/Colors';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { styles } from '@/styles/ProfileView.styles';
+import { Course } from '@/types/course';
+import { User } from '@/types/user';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import {
     collection,
     doc,
@@ -13,21 +13,21 @@ import {
     getFirestore,
     query,
     where,
-} from "@react-native-firebase/firestore";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import LottieView from "lottie-react-native";
-import React, { useEffect, useState } from "react";
+} from '@react-native-firebase/firestore';
+import { useLocalSearchParams } from 'expo-router';
+import LottieView from 'lottie-react-native';
+import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
     Text,
     TouchableOpacity,
     View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileView() {
-    const { safeBack } = useSafeNavigation()
+    const { safeBack } = useSafeNavigation();
     const { userId } = useLocalSearchParams<{ userId: string }>();
     const [loading, setLoading] = useState(true);
     const [userData, setUserData] = useState<User | null>(null);
@@ -41,7 +41,7 @@ export default function ProfileView() {
         const fetchUserData = async () => {
             try {
                 // Get user document
-                const userRef = doc(db, "users", userId);
+                const userRef = doc(db, 'users', userId);
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
@@ -52,8 +52,8 @@ export default function ProfileView() {
 
                 // Get courses created by this user
                 const coursesQuery = query(
-                    collection(db, "course"),
-                    where("createdBy", "==", userId)
+                    collection(db, 'course'),
+                    where('createdBy', '==', userId),
                 );
                 const coursesSnap = await getDocs(coursesQuery);
 
@@ -65,7 +65,7 @@ export default function ProfileView() {
 
                 coursesSnap.forEach(
                     (
-                        docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>
+                        docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>,
                     ) => {
                         const course = docSnap.data();
                         const courseChapters = course.chapters?.length || 0;
@@ -82,7 +82,7 @@ export default function ProfileView() {
                         }
 
                         completedChapters += completedChaptersInCourse;
-                    }
+                    },
                 );
 
                 setCompletedCount(completedCourses);
@@ -94,22 +94,22 @@ export default function ProfileView() {
                         : 0;
                 setProgress(progressPercent);
             } catch (err) {
-                console.log("Error fetching user data:", err);
+                console.log('Error fetching user data:', err);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchUserData();
-    }, [userId]);
+    }, [userId, db]);
 
     if (loading) {
         return (
             <SafeAreaView style={styles.loadingContainer}>
                 <ActivityIndicator
                     style={{
-                        justifyContent: "center",
-                        alignItems: "center",
+                        justifyContent: 'center',
+                        alignItems: 'center',
                         flex: 1,
                     }}
                     size="large"
@@ -132,7 +132,7 @@ export default function ProfileView() {
 
                 <View style={styles.animationContainer}>
                     <LottieView
-                        source={require("../../assets/animations/Empty box by partho.json")}
+                        source={require('../../assets/animations/Empty box by partho.json')}
                         autoPlay
                         loop
                         style={{ width: 200, height: 200 }}
@@ -150,16 +150,13 @@ export default function ProfileView() {
     return (
         <SafeAreaView style={styles.container}>
             <Image
-                source={require("../../assets/images/graph.png")}
-                style={{ position: "absolute", width: "100%", height: 500 }}
+                source={require('../../assets/images/graph.png')}
+                style={{ position: 'absolute', width: '100%', height: 500 }}
             />
-            <TouchableOpacity
-                onPress={() => safeBack()}
-                style={styles.header}
-            >
+            <TouchableOpacity onPress={() => safeBack()} style={styles.header}>
                 <AntDesign name="left" size={24} color={Colors.WHITE} />
                 <Text numberOfLines={1} style={styles.backText}>
-                    {userData?.fullname || "Back"}
+                    {userData?.fullname || 'Back'}
                 </Text>
             </TouchableOpacity>
 
@@ -168,7 +165,7 @@ export default function ProfileView() {
                     source={
                         userData.profilePicture
                             ? { uri: userData.profilePicture }
-                            : require("../../assets/images/logo.png")
+                            : require('../../assets/images/logo.png')
                     }
                     style={styles.profilePicture}
                 />
@@ -206,7 +203,7 @@ export default function ProfileView() {
                         <Text style={styles.numberOfCourses}>
                             {coursesCount}
                         </Text>
-                        <Text style={[styles.email, { textAlign: "center" }]}>
+                        <Text style={[styles.email, { textAlign: 'center' }]}>
                             Courses
                         </Text>
                     </View>
@@ -214,7 +211,7 @@ export default function ProfileView() {
                         <Text style={styles.numberOfCourses}>
                             {completedCount}
                         </Text>
-                        <Text style={[styles.email, { textAlign: "center" }]}>
+                        <Text style={[styles.email, { textAlign: 'center' }]}>
                             Completed Courses
                         </Text>
                     </View>
@@ -225,13 +222,13 @@ export default function ProfileView() {
                         <Text style={styles.numberOfCourses}>
                             {completedChaptersCount}
                         </Text>
-                        <Text style={[styles.email, { textAlign: "center" }]}>
+                        <Text style={[styles.email, { textAlign: 'center' }]}>
                             Completed Chapters
                         </Text>
                     </View>
                     <View style={styles.box}>
                         <Text style={styles.numberOfCourses}>{progress}%</Text>
-                        <Text style={[styles.email, { textAlign: "center" }]}>
+                        <Text style={[styles.email, { textAlign: 'center' }]}>
                             Progress
                         </Text>
                     </View>

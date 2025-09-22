@@ -1,47 +1,29 @@
+// components/VideoCard.tsx
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
+import dayjs from 'dayjs';
 import { Colors } from '@/constant/Colors';
 import { formatDuration } from '@/helpers/formatDateVideoCard';
 import { formatYouTubeDuration } from '@/services/videoService';
-import { Video } from '@/types/video';
-import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import React, { useCallback, useState } from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from '../../styles/VideoCardHomeScreen.styles';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { formatViews } from '@/utils/formatViews';
-import { useVideos } from '@/hooks/useVideos';
+import { Video } from '@/types/video';
+import { TouchableOpacity, View, Text, Image } from 'react-native';
+import { styles } from '@/styles/VideoCardHomeScreen.styles';
 
-export default function VideoCardHomeScreen() {
-    const { safePush } = useSafeNavigation();
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const { videos } = useVideos();
+interface VideoCardProps {
+    item: Video;
+    onPressCategory: (category: string) => void;
+    onPressVideo: (video: Video) => void;
+}
 
-    dayjs.extend(relativeTime);
-
-    const handleCategoryPress = useCallback(
-        (category: string) => {
-            setSelectedCategory(category);
-            safePush({
-                pathname: '/searchResults',
-                params: { query: category },
-            });
-        },
-        [setSelectedCategory, safePush],
-    );
-
-    const renderVideoCard = ({ item }: { item: Video }) => (
+export default function VideoCard({
+    item,
+    onPressCategory,
+    onPressVideo,
+}: VideoCardProps) {
+    return (
         <TouchableOpacity
             style={styles.cardWrapper}
-            onPress={() => {
-                safePush({
-                    pathname: '/videoDetail',
-                    params:
-                        item.uploadedBy === 'YouTube'
-                            ? { ytVideo: JSON.stringify(item) }
-                            : { id: item.id },
-                });
-            }}
+            onPress={() => onPressVideo(item)}
         >
             <View style={styles.card}>
                 {item.thumbnailURL && (
@@ -58,8 +40,9 @@ export default function VideoCardHomeScreen() {
             <Text numberOfLines={3} style={styles.description}>
                 {item.description}
             </Text>
+
             <TouchableOpacity
-                onPress={() => handleCategoryPress(item.category)}
+                onPress={() => onPressCategory(item.category)}
                 style={styles.category}
             >
                 <View
@@ -104,14 +87,5 @@ export default function VideoCardHomeScreen() {
                 </View>
             </View>
         </TouchableOpacity>
-    );
-
-    return (
-        <FlatList
-            data={videos}
-            keyExtractor={(item, index) => item.id ?? index.toString()}
-            renderItem={renderVideoCard}
-            contentContainerStyle={{ paddingBottom: 20 }}
-        />
     );
 }
