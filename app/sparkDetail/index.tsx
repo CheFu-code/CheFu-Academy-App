@@ -1,11 +1,15 @@
 import Loading from '@/component/Shared/Loading';
+import AddComment from '@/component/Spark/AddComment';
+import CommentsList from '@/component/Spark/CommentsList';
+import SparkActions from '@/component/Spark/SparkActions';
+import SparkHeader from '@/component/Spark/SparkHeaser';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
 import { Likes, Spark } from '@/types/sparks';
 import { showToast } from '@/utils/toast';
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import {
     arrayRemove,
     arrayUnion,
@@ -15,19 +19,9 @@ import {
     Timestamp,
     updateDoc,
 } from '@react-native-firebase/firestore';
-import dayjs from 'dayjs';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
-import {
-    ActivityIndicator,
-    Image,
-    Modal,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SparkDetail = () => {
@@ -38,8 +32,6 @@ const SparkDetail = () => {
     const [commenting, setCommenting] = useState(false);
     const [spark, setSpark] = useState<Spark | null>(null);
     const [loading, setLoading] = useState(true);
-    const [menuVisible, setMenuVisible] = useState(false);
-    const [selectedComment, setSelectedComment] = useState<string | null>(null);
 
     useEffect(() => {
         if (!sparkId) return;
@@ -119,6 +111,8 @@ const SparkDetail = () => {
                         profilePicture: userDetail.profilePicture || '',
                     },
                     createdAt: Timestamp.now(),
+                    likes: [],
+                    replies: [],
                 }),
             });
 
@@ -143,6 +137,9 @@ const SparkDetail = () => {
             const updatedComments = spark.comments.map((c) =>
                 c.id === commentId ? { ...c, text: newText } : c,
             );
+
+            // Immediately update local state
+            setSpark({ ...spark, comments: updatedComments });
 
             await updateDoc(sparkRef, { comments: updatedComments });
             showToast('Comment updated successfully');
@@ -169,6 +166,67 @@ const SparkDetail = () => {
         } catch (err) {
             console.log('Error deleting comment:', err);
             showToast('Failed to delete comment');
+        }
+    };
+
+    // Like a comment
+    const handleLikeComment = async (
+        commentId: string,
+        likes: Likes[] = [],
+    ) => {
+        if (!spark || !userDetail) return;
+
+        const db = getFirestore();
+        const sparkRef = doc(db, 'sparks', spark.id);
+
+        try {
+            // Find if the user already liked the comment
+            const existingLike = likes?.find(
+                (like) => like.createdBy.uid === userDetail.uid,
+            );
+
+            let updatedComments;
+
+            if (existingLike) {
+                // Unlike → remove user's like
+                updatedComments = spark.comments.map((c) =>
+                    c.id === commentId
+                        ? {
+                              ...c,
+                              likes: c.likes?.filter(
+                                  (l) => l.createdBy.uid !== userDetail.uid,
+                              ),
+                          }
+                        : c,
+                );
+            } else {
+                // Like → add a new like
+                const newLike: Likes = {
+                    id: userDetail.uid,
+                    text: 'Liked',
+                    createdBy: {
+                        uid: userDetail.uid,
+                        fullname: userDetail.fullname || 'Anonymous',
+                        profilePicture: userDetail.profilePicture || '',
+                    },
+                    createdAt: Timestamp.now(),
+                };
+
+                updatedComments = spark.comments.map((c) =>
+                    c.id === commentId
+                        ? { ...c, likes: [...(c.likes || []), newLike] }
+                        : c,
+                );
+            }
+
+            // Update Firestore
+            await updateDoc(sparkRef, { comments: updatedComments });
+
+            // Update local state immediately
+            setSpark({ ...spark, comments: updatedComments });
+        } catch (err) {
+            console.log('Error liking comment:', err);
+            showToast('Failed to like comment');
         }
     };
 
@@ -206,296 +264,39 @@ const SparkDetail = () => {
             </TouchableOpacity>
 
             {/* Header */}
-            <View style={styles.header}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image
-                        source={
-                            spark.createdBy?.profilePicture
-                                ? { uri: spark.createdBy.profilePicture }
-                                : require('@/assets/images/avatar.jpg')
-                        }
-                        style={styles.avatar}
-                    />
-                    <View>
-                        <Text style={styles.author}>
-                            {spark.createdBy.fullname}
-                        </Text>
-                        <Text style={styles.timestamp}>
-                            {spark.createdAt?.toDate
-                                ? dayjs(spark.createdAt.toDate()).fromNow()
-                                : 'Just now'}
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.categoryBox}>
-                    <Text style={styles.category}>{spark.category}</Text>
-                </View>
-            </View>
+            <SparkHeader spark={spark} />
 
             {/* Title & Content */}
             <Text style={styles.title}>{spark.title}</Text>
             <Text style={styles.content}>{spark.content}</Text>
 
             {/* Actions */}
-            <View style={styles.actions}>
-                <TouchableOpacity
-                    onPress={() => handleLike(spark.id, spark.likes)}
-                    style={styles.actionButton}
-                >
-                    <AntDesign
-                        name={hasLiked() ? 'like1' : 'like2'}
-                        size={20}
-                        color={Colors.PRIMARY}
-                    />
-                    <Text style={styles.actionText}>
-                        {`${spark.likes?.length || 0} ${
-                            spark.likes?.length < 2 ? 'Like' : 'Likes'
-                        }`}
-                    </Text>
-                </TouchableOpacity>
+            <SparkActions
+                likes={spark.likes}
+                commentsCount={spark.comments?.length || 0}
+                liked={hasLiked()}
+                onLike={() => handleLike(spark.id, spark.likes)}
+            />
+            {/* Add comment */}
+            <AddComment
+                value={comment}
+                onChange={setComment}
+                onSubmit={() => handleAddComment(spark.id)}
+                loading={commenting}
+            />
 
-                <View style={styles.actionButton}>
-                    <FontAwesome
-                        name="comment-o"
-                        size={20}
-                        color={Colors.PRIMARY}
-                    />
-                    <Text style={styles.actionText}>
-                        {`${spark.comments?.length || 0} ${
-                            spark.comments?.length < 2 ? 'Comment' : 'Comments'
-                        }`}
-                    </Text>
-                </View>
-            </View>
-            <View style={styles.addButtonContainer}>
-                <TextInput
-                    multiline
-                    numberOfLines={2}
-                    placeholder="Add a comment..."
-                    style={styles.commentInput}
-                    placeholderTextColor={Colors.GRAY}
-                    value={comment}
-                    onChangeText={setComment}
-                />
-                <TouchableOpacity
-                    onPress={() => handleAddComment(spark.id)}
-                    disabled={!comment.trim() || commenting}
-                    style={[
-                        styles.postButton,
-                        { opacity: commenting || !comment.trim() ? 0.5 : 1 },
-                    ]}
-                >
-                    <Text style={{ fontFamily: 'outfit', color: Colors.WHITE }}>
-                        {commenting ? 'Posting...' : 'Post'}
-                    </Text>
-                    {commenting ? (
-                        <ActivityIndicator
-                            size={'small'}
-                            color={Colors.WHITE}
-                        />
-                    ) : (
-                        <AntDesign name="plus" size={12} color={Colors.WHITE} />
-                    )}
-                </TouchableOpacity>
-            </View>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.contentContainer}
             >
                 {/* Comments placeholder */}
-                <View style={styles.commentsSection}>
-                    <Text style={styles.commentsHeader}>Comments</Text>
-                    {spark.comments?.length ? (
-                        spark.comments.map((c, index) => (
-                            <View
-                                key={`${c.id}-${index}`}
-                                style={[
-                                    styles.comment,
-                                    {
-                                        backgroundColor:
-                                            index % 2 === 0
-                                                ? Colors.BG_COLOR
-                                                : '#25252A',
-                                    },
-                                ]}
-                            >
-                                <Image
-                                    source={
-                                        c.createdBy?.profilePicture
-                                            ? {
-                                                  uri: c.createdBy
-                                                      .profilePicture,
-                                              }
-                                            : require('@/assets/images/avatar.jpg')
-                                    }
-                                    style={styles.commentAvatar}
-                                />
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.commentAuthor}>
-                                        {c.createdBy.fullname}
-                                    </Text>
-
-                                    <Text style={styles.commentText}>
-                                        {c.text}
-                                    </Text>
-
-                                    <View
-                                        style={{
-                                            flexDirection: 'row',
-                                            marginTop: 10,
-                                            marginBottom: 5,
-                                            alignItems: 'center',
-                                            gap: 20,
-                                        }}
-                                    >
-                                        <TouchableOpacity
-                                            style={styles.actionButton}
-                                        >
-                                            <AntDesign
-                                                name="like2"
-                                                color={Colors.PRIMARY}
-                                                size={15}
-                                            />
-                                            <Text style={styles.actionText}>
-                                                0 Likes
-                                            </Text>
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity
-                                            style={styles.actionButton}
-                                        >
-                                            <FontAwesome
-                                                name="comment-o"
-                                                size={15}
-                                                color={Colors.PRIMARY}
-                                            />
-                                            <Text style={styles.actionText}>
-                                                0 Comments
-                                            </Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-
-                                {c.createdBy.uid === userDetail?.uid && (
-                                    <>
-                                        <View
-                                            style={{
-                                                alignItems: 'flex-end',
-                                                justifyContent: 'flex-start',
-                                            }}
-                                        >
-                                            <TouchableOpacity
-                                                style={{
-                                                    padding: 2,
-                                                    backgroundColor: '#1E1E1E',
-                                                    borderRadius: 20,
-                                                }}
-                                                onPress={() => {
-                                                    setSelectedComment(c.id);
-                                                    setMenuVisible(true);
-                                                }}
-                                            >
-                                                <Ionicons
-                                                    name="ellipsis-vertical"
-                                                    size={16}
-                                                    color={Colors.GRAY}
-                                                />
-                                            </TouchableOpacity>
-                                        </View>
-
-                                        <Modal
-                                            transparent
-                                            animationType="fade"
-                                            visible={menuVisible}
-                                            onRequestClose={() =>
-                                                setMenuVisible(false)
-                                            }
-                                        >
-                                            <TouchableOpacity
-                                                style={{
-                                                    flex: 1,
-                                                    backgroundColor:
-                                                        'rgba(0,0,0,0.5)',
-                                                    justifyContent: 'flex-end',
-                                                }}
-                                                activeOpacity={1}
-                                                onPressOut={() =>
-                                                    setMenuVisible(false)
-                                                }
-                                            >
-                                                <View
-                                                    style={{
-                                                        backgroundColor:
-                                                            Colors.BG_COLOR,
-                                                        padding: 20,
-                                                        borderTopLeftRadius: 12,
-                                                        borderTopRightRadius: 12,
-                                                    }}
-                                                >
-                                                    <TouchableOpacity
-                                                        style={{
-                                                            paddingVertical: 12,
-                                                        }}
-                                                        onPress={() => {
-                                                            setMenuVisible(
-                                                                false,
-                                                            );
-                                                            if (
-                                                                selectedComment
-                                                            ) {
-                                                                handleEditComment(
-                                                                    selectedComment,
-                                                                    'New text here',
-                                                                ); // You can replace this with an input
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Text
-                                                            style={{
-                                                                color: Colors.WHITE,
-                                                                fontSize: 16,
-                                                            }}
-                                                        >
-                                                            ✏️ Edit
-                                                        </Text>
-                                                    </TouchableOpacity>
-                                                    <TouchableOpacity
-                                                        style={{
-                                                            paddingVertical: 12,
-                                                        }}
-                                                        onPress={() => {
-                                                            setMenuVisible(
-                                                                false,
-                                                            );
-                                                            if (
-                                                                selectedComment
-                                                            ) {
-                                                                handleDeleteComment(
-                                                                    selectedComment,
-                                                                );
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Text
-                                                            style={{
-                                                                color: 'red',
-                                                                fontSize: 16,
-                                                            }}
-                                                        >
-                                                            🗑️ Delete
-                                                        </Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </TouchableOpacity>
-                                        </Modal>
-                                    </>
-                                )}
-                            </View>
-                        ))
-                    ) : (
-                        <Text style={styles.noComments}>No comments yet</Text>
-                    )}
-                </View>
+                <CommentsList
+                    comments={spark.comments || []}
+                    currentUserId={userDetail?.uid || ''}
+                    onEdit={handleEditComment}
+                    onDelete={handleDeleteComment}
+                    onLike={handleLikeComment}
+                />
             </ScrollView>
         </SafeAreaView>
     );

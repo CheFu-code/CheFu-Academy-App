@@ -1,26 +1,27 @@
-import * as Sentry from "@sentry/react-native";
-import { useFonts } from "expo-font";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { useEffect } from "react";
-import "./firebase-background-handler";
+import * as Sentry from '@sentry/react-native';
+import { useFonts } from 'expo-font';
+import { Stack, useSegments } from 'expo-router';
+import { useEffect } from 'react';
+import './firebase-background-handler';
 
-import FontErrorScreen from "@/component/FontErrorScreen";
-import LoadingScreen from "@/component/LoadingScreen";
-import { useDeepLinking } from "@/hooks/useDeepLinking";
-import { useFirebaseAuthObserver } from "@/hooks/useFirebaseAuthObserver";
-import useLastSeenTracker from "@/hooks/useLastSeenTracker";
-import { useNotifications } from "@/hooks/useNotifications";
-import { UserDetail } from "@/types/UserDetail";
-import OfflineScreen from "../component/OfflineScreen";
-import { Colors } from "../constant/Colors";
-import { NetworkProvider, useNetwork } from "../context/NetworkContext";
-import { UserDetailContext } from "../context/UserDetailContext";
-import { useBiometricAuth } from "../hooks/useBiometricAuth";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import FontErrorScreen from '@/component/FontErrorScreen';
+import LoadingScreen from '@/component/LoadingScreen';
+import { useDeepLinking } from '@/hooks/useDeepLinking';
+import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
+import useLastSeenTracker from '@/hooks/useLastSeenTracker';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { UserDetail } from '@/types/UserDetail';
+import { MenuProvider } from 'react-native-popup-menu';
+import OfflineScreen from '../component/OfflineScreen';
+import { Colors } from '../constant/Colors';
+import { NetworkProvider, useNetwork } from '../context/NetworkContext';
+import { UserDetailContext } from '../context/UserDetailContext';
+import { useBiometricAuth } from '../hooks/useBiometricAuth';
 
 // ✅ Sentry Init
 Sentry.init({
-    dsn: "https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840",
+    dsn: 'https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840',
     sendDefaultPii: true,
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1,
@@ -32,24 +33,24 @@ Sentry.init({
 
 const useProtectedRoute = (
     userDetail: UserDetail | null | undefined,
-    authChecked: boolean
+    authChecked: boolean,
 ) => {
     const segments = useSegments();
-    const { safeReplace } = useSafeNavigation()
+    const { safeReplace } = useSafeNavigation();
     useEffect(() => {
         // Wait until the auth state is actually checked before redirecting.
         if (!authChecked) {
             return;
         }
 
-        const inAuthGroup = segments[0] === "auth";
+        const inAuthGroup = segments[0] === 'auth';
 
         if (userDetail && inAuthGroup) {
             // User is signed in and on an auth screen, redirect to home.
-            safeReplace("/(tabs)/home");
+            safeReplace('/(tabs)/home');
         } else if (!userDetail && !inAuthGroup) {
             // User is not signed in and not on a protected screen, redirect to sign in.
-            safeReplace("/auth/signIn");
+            safeReplace('/auth/signIn');
         }
     }, [userDetail, segments, authChecked, safeReplace]);
 };
@@ -58,16 +59,16 @@ function LayoutContent() {
     const { isConnected } = useNetwork();
 
     const [fontsLoaded, fontError] = useFonts({
-        outfit: require("../assets/fonts/Outfit-Regular.ttf"),
-        "outfit-bold": require("../assets/fonts/Outfit-Bold.ttf"),
-        michroma: require("../assets/fonts/Michroma-Regular.ttf"),
-        "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
+        outfit: require('../assets/fonts/Outfit-Regular.ttf'),
+        'outfit-bold': require('../assets/fonts/Outfit-Bold.ttf'),
+        michroma: require('../assets/fonts/Michroma-Regular.ttf'),
+        'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
     });
 
     const { authChecked, authSuccess } = useBiometricAuth();
     const { userDetail, setUserDetail } = useFirebaseAuthObserver(
         authChecked,
-        authSuccess
+        authSuccess,
     );
 
     useProtectedRoute(userDetail, authChecked);
@@ -83,18 +84,20 @@ function LayoutContent() {
 
     return (
         <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-            <Stack
-                screenOptions={{
-                    headerShown: false,
-                    statusBarStyle: "light",
-                    statusBarAnimation: "slide",
-                    gestureEnabled: true,
-                    animation: "slide_from_right",
-                    contentStyle: {
-                        backgroundColor: Colors.BG_COLOR,
-                    },
-                }}
-            />
+            <MenuProvider>
+                <Stack
+                    screenOptions={{
+                        headerShown: false,
+                        statusBarStyle: 'light',
+                        statusBarAnimation: 'slide',
+                        gestureEnabled: true,
+                        animation: 'slide_from_right',
+                        contentStyle: {
+                            backgroundColor: Colors.BG_COLOR,
+                        },
+                    }}
+                />
+            </MenuProvider>
         </UserDetailContext.Provider>
     );
 }

@@ -125,6 +125,7 @@ export const styles = StyleSheet.create({
     commentText: {
         fontSize: 14,
         color: 'white',
+        fontFamily: 'outfit',
     },
     noComments: {
         fontSize: 14,
@@ -168,5 +169,95 @@ export const styles = StyleSheet.create({
         gap: 6,
         marginRight: 10,
         marginTop: 10
+    },
+    commentHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        justifyContent: 'space-between'
+    },
+    commentTimestamp: {
+        fontSize: 12,
+        color: '#777',
+        fontFamily: 'outfit',
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        marginTop: 10,
+        marginBottom: 5,
+        alignItems: 'center',
+        gap: 20,
+    },
+    menuTrigger: {
+        padding: 2,
+        backgroundColor: '#1E1E1E',
+        borderRadius: 20,
+    },
+    editInput: {
+        color: Colors.WHITE,
+        fontSize: 16,
+        marginBottom: 15,
+        borderWidth: 0.7,
+        borderColor: Colors.GRAY,
+        borderRadius: 10,
+        marginTop: 10,
+    },
+    editHeader: {
+        backgroundColor: Colors.BG_COLOR,
+        padding: 20,
+        borderRadius: 12,
+    },
+    editText: {
+        color: Colors.WHITE,
+        fontSize: 18,
+        fontFamily: 'outfit-bold',
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 10,
+    }, modal: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        padding: 20,
+    },
+    menuOption2: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+        padding: 5,
+        borderRadius: 5,
+    },
+    menuOption1: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        paddingBottom: 5,
+        borderBottomWidth: 0.3,
+        borderColor: Colors.GRAY,
+    },
+    optionsContainerStyle: {
+        backgroundColor: Colors.BG_COLOR,
+        borderRadius: 8,
+        paddingVertical: 5,
+        borderWidth: 0.4,
+        borderColor: Colors.GRAY,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    sheetContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: Colors.BG_COLOR,
+        padding: 20,
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        maxHeight: '60%',
     },
 });

@@ -7,6 +7,18 @@ export interface Comment {
         profilePicture?: string;
     };
     createdAt: any;
+    likes?: Likes[];
+    replies?: Replies[];
+}
+export interface Replies {
+    id: string;
+    text: string;
+    createdBy: {
+        uid: string;
+        fullname: string;
+        profilePicture?: string;
+    };
+    createdAt: any;
 }
 export interface Likes {
     id: string;
