@@ -1,13 +1,15 @@
-import ErrorModal from "@/component/Shared/ErrorModal";
-import VideoCardHomeScreen from "@/component/Video/VideoCardHomeScreen";
-import { Course } from "@/types/course";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import SparksFeed from '@/component/Home/SparksFeed';
+import ErrorModal from '@/component/Shared/ErrorModal';
+import VideoCardHomeScreen from '@/component/Video/VideoCardHomeScreen';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     getAuth,
     onAuthStateChanged,
     reload,
     sendEmailVerification,
-} from "@react-native-firebase/auth";
+} from '@react-native-firebase/auth';
 import {
     collection,
     doc,
@@ -18,10 +20,9 @@ import {
     orderBy,
     query,
     where,
-} from "@react-native-firebase/firestore";
-import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+} from '@react-native-firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -31,49 +32,45 @@ import {
     ToastAndroid,
     TouchableOpacity,
     View,
-} from "react-native";
-import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
-import CourseList from "../../component/Home/CourseList";
-import CourseProgress from "../../component/Home/CourseProgress";
-import Header from "../../component/Home/Header";
-import LineLoader from "../../component/Home/LineLoader";
-import NoCourse from "../../component/Home/NoCourse";
-import PracticeSection from "../../component/Home/PracticeSection";
-import AppModal from "../../component/Shared/AppModal";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import Categories from "@/component/Home/Categories";
+} from 'react-native';
+import CourseList from '../../component/Home/CourseList';
+import CourseProgress from '../../component/Home/CourseProgress';
+import Header from '../../component/Home/Header';
+import LineLoader from '../../component/Home/LineLoader';
+import NoCourse from '../../component/Home/NoCourse';
+import PracticeSection from '../../component/Home/PracticeSection';
+import AppModal from '../../component/Shared/AppModal';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
 
 export default function Home() {
     const [courseList, setCourseList] = useState<Course[]>([]);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
-    const [adLoaded, setAdLoaded] = useState(false);
     const [sending, setSending] = useState(false);
     const { safeReplace } = useSafeNavigation();
     const auth = getAuth();
     const firestore = getFirestore();
     const flatListRef = useRef<FlatList>(null);
-    const CACHE_KEY = "@cached_courses";
+    const CACHE_KEY = '@cached_courses';
 
     const [verifyEmail, setVerifyEmail] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
 
     const [errorModal, setErrorModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
 
     const [errorNewModal, setErrorNewModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
 
     useEffect(() => {
@@ -82,14 +79,13 @@ export default function Home() {
                 loadCachedCoursesThenFetch();
             } else {
                 setCourseList([]);
-                safeReplace("/auth/signIn");
+                safeReplace('/auth/signIn');
             }
         });
 
         return unsubscribe;
     }, [auth, safeReplace]);
 
-    // Load cached courses then fetch fresh in background without waiting for it
     const loadCachedCoursesThenFetch = async () => {
         const cached = await loadCachedCourses();
         if (!cached) {
@@ -110,7 +106,7 @@ export default function Home() {
             }
             return null;
         } catch (error) {
-            console.error("Error loading cached courses:", error);
+            console.error('Error loading cached courses:', error);
             return null;
         }
     };
@@ -125,14 +121,14 @@ export default function Home() {
             const user = auth.currentUser;
             if (!user) {
                 setCourseList([]);
-                safeReplace("/auth/signIn");
+                safeReplace('/auth/signIn');
                 return;
             }
 
             if (!user.email) {
-                console.warn("Signed-in user has no email!");
+                console.warn('Signed-in user has no email!');
                 setCourseList([]);
-                safeReplace("/auth/signIn");
+                safeReplace('/auth/signIn');
                 return;
             }
 
@@ -141,11 +137,11 @@ export default function Home() {
 
             if (!refreshedUser?.email) {
                 ToastAndroid.show(
-                    "We detected an issue, please try to login.",
-                    ToastAndroid.LONG
+                    'We detected an issue, please try to login.',
+                    ToastAndroid.LONG,
                 );
                 setCourseList([]);
-                safeReplace("/");
+                safeReplace('/');
                 return;
             }
             if (!userDetail?.email) {
@@ -154,13 +150,13 @@ export default function Home() {
                 if (refreshedUser?.email) {
                     try {
                         console.log(
-                            "Fetching user document for:",
-                            refreshedUser.email
+                            'Fetching user document for:',
+                            refreshedUser.email,
                         );
                         const userDocRef = doc(
                             getFirestore(),
-                            "users",
-                            refreshedUser.email
+                            'users',
+                            refreshedUser.email,
                         );
                         const docSnap = await getDoc(userDocRef);
 
@@ -173,38 +169,38 @@ export default function Home() {
                         } else {
                             ToastAndroid.show(
                                 "We couldn't find your user profile. Please login again.",
-                                ToastAndroid.LONG
+                                ToastAndroid.LONG,
                             );
                             setCourseList([]);
-                            safeReplace("/auth/signIn");
+                            safeReplace('/auth/signIn');
                             return;
                         }
                     } catch (err) {
-                        console.error("Error refreshing userDetail:", err);
+                        console.error('Error refreshing userDetail:', err);
                         ToastAndroid.show(
-                            "An error occurred while refreshing your profile.",
-                            ToastAndroid.LONG
+                            'An error occurred while refreshing your profile.',
+                            ToastAndroid.LONG,
                         );
                         setCourseList([]);
-                        safeReplace("/auth/signIn");
+                        safeReplace('/auth/signIn');
                         return;
                     }
                 } else {
                     ToastAndroid.show(
-                        "No active session found, please login again.",
-                        ToastAndroid.LONG
+                        'No active session found, please login again.',
+                        ToastAndroid.LONG,
                     );
                     setCourseList([]);
-                    safeReplace("/auth/signIn");
+                    safeReplace('/auth/signIn');
                     return;
                 }
             }
 
-            const coursesRef = collection(firestore, "course");
+            const coursesRef = collection(firestore, 'course');
             const q = query(
                 coursesRef,
-                where("createdBy", "==", refreshedUser.email),
-                orderBy("createdOn", "desc")
+                where('createdBy', '==', refreshedUser.email),
+                orderBy('createdOn', 'desc'),
             );
 
             const querySnapshot = await getDocs(q);
@@ -216,7 +212,7 @@ export default function Home() {
                         ...data,
                         id: doc.id,
                     };
-                }
+                },
             );
 
             // Compare new courses with cache to avoid redundant writes
@@ -236,37 +232,37 @@ export default function Home() {
             }
 
             if (isRefresh) {
-                ToastAndroid.show("Refreshed", ToastAndroid.SHORT);
+                ToastAndroid.show('Refreshed', ToastAndroid.SHORT);
             }
         } catch (error: unknown) {
-            console.error("Error fetching courses:", error);
-            let errorMessage = "Failed to refresh. Please try again.";
+            console.error('Error fetching courses:', error);
+            let errorMessage = 'Failed to refresh. Please try again.';
 
             if (
-                typeof error === "object" &&
+                typeof error === 'object' &&
                 error !== null &&
-                "code" in error &&
-                typeof (error as any).code === "string"
+                'code' in error &&
+                typeof (error as any).code === 'string'
             ) {
                 switch ((error as any).code) {
-                    case "firestore/unavailable":
+                    case 'firestore/unavailable':
                         errorMessage =
-                            "Network error. Please check your connection.";
+                            'Network error. Please check your connection.';
                         break;
-                    case "firestore/permission-denied":
+                    case 'firestore/permission-denied':
                         errorMessage =
                             "You don't have permission to access these courses.";
                         break;
-                    case "auth/user-not-found":
+                    case 'auth/user-not-found':
                         errorMessage =
-                            "User not found. Your account may have been deleted.";
+                            'User not found. Your account may have been deleted.';
                         break;
-                    case "auth/invalid-email":
-                        errorMessage = "Invalid email address format.";
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address format.';
                         break;
-                    case "auth/too-many-requests":
+                    case 'auth/too-many-requests':
                         errorMessage =
-                            "Too many requests. Please try again later.";
+                            'Too many requests. Please try again later.';
                         break;
                 }
             }
@@ -283,7 +279,7 @@ export default function Home() {
             if (auth.currentUser) {
                 fetchCourses();
             }
-        }, [auth])
+        }, [auth]),
     );
 
     const verify = async () => {
@@ -291,8 +287,8 @@ export default function Home() {
         if (!user) {
             setErrorModal({
                 visible: true,
-                title: "Not Signed In",
-                message: "You are currently not signed in.",
+                title: 'Not Signed In',
+                message: 'You are currently not signed in.',
             });
             return;
         }
@@ -302,35 +298,35 @@ export default function Home() {
             await sendEmailVerification(user);
             setVerifyEmail({
                 visible: true,
-                title: "Email Verification Sent",
+                title: 'Email Verification Sent',
                 message: `Verification email sent to ${
-                    user?.email ?? "your email"
+                    user?.email ?? 'your email'
                 }. Check your inbox and spam folder.`,
             });
         } catch (error: unknown) {
-            console.error("Failed to send verification email:", error);
+            console.error('Failed to send verification email:', error);
 
             let errorMessage =
-                "Failed to send verification email. Please try again later.";
+                'Failed to send verification email. Please try again later.';
 
             if (
-                typeof error === "object" &&
+                typeof error === 'object' &&
                 error !== null &&
-                "code" in error &&
-                typeof (error as { code?: unknown }).code === "string"
+                'code' in error &&
+                typeof (error as { code?: unknown }).code === 'string'
             ) {
                 if (
                     (error as { code: string }).code ===
-                    "auth/too-many-requests"
+                    'auth/too-many-requests'
                 ) {
-                    errorMessage = "Too many requests. Please try again later.";
+                    errorMessage = 'Too many requests. Please try again later.';
                 }
             }
 
-            Alert.alert("Error", errorMessage);
+            Alert.alert('Error', errorMessage);
             setErrorNewModal({
                 visible: true,
-                title: "Error",
+                title: 'Error',
                 message: errorMessage,
             });
         } finally {
@@ -347,9 +343,9 @@ export default function Home() {
                     <ActivityIndicator
                         style={{
                             backgroundColor: Colors.GREEN,
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
                             transform: [
                                 { translateX: -15 },
                                 { translateY: -15 },
@@ -369,7 +365,7 @@ export default function Home() {
                         <TouchableOpacity
                             onPress={verify}
                             style={{
-                                backgroundColor: "#FFD700",
+                                backgroundColor: '#FFD700',
                                 padding: 5,
                                 borderRadius: 15,
                                 opacity: 0.9,
@@ -378,9 +374,9 @@ export default function Home() {
                         >
                             <Text
                                 style={{
-                                    color: "#000",
-                                    textAlign: "center",
-                                    textDecorationLine: "underline",
+                                    color: '#000',
+                                    textAlign: 'center',
+                                    textDecorationLine: 'underline',
                                 }}
                             >
                                 Please verify your email address to access all
@@ -419,11 +415,11 @@ export default function Home() {
                     <View>
                         <Image
                             style={{
-                                position: "absolute",
-                                width: "100%",
+                                position: 'absolute',
+                                width: '100%',
                                 height: 400,
                             }}
-                            source={require("../../assets/images/graph.png")}
+                            source={require('../../assets/images/graph.png')}
                             resizeMode="cover"
                         />
                         <>
@@ -440,6 +436,7 @@ export default function Home() {
                                         <CourseList courseList={courseList} />
 
                                         <VideoCardHomeScreen />
+                                        <SparksFeed />
                                     </View>
                                 </>
                             )}
@@ -485,25 +482,6 @@ export default function Home() {
                     setVerifyEmail((prev) => ({ ...prev, visible: false }))
                 }
             />
-
-            {/* Banner Ad */}
-            {adLoaded && (
-                <View>
-                    <BannerAd
-                        unitId="ca-app-pub-8952058057579255/9705798694"
-                        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-                        requestOptions={{ requestNonPersonalizedAdsOnly: true }}
-                        onAdLoaded={() => {
-                            console.log("Ad successfully loaded");
-                            setAdLoaded(true);
-                        }}
-                        onAdFailedToLoad={(err) => {
-                            console.log("Ad failed to load", err);
-                            setAdLoaded(false);
-                        }}
-                    />
-                </View>
-            )}
         </>
     );
 }

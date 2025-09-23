@@ -1,6 +1,6 @@
-import { Course } from "@/types/course";
-import { AntDesign } from "@expo/vector-icons";
-import { getApp } from "@react-native-firebase/app";
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { AntDesign } from '@expo/vector-icons';
 import {
     collection,
     FirebaseFirestoreTypes,
@@ -9,49 +9,36 @@ import {
     orderBy,
     query,
     where,
-} from "@react-native-firebase/firestore";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
-import {
-    FlatList,
-    Image,
-    Text,
-    TouchableOpacity,
-    View
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+} from '@react-native-firebase/firestore';
+import { useLocalSearchParams } from 'expo-router';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CourseListGrid, {
     AllowedPaths,
-} from "../../../component/PracticeScreen/CourseListGrid";
-import { Colors } from "../../../constant/Colors";
-import { PracticeOption } from "../../../constant/Option";
-import { UserDetailContext } from "../../../context/UserDetailContext";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+} from '../../../component/PracticeScreen/CourseListGrid';
+import { Colors } from '../../../constant/Colors';
+import { PracticeOption } from '../../../constant/Option';
+import { UserDetailContext } from '../../../context/UserDetailContext';
 
 export default function PracticeTypeHomeScreen() {
     const { type } = useLocalSearchParams();
-    const { safeBack } = useSafeNavigation()
+    const { safeBack } = useSafeNavigation();
     const option = PracticeOption.find((item) => item.name === type);
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [courseList, setCourseList] = useState<Course[]>([]);
 
-    useEffect(() => {
-        if (userDetail) {
-            GetCourseList();
-        }
-    }, [userDetail]);
-
-    const GetCourseList = async () => {
+    const GetCourseList = useCallback(async () => {
         setLoading(true);
         setCourseList([]);
 
         try {
-            const db = getFirestore(getApp());
+            const db = getFirestore();
             const q = query(
-                collection(db, "course"),
-                where("createdBy", "==", userDetail?.email),
-                orderBy("createdOn", "desc")
+                collection(db, 'course'),
+                where('createdBy', '==', userDetail?.email),
+                orderBy('createdOn', 'desc'),
             );
             const querySnapshot = await getDocs(q);
             const courses: Course[] = [];
@@ -60,16 +47,21 @@ export default function PracticeTypeHomeScreen() {
                 (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
                     const courseData = doc.data() as Course; // assert type here
                     courses.push({ ...courseData, id: doc.id });
-                }
+                },
             );
 
             setCourseList(courses);
         } catch (e) {
-            console.error("❌ Error fetching course list:", e);
+            console.error('❌ Error fetching course list:', e);
         } finally {
             setLoading(false);
         }
-    };
+    }, [userDetail?.email]);
+    useEffect(() => {
+        if (userDetail) {
+            GetCourseList();
+        }
+    }, [userDetail, GetCourseList]);
 
     return (
         <>
@@ -81,7 +73,7 @@ export default function PracticeTypeHomeScreen() {
                 <Image
                     style={{
                         height: 250,
-                        width: "100%",
+                        width: '100%',
                         borderBottomRightRadius: 25,
                         borderBottomLeftRadius: 25,
                     }}
@@ -90,23 +82,19 @@ export default function PracticeTypeHomeScreen() {
                 <TouchableOpacity
                     onPress={() => safeBack()}
                     style={{
-                        position: "absolute",
+                        position: 'absolute',
                         padding: 10,
-                        display: "flex",
-                        flexDirection: "row",
+                        display: 'flex',
+                        flexDirection: 'row',
                         gap: 10,
-                        alignItems: "center",
-                        marginTop: 15
+                        alignItems: 'center',
+                        marginTop: 15,
                     }}
                 >
-                    <AntDesign
-                        name="left"
-                        size={24}
-                        color={Colors.PRIMARY}
-                    />
+                    <AntDesign name="left" size={24} color={Colors.PRIMARY} />
                     <Text
                         style={{
-                            fontFamily: "outfit-bold",
+                            fontFamily: 'outfit-bold',
                             fontSize: 25,
                             color: Colors.PRIMARY,
                         }}

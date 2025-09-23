@@ -14,6 +14,7 @@ import {
     Linking,
     Modal,
     Pressable,
+    ScrollView,
     Text,
     TextInput,
     ToastAndroid,
@@ -118,6 +119,8 @@ export default function Header({ onPress }: { onPress?: () => void }) {
             safePush('/addCourse');
         } else if (option === 'Favorite Videos') {
             safePush('/favoriteVideos');
+        } else if (option === 'Add Sparks') {
+            safePush('/addSpark')
         }
     };
 
@@ -127,6 +130,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
         color?: string;
     }[] = [
         { label: 'Add Course', icon: 'add-circle-outline' },
+        { label: 'Add Sparks', icon: 'add' },
         { label: 'Favorite Videos', icon: 'heart' },
         { label: 'Contact Support', icon: 'mail-outline' },
         { label: 'Rate our app', icon: 'star-outline', color: Colors.YELLOW },
@@ -277,29 +281,33 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                 >
                     <View style={styles.modalSheet}>
                         <Text style={styles.modalTitle}>Options</Text>
-
-                        {modalOptions.map(({ label, icon, color }) => (
-                            <TouchableOpacity
-                                key={label}
-                                onPress={() => handleOption(label)}
-                                style={styles.modalItem}
-                            >
-                                <Ionicons
-                                    name={icon}
-                                    size={24}
-                                    color={color || Colors.PRIMARY}
-                                    style={styles.modalIcon}
-                                />
-                                <Text
-                                    style={[
-                                        styles.modalText,
-                                        color && { color },
-                                    ]}
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            style={{ maxHeight: 230 }}
+                        >
+                            {modalOptions.map(({ label, icon, color }) => (
+                                <TouchableOpacity
+                                    key={label}
+                                    onPress={() => handleOption(label)}
+                                    style={styles.modalItem}
                                 >
-                                    {label}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                                    <Ionicons
+                                        name={icon}
+                                        size={24}
+                                        color={color || Colors.PRIMARY}
+                                        style={styles.modalIcon}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.modalText,
+                                            color && { color },
+                                        ]}
+                                    >
+                                        {label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
                     </View>
                 </Pressable>
             </Modal>

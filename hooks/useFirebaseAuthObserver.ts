@@ -6,7 +6,6 @@ import {
     onAuthStateChanged,
 } from "@react-native-firebase/auth";
 import { Timestamp } from "@react-native-firebase/firestore";
-import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useSafeNavigation } from "./useSafeNavigation";
 

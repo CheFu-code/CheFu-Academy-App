@@ -52,7 +52,7 @@ export const styles = StyleSheet.create({
         fontFamily: 'outfit-bold',
         fontSize: 20,
         color: Colors.PRIMARY,
-        marginBottom: 15,
+        marginBottom: 5,
     },
     modalItem: {
         flexDirection: 'row',
