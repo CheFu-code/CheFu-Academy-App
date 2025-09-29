@@ -1,25 +1,21 @@
 import { Colors } from '@/constant/Colors';
 import { styles } from '@/styles/SparkDetail';
-import { Likes } from '@/types/sparks';
+import { Comment, Likes, Replies } from '@/types/sparks';
 import dayjs from 'dayjs';
 import React, { useRef, useState } from 'react';
-import {
-    Animated,
-    Image,
-    Text,
-    View
-} from 'react-native';
+import { Animated, Image, Pressable, Text, View } from 'react-native';
 import CommentActions from './CommentActions';
 import CommentMenu from './CommentMenu';
 import EditModal from './EditModal';
 import RepliesSheet from './RepliesSheet';
 
 interface Props {
-    comment: any;
+    comment: Comment;
     index: number;
     onEdit: (id: string, newText: string) => void;
     onDelete: (id: string) => void;
     onLike: (commentId: string, likes?: Likes[]) => void;
+    onReply?: (commentId: string, reply: Replies) => void;
     currentUserId: string;
 }
 
@@ -29,9 +25,10 @@ export default function CommentItem({
     onEdit,
     onDelete,
     onLike,
+    onReply,
     currentUserId,
 }: Props) {
-    const slideAnim = useRef(new Animated.Value(300)).current; // Start off-screen
+    const slideAnim = useRef(new Animated.Value(300)).current;
     const [editText, setEditText] = useState(comment.text);
     const [modalVisible, setModalVisible] = useState(false);
     const [repliesVisible, setRepliesVisible] = useState(false);
@@ -50,7 +47,9 @@ export default function CommentItem({
             toValue: 300,
             duration: 300,
             useNativeDriver: true,
-        }).start(() => setRepliesVisible(false));
+        }).start(() => {
+            setRepliesVisible(false);
+        });
     };
 
     const handleSave = () => {
@@ -82,7 +81,7 @@ export default function CommentItem({
                 }
                 style={styles.commentAvatar}
             />
-            <View style={{ flex: 1 }}>
+            <Pressable onPress={openReplies} style={{ flex: 1 }}>
                 <View style={styles.commentHeader}>
                     <Text style={styles.commentAuthor}>
                         {comment.createdBy.fullname}
@@ -103,7 +102,7 @@ export default function CommentItem({
                     onLike={handleLikeComment}
                     openReplies={openReplies}
                 />
-            </View>
+            </Pressable>
 
             {/* Menu for edit/delete */}
             {comment.createdBy.uid === currentUserId && (
@@ -114,7 +113,6 @@ export default function CommentItem({
             )}
 
             {/* Edit Modal */}
-
             <EditModal
                 visible={modalVisible}
                 editText={editText}
@@ -128,6 +126,7 @@ export default function CommentItem({
                 slideAnim={slideAnim}
                 closeReplies={closeReplies}
                 comment={comment}
+                onAddReply={(commentId, reply) => onReply?.(commentId, reply)}
             />
         </View>
     );

@@ -7,7 +7,7 @@ import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
-import { Likes, Spark } from '@/types/sparks';
+import { Likes, Replies, Spark } from '@/types/sparks';
 import { showToast } from '@/utils/toast';
 import { AntDesign } from '@expo/vector-icons';
 import {
@@ -162,7 +162,6 @@ const SparkDetail = () => {
             );
 
             await updateDoc(sparkRef, { comments: updatedComments });
-            showToast('Comment deleted successfully');
         } catch (err) {
             console.log('Error deleting comment:', err);
             showToast('Failed to delete comment');
@@ -230,6 +229,26 @@ const SparkDetail = () => {
         }
     };
 
+    const handleAddReply = async (commentId: string, reply: Replies) => {
+        if (!spark) return;
+        const db = getFirestore();
+        const sparkRef = doc(db, 'sparks', spark.id);
+
+        try {
+            const updatedComments = spark.comments.map((c) =>
+                c.id === commentId
+                    ? { ...c, replies: [...(c.replies || []), reply] }
+                    : c,
+            );
+
+            await updateDoc(sparkRef, { comments: updatedComments });
+            setSpark({ ...spark, comments: updatedComments });
+        } catch (err) {
+            console.log('Error adding reply:', err);
+            showToast('Failed to reply');
+        }
+    };
+
     const hasLiked = () => {
         if (!spark || !userDetail) return false;
         return spark.likes?.some(
@@ -289,13 +308,13 @@ const SparkDetail = () => {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.contentContainer}
             >
-                {/* Comments placeholder */}
                 <CommentsList
                     comments={spark.comments || []}
                     currentUserId={userDetail?.uid || ''}
                     onEdit={handleEditComment}
                     onDelete={handleDeleteComment}
                     onLike={handleLikeComment}
+                    onReply={handleAddReply}
                 />
             </ScrollView>
         </SafeAreaView>

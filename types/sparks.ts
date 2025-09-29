@@ -17,8 +17,10 @@ export interface Replies {
         uid: string;
         fullname: string;
         profilePicture?: string;
+        email?: string;
     };
     createdAt: any;
+
 }
 export interface Likes {
     id: string;

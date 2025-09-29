@@ -1,7 +1,7 @@
 import { styles } from '@/styles/SparkDetail';
 import { Text, View } from 'react-native';
 import CommentItem from './CommentItem';
-import { Likes } from '@/types/sparks';
+import { Likes, Replies } from '@/types/sparks';
 
 interface Props {
     comments: any[];
@@ -9,6 +9,7 @@ interface Props {
     onEdit: (id: string, newText: string) => void;
     onDelete: (id: string) => void;
     onLike: (commentId: string, likes?: Likes[]) => void;
+    onReply?: (commentId: string, reply: Replies) => void; // <-- new prop
 }
 
 export default function CommentsList({
@@ -17,6 +18,7 @@ export default function CommentsList({
     onEdit,
     onDelete,
     onLike,
+    onReply
 }: Props) {
     if (!comments.length) {
         return <Text style={styles.noComments}>No comments yet</Text>;
@@ -34,6 +36,7 @@ export default function CommentsList({
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onLike={onLike}
+                    onReply={onReply} // <-- pass down the new prop
                 />
             ))}
         </View>
