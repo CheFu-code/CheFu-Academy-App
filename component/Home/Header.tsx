@@ -238,7 +238,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     <Text
                         numberOfLines={1}
                         ellipsizeMode={'tail'}
-                        style={[styles.text, { fontSize: 14 }]}
+                        style={[styles.text, { fontSize: 13 }]}
                     >
                         Expand your knowledge with our courses
                     </Text>
@@ -247,7 +247,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                 {/*text input */}
                 <View style={styles.inputContainer}>
                     <TextInput
-                        placeholder="Search courses, topics, instructors..."
+                        placeholder="Search courses, sparks, videos..."
                         placeholderTextColor={Colors.BLACK}
                         autoCorrect={false}
                         value={searchTerm}

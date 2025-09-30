@@ -1,8 +1,10 @@
 import CourseCard from '@/component/Shared/CourseCard';
 import Loading from '@/component/Shared/Loading';
+import VideoCard from '@/component/VideoCard';
 import { Colors } from '@/constant/Colors';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
+import { Video } from '@/types/video';
 import { AntDesign } from '@expo/vector-icons';
 import {
     collection,
@@ -14,14 +16,17 @@ import { useLocalSearchParams } from 'expo-router';
 import LottieView from 'lottie-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SearchScreen() {
     const { query } = useLocalSearchParams();
     const { safePush, safeBack } = useSafeNavigation();
     const [results, setResults] = useState<Course[]>([]);
+    const [videoResults, setVideoResults] = useState<Video[]>([]);
     const [loading, setLoading] = useState(true);
-    const category = results[0]?.category;
     const db = getFirestore();
+    const totalResults = results.length + videoResults.length;
 
     const fetchCourses = useCallback(
         async (query: string | string[]) => {
@@ -72,61 +77,155 @@ export default function SearchScreen() {
         },
         [db],
     );
+    const fetchVideos = useCallback(
+        async (query: string | string[]) => {
+            try {
+                const term = Array.isArray(query) ? query[0] : query || '';
+
+                const snapshot = await getDocs(collection(db, 'videos'));
+
+                const filtered: Video[] = snapshot.docs
+                    .map(
+                        (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
+                            const data = doc.data();
+                            return {
+                                id: doc.id,
+                                docId: doc.id,
+                                title: data.title || '',
+                                category: data.category,
+                                thumbnailURL: data.thumbnailURL,
+                                videoURL: data.videoURL,
+                                views: data.views,
+                                duration: data.duration,
+                                instructorCompany: data.instructorCompany,
+                                instructorName: data.instructorName,
+                                description: data.description,
+                                level: data.level,
+                                uploadedBy: data.uploadedBy,
+                                uploadedAt: data.uploadedAt,
+                                topics: data.topics,
+                            };
+                        },
+                    )
+                    .filter(
+                        (video: Video) =>
+                            video.title
+                                ?.toLowerCase()
+                                .includes(term.toLowerCase()) || // ✅ use videoTitle
+                            video.category
+                                ?.toLowerCase()
+                                .includes(term.toLowerCase()),
+                    );
+
+                setVideoResults(filtered);
+            } catch (e) {
+                console.error('Search error:', e);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [db],
+    );
 
     useEffect(() => {
         fetchCourses(query);
     }, [query, fetchCourses]);
 
-    if (loading) return <Loading message="Hang tight, we’re finding the best courses for you..." />;
+    useEffect(() => {
+        fetchVideos(query);
+    }, [query, fetchVideos]);
+
+    if (loading)
+        return (
+            <Loading message="Hang tight, we’re finding the best courses for you..." />
+        );
 
     return (
-        <View style={{ flex: 1, padding: 20 }}>
-            <View
-                style={{
-                    paddingTop: 20,
-                }}
-            >
+        <SafeAreaView style={{ flex: 1 }}>
+            <View style={{ marginTop: 5 }}>
                 <TouchableOpacity
                     onPress={safeBack}
                     style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        gap: 8,
-                        borderBottomWidth: 1,
-                        borderBottomColor: Colors.PRIMARY,
-                        paddingBottom: 20,
+                        gap: 10,
+                        borderBottomWidth: 0.7,
+                        borderBottomColor: Colors.GRAY,
+                        paddingBottom: 5,
                     }}
                 >
-                    <AntDesign color={'white'} size={20} name="left" />
+                    <AntDesign
+                        style={{ left: 5 }}
+                        color={'white'}
+                        size={20}
+                        name="left"
+                    />
                     <Text
                         numberOfLines={1}
                         style={{
                             color: Colors.WHITE,
-                            fontSize: 20,
+                            fontSize: RFValue(18),
                             fontFamily: 'outfit-bold',
                             maxWidth: 320,
                         }}
                     >
-                        Results for
-                        <Text
-                            numberOfLines={1}
-                            style={{
-                                color: Colors.PRIMARY,
-                                fontStyle: 'italic',
-                            }}
-                        >
-                            {' '}
-                            &quot;{query}&quot;
-                        </Text>
+                        Results for :
                     </Text>
                 </TouchableOpacity>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingRight: 10,
+                    }}
+                >
+                    <Text
+                        numberOfLines={1}
+                        style={{
+                            color: Colors.PRIMARY,
+                            fontStyle: 'italic',
+                            fontSize: RFValue(14),
+                        }}
+                    >
+                        {' '}
+                        &quot;{query}&quot;
+                    </Text>
+                    {results.length > 0 ||
+                        (videoResults.length > 0 && (
+                            <View
+                                style={{
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        fontFamily: 'outfit',
+                                        color: 'white',
+                                    }}
+                                >
+                                    found:{' '}
+                                    <Text
+                                        style={{
+                                            fontFamily: 'outfit-bold',
+                                            color: Colors.PRIMARY,
+                                        }}
+                                    >
+                                        {totalResults}
+                                    </Text>
+                                </Text>
+                            </View>
+                        ))}
+                </View>
 
-                {results.length === 0 ? (
+                {results.length === 0 && videoResults.length === 0 ? (
                     <View
                         style={{
                             alignItems: 'center',
                             justifyContent: 'center',
                             marginTop: 50,
+                            padding: 20,
                         }}
                     >
                         <LottieView
@@ -142,21 +241,21 @@ export default function SearchScreen() {
                                 justifyContent: 'center',
                                 marginTop: 50,
                                 fontFamily: 'outfit-bold',
-                                fontSize: 18,
+                                fontSize: RFValue(16),
                                 textAlign: 'center',
                             }}
                         >
-                            No courses were found.
+                            No results were found.
                         </Text>
                         <Text
                             style={{
                                 color: Colors.GRAY,
                                 fontFamily: 'outfit',
-                                fontSize: 15,
+                                fontSize: RFValue(13),
                                 marginTop: 25,
                             }}
                         >
-                            We couldn&apos;t find any courses that match your
+                            We couldn&apos;t find any results that match your
                             search. Try exploring by category — and if you still
                             don’t find what you’re looking for, be the first to{' '}
                             <TouchableOpacity
@@ -177,77 +276,61 @@ export default function SearchScreen() {
                     </View>
                 ) : (
                     <View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginTop: 20,
-                            }}
-                        >
-                            {category && (
-                                <Text
-                                    numberOfLines={1}
-                                    ellipsizeMode={'tail'}
-                                    style={{
-                                        fontSize: 18,
-                                        color: Colors.WHITE,
-                                        fontFamily: 'outfit-bold',
-                                        textTransform: 'capitalize',
-                                        marginBottom: 10,
-                                        maxWidth: 250,
-                                    }}
-                                >
-                                    Category: {category}
-                                </Text>
-                            )}
+                        {results.length > 0 && (
+                            <FlatList
+                                showsVerticalScrollIndicator={false}
+                                data={results}
+                                numColumns={2}
+                                keyExtractor={(item) => item.id}
+                                renderItem={({ item }) => (
+                                    <CourseCard course={item} enroll={true} />
+                                )}
+                                columnWrapperStyle={{
+                                    justifyContent: 'space-between',
+                                    paddingHorizontal: 10,
+                                }}
+                            />
+                        )}
 
-                            {results.length > 0 && (
-                                <View
-                                    style={{
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            fontFamily: 'outfit',
-                                            color: 'white',
-                                        }}
-                                    >
-                                        found:{' '}
-                                        <Text
-                                            style={{
-                                                fontFamily: 'outfit-bold',
-                                                color: Colors.PRIMARY,
-                                            }}
-                                        >
-                                            {results.length}
-                                        </Text>
-                                    </Text>
-                                </View>
-                            )}
-                        </View>
-
-                        <FlatList
-                            showsVerticalScrollIndicator={false}
-                            data={results}
-                            numColumns={2}
-                            keyExtractor={(item) => item.id}
-                            renderItem={({ item }) => (
-                                <CourseCard course={item} enroll={true} />
-                            )}
-                            columnWrapperStyle={{
-                                justifyContent: 'space-between',
-                                paddingHorizontal: 10,
-                            }}
-                            contentContainerStyle={{
-                                paddingBottom: 240,
-                            }}
-                        />
+                        {videoResults.length > 0 && (
+                            <FlatList
+                                showsVerticalScrollIndicator={false}
+                                data={videoResults}
+                                keyExtractor={(item) => item.id}
+                                renderItem={({ item }) => (
+                                    <VideoCard
+                                        item={item}
+                                        onPress={(video) =>
+                                            safePush({
+                                                pathname: '/videoDetail',
+                                                params:
+                                                    video.uploadedBy ===
+                                                    'YouTube'
+                                                        ? {
+                                                              ytVideo:
+                                                                  JSON.stringify(
+                                                                      video,
+                                                                  ),
+                                                          }
+                                                        : { id: video.id },
+                                            })
+                                        }
+                                        onCategoryPress={(category) =>
+                                            safePush({
+                                                pathname: '/searchResults',
+                                                params: { query: category },
+                                            })
+                                        }
+                                    />
+                                )}
+                                contentContainerStyle={{
+                                    paddingHorizontal: 10,
+                                }}
+                            />
+                        )}
                     </View>
                 )}
             </View>
-        </View>
+        </SafeAreaView>
     );
 }

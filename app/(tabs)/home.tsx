@@ -4,7 +4,7 @@ import VideoCardHomeScreen from '@/component/Video/VideoCardHomeScreen';
 import { useCourses } from '@/hooks/useCourses';
 import { getAuth } from '@react-native-firebase/auth';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { FlatList, Image, View } from 'react-native';
 import CourseList from '../../component/Home/CourseList';
 import CourseProgress from '../../component/Home/CourseProgress';
@@ -25,6 +25,22 @@ export default function Home() {
                 fetchCourses();
             }
         }, [auth]),
+    );
+
+    function shuffleArray<T>(array: T[]): T[] {
+        return array
+            .map((item) => ({ item, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ item }) => item);
+    }
+
+    const randomizedBlocks = useMemo(
+        () =>
+            shuffleArray([
+                <VideoCardHomeScreen key="videos" />,
+                <SparksFeed key="sparks" />,
+            ]),
+        [courseList],
     );
 
     return (
@@ -78,8 +94,7 @@ export default function Home() {
 
                                         <CourseList courseList={courseList} />
 
-                                        <VideoCardHomeScreen />
-                                        <SparksFeed />
+                                        {randomizedBlocks}
                                     </View>
                                 </>
                             )}
