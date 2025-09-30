@@ -37,6 +37,8 @@ const AddSpark = () => {
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('');
+    const MAX_WORDS = 60;
+    const wordCount = content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
 
     const handlePost = async () => {
         if (!title || !content || !selectedCategory) {
@@ -44,8 +46,16 @@ const AddSpark = () => {
             return;
         }
 
-        setLoading(true);
+        const words = content.trim().split(/\s+/);
+        if (words.length > MAX_WORDS) {
+            showToast(
+                `Content too long. Please keep it under ${MAX_WORDS} words (~5 lines).`,
+            );
+            return;
+        }
+
         try {
+            setLoading(true);
             if (!userDetail) {
                 showToast('You must be logged in to post a Spark');
                 setLoading(false);
@@ -112,6 +122,20 @@ const AddSpark = () => {
                         value={content}
                         onChangeText={setContent}
                     />
+
+                    <Text
+                        style={[
+                            styles.wordCount,
+                            {
+                                color:
+                                    wordCount > MAX_WORDS
+                                        ? Colors.RED
+                                        : Colors.GRAY,
+                            }, // turn red if exceeded
+                        ]}
+                    >
+                        {wordCount} / {MAX_WORDS} words
+                    </Text>
                 </View>
 
                 <Text style={[styles.label, { paddingHorizontal: 10 }]}>

@@ -71,4 +71,8 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 5,
     },
+    wordCount: {
+        textAlign: 'right',
+        color: Colors.GRAY,
+    },
 });
