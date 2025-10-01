@@ -304,6 +304,7 @@ const SparkDetail = () => {
                 <CommentsList
                     comments={spark.comments || []}
                     currentUserId={userDetail?.uid || ''}
+                    sparkId={sparkId} 
                     onEdit={handleEditComment}
                     onDelete={handleDeleteComment}
                     onLike={handleLikeComment}

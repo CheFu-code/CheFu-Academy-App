@@ -1,5 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     container: {
@@ -192,12 +193,12 @@ export const styles = StyleSheet.create({
     },
     editInput: {
         color: Colors.WHITE,
-        fontSize: 16,
-        marginBottom: 15,
+        fontSize: RFValue(13),
+        // marginBottom: 5,
         borderWidth: 0.7,
         borderColor: Colors.GRAY,
         borderRadius: 22,
-        marginTop: 10,
+        // marginTop: 10,
         flex: 1,
         maxWidth: '75%',
         padding: 10,
@@ -281,12 +282,53 @@ export const styles = StyleSheet.create({
     },
     replyText: {
         color: Colors.WHITE,
-        fontSize: 16,
+        fontSize: RFValue(14),
         fontFamily: 'outfit-bold',
     },
     noReplyText: {
         color: Colors.GRAY,
         marginBottom: 5,
         fontFamily: 'outfit-bold',
+    },
+    reply: {
+        color: Colors.GRAY,
+        fontSize: RFValue(11),
+        lineHeight: 20,
+        maxWidth: 270,
+    }, fullname: {
+        color: Colors.WHITE,
+        fontSize: RFValue(12),
+    }, fullnameCont: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent:
+            'space-between',
+    }, containerReply: {
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        backgroundColor: Colors.BG_COLOR,
+        borderRadius: 10,
+    },
+    X: {
+        flexDirection: 'row',
+        gap: 10,
+    }, Y: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 40,
+    }, Z: {
+        color: Colors.PRIMARY,
+        fontFamily: 'outfit',
+        marginTop: 6,
+    }, A: {
+        color: Colors.WHITE,
+        fontFamily: 'outfit',
+        fontSize: RFValue(12),
+    }, delete: {
+        padding: 6,
+        paddingHorizontal:8,
+        backgroundColor: Colors.LIGHT_RED, borderRadius: '50%'
     }
+
 });

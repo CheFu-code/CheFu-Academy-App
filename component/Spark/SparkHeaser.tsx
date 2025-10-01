@@ -1,19 +1,22 @@
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
 import { Spark } from '@/types/sparks';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { doc, getDoc } from '@react-native-firebase/firestore';
+import { showToast } from '@/utils/toast';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { deleteDoc, doc, getDoc } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import { useContext, useEffect, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
     spark: Spark;
 }
 
 export default function SparkHeader({ spark }: Props) {
+    const { safeReplace } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
     const [isVerified, setIsVerified] = useState(false);
 
@@ -36,6 +39,33 @@ export default function SparkHeader({ spark }: Props) {
 
         checkVerified();
     }, [spark.createdBy]);
+
+    const handleDelete = () => {
+        Alert.alert(
+            'Delete Spark',
+            'Are you sure you want to delete this spark?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            if (!spark.id) return;
+                            const sparkRef = doc(db, 'sparks', spark.id);
+                            await deleteDoc(sparkRef);
+                            safeReplace('/(tabs)/home')
+                            showToast('Spark deleted successfully!');
+                        } catch (error) {
+                            console.error('Error deleting spark:', error);
+                            showToast('Failed to delete spark.');
+                        }
+                    },
+                },
+            ],
+            { cancelable: true },
+        );
+    };
 
     return (
         <View style={styles.header}>
@@ -85,12 +115,11 @@ export default function SparkHeader({ spark }: Props) {
                     <Text style={styles.category}>{spark.category}</Text>
                 </View>
                 {spark.createdBy.email === userDetail.email && (
-                    <TouchableOpacity>
-                        <MaterialIcons
-                            name="more-vert"
-                            color={'white'}
-                            size={18}
-                        />
+                    <TouchableOpacity
+                        onPress={() => handleDelete()}
+                        style={styles.delete}
+                    >
+                        <FontAwesome name="trash-o" color={'red'} size={16} />
                     </TouchableOpacity>
                 )}
             </View>

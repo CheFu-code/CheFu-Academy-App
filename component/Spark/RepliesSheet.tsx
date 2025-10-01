@@ -1,33 +1,32 @@
 import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { useRenderTextWithLinks } from '@/helpers/detectLinks';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
-import React, { useContext, useState } from 'react';
+import { Comment, Replies } from '@/types/sparks';
+import dayjs from 'dayjs';
+import { useContext, useState } from 'react';
+import * as Haptics from 'expo-haptics';
+import { db } from '@/config/fireConfig';
+import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 import {
     ActivityIndicator,
+    Alert,
     Animated,
+    Image,
+    KeyboardAvoidingView,
     Modal,
+    Platform,
+    Pressable,
+    ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
-    ScrollView,
     useWindowDimensions,
-    KeyboardAvoidingView,
-    Platform,
-    Image,
-    Pressable,
+    View,
 } from 'react-native';
-import { Replies } from '@/types/sparks';
-import { UserDetailContext } from '@/context/UserDetailContext';
-import {
-    Menu,
-    MenuOption,
-    MenuOptions,
-    MenuTrigger,
-} from 'react-native-popup-menu';
-import { Ionicons } from '@expo/vector-icons';
-import { useRenderTextWithLinks } from '@/helpers/detectLinks';
-import dayjs from 'dayjs';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import NoReply from './NoReply';
+import { showToast } from '@/utils/toast';
 
 interface Props {
     visible: boolean;
@@ -35,6 +34,7 @@ interface Props {
     closeReplies: () => void;
     comment: { id: string; replies?: Replies[] };
     onAddReply?: (commentId: string, reply: Replies) => void;
+    sparkId: string;
 }
 
 export default function RepliesSheet({
@@ -43,6 +43,7 @@ export default function RepliesSheet({
     closeReplies,
     comment,
     onAddReply,
+    sparkId,
 }: Props) {
     const [replyText, setReplyText] = useState('');
     const { safePush } = useSafeNavigation();
@@ -75,6 +76,53 @@ export default function RepliesSheet({
         } finally {
             setReplying(false);
         }
+    };
+
+    const handleDeleteReply = async (replyId: string) => {
+        if (!sparkId) return showToast('Missing sparkId');
+        if (!replyId) return showToast('Missing replyId');
+
+        Alert.alert(
+            'Delete Reply',
+            'Are you sure you want to delete this reply?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const sparkRef = doc(db, 'sparks', sparkId);
+                            const sparkSnap = await getDoc(sparkRef);
+                            if (!sparkSnap.exists()) return;
+
+                            const sparkData = sparkSnap.data();
+                            if (!sparkData) return;
+
+                            const updatedComments = (
+                                sparkData.comments || []
+                            ).map((c: Comment) => {
+                                if (c.id !== comment.id) return c;
+                                return {
+                                    ...c,
+                                    replies:
+                                        c.replies?.filter(
+                                            (r) => r.id !== replyId,
+                                        ) || [],
+                                };
+                            });
+
+                            await updateDoc(sparkRef, {
+                                comments: updatedComments,
+                            });
+                            showToast('Reply deleted');
+                        } catch (error) {
+                            console.error('Error deleting reply:', error);
+                        }
+                    },
+                },
+            ],
+        );
     };
 
     return (
@@ -119,19 +167,9 @@ export default function RepliesSheet({
                             comment.replies.map((reply: Replies) => (
                                 <View
                                     key={reply.id}
-                                    style={{
-                                        paddingVertical: 10,
-                                        paddingHorizontal: 12,
-                                        backgroundColor: Colors.BG_COLOR,
-                                        borderRadius: 10,
-                                    }}
+                                    style={styles.containerReply}
                                 >
-                                    <View
-                                        style={{
-                                            flexDirection: 'row',
-                                            gap: 10,
-                                        }}
-                                    >
+                                    <View style={styles.X}>
                                         <Image
                                             source={{
                                                 uri: reply.createdBy
@@ -152,19 +190,11 @@ export default function RepliesSheet({
                                                         },
                                                     });
                                                 }}
-                                                style={{
-                                                    flexDirection: 'row',
-                                                    alignItems: 'center',
-                                                    justifyContent:
-                                                        'space-between',
-                                                }}
+                                                style={styles.fullnameCont}
                                             >
                                                 <Text
                                                     numberOfLines={1}
-                                                    style={{
-                                                        color: Colors.WHITE,
-                                                        fontSize: 14,
-                                                    }}
+                                                    style={styles.fullname}
                                                 >
                                                     {reply.createdBy.fullname}
                                                 </Text>
@@ -182,112 +212,36 @@ export default function RepliesSheet({
                                                 </Text>
                                             </Pressable>
 
-                                            <Text
-                                                style={{
-                                                    color: Colors.GRAY,
-                                                    fontSize: 13,
-                                                    lineHeight: 20,
-                                                    maxWidth: 270,
+                                            <Pressable
+                                                onLongPress={() => {
+                                                    if (
+                                                        reply.createdBy
+                                                            .email ===
+                                                        userDetail?.email
+                                                    ) {
+                                                        Haptics.impactAsync(
+                                                            Haptics
+                                                                .ImpactFeedbackStyle
+                                                                .Medium,
+                                                        );
+                                                        handleDeleteReply(
+                                                            reply.id,
+                                                        );
+                                                    }
                                                 }}
                                             >
-                                                {renderTextWithLinks(
-                                                    reply.text,
-                                                )}
-                                            </Text>
+                                                <Text style={styles.reply}>
+                                                    {renderTextWithLinks(
+                                                        reply.text,
+                                                    )}
+                                                </Text>
+                                            </Pressable>
                                         </View>
-
-                                        {reply?.createdBy?.email ===
-                                            userDetail?.email && (
-                                            <View
-                                                style={{
-                                                    flexDirection: 'row',
-                                                    justifyContent: 'flex-end',
-                                                }}
-                                            >
-                                                <Menu>
-                                                    <MenuTrigger>
-                                                        <Ionicons
-                                                            name="ellipsis-vertical"
-                                                            size={16}
-                                                            color={Colors.GRAY}
-                                                        />
-                                                    </MenuTrigger>
-                                                    <MenuOptions>
-                                                        <MenuOption>
-                                                            <View
-                                                                style={
-                                                                    styles.menuOption1
-                                                                }
-                                                            >
-                                                                <Ionicons
-                                                                    name="pencil"
-                                                                    size={15}
-                                                                    color={
-                                                                        Colors.WHITE
-                                                                    }
-                                                                />
-                                                                <Text
-                                                                    style={{
-                                                                        color: Colors.WHITE,
-                                                                        fontSize: 15,
-                                                                    }}
-                                                                >
-                                                                    Edit
-                                                                </Text>
-                                                            </View>
-                                                        </MenuOption>
-                                                        <MenuOption>
-                                                            <View
-                                                                style={
-                                                                    styles.menuOption2
-                                                                }
-                                                            >
-                                                                <Ionicons
-                                                                    name="trash-bin"
-                                                                    size={15}
-                                                                    color={
-                                                                        Colors.RED
-                                                                    }
-                                                                />
-                                                                <Text
-                                                                    style={{
-                                                                        color: Colors.RED,
-                                                                        fontSize: 15,
-                                                                    }}
-                                                                >
-                                                                    Delete
-                                                                </Text>
-                                                            </View>
-                                                        </MenuOption>
-                                                    </MenuOptions>
-                                                </Menu>
-                                            </View>
-                                        )}
                                     </View>
                                 </View>
                             ))
                         ) : (
-                            <View
-                                style={{
-                                    flex: 1,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginTop: 40,
-                                }}
-                            >
-                                <Text style={styles.noReplyText}>
-                                    No replies yet...
-                                </Text>
-                                <Text
-                                    style={{
-                                        color: Colors.PRIMARY,
-                                        fontFamily: 'outfit',
-                                        marginTop: 6,
-                                    }}
-                                >
-                                    Be the first to share your thoughts 💬
-                                </Text>
-                            </View>
+                            <NoReply />
                         )}
                     </ScrollView>
 
@@ -324,15 +278,7 @@ export default function RepliesSheet({
                                     color={Colors.WHITE}
                                 />
                             ) : (
-                                <Text
-                                    style={{
-                                        color: Colors.WHITE,
-                                        fontFamily: 'outfit',
-                                        fontSize: 14,
-                                    }}
-                                >
-                                    Reply
-                                </Text>
+                                <Text style={styles.A}>Reply</Text>
                             )}
                         </TouchableOpacity>
                     </View>

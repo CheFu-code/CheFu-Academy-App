@@ -2,7 +2,7 @@ import { Colors } from '@/constant/Colors';
 import { styles } from '@/styles/SparkDetail';
 import { Comment, Likes, Replies } from '@/types/sparks';
 import dayjs from 'dayjs';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Animated, Image, Pressable, Text, View } from 'react-native';
 import CommentActions from './CommentActions';
 import CommentMenu from './CommentMenu';
@@ -17,6 +17,7 @@ interface Props {
     onLike: (commentId: string, likes?: Likes[]) => void;
     onReply?: (commentId: string, reply: Replies) => void;
     currentUserId: string;
+    sparkId: string;
 }
 
 export default function CommentItem({
@@ -27,6 +28,7 @@ export default function CommentItem({
     onLike,
     onReply,
     currentUserId,
+    sparkId,
 }: Props) {
     const slideAnim = useRef(new Animated.Value(300)).current;
     const [editText, setEditText] = useState(comment.text);
@@ -126,6 +128,7 @@ export default function CommentItem({
                 slideAnim={slideAnim}
                 closeReplies={closeReplies}
                 comment={comment}
+                sparkId={sparkId} 
                 onAddReply={(commentId, reply) => onReply?.(commentId, reply)}
             />
         </View>

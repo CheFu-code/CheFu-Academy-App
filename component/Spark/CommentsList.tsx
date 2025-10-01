@@ -6,6 +6,7 @@ import { Likes, Replies } from '@/types/sparks';
 interface Props {
     comments: any[];
     currentUserId: string;
+    sparkId: string;
     onEdit: (id: string, newText: string) => void;
     onDelete: (id: string) => void;
     onLike: (commentId: string, likes?: Likes[]) => void;
@@ -15,10 +16,11 @@ interface Props {
 export default function CommentsList({
     comments,
     currentUserId,
+    sparkId,
     onEdit,
     onDelete,
     onLike,
-    onReply
+    onReply,
 }: Props) {
     if (!comments.length) {
         return <Text style={styles.noComments}>No comments yet</Text>;
@@ -33,6 +35,7 @@ export default function CommentsList({
                     comment={c}
                     index={i}
                     currentUserId={currentUserId}
+                    sparkId={sparkId}
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onLike={onLike}

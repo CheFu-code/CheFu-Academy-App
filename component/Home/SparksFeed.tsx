@@ -5,11 +5,13 @@ import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparksFeed.styles';
 import { Likes, Spark } from '@/types/sparks';
 import { formatViews } from '@/utils/formatViews';
+import { showToast } from '@/utils/toast';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import {
     arrayRemove,
     arrayUnion,
     collection,
+    deleteDoc,
     doc,
     FirebaseFirestoreTypes,
     getDoc,
@@ -17,12 +19,19 @@ import {
     orderBy,
     query,
     Timestamp,
-    updateDoc
+    updateDoc,
 } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useContext, useEffect, useState } from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import {
+    Alert,
+    FlatList,
+    Image,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import Loading from '../Shared/Loading';
 
 dayjs.extend(relativeTime);
@@ -112,6 +121,31 @@ const SparksFeed = () => {
         }
     };
 
+    const handleDelete = (sparkId: string) => {
+        Alert.alert(
+            'Delete Spark',
+            'Are you sure you want to delete this spark?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const sparkRef = doc(db, 'sparks', sparkId);
+                            await deleteDoc(sparkRef);
+                            showToast('Spark deleted successfully!');
+                        } catch (error) {
+                            console.error('Error deleting spark:', error);
+                            showToast('Failed to delete spark.');
+                        }
+                    },
+                },
+            ],
+            { cancelable: true },
+        );
+    };
+
     const renderSpark = ({ item }: { item: Spark }) => {
         const hasLiked = item.likes?.some(
             (like) => like.createdBy.uid === userDetail?.uid,
@@ -125,6 +159,7 @@ const SparksFeed = () => {
                         params: { sparkId: item.id },
                     });
                 }}
+                onLongPress={() => handleDelete(item.id)}
                 style={styles.card}
             >
                 <View style={styles.header}>

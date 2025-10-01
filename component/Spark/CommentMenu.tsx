@@ -1,13 +1,12 @@
 import { Colors } from '@/constant/Colors';
 import { styles } from '@/styles/SparkDetail';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 import {
     Menu,
-    MenuTrigger,
-    MenuOptions,
     MenuOption,
+    MenuOptions,
+    MenuTrigger,
 } from 'react-native-popup-menu';
 
 interface Props {
