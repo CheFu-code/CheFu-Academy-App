@@ -5,11 +5,15 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signOut } from '@react-native-firebase/auth';
 import {
+    collection,
     doc,
+    onSnapshot,
+    query,
     serverTimestamp,
-    setDoc
+    setDoc,
+    where,
 } from '@react-native-firebase/firestore';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     Linking,
     Modal,
@@ -28,11 +32,12 @@ import AddVideoModal from './AddVideoModal';
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function Header({ onPress }: { onPress?: () => void }) {
+    const { safePush, safeReplace } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [unreadCount, setUnreadCount] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
-    const { safePush, safeReplace } = useSafeNavigation();
     const CACHE_KEY = '@cached_courses';
     const handleOption = async (option: string) => {
         setShowModal(false);
@@ -117,7 +122,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
             safePush('/addCourse');
         } else if (option === 'Favorite Videos') {
             safePush('/favoriteVideos');
-        } else if (option === 'Add Sparks') {
+        } else if (option === 'Post Spark') {
             safePush('/addSpark');
         }
     };
@@ -128,11 +133,27 @@ export default function Header({ onPress }: { onPress?: () => void }) {
         color?: string;
     }[] = [
         { label: 'Add Course', icon: 'add-circle-outline' },
-        { label: 'Add Sparks', icon: 'add' },
+        { label: 'Post Spark', icon: 'add' },
         { label: 'Favorite Videos', icon: 'heart' },
         { label: 'Contact Support', icon: 'mail-outline' },
         { label: 'Rate our app', icon: 'star-outline', color: Colors.YELLOW },
     ];
+
+    useEffect(() => {
+        if (!userDetail) return;
+
+        const q = query(
+            collection(db, 'notifications'),
+            where('to', '==', userDetail.uid),
+            where('read', '==', false),
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            setUnreadCount(snapshot.size);
+        });
+
+        return () => unsubscribe();
+    }, [userDetail]);
 
     const handleSearch = () => {
         if (!searchTerm.trim()) {
@@ -223,12 +244,24 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     {userDetail && (
                         <View style={styles.bellCont}>
                             <TouchableOpacity
+                                style={{ position: 'relative' }}
                                 onPress={() => {
                                     safePush('/notification');
                                 }}
                             >
                                 <Feather name="bell" size={20} color="white" />
+
+                                {unreadCount > 0 && (
+                                    <View style={styles.badge}>
+                                        <Text style={styles.badgeText}>
+                                            {unreadCount > 99
+                                                ? '99+'
+                                                : unreadCount}
+                                        </Text>
+                                    </View>
+                                )}
                             </TouchableOpacity>
+
                             <TouchableOpacity
                                 onPress={() => setShowModal(true)}
                             >

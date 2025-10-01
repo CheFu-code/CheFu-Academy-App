@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from '../constant/Colors';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export const styles = StyleSheet.create({
     headerContainer: {
@@ -93,5 +94,22 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
+    },
+    badge: {
+        position: 'absolute',
+        top: -5,
+        right: -5,
+        backgroundColor: Colors.GREEN,
+        borderRadius: 8,
+        paddingHorizontal: 4,
+        paddingVertical: 1,
+        minWidth: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: RFValue(8),
+        fontFamily:"outfit-bold"
     },
 });

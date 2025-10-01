@@ -8,6 +8,7 @@ import { formatViews } from '@/utils/formatViews';
 import { showToast } from '@/utils/toast';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import {
+    addDoc,
     arrayRemove,
     arrayUnion,
     collection,
@@ -91,6 +92,10 @@ const SparksFeed = () => {
         if (!userDetail) return;
 
         const sparkRef = doc(db, 'sparks', sparkId);
+        const sparkSnap = await getDoc(sparkRef);
+        const sparkData = sparkSnap.data();
+
+        if (!sparkData) return;
 
         // Check if the user already liked
         const existingLike = likes.find(
@@ -118,6 +123,25 @@ const SparksFeed = () => {
             await updateDoc(sparkRef, {
                 likes: arrayUnion(newLike),
             });
+
+            // ✅ Send notification only if user is not liking their own spark
+            if (sparkData.createdBy?.uid !== userDetail.uid) {
+                const notificationRef = collection(db, 'notifications');
+                await addDoc(notificationRef, {
+                    type: 'like',
+                    sparkId,
+                    from: {
+                        uid: userDetail?.uid,
+                        fullname: userDetail?.fullname || 'Anonymous',
+                    },
+                    to: sparkData.createdBy?.uid,
+                    message: `${
+                        userDetail?.fullname || 'Someone'
+                    } liked your spark.`,
+                    createdAt: Timestamp.now(),
+                    read: false, // for badge count
+                });
+            }
         }
     };
 
