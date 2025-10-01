@@ -54,17 +54,14 @@ export default function SearchScreen() {
                         {' '}
                         &quot;{query}&quot;
                     </Text>
-                    {results.length > 0 ||
-                        (videoResults.length > 0 && (
-                            <View style={styles.center}>
-                                <Text style={styles.found}>
-                                    found:{' '}
-                                    <Text style={styles.total}>
-                                        {totalResults}
-                                    </Text>
-                                </Text>
-                            </View>
-                        ))}
+                    {(results.length > 0 || videoResults.length > 0) && (
+                        <View style={styles.center}>
+                            <Text style={styles.found}>
+                                found:{' '}
+                                <Text style={styles.total}>{totalResults}</Text>
+                            </Text>
+                        </View>
+                    )}
                 </View>
 
                 {results.length === 0 && videoResults.length === 0 ? (
@@ -105,7 +102,7 @@ export default function SearchScreen() {
                                     <CourseCard course={item} enroll={true} />
                                 )}
                                 contentContainerStyle={{
-                                    paddingBottom: insets.bottom + 20,
+                                    paddingBottom: insets.bottom,
                                     paddingHorizontal: 10,
                                 }}
                                 columnWrapperStyle={{
@@ -120,9 +117,7 @@ export default function SearchScreen() {
                                 data={videoResults}
                                 keyExtractor={(item) => item.id}
                                 ListFooterComponent={
-                                    <View
-                                        style={{ height: insets.bottom + 20 }}
-                                    />
+                                    <View style={{ height: insets.bottom }} />
                                 }
                                 renderItem={({ item }) => (
                                     <VideoCard

@@ -4,7 +4,8 @@
         "strict": true,
         "paths": {
             "@/*": ["./*"]
-        }
+        },
+        "jsx": "react-jsx" // <-- Add this line
     },
     "include": [
         "**/*.ts",
@@ -15,6 +16,8 @@
         "app/_layout.tsx",
         "app/auth2.jsx",
         "app/auth.jsx",
-        "component/Spinner.js"
-, "utils", "styles/MyCourses.styles.js"    ]
+        "component/Spinner.js",
+        "utils",
+        "styles/MyCourses.styles.js"
+    ]
 }

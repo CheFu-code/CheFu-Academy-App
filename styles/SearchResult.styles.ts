@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
         paddingRight: 10,
     },
     queryText: {
-        color: Colors.PRIMARY,
+        color: Colors.GRAY,
         fontStyle: 'italic',
         fontSize: RFValue(14),
     },

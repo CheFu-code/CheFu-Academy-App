@@ -7,6 +7,7 @@ import { menuItems } from "@/data/menuItems";
 import { usePickImage } from "@/hooks/usePickImage";
 import { useProfileActions } from "@/hooks/useProfileActions";
 import { useRefreshProfile } from "@/hooks/useRefreshProfile";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { User } from "@/types/user";
 import { changeAvatar } from "@/utils/changeAvatar";
 import { showToast } from "@/utils/toast";
@@ -19,7 +20,6 @@ import AppModal from "../../component/Shared/AppModal";
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import { styles } from "../../styles/Profile.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function Profile() {
     const { safePush, safeReplace } = useSafeNavigation()
@@ -30,13 +30,11 @@ export default function Profile() {
         member,
         memberUntil,
         planType,
-        profilePicture,
         provider,
         createdAt,
     } = userDetail || {};
     const auth = getAuth();
     const db = getFirestore();
-    const user = auth.currentUser;
 
     const [loader, setLoader] = useState(false);
     const [loadingName, setLoadingName] = useState(false);

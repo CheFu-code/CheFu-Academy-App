@@ -224,7 +224,11 @@ export default function Header({ onPress }: { onPress?: () => void }) {
 
                     {userDetail && (
                         <View style={styles.bellCont}>
-                            <TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    safePush('/notification');
+                                }}
+                            >
                                 <Feather name="bell" size={20} color="white" />
                             </TouchableOpacity>
                             <TouchableOpacity

@@ -1,25 +1,25 @@
-import { TermsText } from "@/component/TermsText";
-import { useImmersiveMode } from "@/hooks/useImmersiveMode";
-import { useLoadUser } from "@/hooks/useLoadUser";
-import { useSocialAuthNavigation } from "@/hooks/useSocialAuthNavigation";
-import { AntDesign } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../constant/Colors";
-import { styles } from "../styles/WelcomeScreen.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import { TermsText } from '@/component/TermsText';
+import { useImmersiveMode } from '@/hooks/useImmersiveMode';
+import { useLoadUser } from '@/hooks/useLoadUser';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { useSocialAuthNavigation } from '@/hooks/useSocialAuthNavigation';
+import { AntDesign } from '@expo/vector-icons';
+import { Image, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from '../constant/Colors';
+import { styles } from '../styles/WelcomeScreen.styles';
 
 export default function Index() {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     const { loading } = useLoadUser();
-    const { navigateGitHub, navigateGoogle } = useSocialAuthNavigation();
+    const { navigateGoogle } = useSocialAuthNavigation();
     useImmersiveMode();
 
     return (
-        <View style={styles.centeredContainer}>
+        <SafeAreaView style={styles.centeredContainer}>
             <Image
-                source={require("./../assets/images/landing.png")}
-                style={{ width: "100%", height: 360, marginTop: 20 }}
+                source={require('./../assets/images/landing.png')}
+                style={{ width: '100%', height: 430,  }}
                 resizeMode="contain"
             />
 
@@ -29,11 +29,11 @@ export default function Index() {
                 contentContainerStyle={{ flexGrow: 1 }}
             >
                 <Text style={styles.title}>
-                    Welcome to{"\n"}
+                    Welcome to{'\n'}
                     <Text
                         style={{
                             color: Colors.BG_COLOR,
-                            fontFamily: "outfit-bold",
+                            fontFamily: 'outfit-bold',
                         }}
                     >
                         CheFu Academy
@@ -45,12 +45,10 @@ export default function Index() {
                 <TouchableOpacity
                     disabled={loading}
                     style={styles.button}
-                    onPress={() => safePush("/auth/signUp")}
+                    onPress={() => safePush('/auth/signUp')}
                 >
                     <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
-
-                {/* <View style={styles.iconsContainer}> */}
 
                 <TouchableOpacity
                     style={styles.iconsContainer}
@@ -60,31 +58,16 @@ export default function Index() {
                     <Text
                         style={{
                             fontSize: 16,
-                            fontFamily: "outfit",
-                            color: "white",
+                            fontFamily: 'outfit',
+                            color: 'white',
                         }}
                     >
                         Google
                     </Text>
                 </TouchableOpacity>
-                {/* </View> */}
-
-                <TouchableOpacity
-                    disabled={loading}
-                    onPress={() => safePush("/auth/signIn")}
-                    style={[
-                        styles.button2,
-                        { backgroundColor: Colors.PRIMARY },
-                    ]}
-                >
-                    <Text style={[styles.buttonText, { color: Colors.WHITE }]}>
-                        Already have an account? {"\n"}
-                        <Text style={{ color: Colors.BLACK }}>Sign In</Text>
-                    </Text>
-                </TouchableOpacity>
 
                 <TermsText disabled={loading} />
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }

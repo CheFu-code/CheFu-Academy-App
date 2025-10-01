@@ -9,11 +9,10 @@ import { showToast } from "@/utils/toast";
 import {
     Entypo,
     Ionicons,
-    MaterialCommunityIcons,
-    SimpleLineIcons,
+    SimpleLineIcons
 } from "@expo/vector-icons";
 import Constants from "expo-constants";
-import { router, useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useContext, useMemo } from "react";
 import {
     Linking,
@@ -44,11 +43,9 @@ export const ProfileMenu = ({
     confirmDeleteAccount,
     avatarURL,
 }: ProfileMenuProps) => {
-    const { safePush } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { email, member, planType } = userDetail || {};
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
-    const isAdmin = userDetail?.roles?.includes("admin");
     const renderedMenuItems = useMemo(
         () => menuItems(router, Linking, ToastAndroid, Colors),
         [router]

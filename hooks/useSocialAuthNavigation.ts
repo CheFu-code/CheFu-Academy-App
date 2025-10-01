@@ -1,5 +1,4 @@
 // hooks/useSocialAuthNavigation.ts
-import { useRouter } from "expo-router";
 import { useSafeNavigation } from "./useSafeNavigation";
 
 export const useSocialAuthNavigation = () => {

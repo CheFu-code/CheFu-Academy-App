@@ -1,9 +1,8 @@
 // components/TermsText.tsx
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { styles } from "@/styles/WelcomeScreen.styles";
-import { useRouter } from "expo-router";
 import { Pressable, Text } from "react-native";
 import { Colors } from "../constant/Colors";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export const TermsText = ({ disabled = false }: { disabled?: boolean }) => {
     const { safePush } = useSafeNavigation()

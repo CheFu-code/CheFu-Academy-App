@@ -222,12 +222,12 @@ export default function CourseProgressCard({
                                     fontFamily: 'outfit-bold',
                                 }}
                             >
-                                All chapters completed!
+                                All chapters completed
                             </Text>
                         ) : (
                             `${item?.completedChapter?.length ?? 0} of ${
                                 item.chapters?.length
-                            } chapters completed!`
+                            } chapters completed`
                         )}
                     </Text>
                 </View>

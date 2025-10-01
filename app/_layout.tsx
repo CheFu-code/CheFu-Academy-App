@@ -19,6 +19,7 @@ import { NetworkProvider, useNetwork } from '../context/NetworkContext';
 import { UserDetailContext } from '../context/UserDetailContext';
 import { useBiometricAuth } from '../hooks/useBiometricAuth';
 import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
+import { useImmersiveMode } from '@/hooks/useImmersiveMode';
 
 // ✅ Sentry Init
 Sentry.init({
@@ -75,6 +76,7 @@ function LayoutContent() {
     useProtectedRoute(userDetail, authChecked);
     useLastSeenTracker();
     useNotifications();
+    useImmersiveMode();
     useDeepLinking();
     useHandleDynamicLinks();
 

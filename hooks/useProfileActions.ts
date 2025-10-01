@@ -6,11 +6,11 @@ import * as Sentry from "@sentry/react-native";
 import { useCallback, useState } from "react";
 import { ToastAndroid } from "react-native";
 
+
 export function useProfileActions(userDetail: any, setUserDetail: any, router: any) {
     const auth = getAuth();
     const CACHE_KEY = "@cached_courses";
     const [loading, setLoading] = useState(false);
-    const firestore = getFirestore();
 
     const handleLogout = useCallback(async () => {
         try {

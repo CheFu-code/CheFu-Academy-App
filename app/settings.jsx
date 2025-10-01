@@ -10,10 +10,8 @@ import * as LocalAuthentication from "expo-local-authentication";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
-import * as Sharing from "expo-sharing";
-import {useSafeNavigation} from "../hooks/useSafeNavigation"
 import * as FileSystem from "expo-file-system";
-import { useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -31,6 +29,7 @@ import {
 import AppModal from "../component/Shared/AppModal";
 import { Colors } from "../constant/Colors";
 import { UserDetailContext } from "../context/UserDetailContext";
+import { useSafeNavigation } from "../hooks/useSafeNavigation";
 import { styles } from "../styles/Settings.styles";
 
 export default function SettingsScreen() {

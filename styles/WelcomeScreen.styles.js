@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     centeredContainer: {
@@ -12,26 +13,25 @@ export const styles = StyleSheet.create({
         textAlign: "center",
         color: Colors.WHITE,
         marginTop: 30,
-        fontSize: 14,
-        marginBottom: 75,
+        fontSize: RFValue(11),
         fontFamily: "outfit",
     },
     bottomSheet: {
-        padding: 25,
+        padding: 20,
         backgroundColor: Colors.PRIMARY,
         borderTopLeftRadius: 35,
         borderTopRightRadius: 35,
     },
     title: {
-        fontSize: 28,
-        fontWeight: "bold",
+        fontSize: RFValue(24),
         textAlign: "center",
         color: Colors.WHITE,
+        fontFamily:"outfit-bold"
     },
     subtitle: {
-        fontSize: 20,
+        fontSize: RFValue(17),
         color: Colors.WHITE,
-        marginTop: 20,
+        marginTop: RFValue(5),
         textAlign: "center",
         fontFamily: "outfit",
     },
