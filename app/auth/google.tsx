@@ -4,7 +4,7 @@ import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Ionicons } from '@expo/vector-icons';
 import {
     GoogleAuthProvider,
-    signInWithCredential
+    signInWithCredential,
 } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import LottieView from 'lottie-react-native';
@@ -37,9 +37,14 @@ export default function GoogleAuthScreen() {
             await GoogleSignin.hasPlayServices({
                 showPlayServicesUpdateDialog: true,
             });
-            const { idToken } = await GoogleSignin.getTokens();
-            const credential = GoogleAuthProvider.credential(idToken);
+            const userInfo = await GoogleSignin.signIn();
 
+            if (!userInfo?.data?.idToken) {
+                throw new Error('No ID token returned from Google Sign-In');
+              }
+
+              const { idToken } = userInfo.data;
+            const credential = GoogleAuthProvider.credential(idToken);
             const firebaseUserCredential = await signInWithCredential(
                 auth,
                 credential,
