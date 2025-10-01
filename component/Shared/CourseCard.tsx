@@ -1,3 +1,4 @@
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import {
     doc,
@@ -5,7 +6,6 @@ import {
     getDoc,
     getFirestore,
 } from '@react-native-firebase/firestore';
-import { router } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 import {
     Image,
@@ -28,6 +28,7 @@ export default function CourseCard({
     enroll?: boolean;
     style?: StyleProp<ViewStyle>;
 }) {
+    const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
     const [creatorInfo, setCreatorInfo] =
         useState<null | FirebaseFirestoreTypes.DocumentData>(null);
@@ -68,7 +69,7 @@ export default function CourseCard({
 
                         return;
                     } else {
-                        router.push({
+                        safePush({
                             pathname: '/courseView',
                             params: {
                                 courseParams: JSON.stringify(course),
@@ -89,7 +90,7 @@ export default function CourseCard({
                         <TouchableOpacity
                             style={styles.creatorProfilePicWrapper}
                             onPress={() => {
-                                router.push({
+                                safePush({
                                     pathname: '/profileView',
                                     params: {
                                         userId: course.createdBy,
@@ -100,7 +101,9 @@ export default function CourseCard({
                             <Image
                                 source={
                                     creatorInfo?.profilePicture
-                                        ? { uri: creatorInfo.profilePicture }
+                                        ? {
+                                              uri: creatorInfo.profilePicture,
+                                          }
                                         : require('../../assets/images/logo.png')
                                 }
                                 style={styles.creatorProfilePic}
@@ -124,7 +127,7 @@ export default function CourseCard({
                             Chapters: {course.chapters?.length || 0}
                         </Text>
                         {course?.createdBy === userDetail?.email && (
-                            <Text>Owner</Text>
+                            <Text style={styles.ownerLabel}>Owner</Text>
                         )}
 
                         {course?.createdBy !== userDetail?.email && (
@@ -150,7 +153,7 @@ export default function CourseCard({
                 message={modal.message}
                 onConfirm={() => {
                     setModal({ ...modal, visible: false });
-                    router.push('/myCourses');
+                    safePush('/myCourses');
                 }}
                 onCancel={() => setModal({ ...modal, visible: false })}
             />

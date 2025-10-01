@@ -1,8 +1,8 @@
-import { Course } from "@/types/course";
-import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -11,10 +11,10 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import { imageAssets } from "../../constant/Option";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+} from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { Colors } from '../../constant/Colors';
+import { imageAssets } from '../../constant/Option';
 
 interface CourseListProps {
     courseList: Course[];
@@ -24,26 +24,26 @@ interface CourseListProps {
 
 export default function CourseList({
     courseList,
-    heading = "My Courses",
+    heading = 'Courses',
     enroll = false,
 }: CourseListProps) {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const displayedCourses = courseList.slice(0, 4);
 
     useFocusEffect(
         useCallback(() => {
             setLoadingId(null);
-        }, [])
+        }, []),
     );
 
     const handlePress = (item: Course) => {
-        const id = item.id || item.courseTitle || "";
+        const id = item.id || item.courseTitle || '';
         setLoadingId(id);
 
         setTimeout(() => {
             safePush({
-                pathname: "/courseView",
+                pathname: '/courseView',
                 params: {
                     courseParams: JSON.stringify(item),
                     enroll: enroll.toString(),
@@ -55,20 +55,20 @@ export default function CourseList({
     return (
         <View
             style={{
-                pointerEvents: loadingId ? "none" : "auto",
-                marginHorizontal:-10
+                pointerEvents: loadingId ? 'none' : 'auto',
+                marginHorizontal: -10,
             }}
         >
             <View
                 style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginHorizontal:10
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginHorizontal: 10,
                 }}
             >
                 <Text style={styles.heading}>{heading}</Text>
-                <TouchableOpacity onPress={() => safePush("/myCourses")}>
+                <TouchableOpacity onPress={() => safePush('/myCourses')}>
                     <Text style={styles.viewAll}>View All</Text>
                 </TouchableOpacity>
             </View>
@@ -81,7 +81,7 @@ export default function CourseList({
                 horizontal={true}
                 renderItem={({ item }: { item: Course }) => {
                     const isLoading =
-                        loadingId === (item.id || item.courseTitle || "");
+                        loadingId === (item.id || item.courseTitle || '');
                     return (
                         <TouchableOpacity
                             style={styles.courseContainer}
@@ -97,40 +97,42 @@ export default function CourseList({
                                 }}
                                 source={
                                     imageAssets[
-                                    item?.banner_image as keyof typeof imageAssets
+                                        item?.banner_image as keyof typeof imageAssets
                                     ]
                                 }
                             />
                             <Text
                                 style={{
-                                    fontFamily: "outfit-bold",
-                                    fontSize: 15,
-                                    marginTop: 10,
+                                    fontFamily: 'outfit-bold',
+                                    fontSize: RFValue(12),
+                                    marginTop: RFValue(5),
                                     maxWidth: 200,
+                                    paddingHorizontal: 5,
                                 }}
-                                numberOfLines={1}
+                                numberOfLines={2}
                                 ellipsizeMode="tail"
                             >
                                 {item?.courseTitle}
                             </Text>
                             <View
                                 style={{
-                                    display: "flex",
-                                    flexDirection: "row",
+                                    display: 'flex',
+                                    flexDirection: 'row',
                                     gap: 5,
-                                    alignItems: "center",
-                                    marginTop: 5,
+                                    alignItems: 'center',
+                                    paddingHorizontal: 5,
+                                    paddingBottom: 4,
                                 }}
                             >
                                 <Ionicons
                                     name="book-outline"
-                                    size={20}
+                                    size={18}
                                     color={Colors.PRIMARY}
                                 />
                                 <Text
                                     style={{
-                                        fontFamily: "outfit",
-                                        textDecorationLine: "underline",
+                                        fontFamily: 'outfit',
+                                        fontSize: RFValue(10),
                                     }}
                                 >
                                     {item?.chapters?.length} Chapters
@@ -139,20 +141,20 @@ export default function CourseList({
                             {isLoading && (
                                 <View
                                     style={{
-                                        position: "absolute",
+                                        position: 'absolute',
                                         top: 0,
                                         left: 0,
                                         right: 0,
                                         bottom: 0,
                                         backgroundColor:
-                                            "rgba(255,255,255,0.5)",
+                                            'rgba(255,255,255,0.5)',
                                         borderRadius: 15,
-                                        justifyContent: "center",
-                                        alignItems: "center",
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
                                     }}
                                 >
                                     <ActivityIndicator
-                                        style={{ alignItems: "center" }}
+                                        style={{ alignItems: 'center' }}
                                         size="large"
                                         color={Colors.PRIMARY}
                                     />
@@ -168,20 +170,20 @@ export default function CourseList({
 
 const styles = StyleSheet.create({
     courseContainer: {
-        padding: 8,
+        padding: 2,
         backgroundColor: Colors.GREEN,
         margin: 6,
         borderRadius: 15,
     },
     heading: {
-        fontFamily: "outfit-bold",
-        fontSize: 25,
+        fontFamily: 'outfit-bold',
+        fontSize: RFValue(18),
         color: Colors.PRIMARY,
     },
     viewAll: {
-        fontFamily: "outfit",
-        fontSize: 14,
+        fontFamily: 'outfit',
+        fontSize: RFValue(12),
         color: Colors.PRIMARY,
-        textDecorationLine: "underline",
+        textDecorationLine: 'underline',
     },
 });

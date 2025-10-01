@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
     },
     modalSheet: {
         backgroundColor: Colors.BG_COLOR,
-        padding: 20,
+        // padding: 20,
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
     },
@@ -53,6 +53,7 @@ export const styles = StyleSheet.create({
         fontSize: 20,
         color: Colors.PRIMARY,
         marginBottom: 5,
+        margin: 13,
     },
     modalItem: {
         flexDirection: 'row',
@@ -63,6 +64,7 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 12,
         elevation: 2,
+        marginHorizontal: 13,
     },
     modalIcon: {
         marginRight: 16,

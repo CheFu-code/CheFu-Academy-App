@@ -1,20 +1,17 @@
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { Course, CourseProgressProps } from "@/types/course";
 import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
 import CourseProgressCard from "../Shared/CourseProgressCard";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function CourseProgress({
     courseList,
     enroll = false,
 }: CourseProgressProps) {
-    const { userDetail } = useContext(UserDetailContext);
     const { safePush } = useSafeNavigation()
-    const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const displayedCourses = courseList.slice(0, 4);
 
@@ -50,12 +47,12 @@ export default function CourseProgress({
                 <Text
                     style={{
                         fontFamily: "outfit-bold",
-                        fontSize: 25,
+                        fontSize: RFValue(18),
                         color: Colors.PRIMARY,
 
                     }}
                 >
-                    My Progress
+                    Progress
                 </Text>
                 <TouchableOpacity
                     onPress={() => safePush("/(tabs)/progress")}

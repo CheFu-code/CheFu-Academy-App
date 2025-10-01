@@ -20,6 +20,7 @@ import CourseListGrid, {
 import { Colors } from '../../../constant/Colors';
 import { PracticeOption } from '../../../constant/Option';
 import { UserDetailContext } from '../../../context/UserDetailContext';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function PracticeTypeHomeScreen() {
     const { type } = useLocalSearchParams();
@@ -68,6 +69,7 @@ export default function PracticeTypeHomeScreen() {
             <SafeAreaView
                 style={{
                     backgroundColor: Colors.BG_COLOR,
+                    paddingBottom: -25,
                 }}
             >
                 <Image
@@ -86,7 +88,6 @@ export default function PracticeTypeHomeScreen() {
                         padding: 10,
                         display: 'flex',
                         flexDirection: 'row',
-                        gap: 10,
                         alignItems: 'center',
                         marginTop: 15,
                     }}
@@ -95,7 +96,7 @@ export default function PracticeTypeHomeScreen() {
                     <Text
                         style={{
                             fontFamily: 'outfit-bold',
-                            fontSize: 25,
+                            fontSize: RFValue(20),
                             color: Colors.PRIMARY,
                         }}
                     >

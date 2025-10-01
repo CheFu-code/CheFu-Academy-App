@@ -1,18 +1,17 @@
-import { useRouter } from "expo-router";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constant/Colors";
-import { PracticeOption } from "../../constant/Option";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Colors } from '../../constant/Colors';
+import { PracticeOption } from '../../constant/Option';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function PracticeSection() {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     return (
-        <View
-        >
+        <View>
             <Text
                 style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: 25,
+                    fontFamily: 'outfit-bold',
+                    fontSize: RFValue(18),
                     color: Colors.PRIMARY,
                 }}
             >
@@ -26,7 +25,7 @@ export default function PracticeSection() {
                         <TouchableOpacity
                             onPress={() =>
                                 safePush({
-                                    pathname: "/practice/[type]", // dynamic route template
+                                    pathname: '/practice/[type]', // dynamic route template
                                     params: { type: item.name }, // provide param to replace [type]
                                 })
                             }
@@ -39,17 +38,17 @@ export default function PracticeSection() {
                             <Image
                                 source={item?.image}
                                 style={{
-                                    width: "100%",
-                                    height: "100%",
+                                    width: '100%',
+                                    height: '100%',
                                     maxHeight: 100,
                                     borderRadius: 15,
                                 }}
                             />
                             <Text
                                 style={{
-                                    position: "absolute",
+                                    position: 'absolute',
                                     padding: 8,
-                                    fontFamily: "outfit-bold",
+                                    fontFamily: 'outfit-bold',
                                     fontSize: 13,
                                     color: Colors.WHITE,
                                 }}
