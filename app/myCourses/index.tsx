@@ -1,19 +1,17 @@
-import { Colors } from "@/constant/Colors";
-import { imageAssets } from "@/constant/Option";
-import { UserDetailContext } from "@/context/UserDetailContext";
-import { Course } from "@/types/course";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { getAuth } from "@react-native-firebase/auth";
+import { auth, db } from '@/config/fireConfig';
+import { Colors } from '@/constant/Colors';
+import { imageAssets } from '@/constant/Option';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
-    getFirestore,
     query,
-    where,
-} from "@react-native-firebase/firestore";
-import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+    where
+} from '@react-native-firebase/firestore';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -21,28 +19,24 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { styles } from "../../styles/MyCourses.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { styles } from '../../styles/MyCourses.styles';
 
 export default function MyCourses() {
-    const { safeBack, safePush } = useSafeNavigation()
-    const { userDetail } = useContext(UserDetailContext);
+    const { safeBack, safePush } = useSafeNavigation();
     const [loading, setLoading] = useState(true);
     const [myCourses, setMyCourses] = useState<Course[]>([]);
 
     useEffect(() => {
         const fetchMyCourses = async () => {
             try {
-                const auth = getAuth();
                 const user = auth.currentUser;
                 if (!user) return;
 
-                const db = getFirestore();
                 const q = query(
-                    collection(db, "course"),
-                    where("createdBy", "==", user.email)
+                    collection(db, 'course'),
+                    where('createdBy', '==', user.email),
                 );
                 const snap = await getDocs(q);
 
@@ -50,11 +44,11 @@ export default function MyCourses() {
                     (doc: FirebaseFirestoreTypes.DocumentSnapshot) => ({
                         id: doc.id,
                         ...doc.data(),
-                    })
+                    }),
                 );
                 setMyCourses(courses);
             } catch (err) {
-                console.error("Error fetching courses:", err);
+                console.error('Error fetching courses:', err);
             } finally {
                 setLoading(false);
             }
@@ -105,10 +99,10 @@ export default function MyCourses() {
                                 style={styles.courseCard}
                                 onPress={() =>
                                     safePush({
-                                        pathname: "/courseView",
+                                        pathname: '/courseView',
                                         params: {
                                             courseParams: JSON.stringify(item),
-                                            enroll: "true",
+                                            enroll: 'true',
                                         },
                                     })
                                 }
@@ -144,7 +138,7 @@ export default function MyCourses() {
 
                                     <View style={styles.chapterContainer}>
                                         <Text style={styles.chapter}>
-                                            Chapters:{" "}
+                                            Chapters:{' '}
                                             {item.chapters?.length || 0}
                                         </Text>
 
@@ -154,16 +148,16 @@ export default function MyCourses() {
                                         >
                                             {item?.createdOn?.toDate
                                                 ? item.createdOn
-                                                    .toDate()
-                                                    .toLocaleDateString(
-                                                        "en-GB",
-                                                        {
-                                                            day: "2-digit",
-                                                            month: "2-digit",
-                                                            year: "numeric",
-                                                        }
-                                                    )
-                                                : ""}
+                                                      .toDate()
+                                                      .toLocaleDateString(
+                                                          'en-GB',
+                                                          {
+                                                              day: '2-digit',
+                                                              month: '2-digit',
+                                                              year: 'numeric',
+                                                          },
+                                                      )
+                                                : ''}
                                         </Text>
                                     </View>
                                     {isCourseComplete(item) && (

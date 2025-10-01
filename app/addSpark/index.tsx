@@ -1,4 +1,5 @@
 import Button from '@/component/Shared/Button';
+import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
@@ -8,10 +9,9 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import {
     addDoc,
     collection,
-    getFirestore,
-    serverTimestamp,
+    serverTimestamp
 } from '@react-native-firebase/firestore';
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
     ScrollView,
     Text,
@@ -22,11 +22,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const categories = [
-    'Tips',
-    'Questions',
-    'Projects',
-    'Resources',
-    'Achievements',
+    'Tip',
+    'Question',
+    'Project',
+    'Resource',
+    'Achievement',
     'Discussion',
 ];
 
@@ -38,7 +38,8 @@ const AddSpark = () => {
     const [loading, setLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('');
     const MAX_WORDS = 60;
-    const wordCount = content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
+    const wordCount =
+        content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
 
     const handlePost = async () => {
         if (!title || !content || !selectedCategory) {
@@ -61,8 +62,6 @@ const AddSpark = () => {
                 setLoading(false);
                 return;
             }
-
-            const db = getFirestore();
 
             await addDoc(collection(db, 'sparks'), {
                 title,
@@ -121,6 +120,7 @@ const AddSpark = () => {
                         numberOfLines={6}
                         value={content}
                         onChangeText={setContent}
+                        placeholderTextColor={Colors.GRAY}
                     />
 
                     <Text

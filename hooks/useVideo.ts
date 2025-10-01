@@ -1,13 +1,13 @@
+import { db } from "@/config/fireConfig";
 import { Course } from "@/types/course";
 import { Video } from "@/types/video";
-import { collection, FirebaseFirestoreTypes, getDocs, getFirestore } from "@react-native-firebase/firestore";
+import { collection, FirebaseFirestoreTypes, getDocs } from "@react-native-firebase/firestore";
 import { useCallback, useState } from "react";
 
 export const useVideo = () => {
     const [results, setResults] = useState<Course[]>([]);
     const [videoResults, setVideoResults] = useState<Video[]>([]);
     const [loading, setLoading] = useState(true);
-    const db = getFirestore();
 
     const fetchCourses = useCallback(
         async (query: string | string[]) => {

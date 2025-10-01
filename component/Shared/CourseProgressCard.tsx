@@ -1,13 +1,12 @@
+import { auth, db } from '@/config/fireConfig';
 import { Course } from '@/types/course';
 import { sendNotification } from '@/utils/notifications';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuth } from '@react-native-firebase/auth';
 import {
     doc,
     FirebaseFirestoreTypes,
     getDoc,
-    getFirestore,
 } from '@react-native-firebase/firestore';
 import * as Notifications from 'expo-notifications';
 import { useContext, useEffect, useState } from 'react';
@@ -20,10 +19,10 @@ import {
     View,
 } from 'react-native';
 import * as Progress from 'react-native-progress';
+import { RFValue } from 'react-native-responsive-fontsize';
 import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
 import { UserDetailContext } from '../../context/UserDetailContext';
-import { RFValue } from 'react-native-responsive-fontsize';
 
 interface CourseProgressCardProps {
     item: Course;
@@ -41,8 +40,7 @@ export default function CourseProgressCard({
     onPress,
 }: CourseProgressCardProps) {
     if (!item) return null;
-    const auth = getAuth();
-    const firestore = getFirestore();
+
     const { userDetail } = useContext(UserDetailContext);
     const [userData, setUserData] =
         useState<FirebaseFirestoreTypes.DocumentData | null>(null);
@@ -55,7 +53,7 @@ export default function CourseProgressCard({
             return;
         }
 
-        const userDocRef = doc(firestore, 'users', userDetail?.email); // using email as doc ID
+        const userDocRef = doc(db, 'users', userDetail?.email); // using email as doc ID
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {

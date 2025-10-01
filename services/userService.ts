@@ -1,38 +1,35 @@
 // services/userService.ts
+import { auth, db } from "@/config/fireConfig";
 import {
     deleteUser,
     EmailAuthProvider,
-    getAuth,
     reauthenticateWithCredential,
-    sendEmailVerification,
+    sendEmailVerification
 } from "@react-native-firebase/auth";
 import {
     deleteDoc,
     doc,
     getDoc,
-    getFirestore,
-    setDoc,
+    setDoc
 } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useCallback, useState } from "react";
 
 export async function fetchUser(email: string) {
-    const firestore = getFirestore();
-    return getDoc(doc(firestore, "users", email));
+    return getDoc(doc(db, "users", email));
 }
 
 export async function deleteAccount(user: any, password: string) {
-    const auth = getAuth();
-    const firestore = getFirestore();
+
 
     const cred = EmailAuthProvider.credential(user.email, password);
     await reauthenticateWithCredential(user, cred);
 
-    const userDocRef = doc(firestore, "users", user.email);
+    const userDocRef = doc(db, "users", user.email);
     const userSnap = await getDoc(userDocRef);
 
     if (userSnap.exists()) {
-        const deletedRef = doc(firestore, "deletedAccounts", user.email + user.uid);
+        const deletedRef = doc(db, "deletedAccounts", user.email + user.uid);
         await setDoc(deletedRef, {
             ...userSnap.data(),
             email: user.email,
@@ -47,7 +44,6 @@ export async function deleteAccount(user: any, password: string) {
 export async function sendVerificationEmail(user: any) {
     return sendEmailVerification(user);
 }
-const auth = getAuth();
 
 export const verify = useCallback(async () => {
     const user = auth.currentUser;

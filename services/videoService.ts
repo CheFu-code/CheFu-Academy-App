@@ -1,17 +1,16 @@
+import { auth, db } from "@/config/fireConfig";
 import { Video, YouTubeVideo } from "@/types/video";
-import { getAuth } from "@react-native-firebase/auth";
 import {
     collection,
     doc,
     FirebaseFirestoreTypes,
     getDoc,
     getDocs,
-    getFirestore,
     orderBy,
     query,
     serverTimestamp,
     setDoc,
-    where,
+    where
 } from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import axios from "axios";
@@ -30,8 +29,6 @@ export const uploadVideo = async (
     topics: string[],
 
 ) => {
-    const db = getFirestore();
-    const auth = getAuth();
     const user = auth.currentUser;
     if (!user) throw new Error("Not authenticated");
 
@@ -68,7 +65,6 @@ const uploadFile = async (uri: string, path: string): Promise<string> => {
 };
 
 export const fetchVideos = async (): Promise<Video[]> => {
-    const db = getFirestore();
     const q = query(
         collection(db, "videos"),
         where("visibility", "==", "public"),
@@ -80,7 +76,6 @@ export const fetchVideos = async (): Promise<Video[]> => {
 };
 
 export const fetchVideoById = async (videoId: string): Promise<Video | null> => {
-    const db = getFirestore();
     try {
         const docRef = doc(db, "videos", videoId);
         const docSnap = await getDoc(docRef);
@@ -147,7 +142,6 @@ const fetchYouTubeVideoDetails = async (videoId: string) => {
 
 export const fetchYouTubeVideos = async (): Promise<YouTubeVideo[]> => {
     try {
-        const db = getFirestore();
         const videosCol = collection(db, "youTubeVideos");
         const q = query(videosCol, orderBy("createdAt", "desc"));
         const snapshot = await getDocs(q);

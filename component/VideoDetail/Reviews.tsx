@@ -1,26 +1,25 @@
-import { Colors } from "@/constant/Colors";
-import { UserDetailContext } from "@/context/UserDetailContext";
-import { UserReviews, Video } from "@/types/video";
-import { showToast } from "@/utils/toast";
-import { AntDesign, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
-import { getAuth } from "@react-native-firebase/auth";
+import { auth, db } from '@/config/fireConfig';
+import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { UserReviews, Video } from '@/types/video';
+import { showToast } from '@/utils/toast';
+import { AntDesign, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import {
     addDoc,
     collection,
     deleteDoc,
     doc,
     FirebaseFirestoreTypes,
-    getFirestore,
     onSnapshot,
     orderBy,
     query,
     serverTimestamp,
     updateDoc,
-} from "@react-native-firebase/firestore";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+} from '@react-native-firebase/firestore';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -30,9 +29,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from "react-native";
-import { styles } from "../../styles/Reviews.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+} from 'react-native';
+import { styles } from '../../styles/Reviews.styles';
 
 type Props = {
     video: Video | null;
@@ -43,17 +41,15 @@ dayjs.extend(relativeTime);
 
 export default function Reviews({ video, enrolled }: Props) {
     const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const { userDetail } = useContext(UserDetailContext);
     const [editReviewModal, setEditReviewModal] = useState(false);
     const [addReviewModal, setAddReviewModal] = useState(false);
     const [deleteReviewModal, setDeleteReviewModal] = useState(false);
-    const [reviewText, setReviewText] = useState("");
+    const [reviewText, setReviewText] = useState('');
     const [reviews, setReviews] = useState<UserReviews[]>([]);
     const [loading, setLoading] = useState(false);
     const [rating, setRating] = useState(0);
-    const { safeBack, safePush } = useSafeNavigation()
-    const auth = getAuth();
-    const db = getFirestore();
+    const { safePush } = useSafeNavigation();
 
     const hasReviewed = () => {
         if (!userDetail?.uid) return false;
@@ -63,17 +59,16 @@ export default function Reviews({ video, enrolled }: Props) {
     useEffect(() => {
         if (!video) return;
 
-        const db = getFirestore();
-        const reviewsRef = collection(db, "videos", video.id, "reviews");
+        const reviewsRef = collection(db, 'videos', video.id, 'reviews');
 
-        const q = query(reviewsRef, orderBy("createdAt", "desc"));
+        const q = query(reviewsRef, orderBy('createdAt', 'desc'));
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const data = snapshot.docs.map(
                 (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
                     id: doc.id,
                     ...doc.data(),
-                })
+                }),
             ) as UserReviews[];
 
             setReviews(data);
@@ -84,7 +79,7 @@ export default function Reviews({ video, enrolled }: Props) {
 
     const handleSubmitReview = async () => {
         if (!video || !video.id) {
-            showToast("Invalid video");
+            showToast('Invalid video');
             return;
         }
         if (!userDetail?.uid || !userDetail?.fullname) {
@@ -92,11 +87,11 @@ export default function Reviews({ video, enrolled }: Props) {
             return;
         }
         if (hasReviewed()) {
-            showToast("You have already reviewed this video");
+            showToast('You have already reviewed this video');
             return;
         }
-        if (rating === 0 || reviewText.trim() === "") {
-            showToast("Please select a rating and write a review");
+        if (rating === 0 || reviewText.trim() === '') {
+            showToast('Please select a rating and write a review');
             return;
         }
 
@@ -104,16 +99,16 @@ export default function Reviews({ video, enrolled }: Props) {
         try {
             const reviewsCollection = collection(
                 db,
-                "videos",
+                'videos',
                 video.id,
-                "reviews"
+                'reviews',
             );
 
             const reviewRef = await addDoc(reviewsCollection, {
                 userId: userDetail.uid,
                 username: userDetail.fullname,
-                email: userDetail?.email || "",
-                avatar: userDetail?.profilePicture || "", // ✅ default empty string
+                email: userDetail?.email || '',
+                avatar: userDetail?.profilePicture || '', // ✅ default empty string
                 rating,
                 comment: reviewText.trim(),
                 videoId: video.id,
@@ -124,8 +119,8 @@ export default function Reviews({ video, enrolled }: Props) {
                 id: reviewRef.id,
                 userId: userDetail.uid,
                 username: userDetail.fullname,
-                email: userDetail?.email || "",
-                avatar: userDetail?.profilePicture || "", // ✅ default empty string
+                email: userDetail?.email || '',
+                avatar: userDetail?.profilePicture || '', // ✅ default empty string
                 rating,
                 comment: reviewText.trim(),
                 videoId: video.id,
@@ -134,13 +129,13 @@ export default function Reviews({ video, enrolled }: Props) {
 
             setReviews((prev) => [newReview, ...prev]);
 
-            setReviewText("");
+            setReviewText('');
             setRating(0);
             setAddReviewModal(false);
-            showToast("Review submitted successfully");
+            showToast('Review submitted successfully');
         } catch (error) {
-            console.error("Error submitting a review: ", error);
-            showToast("Failed to submit a review");
+            console.error('Error submitting a review: ', error);
+            showToast('Failed to submit a review');
         } finally {
             setLoading(false);
         }
@@ -155,13 +150,13 @@ export default function Reviews({ video, enrolled }: Props) {
     const handleEditReview = async () => {
         if (!video || !editingReviewId) return;
         if (userDetail?.uid !== auth.currentUser?.uid) {
-            showToast("You can only edit your own reviews");
+            showToast('You can only edit your own reviews');
             return;
         }
         setLoading(true);
 
-        if (rating === 0 || reviewText.trim() === "") {
-            showToast("Please select a rating and write a review");
+        if (rating === 0 || reviewText.trim() === '') {
+            showToast('Please select a rating and write a review');
             setLoading(false);
             return;
         }
@@ -173,13 +168,12 @@ export default function Reviews({ video, enrolled }: Props) {
                 updatedAt: serverTimestamp(),
             };
 
-            const db = getFirestore();
             const reviewRef = doc(
                 db,
-                "videos",
+                'videos',
                 video.id,
-                "reviews",
-                editingReviewId
+                'reviews',
+                editingReviewId,
             );
             await updateDoc(reviewRef, updatedReview);
 
@@ -188,27 +182,27 @@ export default function Reviews({ video, enrolled }: Props) {
                 prev.map((rev) =>
                     rev.id === editingReviewId
                         ? { ...rev, ...updatedReview }
-                        : rev
-                )
+                        : rev,
+                ),
             );
 
             // reset state
             setEditingReviewId(null);
-            setReviewText("");
+            setReviewText('');
             setRating(0);
             setEditReviewModal(false);
 
-            showToast("Review updated successfully");
+            showToast('Review updated successfully');
         } catch (error) {
-            console.error("Error updating review: ", error);
-            showToast("Failed to update review");
+            console.error('Error updating review: ', error);
+            showToast('Failed to update review');
         } finally {
             setLoading(false);
         }
     };
     const handleDeleteReview = async () => {
         if (!video || !video.id) {
-            showToast("Invalid video");
+            showToast('Invalid video');
             return;
         }
         if (!userDetail?.uid) {
@@ -216,7 +210,7 @@ export default function Reviews({ video, enrolled }: Props) {
             return;
         }
         if (!editingReviewId) {
-            showToast("No review selected");
+            showToast('No review selected');
             return;
         }
 
@@ -224,27 +218,27 @@ export default function Reviews({ video, enrolled }: Props) {
         try {
             const reviewRef = doc(
                 db,
-                "videos",
+                'videos',
                 video.id,
-                "reviews",
-                editingReviewId
+                'reviews',
+                editingReviewId,
             );
 
             await deleteDoc(reviewRef);
 
             // update local state
             setReviews((prev) =>
-                prev.filter((rev) => rev.id !== editingReviewId)
+                prev.filter((rev) => rev.id !== editingReviewId),
             );
 
             // reset state
             setEditingReviewId(null);
             setDeleteReviewModal(false);
 
-            showToast("Review deleted successfully");
+            showToast('Review deleted successfully');
         } catch (error) {
-            console.error("Error deleting review:", error);
-            showToast("Failed to delete review");
+            console.error('Error deleting review:', error);
+            showToast('Failed to delete review');
         } finally {
             setLoading(false);
         }
@@ -267,14 +261,14 @@ export default function Reviews({ video, enrolled }: Props) {
                             onPress={() => {
                                 if (hasReviewed()) {
                                     showToast(
-                                        "You have already reviewed this video"
+                                        'You have already reviewed this video',
                                     );
                                     return;
                                 }
 
                                 if (!enrolled) {
                                     showToast(
-                                        "You must be enrolled to review this video"
+                                        'You must be enrolled to review this video',
                                     );
                                     return;
                                 }
@@ -309,7 +303,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                     <TouchableOpacity
                                         onPress={() => {
                                             safePush({
-                                                pathname: "/profileView",
+                                                pathname: '/profileView',
                                                 params: {
                                                     userId: rev.email,
                                                 },
@@ -327,55 +321,55 @@ export default function Reviews({ video, enrolled }: Props) {
                                                 {rev.username}
                                             </Text>
                                             <Text>
-                                                {"⭐".repeat(rev.rating)}
+                                                {'⭐'.repeat(rev.rating)}
                                             </Text>
                                         </View>
                                         <View>
                                             <Text style={styles.date}>
                                                 {rev.createdAt &&
-                                                    "toDate" in rev.createdAt
+                                                'toDate' in rev.createdAt
                                                     ? dayjs(
-                                                        rev.createdAt.toDate()
-                                                    ).fromNow()
-                                                    : "Just now"}
+                                                          rev.createdAt.toDate(),
+                                                      ).fromNow()
+                                                    : 'Just now'}
                                             </Text>
                                             <View style={styles.deleteButton}>
                                                 <TouchableOpacity
                                                     onPress={() => {
                                                         setEditingReviewId(
-                                                            rev.id
+                                                            rev.id,
                                                         );
                                                         setReviewText(
-                                                            rev.comment
+                                                            rev.comment,
                                                         );
                                                         setRating(rev.rating);
                                                         setEditReviewModal(
-                                                            true
+                                                            true,
                                                         );
                                                     }}
                                                 >
                                                     <AntDesign
                                                         name="edit"
                                                         size={18}
-                                                        color={"black"}
+                                                        color={'black'}
                                                     />
                                                 </TouchableOpacity>
                                                 {rev.userId ===
                                                     userDetail?.uid && (
-                                                        <TouchableOpacity
-                                                            onPress={() => {
-                                                                setDeleteReviewModal(
-                                                                    true
-                                                                );
-                                                            }}
-                                                        >
-                                                            <MaterialIcons
-                                                                name="delete-outline"
-                                                                size={18}
-                                                                color="red"
-                                                            />
-                                                        </TouchableOpacity>
-                                                    )}
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            setDeleteReviewModal(
+                                                                true,
+                                                            );
+                                                        }}
+                                                    >
+                                                        <MaterialIcons
+                                                            name="delete-outline"
+                                                            size={18}
+                                                            color="red"
+                                                        />
+                                                    </TouchableOpacity>
+                                                )}
                                             </View>
                                         </View>
                                     </View>
@@ -413,7 +407,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                     <AntDesign
                                         name="star"
                                         size={28}
-                                        color={star <= rating ? "gold" : "gray"}
+                                        color={star <= rating ? 'gold' : 'gray'}
                                     />
                                 </TouchableOpacity>
                             ))}
@@ -455,7 +449,7 @@ export default function Reviews({ video, enrolled }: Props) {
                             >
                                 {loading ? (
                                     <ActivityIndicator
-                                        size={"small"}
+                                        size={'small'}
                                         color={Colors.GREEN}
                                     />
                                 ) : (
@@ -488,7 +482,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                     <AntDesign
                                         name="star"
                                         size={28}
-                                        color={star <= rating ? "gold" : "gray"}
+                                        color={star <= rating ? 'gold' : 'gray'}
                                     />
                                 </TouchableOpacity>
                             ))}
@@ -530,7 +524,7 @@ export default function Reviews({ video, enrolled }: Props) {
                             >
                                 {loading ? (
                                     <ActivityIndicator
-                                        size={"small"}
+                                        size={'small'}
                                         color={Colors.GREEN}
                                     />
                                 ) : (
@@ -556,15 +550,15 @@ export default function Reviews({ video, enrolled }: Props) {
                             { backgroundColor: Colors.LIGHT_RED },
                         ]}
                     >
-                        <Text style={[styles.modalTitle, { color: "red" }]}>
+                        <Text style={[styles.modalTitle, { color: 'red' }]}>
                             Delete your review
                         </Text>
 
                         <Text
                             style={{
                                 marginBottom: 20,
-                                textAlign: "center",
-                                fontFamily: "outfit",
+                                textAlign: 'center',
+                                fontFamily: 'outfit',
                                 fontSize: 15,
                             }}
                         >
@@ -598,7 +592,7 @@ export default function Reviews({ video, enrolled }: Props) {
                             >
                                 {loading ? (
                                     <ActivityIndicator
-                                        size={"small"}
+                                        size={'small'}
                                         color={Colors.WHITE}
                                     />
                                 ) : (

@@ -1,14 +1,14 @@
+import { auth, db } from "@/config/fireConfig";
 import { showToast } from "@/utils/toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { deleteUser, EmailAuthProvider, getAuth, reauthenticateWithCredential, sendEmailVerification, signOut } from "@react-native-firebase/auth";
-import { deleteDoc, doc, getDoc, getFirestore, setDoc } from "@react-native-firebase/firestore";
+import { deleteUser, EmailAuthProvider, reauthenticateWithCredential, sendEmailVerification, signOut } from "@react-native-firebase/auth";
+import { deleteDoc, doc, getDoc, setDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useCallback, useState } from "react";
 import { ToastAndroid } from "react-native";
 
 
 export function useProfileActions(userDetail: any, setUserDetail: any, router: any) {
-    const auth = getAuth();
     const CACHE_KEY = "@cached_courses";
     const [loading, setLoading] = useState(false);
 
@@ -25,7 +25,7 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
         } finally {
             setLoading(false);
         }
-    }, [auth, setUserDetail]);
+    }, [setUserDetail]);
 
     const handleDeleteAccount = useCallback(async (password: string) => {
         if (!password) return;
@@ -34,15 +34,14 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
             const user = auth.currentUser;
             if (!user?.email) return ToastAndroid.show("No user logged in", ToastAndroid.SHORT);
 
-            const firestore = getFirestore();
             const cred = EmailAuthProvider.credential(user.email, password);
             await reauthenticateWithCredential(user, cred);
 
-            const userDocRef = doc(firestore, "users", user.email);
+            const userDocRef = doc(db, "users", user.email);
             const userSnap = await getDoc(userDocRef);
 
             if (userSnap.exists()) {
-                const deletedRef = doc(firestore, "deletedAccounts", user.email + user.uid);
+                const deletedRef = doc(db, "deletedAccounts", user.email + user.uid);
                 await setDoc(deletedRef, { ...userSnap.data(), email: user.email, deletedAt: new Date() });
                 await deleteDoc(userDocRef);
             }
@@ -68,7 +67,7 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
         } finally {
             setLoading(false);
         }
-    }, [auth, router, setUserDetail]);
+    }, [router, setUserDetail]);
 
 
     const verifyEmail = useCallback(async () => {
@@ -84,7 +83,7 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
         } finally {
             setLoading(false);
         }
-    }, [auth]);
+    }, []);
 
     return { loading, handleLogout, handleDeleteAccount, verifyEmail };
 }

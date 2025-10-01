@@ -1,10 +1,10 @@
+import { db } from "@/config/fireConfig";
 import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
-    getFirestore,
     orderBy,
-    query,
+    query
 } from "@react-native-firebase/firestore";
 import LottieView from "lottie-react-native";
 import { memo, useEffect, useState } from "react";
@@ -21,7 +21,6 @@ function CourseListByCategory({ category }: { category: string }) {
         const fetchCourses = async () => {
             setLoading(true);
             try {
-                const db = getFirestore();
                 const q = query(
                     collection(db, "course"),
                     orderBy("createdOn", "desc")

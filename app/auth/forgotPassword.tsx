@@ -1,7 +1,7 @@
 import AppModal from "@/component/Shared/AppModal";
-import { getAuth } from "@react-native-firebase/auth";
+import { auth } from "@/config/fireConfig";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import * as Sentry from "@sentry/react-native";
-import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useState } from "react";
 import {
@@ -15,13 +15,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import ErrorModal from "../../component/Shared/ErrorModal";
 import { Colors } from "../../constant/Colors";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const { safeBack } = useSafeNavigation()
-    const auth = getAuth();
     const [successModalVisible, setSuccessModalVisible] = useState({
         visible: false,
         title: "",

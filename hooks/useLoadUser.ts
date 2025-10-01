@@ -1,9 +1,9 @@
 // hooks/useLoadUser.ts
+import { auth, db } from "@/config/fireConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAuth, onAuthStateChanged } from "@react-native-firebase/auth";
-import { doc, getDoc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
+import { onAuthStateChanged } from "@react-native-firebase/auth";
+import { doc, getDoc, updateDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
-import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { Platform, ToastAndroid } from "react-native";
 import { UserDetailContext } from "../context/UserDetailContext";
@@ -15,8 +15,6 @@ export const useLoadUser = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const auth = getAuth();
-        const firestore = getFirestore();
 
         const isErrorWithCode = (e: unknown): e is { code: string; message?: string } =>
             typeof e === "object" && e !== null && "code" in e && typeof (e as any).code === "string";
@@ -46,7 +44,7 @@ export const useLoadUser = () => {
 
                         if (!user.email) return setLoading(false);
 
-                        const userRef = doc(firestore, "users", user.email);
+                        const userRef = doc(db, "users", user.email);
                         const result = await getDoc(userRef);
 
                         if (result.exists()) {

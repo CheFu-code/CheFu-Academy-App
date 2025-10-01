@@ -1,15 +1,15 @@
-import { FirebaseAuthError } from "@/types";
-import { DeviceInfo } from "@/types/DeviceInfo";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { getAuth } from "@react-native-firebase/auth";
-import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
-import messaging from "@react-native-firebase/messaging";
-import * as Sentry from "@sentry/react-native";
-import * as Device from "expo-device";
-import * as Location from "expo-location";
-import { useRouter } from "expo-router";
-import LottieView from "lottie-react-native";
-import { useContext, useState } from "react";
+import { auth, db } from '@/config/fireConfig';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { FirebaseAuthError } from '@/types';
+import { DeviceInfo } from '@/types/DeviceInfo';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { doc, getDoc } from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
+import * as Sentry from '@sentry/react-native';
+import * as Device from 'expo-device';
+import * as Location from 'expo-location';
+import LottieView from 'lottie-react-native';
+import { useContext, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -25,39 +25,36 @@ import {
     ToastAndroid,
     TouchableOpacity,
     View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/SignIn.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+} from 'react-native';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import { styles } from '../../styles/SignIn.styles';
 
 const SignIn = () => {
-    const { safePush, safeReplace } = useSafeNavigation()
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { safePush, safeReplace } = useSafeNavigation();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
-    const [emailError, setEmailError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [fatalError, setFatalError] = useState<Error | null>(null);
-    const auth = getAuth();
-    const db = getFirestore();
-    const SUPPORT_EMAIL = "kurisanimaluleke77@gmail.com";
+    const SUPPORT_EMAIL = 'kurisanimaluleke77@gmail.com';
 
     const getUserDetail = async (email: string) => {
         try {
-            const userDocRef = doc(db, "users", email);
+            const userDocRef = doc(db, 'users', email);
             // Update lastLogin to now
             await userDocRef.update({ lastLogin: new Date() });
             const userDoc = await getDoc(userDocRef);
             if (userDoc.exists()) {
                 setUserDetail(userDoc.data());
             } else {
-                console.warn("User data not found in Firestore.");
+                console.warn('User data not found in Firestore.');
             }
         } catch (error) {
-            console.error("Error fetching user data from sign in:", error);
+            console.error('Error fetching user data from sign in:', error);
             Sentry.captureException(error);
         }
     };
@@ -69,19 +66,19 @@ const SignIn = () => {
         if (loading) return;
 
         const cleanEmail = email.trim().toLowerCase();
-        setEmailError("");
-        setPasswordError("");
+        setEmailError('');
+        setPasswordError('');
 
         if (!cleanEmail) {
-            setEmailError("Please enter your email");
+            setEmailError('Please enter your email');
             return;
         }
         if (!validateEmail(cleanEmail)) {
-            setEmailError("Please enter a valid email address");
+            setEmailError('Please enter a valid email address');
             return;
         }
         if (!password) {
-            setPasswordError("Please enter your password");
+            setPasswordError('Please enter your password');
             return;
         }
 
@@ -89,7 +86,7 @@ const SignIn = () => {
         try {
             const resp = await auth.signInWithEmailAndPassword(
                 cleanEmail,
-                password
+                password,
             );
             const signedInEmail = resp.user.email;
 
@@ -99,18 +96,18 @@ const SignIn = () => {
             if (fcmToken) {
                 // 🔥 2. Save to Firestore backend (use your own endpoint)
                 await fetch(
-                    "https://chefu-academy-tmzx.onrender.com/api/save-fcm-token",
+                    'https://chefu-academy-tmzx.onrender.com/api/save-fcm-token',
                     {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             email: signedInEmail,
                             fcmToken,
                         }),
-                    }
+                    },
                 );
             } else {
-                console.warn("⚠️ No FCM token received.");
+                console.warn('⚠️ No FCM token received.');
             }
 
             const deviceInfo = {
@@ -125,30 +122,30 @@ const SignIn = () => {
             const { status } =
                 await Location.requestForegroundPermissionsAsync();
             let locationInfo = {};
-            if (status === "granted") {
+            if (status === 'granted') {
                 const location = await Location.getCurrentPositionAsync({});
                 locationInfo = {
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
                 };
             } else {
-                console.warn("Location permission not granted.");
+                console.warn('Location permission not granted.');
                 ToastAndroid.show(
-                    "Please grant location permission to protect your account.",
-                    ToastAndroid.SHORT
+                    'Please grant location permission to protect your account.',
+                    ToastAndroid.SHORT,
                 );
             }
 
             if (!signedInEmail) {
-                throw new Error("User email is missing");
+                throw new Error('User email is missing');
             }
 
             await getUserDetail(signedInEmail);
 
-            safeReplace("/(tabs)/home");
-            ToastAndroid.show("Signed in successfully", ToastAndroid.SHORT);
+            safeReplace('/(tabs)/home');
+            ToastAndroid.show('Signed in successfully', ToastAndroid.SHORT);
 
-            const userDocRef = doc(db, "users", signedInEmail);
+            const userDocRef = doc(db, 'users', signedInEmail);
             const userDoc = await getDoc(userDocRef);
             const userData = userDoc.data();
             const previousDevices = userDoc.data()?.trustedDevices || [];
@@ -160,102 +157,101 @@ const SignIn = () => {
                     d.brand === currentDevice.brand &&
                     d.modelName === currentDevice.modelName &&
                     d.osName === currentDevice.osName &&
-                    d.osVersion === currentDevice.osVersion
+                    d.osVersion === currentDevice.osVersion,
             );
 
             if (isNewDevice && userData?.emailPreferences?.security === true) {
                 // Send alert email
                 await fetch(
-                    "https://chefu-academy-tmzx.onrender.com/api/email/send-alert",
+                    'https://chefu-academy-tmzx.onrender.com/api/email/send-alert',
                     {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             email: signedInEmail,
                             name:
                                 userData?.fullname ||
-                                signedInEmail.split("@")[0],
+                                signedInEmail.split('@')[0],
                             device: deviceInfo,
                             location: locationInfo,
                         }),
-                    }
+                    },
                 );
                 // Update trusted devices and locations
                 await userDocRef.update({
                     trustedDevices: [...previousDevices, currentDevice],
                 });
 
-                console.log("alert email sent");
+                console.log('alert email sent');
             } else {
-                console.log("no need to send alert email");
+                console.log('no need to send alert email');
             }
         } catch (e: unknown) {
             Sentry.captureException(e);
             const contactSupport = () =>
                 Linking.openURL(`mailto:${SUPPORT_EMAIL}`);
 
-            if (typeof e === "object" && e !== null && "code" in e) {
+            if (typeof e === 'object' && e !== null && 'code' in e) {
                 const error = e as FirebaseAuthError;
 
                 switch (e.code) {
-                    case "auth/operation-not-allowed":
+                    case 'auth/operation-not-allowed':
                         Alert.alert(
-                            "Login Not Enabled",
-                            "Email/password accounts are not enabled. Please contact support.",
+                            'Login Not Enabled',
+                            'Email/password accounts are not enabled. Please contact support.',
                             [
-                                { text: "Cancel", style: "cancel" },
+                                { text: 'Cancel', style: 'cancel' },
                                 {
-                                    text: "Contact Now",
+                                    text: 'Contact Now',
                                     onPress: contactSupport,
                                 },
-                            ]
+                            ],
                         );
                         break;
-                    case "auth/invalid-credential":
+                    case 'auth/invalid-credential':
                         ToastAndroid.show(
-                            "Invalid credentials. Please try again.",
-                            ToastAndroid.SHORT
+                            'Invalid credentials. Please try again.',
+                            ToastAndroid.SHORT,
                         );
                         break;
-                    case "auth/unknown":
+                    case 'auth/unknown':
                         Alert.alert(
-                            "Unknown Error",
-                            "We encountered an unknown error. Please try again later"
+                            'Unknown Error',
+                            'We encountered an unknown error. Please try again later',
                         );
                         break;
-                    case "auth/network-request-failed":
+                    case 'auth/network-request-failed':
                         Alert.alert(
-                            "Network Error",
-                            "Please check your internet connection and try again."
+                            'Network Error',
+                            'Please check your internet connection and try again.',
                         );
                         break;
-                    case "auth/too-many-requests":
+                    case 'auth/too-many-requests':
                         Alert.alert(
-                            "Error",
-                            "Too many requests have been made from this device."
+                            'Error',
+                            'Too many requests have been made from this device.',
                         );
                         break;
-                    case "auth/internal-error":
-                    case "auth/network-request-failed":
+                    case 'auth/internal-error':
                         Alert.alert(
-                            "Error",
+                            'Error',
                             error.message ||
-                            "Please try again or contact support.",
+                                'Please try again or contact support.',
                             [
-                                { text: "Cancel", style: "cancel" },
-                                { text: "Contact", onPress: contactSupport },
-                            ]
+                                { text: 'Cancel', style: 'cancel' },
+                                { text: 'Contact', onPress: contactSupport },
+                            ],
                         );
                         break;
                     default:
                         Alert.alert(
-                            "Error",
-                            error.message || "An unexpected error occurred."
+                            'Error',
+                            error.message || 'An unexpected error occurred.',
                         );
                         break;
                 }
             } else {
-                Alert.alert("Error", "An unexpected error occurred.");
+                Alert.alert('Error', 'An unexpected error occurred.');
             }
         } finally {
             setLoading(false);
@@ -268,7 +264,7 @@ const SignIn = () => {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <LottieView
-                            source={require("./../../assets/animations/GO TO SCHOOL ANIMATION.json")}
+                            source={require('./../../assets/animations/GO TO SCHOOL ANIMATION.json')}
                             autoPlay
                             loop
                             style={{ width: 150, height: 150 }}
@@ -289,14 +285,14 @@ const SignIn = () => {
                 style={{
                     flex: 1,
                     backgroundColor: Colors.BG_COLOR,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
             >
-                <Text style={{ color: "red", fontSize: 18, marginBottom: 20 }}>
+                <Text style={{ color: 'red', fontSize: 18, marginBottom: 20 }}>
                     A fatal error occurred.
                 </Text>
-                <Text style={{ color: "red", fontSize: 14, marginBottom: 20 }}>
+                <Text style={{ color: 'red', fontSize: 14, marginBottom: 20 }}>
                     {fatalError?.message || String(fatalError)}
                 </Text>
 
@@ -309,7 +305,7 @@ const SignIn = () => {
                         marginTop: 10,
                     }}
                 >
-                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>
                         Try Again
                     </Text>
                 </TouchableOpacity>
@@ -317,32 +313,28 @@ const SignIn = () => {
         );
     }
 
-    const gitHub = () => {
-        safePush("/auth/github");
-    };
-
     const google = () => {
-        safePush("/auth/google");
+        safePush('/auth/google');
     };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 keyboardVerticalOffset={30}
             >
                 <ScrollView
                     contentContainerStyle={{
                         flexGrow: 1,
-                        justifyContent: "center",
+                        justifyContent: 'center',
                         paddingBottom: 40,
                     }}
                     keyboardShouldPersistTaps="handled"
                 >
                     <View
                         style={{
-                            alignItems: "center",
+                            alignItems: 'center',
                             paddingTop: 30,
                             padding: 25,
                         }}
@@ -350,7 +342,7 @@ const SignIn = () => {
                         <LottieView
                             autoPlay
                             loop={true}
-                            source={require("./../../assets/animations/Login.json")}
+                            source={require('./../../assets/animations/Login.json')}
                             style={styles.lottieView}
                         />
                         <Text style={styles.welcomeText}>Welcome back</Text>
@@ -361,7 +353,7 @@ const SignIn = () => {
                             placeholderTextColor={Colors.GRAY}
                             onChangeText={(value) => {
                                 setEmail(value.trim());
-                                if (emailError) setEmailError("");
+                                if (emailError) setEmailError('');
                             }}
                             keyboardType="email-address"
                             autoCapitalize="none"
@@ -369,8 +361,8 @@ const SignIn = () => {
                         {emailError ? (
                             <Text
                                 style={{
-                                    color: "red",
-                                    alignSelf: "flex-start",
+                                    color: 'red',
+                                    alignSelf: 'flex-start',
                                 }}
                             >
                                 {emailError}
@@ -384,7 +376,7 @@ const SignIn = () => {
                                 secureTextEntry={!showPassword}
                                 onChangeText={(value) => {
                                     setPassword(value);
-                                    if (passwordError) setPasswordError("");
+                                    if (passwordError) setPasswordError('');
                                 }}
                                 autoCapitalize="none"
                                 style={styles.passwordInput}
@@ -397,7 +389,7 @@ const SignIn = () => {
                                 onPress={() => setShowPassword((prev) => !prev)}
                             >
                                 <Ionicons
-                                    name={showPassword ? "eye-off" : "eye"}
+                                    name={showPassword ? 'eye-off' : 'eye'}
                                     size={24}
                                     color={Colors.PRIMARY}
                                 />
@@ -406,8 +398,8 @@ const SignIn = () => {
                         {passwordError ? (
                             <Text
                                 style={{
-                                    color: "red",
-                                    alignSelf: "flex-start",
+                                    color: 'red',
+                                    alignSelf: 'flex-start',
                                 }}
                             >
                                 {passwordError}
@@ -415,13 +407,13 @@ const SignIn = () => {
                         ) : null}
 
                         <Pressable
-                            onPress={() => safePush("/auth/forgotPassword")}
-                            style={{ alignSelf: "flex-end", marginTop: 10 }}
+                            onPress={() => safePush('/auth/forgotPassword')}
+                            style={{ alignSelf: 'flex-end', marginTop: 10 }}
                         >
                             <Text
                                 style={{
                                     color: Colors.PRIMARY,
-                                    fontWeight: "bold",
+                                    fontWeight: 'bold',
                                 }}
                             >
                                 Forgot Password?
@@ -436,14 +428,13 @@ const SignIn = () => {
                                 style={styles.icons}
                                 name="google"
                                 size={24}
-                                color={"white"}
+                                color={'white'}
                             />
                             <Text
                                 style={{
                                     fontSize: 16,
-                                    fontFamily: "outfit",
-                                    color: "white",
-
+                                    fontFamily: 'outfit',
+                                    color: 'white',
                                 }}
                             >
                                 Google
@@ -470,17 +461,17 @@ const SignIn = () => {
                             )}
                         </TouchableOpacity>
 
-                        <View style={{ flexDirection: "row", marginTop: 20 }}>
+                        <View style={{ flexDirection: 'row', marginTop: 20 }}>
                             <Text style={{ color: Colors.WHITE }}>
-                                Don't have an account?{" "}
+                                Don&apos;t have an account?{' '}
                             </Text>
                             <Pressable
-                                onPress={() => safeReplace("/auth/signUp")}
+                                onPress={() => safeReplace('/auth/signUp')}
                             >
                                 <Text
                                     style={{
                                         color: Colors.PRIMARY,
-                                        fontWeight: "bold",
+                                        fontWeight: 'bold',
                                     }}
                                 >
                                     Sign Up

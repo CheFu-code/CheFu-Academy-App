@@ -1,5 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     container: {
@@ -26,10 +27,11 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 15,
         paddingVertical: 10,
-        fontSize: 16,
+        fontSize: RFValue(13),
         marginBottom: 15,
         borderWidth: 1,
         borderColor: '#ddd',
+        color:Colors.BLACK
     },
     textArea: {
         height: 120,

@@ -1,17 +1,17 @@
-import { Course } from "@/types/course";
-import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { db } from '@/config/fireConfig';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
-    getFirestore,
     orderBy,
-    query,
-} from "@react-native-firebase/firestore";
-import { useRouter } from "expo-router";
-import LottieView from "lottie-react-native";
-import { useCallback, useContext, useEffect, useState } from "react";
+    query
+} from '@react-native-firebase/firestore';
+import LottieView from 'lottie-react-native';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import {
     FlatList,
     Image,
@@ -20,29 +20,27 @@ import {
     ToastAndroid,
     TouchableOpacity,
     View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import CourseCard from "../../component/Shared/CourseCard";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/Explore.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import CourseCard from '../../component/Shared/CourseCard';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import { styles } from '../../styles/Explore.styles';
 
 export default function ExploreScreen() {
     const { userDetail } = useContext(UserDetailContext);
     const [courseData, setCourseData] = useState<Course[]>([]);
     const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
     const [refreshing, setRefreshing] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
-    const { safePush, safeReplace } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     const fetchCourses = useCallback(async () => {
         setRefreshing(true);
         try {
-            const db = getFirestore();
             const q = query(
-                collection(db, "course"),
-                orderBy("createdOn", "desc")
+                collection(db, 'course'),
+                orderBy('createdOn', 'desc'),
             );
             const snapshot = await getDocs(q);
 
@@ -50,12 +48,12 @@ export default function ExploreScreen() {
                 (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
                     id: doc.id,
                     ...doc.data(),
-                })
+                }),
             );
 
             // ✅ Exclude courses owned by current user
             data = data.filter(
-                (course) => course.createdBy !== userDetail?.email
+                (course) => course.createdBy !== userDetail?.email,
             );
 
             const limitedData = data.slice(0, Math.ceil(data.length * 0.4)); // 40%
@@ -63,12 +61,12 @@ export default function ExploreScreen() {
             setCourseData(limitedData);
             setFilteredCourses(limitedData);
             await AsyncStorage.setItem(
-                "cachedCourses",
-                JSON.stringify(limitedData)
+                'cachedCourses',
+                JSON.stringify(limitedData),
             );
         } catch (error) {
-            console.error("Failed to fetch courses:", error);
-            const cached = await AsyncStorage.getItem("cachedCourses");
+            console.error('Failed to fetch courses:', error);
+            const cached = await AsyncStorage.getItem('cachedCourses');
             if (cached) {
                 const parsed = JSON.parse(cached);
                 setCourseData(parsed);
@@ -86,15 +84,15 @@ export default function ExploreScreen() {
 
     const handleSearch = () => {
         if (!searchTerm.trim()) {
-            ToastAndroid.show("Please enter a search term", ToastAndroid.SHORT);
+            ToastAndroid.show('Please enter a search term', ToastAndroid.SHORT);
             return;
         }
 
         safePush({
-            pathname: "/searchResults",
+            pathname: '/searchResults',
             params: { query: searchTerm.trim() },
         });
-        setSearchTerm("");
+        setSearchTerm('');
     };
 
     if (loading) {
@@ -102,15 +100,15 @@ export default function ExploreScreen() {
             <View
                 style={{
                     flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     backgroundColor: Colors.BG_COLOR,
                 }}
             >
                 <LottieView
                     autoPlay
                     loop
-                    source={require("../../assets/animations/Loading.json")}
+                    source={require('../../assets/animations/Loading.json')}
                     style={{
                         width: 150,
                         height: 150,
@@ -119,7 +117,7 @@ export default function ExploreScreen() {
                 <Text
                     style={{
                         marginTop: 10,
-                        fontFamily: "outfit-bold",
+                        fontFamily: 'outfit-bold',
                         fontSize: 16,
                         color: Colors.PRIMARY,
                     }}
@@ -133,8 +131,8 @@ export default function ExploreScreen() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
             <Image
-                source={require("../../assets/images/graph.png")}
-                style={{ position: "absolute", width: "100%", height: 500 }}
+                source={require('../../assets/images/graph.png')}
+                style={{ position: 'absolute', width: '100%', height: 500 }}
             />
             <View style={styles.headerWrapper}>
                 <Text style={styles.headerText}>Explore courses</Text>
@@ -169,20 +167,20 @@ export default function ExploreScreen() {
                     contentContainerStyle={{
                         paddingBottom: 90,
                     }}
-                    columnWrapperStyle={{ justifyContent: "space-between" }}
+                    columnWrapperStyle={{ justifyContent: 'space-between' }}
                     renderItem={({ item }) => (
                         <CourseCard
                             course={item}
                             enroll={true}
-                            style={{ width: "48%", marginBottom: 10 }}
+                            style={{ width: '48%', marginBottom: 10 }}
                         />
                     )}
                     ListEmptyComponent={
                         <Text
                             style={{
-                                textAlign: "center",
+                                textAlign: 'center',
                                 marginTop: 20,
-                                color: "#999",
+                                color: '#999',
                             }}
                         >
                             No courses found.

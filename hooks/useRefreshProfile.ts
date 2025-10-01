@@ -1,6 +1,7 @@
 // hooks/useRefreshProfile.ts
+import { db } from "@/config/fireConfig";
 import { showToast } from "@/utils/toast";
-import { doc, getDoc, getFirestore } from "@react-native-firebase/firestore";
+import { doc, getDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import { useCallback, useRef, useState } from "react";
 
@@ -15,8 +16,7 @@ export function useRefreshProfile(email: string, setUserDetail: any) {
         fetchingRef.current = true;
 
         try {
-            const firestore = getFirestore();
-            const snap = await getDoc(doc(firestore, "users", email));
+            const snap = await getDoc(doc(db, "users", email));
             if (snap.exists()) {
                 setUserDetail(snap.data());
                 showToast("Profile refreshed");

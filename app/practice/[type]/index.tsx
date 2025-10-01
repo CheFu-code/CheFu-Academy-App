@@ -1,3 +1,4 @@
+import { db } from '@/config/fireConfig';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { AntDesign } from '@expo/vector-icons';
@@ -5,14 +6,14 @@ import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
-    getFirestore,
     orderBy,
     query,
-    where,
+    where
 } from '@react-native-firebase/firestore';
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CourseListGrid, {
     AllowedPaths,
@@ -20,7 +21,6 @@ import CourseListGrid, {
 import { Colors } from '../../../constant/Colors';
 import { PracticeOption } from '../../../constant/Option';
 import { UserDetailContext } from '../../../context/UserDetailContext';
-import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function PracticeTypeHomeScreen() {
     const { type } = useLocalSearchParams();
@@ -35,7 +35,6 @@ export default function PracticeTypeHomeScreen() {
         setCourseList([]);
 
         try {
-            const db = getFirestore();
             const q = query(
                 collection(db, 'course'),
                 where('createdBy', '==', userDetail?.email),

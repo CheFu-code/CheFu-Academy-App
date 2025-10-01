@@ -3,14 +3,12 @@ import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { formatDate } from "@/helpers/formatDate";
 import { useProfileActions } from "@/hooks/useProfileActions";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { styles, styles2 } from "@/styles/Profile.styles";
 import { showToast } from "@/utils/toast";
 import { Ionicons } from "@expo/vector-icons";
-import { getAuth } from "@react-native-firebase/auth";
-import { getFirestore } from "@react-native-firebase/firestore";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useContext, useState } from "react";
 import {
@@ -22,7 +20,7 @@ import {
     View,
 } from "react-native";
 import ErrorModal from "../Shared/ErrorModal";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import { auth } from "@/config/fireConfig";
 
 interface ProfileHeaderProps {
     profilePicture: string;
@@ -56,8 +54,6 @@ export const ProfileHeader = ({
 }: ProfileHeaderProps) => {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { safePush } = useSafeNavigation()
-    const auth = getAuth();
-    const firestore = getFirestore();
     const [modalVisible, setModalVisible] = useState(false);
     const [nameInput, setNameInput] = useState(fullname);
     const { loading, verifyEmail } = useProfileActions(

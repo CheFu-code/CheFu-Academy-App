@@ -2,6 +2,7 @@ import ChatHeader from "@/component/chat/ChatHeader";
 import MessageInput from "@/component/chat/MessageInput";
 import MessageList from "@/component/chat/MessageList";
 import UserModal from "@/component/chat/UserModal";
+import { db } from "@/config/fireConfig";
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import useRelativeTime from "@/hooks/useRelativeTime";
@@ -13,15 +14,14 @@ import {
     doc,
     FirebaseFirestoreTypes,
     getDoc,
-    getFirestore,
     onSnapshot,
     orderBy,
     query,
     serverTimestamp,
-    updateDoc,
+    updateDoc
 } from "@react-native-firebase/firestore";
 import { useLocalSearchParams } from "expo-router";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
     KeyboardAvoidingView,
     Platform,
@@ -39,7 +39,6 @@ export default function ChatDetailScreen() {
     const [showModal, setShowModal] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
     const insets = useSafeAreaInsets();
-    const db = getFirestore();
 
     useEffect(() => {
         if (!chatId) {

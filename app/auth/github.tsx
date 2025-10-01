@@ -1,23 +1,22 @@
 import Button from "@/component/Shared/Button";
+import { auth } from "@/config/fireConfig";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { Ionicons } from "@expo/vector-icons";
 import {
-    getAuth,
     GithubAuthProvider,
-    signInWithCredential,
+    signInWithCredential
 } from "@react-native-firebase/auth";
 import {
     CodeChallengeMethod,
     makeRedirectUri,
     useAuthRequest,
 } from "expo-auth-session";
-import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import LottieView from "lottie-react-native";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import { styles } from "../../styles/GitHub.styles";
 import { saveUser } from "../../utils/authService";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -30,7 +29,6 @@ export default function GitHubAuthScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { safeReplace } = useSafeNavigation()
-    const auth = getAuth();
 
     const codeVerifierRef = useRef<string | null | undefined>(null);
 

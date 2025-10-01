@@ -1,8 +1,8 @@
 import EmailVerificationBanner from '@/component/Home/EmailVerificationBanner';
 import SparksFeed from '@/component/Home/SparksFeed';
 import VideoCardHomeScreen from '@/component/Video/VideoCardHomeScreen';
+import { auth } from '@/config/fireConfig';
 import { useCourses } from '@/hooks/useCourses';
-import { getAuth } from '@react-native-firebase/auth';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useMemo, useRef } from 'react';
 import { FlatList, Image, View } from 'react-native';
@@ -15,7 +15,6 @@ import PracticeSection from '../../component/Home/PracticeSection';
 import { Colors } from '../../constant/Colors';
 
 export default function Home() {
-    const auth = getAuth();
     const flatListRef = useRef<FlatList>(null);
     const { courseList, fetchCourses, loading } = useCourses();
 
@@ -24,7 +23,7 @@ export default function Home() {
             if (auth.currentUser) {
                 fetchCourses();
             }
-        }, [auth]),
+        }, []),
     );
 
     function shuffleArray<T>(array: T[]): T[] {
@@ -40,7 +39,7 @@ export default function Home() {
                 <VideoCardHomeScreen key="videos" />,
                 <SparksFeed key="sparks" />,
             ]),
-        [courseList],
+        [],
     );
 
     return (

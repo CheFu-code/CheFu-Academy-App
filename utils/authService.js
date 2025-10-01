@@ -1,12 +1,11 @@
+import { auth, db } from "@/config/fireConfig";
 import {
-    createUserWithEmailAndPassword,
-    getAuth,
+    createUserWithEmailAndPassword
 } from "@react-native-firebase/auth";
 import {
     doc,
     getDoc,
-    getFirestore,
-    setDoc,
+    setDoc
 } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";
 import * as Device from "expo-device";
@@ -14,8 +13,7 @@ import { Dimensions, I18nManager, Platform } from "react-native";
 import * as RNLocalize from "react-native-localize";
 import { handleFirebaseAuthError } from "./firebaseErrors";
 
-const auth = getAuth();
-const firestore = getFirestore();
+
 
 export const signUpUser = async (fullName, email, password) => {
     try {
@@ -61,7 +59,7 @@ export const saveUser = async (user, fullName, email) => {
         const userProvider =
             user?.providerData?.[0]?.providerId ?? user?.providerId ?? "email";
 
-        const userDocRef = doc(firestore, "users", userEmail);
+        const userDocRef = doc(db, "users", userEmail);
         const userDoc = await getDoc(userDocRef);
         const DEFAULT_PREFS = {
             general: false,

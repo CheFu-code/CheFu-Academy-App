@@ -1,7 +1,8 @@
 // hooks/useChats.ts
+import { db } from "@/config/fireConfig";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { showToast } from "@/utils/toast";
-import { addDoc, collection, deleteDoc, doc, FirebaseFirestoreTypes, getDoc, getDocs, getFirestore, onSnapshot, orderBy, query, serverTimestamp, where } from "@react-native-firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, FirebaseFirestoreTypes, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, where } from "@react-native-firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 
 export interface Chat {
@@ -19,7 +20,6 @@ export const useChats = () => {
     const { userDetail } = useContext(UserDetailContext);
     const [chats, setChats] = useState<Chat[]>([]);
     const [otherUsersMap, setOtherUsersMap] = useState<{ [id: string]: any }>({});
-    const db = getFirestore();
 
     useEffect(() => {
         if (!userDetail?.email) return;

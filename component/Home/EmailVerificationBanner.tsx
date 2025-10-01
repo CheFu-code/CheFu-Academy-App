@@ -1,13 +1,13 @@
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import { getAuth, sendEmailVerification } from '@react-native-firebase/auth';
-import { useState } from 'react';
+import { auth } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
+import { sendEmailVerification } from '@react-native-firebase/auth';
+import { useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import AppModal from '../Shared/AppModal';
 import ErrorModal from '../Shared/ErrorModal';
 
 export default function EmailVerificationBanner() {
     const [sending, setSending] = useState(false);
-    const auth = getAuth();
     const [verifyEmail, setVerifyEmail] = useState({
         visible: false,
         title: '',

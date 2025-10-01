@@ -1,10 +1,11 @@
-import { useState, useCallback, useContext, useEffect } from 'react';
-import { getAuth, onAuthStateChanged, reload } from '@react-native-firebase/auth';
-import { collection, doc, FirebaseFirestoreTypes, getDoc, getDocs, getFirestore, orderBy, query, where } from '@react-native-firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ToastAndroid } from 'react-native';
+import { auth, db } from '@/config/fireConfig';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { Course } from '@/types/course';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { onAuthStateChanged, reload } from '@react-native-firebase/auth';
+import { collection, doc, FirebaseFirestoreTypes, getDoc, getDocs, orderBy, query, where } from '@react-native-firebase/firestore';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { ToastAndroid } from 'react-native';
 import { useSafeNavigation } from './useSafeNavigation';
 
 export const useCourses = () => {
@@ -13,8 +14,6 @@ export const useCourses = () => {
     const [fetching, setFetching] = useState(false);
     const { safeReplace } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const auth = getAuth();
-    const firestore = getFirestore();
     const CACHE_KEY = '@cached_courses';
 
     const loadCachedCourses = async () => {
@@ -52,7 +51,7 @@ export const useCourses = () => {
         });
 
         return unsubscribe;
-    }, [auth, safeReplace]);
+    }, [safeReplace]);
 
     const fetchCourses = useCallback(async (isRefresh = false) => {
         if (fetching && !isRefresh) return;
@@ -97,7 +96,7 @@ export const useCourses = () => {
                             refreshedUser.email,
                         );
                         const userDocRef = doc(
-                            getFirestore(),
+                            db,
                             'users',
                             refreshedUser.email,
                         );
@@ -139,7 +138,7 @@ export const useCourses = () => {
                 }
             }
 
-            const coursesRef = collection(firestore, 'course');
+            const coursesRef = collection(db, 'course');
             const q = query(
                 coursesRef,
                 where('createdBy', '==', refreshedUser.email),
@@ -215,7 +214,7 @@ export const useCourses = () => {
             setLoading(false);
             setFetching(false);
         }
-    }, [auth, fetching, firestore, safeReplace, userDetail, setUserDetail]);
+    }, [fetching, safeReplace, userDetail, setUserDetail]);
 
     return { courseList, fetchCourses, loading, fetching };
 };

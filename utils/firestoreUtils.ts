@@ -1,17 +1,16 @@
+import { db } from "@/config/fireConfig";
 import {
     collection,
     getDocs,
-    getFirestore,
     query,
     Timestamp,
-    where,
+    where
 } from "@react-native-firebase/firestore";
 
 /**
  * Check how many courses a user has created today.
  */
 export const checkDailyLimit = async (email: string) => {
-    const db = getFirestore();
     const now = new Date();
 
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);

@@ -1,29 +1,28 @@
-import { Colors } from "@/constant/Colors";
-import { UserDetailContext } from "@/context/UserDetailContext";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { styles } from "@/styles/CompletedCourse.styles";
-import { Course } from "@/types/course";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { db } from '@/config/fireConfig';
+import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { styles } from '@/styles/CompletedCourse.styles';
+import { Course } from '@/types/course';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
-    getFirestore,
     query,
     where,
-} from "@react-native-firebase/firestore";
-import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+} from '@react-native-firebase/firestore';
+import { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
     Text,
     TouchableOpacity,
     View,
-} from "react-native";
+} from 'react-native';
 
 const CompletedChapters = () => {
-    const { safeReplace, safeBack } = useSafeNavigation()
+    const { safeReplace, safeBack } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
@@ -31,17 +30,15 @@ const CompletedChapters = () => {
     useEffect(() => {
         const fetchCompleted = async () => {
             if (!userDetail?.email) {
-                safeReplace("/auth/signIn");
+                safeReplace('/auth/signIn');
                 return;
             }
 
             try {
-                const db = getFirestore();
-
                 // ✅ Fetch only courses created by the current user
                 const q = query(
-                    collection(db, "course"),
-                    where("createdBy", "==", userDetail?.email)
+                    collection(db, 'course'),
+                    where('createdBy', '==', userDetail?.email),
                 );
 
                 const snapshot = await getDocs(q);
@@ -49,7 +46,7 @@ const CompletedChapters = () => {
 
                 snapshot.forEach(
                     (
-                        docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>
+                        docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>,
                     ) => {
                         const data = docSnap.data() as Course;
 
@@ -62,12 +59,12 @@ const CompletedChapters = () => {
                                 id: docSnap.id,
                             });
                         }
-                    }
+                    },
                 );
 
                 setCourses(completed);
             } catch (error) {
-                console.error("Error fetching completed chapters:", error);
+                console.error('Error fetching completed chapters:', error);
             } finally {
                 setLoading(false);
             }
@@ -76,12 +73,12 @@ const CompletedChapters = () => {
         if (userDetail?.email) {
             fetchCompleted();
         }
-    }, [userDetail?.email]);
+    }, [userDetail?.email, safeReplace]);
 
     const renderItem = ({ item }: { item: Course }) => (
         <View style={styles.courseItem}>
             <Ionicons name="checkmark-circle" size={28} color={Colors.GREEN} />
-            <View style={{ marginLeft: 12, width: "80%" }}>
+            <View style={{ marginLeft: 12, width: '80%' }}>
                 <Text numberOfLines={2} style={styles.courseTitle}>
                     {item.courseTitle}
                 </Text>
@@ -99,7 +96,7 @@ const CompletedChapters = () => {
                 <Text
                     style={[
                         styles.courseTitle,
-                        { color: "white", marginTop: 16 },
+                        { color: 'white', marginTop: 16 },
                     ]}
                 >
                     Loading...
@@ -110,10 +107,7 @@ const CompletedChapters = () => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity
-                onPress={safeBack}
-                style={styles.button}
-            >
+            <TouchableOpacity onPress={safeBack} style={styles.button}>
                 <AntDesign name="left" size={24} color={Colors.WHITE} />
                 <Text style={styles.header}>Completed Courses</Text>
             </TouchableOpacity>

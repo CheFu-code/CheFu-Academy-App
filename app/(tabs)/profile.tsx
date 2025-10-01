@@ -1,28 +1,28 @@
-import ConfirmPasswordModal from "@/component/Profile/ConfirmPasswordModal";
-import LoggedOutMessage from "@/component/Profile/LoggedOutMessage ";
-import { ProfileHeader } from "@/component/Profile/ProfileHeader";
-import { ProfileMenu } from "@/component/Profile/ProfileMenu";
-import ErrorModal from "@/component/Shared/ErrorModal";
-import { menuItems } from "@/data/menuItems";
-import { usePickImage } from "@/hooks/usePickImage";
-import { useProfileActions } from "@/hooks/useProfileActions";
-import { useRefreshProfile } from "@/hooks/useRefreshProfile";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { User } from "@/types/user";
-import { changeAvatar } from "@/utils/changeAvatar";
-import { showToast } from "@/utils/toast";
-import { getAuth } from "@react-native-firebase/auth";
-import { doc, getFirestore, updateDoc } from "@react-native-firebase/firestore";
-import { router } from "expo-router";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Image, Linking, SafeAreaView, ToastAndroid } from "react-native";
-import AppModal from "../../component/Shared/AppModal";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/Profile.styles";
+import ConfirmPasswordModal from '@/component/Profile/ConfirmPasswordModal';
+import LoggedOutMessage from '@/component/Profile/LoggedOutMessage ';
+import { ProfileHeader } from '@/component/Profile/ProfileHeader';
+import { ProfileMenu } from '@/component/Profile/ProfileMenu';
+import ErrorModal from '@/component/Shared/ErrorModal';
+import { menuItems } from '@/data/menuItems';
+import { usePickImage } from '@/hooks/usePickImage';
+import { useProfileActions } from '@/hooks/useProfileActions';
+import { useRefreshProfile } from '@/hooks/useRefreshProfile';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { User } from '@/types/user';
+import { changeAvatar } from '@/utils/changeAvatar';
+import { showToast } from '@/utils/toast';
+import { doc, updateDoc } from '@react-native-firebase/firestore';
+import { router } from 'expo-router';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { Image, Linking, SafeAreaView, ToastAndroid } from 'react-native';
+import AppModal from '../../component/Shared/AppModal';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import { styles } from '../../styles/Profile.styles';
+import { auth, db } from '@/config/fireConfig';
 
 export default function Profile() {
-    const { safePush, safeReplace } = useSafeNavigation()
+    const { safePush, safeReplace } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const {
         email,
@@ -33,19 +33,17 @@ export default function Profile() {
         provider,
         createdAt,
     } = userDetail || {};
-    const auth = getAuth();
-    const db = getFirestore();
 
     const [loader, setLoader] = useState(false);
     const [loadingName, setLoadingName] = useState(false);
     const { loading, handleLogout, handleDeleteAccount } = useProfileActions(
         userDetail,
         setUserDetail,
-        router
+        router,
     );
 
     const [showPasswordModal, setShowPasswordModal] = useState(false);
-    const [password, setPassword] = useState("");
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const isFreeUser = !member;
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
@@ -53,23 +51,23 @@ export default function Profile() {
     const [avatarURL, setAvatarURL] = useState(userDetail?.profilePicture);
     const [modalVisible, setModalVisible] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
 
     const [errorModal, setErrorModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
     const renderedMenuItems = useMemo(
         () => menuItems(router, Linking, ToastAndroid, Colors),
-        [router]
+        [],
     );
 
     useEffect(() => {
         if (!email) {
-            safeReplace("/auth/signIn");
+            safeReplace('/auth/signIn');
         } else {
             refreshData();
         }
@@ -81,16 +79,16 @@ export default function Profile() {
 
     const confirmDeleteAccount = useCallback(
         () => setShowPasswordModal(true),
-        []
+        [],
     );
 
     const subscribe = useCallback(() => {
         if (member === true) {
-            showToast("You are already a member.");
+            showToast('You are already a member.');
         } else {
-            safePush("/subscription");
+            safePush('/subscription');
         }
-    }, [member, safePush, showToast]);
+    }, [member, safePush]);
 
     const handleChangeAvatar = async () => {
         setLoader(true);
@@ -113,7 +111,7 @@ export default function Profile() {
 
                 // Optionally, update Firestore user document
                 if (user?.email) {
-                    await updateDoc(doc(db, "users", user.email), {
+                    await updateDoc(doc(db, 'users', user.email), {
                         fullname: newName,
                     });
                     setUserDetail((prev: User) => ({
@@ -122,17 +120,17 @@ export default function Profile() {
                     }));
                 } else {
                     console.warn(
-                        "User email is null, cannot update Firestore document."
+                        'User email is null, cannot update Firestore document.',
                     );
                 }
 
                 setUserDetail((prev: User) => ({ ...prev, fullname: newName }));
 
-                showToast("Name updated successfully");
+                showToast('Name updated successfully');
             }
         } catch (error) {
-            console.error("Error updating name:", error);
-            showToast("Error updating name");
+            console.error('Error updating name:', error);
+            showToast('Error updating name');
         } finally {
             setLoadingName(false);
         }
@@ -141,8 +139,8 @@ export default function Profile() {
     return (
         <SafeAreaView style={styles.container}>
             <Image
-                source={require("../../assets/images/graph.png")}
-                style={{ position: "absolute", width: "100%", height: 500 }}
+                source={require('../../assets/images/graph.png')}
+                style={{ position: 'absolute', width: '100%', height: 500 }}
             />
             {!userDetail ? (
                 <LoggedOutMessage />
@@ -189,7 +187,7 @@ export default function Profile() {
                             loading={loading}
                             onCancel={() => {
                                 setShowPasswordModal(false);
-                                setPassword("");
+                                setPassword('');
                             }}
                             onConfirm={() => handleDeleteAccount(password)}
                         />

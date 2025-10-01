@@ -1,7 +1,8 @@
+import { db } from "@/config/fireConfig";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { Course } from "@/types/course";
 import { Ionicons } from "@expo/vector-icons";
-import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
-import { useRouter } from "expo-router";
+import { doc, setDoc } from "@react-native-firebase/firestore";
 import { useContext, useState } from "react";
 import {
     ScrollView,
@@ -13,7 +14,6 @@ import {
 import { Colors } from "../../constant/Colors";
 import { UserDetailContext } from "../../context/UserDetailContext";
 import Button from "../Shared/Button";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 interface IntroProps {
     course: Course;
@@ -26,7 +26,6 @@ export default function Intro({ course, enroll }: IntroProps) {
     const [loading, setLoading] = useState(false);
     const [showFull, setShowFull] = useState(false);
     const maxLines = showFull ? undefined : 4;
-    const db = getFirestore();
 
     const isCourseCompleted =
         Array.isArray(course?.completedChapter) &&

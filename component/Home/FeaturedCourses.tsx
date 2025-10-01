@@ -1,24 +1,22 @@
+import { db } from "@/config/fireConfig";
+import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { Course } from "@/types/course";
 import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
-    getFirestore,
     limit,
-    query,
+    query
 } from "@react-native-firebase/firestore";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 import FeaturedCourseCard from "./FeaturedCourseCard";
 import FeaturedCourseSkeleton from "./FeaturedCourseSkeleton";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 
 export default function FeaturedCourses() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
-    const db = getFirestore();
     const { safePush } = useSafeNavigation()
     useEffect(() => {
         const fetchFeaturedCourses = async () => {

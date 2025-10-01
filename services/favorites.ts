@@ -1,7 +1,7 @@
-import { getFirestore, collection, getDocs, doc, getDoc, deleteDoc, FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { db } from "@/config/fireConfig";
 import { FavoriteCourse } from "@/types/video";
+import { collection, deleteDoc, doc, FirebaseFirestoreTypes, getDoc, getDocs } from "@react-native-firebase/firestore";
 
-const db = getFirestore();
 
 export const fetchFavoritesFromFirestore = async (userEmail: string) => {
     const favColRef = collection(db, "users", userEmail, "favorites");

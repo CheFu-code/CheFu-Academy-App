@@ -1,13 +1,13 @@
+import { auth, db } from '@/config/fireConfig';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { showToast } from '@/utils/toast';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuth, signOut } from '@react-native-firebase/auth';
+import { signOut } from '@react-native-firebase/auth';
 import {
     doc,
-    getFirestore,
     serverTimestamp,
-    setDoc,
+    setDoc
 } from '@react-native-firebase/firestore';
 import { useContext, useState } from 'react';
 import {
@@ -33,8 +33,6 @@ export default function Header({ onPress }: { onPress?: () => void }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const { safePush, safeReplace } = useSafeNavigation();
-    const db = getFirestore();
-    const auth = getAuth();
     const CACHE_KEY = '@cached_courses';
     const handleOption = async (option: string) => {
         setShowModal(false);

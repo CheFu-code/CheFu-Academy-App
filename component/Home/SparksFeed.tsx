@@ -1,35 +1,28 @@
+import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparksFeed.styles';
 import { Likes, Spark } from '@/types/sparks';
 import { formatViews } from '@/utils/formatViews';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
-import dynamicLinks from '@react-native-firebase/dynamic-links';
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import {
     arrayRemove,
     arrayUnion,
     collection,
     doc,
     FirebaseFirestoreTypes,
-    getFirestore,
+    getDoc,
     onSnapshot,
     orderBy,
     query,
     Timestamp,
-    updateDoc,
+    updateDoc
 } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import React, { useContext, useEffect, useState } from 'react';
-import {
-    FlatList,
-    Image,
-    Share,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { useContext, useEffect, useState } from 'react';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import Loading from '../Shared/Loading';
 
 dayjs.extend(relativeTime);
@@ -39,9 +32,29 @@ const SparksFeed = () => {
     const { userDetail } = useContext(UserDetailContext);
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isVerified, setIsVerified] = useState(false);
 
     useEffect(() => {
-        const db = getFirestore();
+        const checkVerified = async () => {
+            if (!userDetail?.email) return;
+
+            try {
+                const userDoc = await getDoc(
+                    doc(db, 'users', userDetail?.email),
+                );
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setIsVerified(!!userData?.isVerified);
+                }
+            } catch (err) {
+                console.log('Error checking verified status:', err);
+            }
+        };
+
+        checkVerified();
+    }, [userDetail?.email]);
+
+    useEffect(() => {
         const q = query(collection(db, 'sparks'), orderBy('createdAt', 'desc'));
 
         const unsubscribe = onSnapshot(
@@ -68,7 +81,6 @@ const SparksFeed = () => {
     const handleLike = async (sparkId: string, likes: Likes[] = []) => {
         if (!userDetail) return;
 
-        const db = getFirestore();
         const sparkRef = doc(db, 'sparks', sparkId);
 
         // Check if the user already liked
@@ -100,24 +112,6 @@ const SparksFeed = () => {
         }
     };
 
-    const handleShare = async (spark: Spark) => {
-        try {
-            const link = await dynamicLinks().buildShortLink({
-                link: `https://chefuacademy.app/spark/${spark.id}`, // deep link path
-                domainUriPrefix: 'https://chefu.page.link', // Firebase Dynamic Links domain
-                android: {
-                    packageName: 'com.chefu.academy', // your Android app package
-                },
-            });
-
-            await Share.share({
-                message: `Check out this spark on CheFu Academy: ${link}`,
-            });
-        } catch (err) {
-            console.log('Error sharing spark:', err);
-        }
-    };
-
     const renderSpark = ({ item }: { item: Spark }) => {
         const hasLiked = item.likes?.some(
             (like) => like.createdBy.uid === userDetail?.uid,
@@ -144,15 +138,30 @@ const SparksFeed = () => {
                             style={{ width: 35, height: 35, borderRadius: 20 }}
                         />
                         <View>
-                            <Text
-                                numberOfLines={1}
+                            <View
                                 style={{
-                                    maxWidth: 150,
-                                    fontFamily: 'outfit-bold',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 3,
                                 }}
                             >
-                                {item.createdBy?.fullname || 'Anonymous'}
-                            </Text>
+                                <Text
+                                    numberOfLines={1}
+                                    style={{
+                                        maxWidth: 150,
+                                        fontFamily: 'outfit-bold',
+                                    }}
+                                >
+                                    {item.createdBy?.fullname || 'Anonymous'}
+                                </Text>
+                                {isVerified && (
+                                    <Ionicons
+                                        name="checkmark-circle"
+                                        size={13}
+                                        color={Colors.PRIMARY}
+                                    />
+                                )}
+                            </View>
                             <Text style={styles.author}>
                                 {item.createdAt?.toDate
                                     ? dayjs(item.createdAt.toDate()).fromNow()
@@ -213,7 +222,7 @@ const SparksFeed = () => {
                         </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() => handleShare(item)}
                         style={styles.actionButton}
                     >
@@ -222,7 +231,7 @@ const SparksFeed = () => {
                             size={18}
                             color={Colors.PRIMARY}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </TouchableOpacity>
         );

@@ -1,12 +1,12 @@
+import { db } from '@/config/fireConfig';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import {
     doc,
     FirebaseFirestoreTypes,
-    getDoc,
-    getFirestore,
+    getDoc
 } from '@react-native-firebase/firestore';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     Image,
     StyleProp,
@@ -32,7 +32,6 @@ export default function CourseCard({
     const { userDetail } = useContext(UserDetailContext);
     const [creatorInfo, setCreatorInfo] =
         useState<null | FirebaseFirestoreTypes.DocumentData>(null);
-    const firestore = getFirestore();
     const [modal, setModal] = useState({
         visible: false,
         title: '',
@@ -43,7 +42,7 @@ export default function CourseCard({
         const fetchCreator = async () => {
             if (!course?.createdBy) return;
 
-            const userDocRef = doc(firestore, 'users', course.createdBy);
+            const userDocRef = doc(db, 'users', course.createdBy);
             const userDocSnap = await getDoc(userDocRef);
 
             const data = userDocSnap.data();
@@ -53,7 +52,7 @@ export default function CourseCard({
         };
 
         fetchCreator();
-    }, [course, firestore]);
+    }, [course]);
 
     return (
         <>

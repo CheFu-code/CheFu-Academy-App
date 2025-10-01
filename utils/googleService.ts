@@ -1,9 +1,9 @@
 // utils/authService.ts
+import { auth } from "@/config/fireConfig";
 import { getAuth, GoogleAuthProvider, signInWithCredential } from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export async function signInWithGoogle() {
-    const auth = getAuth();
 
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
     const userInfo = await GoogleSignin.signIn();

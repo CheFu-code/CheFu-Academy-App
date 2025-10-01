@@ -1,14 +1,14 @@
+import { db } from "@/config/fireConfig";
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import {
     doc,
     getDoc,
-    getFirestore,
-    updateDoc,
+    updateDoc
 } from "@react-native-firebase/firestore";
 import { router } from "expo-router";
-import React, { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -31,7 +31,6 @@ type TrustedDevice = {
 export default function TrustedDevices() {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
-    const db = getFirestore();
 
     const [loadingDevice, setLoadingDevice] = useState<string | null>(null);
 

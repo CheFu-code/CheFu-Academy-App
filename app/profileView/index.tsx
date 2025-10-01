@@ -1,3 +1,4 @@
+import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/ProfileView.styles';
@@ -10,13 +11,12 @@ import {
     FirebaseFirestoreTypes,
     getDoc,
     getDocs,
-    getFirestore,
     query,
-    where,
+    where
 } from '@react-native-firebase/firestore';
 import { useLocalSearchParams } from 'expo-router';
 import LottieView from 'lottie-react-native';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -35,7 +35,6 @@ export default function ProfileView() {
     const [coursesCount, setCoursesCount] = useState(0);
     const [completedCount, setCompletedCount] = useState(0);
     const [completedChaptersCount, setCompletedChaptersCount] = useState(0);
-    const db = getFirestore();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -101,7 +100,7 @@ export default function ProfileView() {
         };
 
         fetchUserData();
-    }, [userId, db]);
+    }, [userId]);
 
     if (loading) {
         return (

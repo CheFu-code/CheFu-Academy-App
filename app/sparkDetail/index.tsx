@@ -3,6 +3,7 @@ import AddComment from '@/component/Spark/AddComment';
 import CommentsList from '@/component/Spark/CommentsList';
 import SparkActions from '@/component/Spark/SparkActions';
 import SparkHeader from '@/component/Spark/SparkHeaser';
+import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
@@ -14,13 +15,12 @@ import {
     arrayRemove,
     arrayUnion,
     doc,
-    getFirestore,
     onSnapshot,
     Timestamp,
-    updateDoc,
+    updateDoc
 } from '@react-native-firebase/firestore';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -36,7 +36,6 @@ const SparkDetail = () => {
     useEffect(() => {
         if (!sparkId) return;
 
-        const db = getFirestore();
         const sparkRef = doc(db, 'sparks', sparkId);
 
         const unsubscribe = onSnapshot(
@@ -62,7 +61,6 @@ const SparkDetail = () => {
     const handleLike = async (sparkId: string, likes: Likes[] = []) => {
         if (!userDetail) return;
 
-        const db = getFirestore();
         const sparkRef = doc(db, 'sparks', sparkId);
 
         // Check if the user already liked
@@ -98,7 +96,6 @@ const SparkDetail = () => {
         if (!userDetail || !spark || !comment.trim()) return;
         setCommenting(true);
         try {
-            const db = getFirestore();
             const sparkRef = doc(db, 'sparks', sparkId);
 
             await updateDoc(sparkRef, {
@@ -130,7 +127,6 @@ const SparkDetail = () => {
     const handleEditComment = async (commentId: string, newText: string) => {
         if (!spark || !userDetail) return;
 
-        const db = getFirestore();
         const sparkRef = doc(db, 'sparks', spark.id);
 
         try {
@@ -153,7 +149,6 @@ const SparkDetail = () => {
     const handleDeleteComment = async (commentId: string) => {
         if (!spark || !userDetail) return;
 
-        const db = getFirestore();
         const sparkRef = doc(db, 'sparks', spark.id);
 
         try {
@@ -175,7 +170,6 @@ const SparkDetail = () => {
     ) => {
         if (!spark || !userDetail) return;
 
-        const db = getFirestore();
         const sparkRef = doc(db, 'sparks', spark.id);
 
         try {
@@ -231,7 +225,6 @@ const SparkDetail = () => {
 
     const handleAddReply = async (commentId: string, reply: Replies) => {
         if (!spark) return;
-        const db = getFirestore();
         const sparkRef = doc(db, 'sparks', spark.id);
 
         try {

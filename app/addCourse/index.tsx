@@ -1,10 +1,13 @@
-import { checkDailyLimit } from "@/utils/firestoreUtils";
-import { Ionicons } from "@expo/vector-icons";
-import { doc, getFirestore, setDoc } from "@react-native-firebase/firestore";
-import * as Sentry from "@sentry/react-native";
-import { useRouter } from "expo-router";
-import LottieView from "lottie-react-native";
-import { useContext, useState } from "react";
+import ErrorModal from '@/component/Shared/ErrorModal';
+import { db } from '@/config/fireConfig';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { checkDailyLimit } from '@/utils/firestoreUtils';
+import { showToast } from '@/utils/toast';
+import { Ionicons } from '@expo/vector-icons';
+import { doc, setDoc } from '@react-native-firebase/firestore';
+import * as Sentry from '@sentry/react-native';
+import LottieView from 'lottie-react-native';
+import { useContext, useState } from 'react';
 import {
     Alert,
     Modal,
@@ -14,42 +17,37 @@ import {
     TextInput,
     ToastAndroid,
     View,
-} from "react-native";
-import AppModal from "../../component/Shared/AppModal";
-import Button from "../../component/Shared/Button";
-import { generateCourse, generateTopics } from "../../config/AiModel";
-import { Colors } from "../../constant/Colors";
-import Prompt from "../../constant/Prompt";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/AddCourse";
-import { handleAiError } from "../../utils/errorUtils";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import ErrorModal from "@/component/Shared/ErrorModal";
+} from 'react-native';
 import {
     AdEventType,
     RewardedAd,
     RewardedAdEventType,
-} from "react-native-google-mobile-ads";
-import { showToast } from "@/utils/toast";
+} from 'react-native-google-mobile-ads';
+import AppModal from '../../component/Shared/AppModal';
+import Button from '../../component/Shared/Button';
+import { generateCourse, generateTopics } from '../../config/AiModel';
+import { Colors } from '../../constant/Colors';
+import Prompt from '../../constant/Prompt';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import { styles } from '../../styles/AddCourse';
+import { handleAiError } from '../../utils/errorUtils';
 
 export default function AddCourse() {
     const [loading, setLoading] = useState(false);
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const { safeReplace, safePush, safeBack } = useSafeNavigation();
-    const [userInput, setUserInput] = useState("");
+    const { userDetail } = useContext(UserDetailContext);
+    const { safeReplace, safeBack } = useSafeNavigation();
+    const [userInput, setUserInput] = useState('');
     const [topics, setTopics] = useState<string[]>([]);
     const [selectedTopic, setSelectedTopic] = useState<string[]>([]);
     const [generatingTopic, setGeneratingTopic] = useState(false);
-    const db = getFirestore();
-    const INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-8952058057579255/6615319669";
-    const REWARDED_AD_UNIT_ID = "ca-app-pub-8952058057579255/8646813913";
+    const REWARDED_AD_UNIT_ID = 'ca-app-pub-8952058057579255/8646813913';
     const [limitModalVisible, setLimitModalVisible] = useState(false);
     const [extraCourseUnlocked, setExtraCourseUnlocked] = useState(false);
-    const support = "chefu.inc@gmail.com";
+    const support = 'chefu.inc@gmail.com';
     const [errorModal, setErrorModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
     const rewardedAd = RewardedAd.createForAdRequest(REWARDED_AD_UNIT_ID, {
         requestNonPersonalizedAdsOnly: true,
@@ -59,8 +57,8 @@ export default function AddCourse() {
         if (!userInput.trim()) {
             setErrorModal({
                 visible: true,
-                title: "Input Required",
-                message: "Please enter a course idea first.",
+                title: 'Input Required',
+                message: 'Please enter a course idea first.',
             });
             return;
         }
@@ -76,15 +74,15 @@ export default function AddCourse() {
             ) {
                 setLimitModalVisible(true);
                 setGeneratingTopic(false);
-                setUserInput("");
+                setUserInput('');
                 setTopics([]);
                 setSelectedTopic([]);
                 setLoading(false);
                 return;
             }
         } catch (error) {
-            console.error("Error checking course count:", error);
-            Alert.alert("Error", "Failed to verify daily course limit.");
+            console.error('Error checking course count:', error);
+            Alert.alert('Error', 'Failed to verify daily course limit.');
             setGeneratingTopic(false);
             return;
         }
@@ -95,8 +93,8 @@ export default function AddCourse() {
             if (!apiKey) {
                 setErrorModal({
                     visible: true,
-                    title: "Missing Key",
-                    message: "Your AI key is missing.",
+                    title: 'Missing Key',
+                    message: 'Your AI key is missing.',
                 });
                 setGeneratingTopic(false);
                 return;
@@ -105,20 +103,20 @@ export default function AddCourse() {
             const promptText = userInput + Prompt.IDEA;
             const contents = [
                 {
-                    role: "user",
+                    role: 'user',
                     parts: [{ text: promptText }],
                 },
             ];
             const aiResponse = await generateTopics(contents);
             const cleanedResponse =
-                aiResponse && typeof aiResponse === "string"
-                    ? aiResponse.replace(/^```json[\r\n]+|```$/gi, "").trim()
+                aiResponse && typeof aiResponse === 'string'
+                    ? aiResponse.replace(/^```json[\r\n]+|```$/gi, '').trim()
                     : aiResponse;
-            if (!cleanedResponse || cleanedResponse.trim() === "") {
+            if (!cleanedResponse || cleanedResponse.trim() === '') {
                 setErrorModal({
                     visible: true,
-                    title: "No Response",
-                    message: "The AI didn’t return any results.",
+                    title: 'No Response',
+                    message: 'The AI didn’t return any results.',
                 });
                 topicIdea = [];
                 setGeneratingTopic(false);
@@ -139,13 +137,13 @@ export default function AddCourse() {
                     handleAiError(e, support);
                 }
             }
-            setUserInput("");
+            setUserInput('');
         } catch (error) {
-            console.error("Error generating topic:", error);
+            console.error('Error generating topic:', error);
             setErrorModal({
                 visible: true,
-                title: "Error",
-                message: "Failed to generate topic.",
+                title: 'Error',
+                message: 'Failed to generate topic.',
             });
             topicIdea = [];
         } finally {
@@ -174,8 +172,8 @@ export default function AddCourse() {
         if (!selectedTopic.length) {
             setErrorModal({
                 visible: true,
-                title: "No Topics Selected",
-                message: "Please select at least one topic.",
+                title: 'No Topics Selected',
+                message: 'Please select at least one topic.',
             });
 
             return;
@@ -184,17 +182,17 @@ export default function AddCourse() {
         const promptText = selectedTopic + Prompt.COURSE;
         const contents = [
             {
-                role: "user",
+                role: 'user',
                 parts: [{ text: promptText }],
             },
         ];
         try {
             const aiResp = await generateCourse(contents);
-            if (!aiResp || aiResp.trim() === "") {
+            if (!aiResp || aiResp.trim() === '') {
                 setErrorModal({
                     visible: true,
-                    title: "No Response",
-                    message: "The AI didn’t return any results.",
+                    title: 'No Response',
+                    message: 'The AI didn’t return any results.',
                 });
                 setLoading(false);
                 return;
@@ -204,7 +202,7 @@ export default function AddCourse() {
                 coursesObj = JSON.parse(aiResp);
             } catch (e) {
                 handleAiError(e, support);
-                if (typeof Sentry !== "undefined") {
+                if (typeof Sentry !== 'undefined') {
                     Sentry.captureException(e, {
                         extra: { aiResponse: aiResp },
                     });
@@ -219,8 +217,8 @@ export default function AddCourse() {
             if (!Array.isArray(coursesArray) || coursesArray.length === 0) {
                 setErrorModal({
                     visible: true,
-                    title: "No Response",
-                    message: "The AI didn’t return any results.",
+                    title: 'No Response',
+                    message: 'The AI didn’t return any results.',
                 });
                 setLoading(false);
                 return;
@@ -229,29 +227,29 @@ export default function AddCourse() {
             // Await all course writes before continuing
             await Promise.all(
                 coursesArray.map(async (course) => {
-                    const emailSafe = userDetail?.email.replace(/[@.]/g, "_");
-                    const docId = emailSafe + "_" + Date.now().toString();
+                    const emailSafe = userDetail?.email.replace(/[@.]/g, '_');
+                    const docId = emailSafe + '_' + Date.now().toString();
 
-                    await setDoc(doc(db, "course", docId), {
+                    await setDoc(doc(db, 'course', docId), {
                         ...course,
                         createdOn: new Date(),
                         createdBy: userDetail?.email,
                         docId: docId,
                     });
-                })
+                }),
             );
 
-            safeReplace("/(tabs)/home");
+            safeReplace('/(tabs)/home');
             ToastAndroid.show(
-                "Course created successfully!",
-                ToastAndroid.SHORT
+                'Course created successfully!',
+                ToastAndroid.SHORT,
             );
         } catch (e: unknown) {
-            console.log("failed course", (e as Error).message);
+            console.log('failed course', (e as Error).message);
             setErrorModal({
                 visible: true,
-                title: "Error",
-                message: "Failed to generate course.",
+                title: 'Error',
+                message: 'Failed to generate course.',
             });
         } finally {
             setLoading(false);
@@ -259,29 +257,29 @@ export default function AddCourse() {
     };
 
     const watchRewardedAd = () => {
-        showToast("Your ad is loading. It will be ready shortly.");
+        showToast('Your ad is loading. It will be ready shortly.');
         rewardedAd.load();
 
         const unsubscribe = rewardedAd.addAdEventListener(
             RewardedAdEventType.LOADED,
             () => {
                 rewardedAd.show();
-            }
+            },
         );
 
         rewardedAd.addAdEventListener(
             RewardedAdEventType.EARNED_REWARD,
             (reward) => {
                 setExtraCourseUnlocked(true);
-                showToast("You earned 1 extra course!");
-            }
+                showToast('You earned 1 extra course!');
+            },
         );
 
         rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
-            console.error("Ad failed to load:", error);
+            console.error('Ad failed to load:', error);
             Alert.alert(
-                "Ad Error",
-                "Failed to load rewarded ad. Try again later."
+                'Ad Error',
+                'Failed to load rewarded ad. Try again later.',
             );
         });
 
@@ -301,7 +299,7 @@ export default function AddCourse() {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <LottieView
-                            source={require("./../../assets/animations/Brainstorm.json")}
+                            source={require('./../../assets/animations/Brainstorm.json')}
                             autoPlay
                             loop
                             style={{ width: 150, height: 150 }}
@@ -325,7 +323,7 @@ export default function AddCourse() {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <LottieView
-                            source={require("./../../assets/animations/generatingTopic.json")}
+                            source={require('./../../assets/animations/generatingTopic.json')}
                             autoPlay
                             loop
                             style={{ width: 190, height: 190 }}
@@ -392,7 +390,7 @@ export default function AddCourse() {
                         />
 
                         <Button
-                            text={"Generate Topic"}
+                            text={'Generate Topic'}
                             type="fill"
                             onPress={generateTopic}
                             loading={loading}
@@ -437,7 +435,7 @@ export default function AddCourse() {
                                                 },
                                             ]}
                                         >
-                                            {item.replace(/^"|"$/g, "")}
+                                            {item.replace(/^"|"$/g, '')}
                                         </Text>
                                     </Pressable>
                                 ))}

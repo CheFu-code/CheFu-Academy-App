@@ -1,11 +1,9 @@
-import { getAuth } from "@react-native-firebase/auth";
-import { doc, getFirestore, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
+import { auth, db } from "@/config/fireConfig";
+import { doc, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
 import { useEffect } from "react";
 import { AppState } from "react-native";
 
 export default function useLastSeenTracker() {
-    const db = getFirestore();
-    const auth = getAuth();
 
     useEffect(() => {
         const updateOnlineStatus = async (online: boolean) => {

@@ -2,6 +2,7 @@ import AppModal from '@/component/Shared/AppModal';
 import Button from '@/component/Shared/Button';
 import OverView from '@/component/VideoDetail/OverView';
 import Reviews from '@/component/VideoDetail/Reviews';
+import { auth, db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { formatDuration } from '@/helpers/formatDateVideoCard';
@@ -19,16 +20,14 @@ import {
     Ionicons,
     MaterialIcons,
 } from '@expo/vector-icons';
-import { getAuth } from '@react-native-firebase/auth';
 import {
     deleteDoc,
     doc,
     getDoc,
-    getFirestore,
     increment,
     serverTimestamp,
     setDoc,
-    updateDoc,
+    updateDoc
 } from '@react-native-firebase/firestore';
 import {
     deleteObject,
@@ -38,7 +37,7 @@ import {
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -54,8 +53,6 @@ import { Video as VideoView } from 'react-native-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
 
 export default function VideoDetail() {
-    const db = getFirestore();
-    const auth = getAuth();
     const { safeReplace, safeBack } = useSafeNavigation();
     const { id, ytVideo } = useLocalSearchParams();
     const { userDetail } = useContext(UserDetailContext);
@@ -114,7 +111,7 @@ export default function VideoDetail() {
         const fetchUploaderName = async () => {
             if (!video?.uploadedBy) return;
 
-            const userRef = doc(getFirestore(), 'users', video.uploadedBy);
+            const userRef = doc(db, 'users', video.uploadedBy);
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
@@ -187,7 +184,7 @@ export default function VideoDetail() {
         getDoc(ref).then((docSnap) => {
             if (docSnap.exists()) setEnrolled(true);
         });
-    }, [video, db, userDetail]);
+    }, [video, userDetail]);
 
     useEffect(() => {
         if (!userDetail || !video) return;
@@ -201,7 +198,7 @@ export default function VideoDetail() {
         getDoc(favRef).then((docSnap) => {
             if (docSnap.exists()) setFavorite(true);
         });
-    }, [video, userDetail, db]);
+    }, [video, userDetail]);
 
     const handleFavorite = async () => {
         setAdding(true);
@@ -299,7 +296,6 @@ export default function VideoDetail() {
             setDeleting(true);
             showToast('Deleting video...');
 
-            const db = getFirestore();
 
             if (video.uploadedBy === 'YouTube') {
                 const docRef = doc(db, 'youTubeVideos', video.id);

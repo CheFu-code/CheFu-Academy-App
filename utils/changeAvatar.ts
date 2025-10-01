@@ -1,5 +1,5 @@
-import { getAuth } from "@react-native-firebase/auth";
-import { doc, getFirestore, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
+import { auth, db } from "@/config/fireConfig";
+import { doc, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import ImagePicker from "react-native-image-crop-picker";
 import { showToast } from "./toast";
@@ -28,7 +28,6 @@ export const changeAvatar = async (setUserDetail: (updater: (prev: any) => any) 
         if (!image || !image.path) return null;
 
         // 2. Get current user
-        const auth = getAuth();
         const user = auth.currentUser;
         if (!user) throw new Error("No user logged in");
         showToast("Updating...");
@@ -43,7 +42,6 @@ export const changeAvatar = async (setUserDetail: (updater: (prev: any) => any) 
         // 5. Update Firebase Auth profile
         await user.updateProfile({ photoURL: downloadURL });
 
-        const db = getFirestore();
 
         if (!user.email) {
             throw new Error("User email not available");
