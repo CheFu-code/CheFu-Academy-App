@@ -5,6 +5,7 @@ import { styles } from '@/styles/SparksFeed.styles';
 import { Likes, Spark } from '@/types/sparks';
 import { formatViews } from '@/utils/formatViews';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {
     arrayRemove,
     arrayUnion,
@@ -22,13 +23,14 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
     FlatList,
     Image,
+    Share,
     Text,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
+import Loading from '../Shared/Loading';
 
 dayjs.extend(relativeTime);
 
@@ -98,6 +100,24 @@ const SparksFeed = () => {
         }
     };
 
+    const handleShare = async (spark: Spark) => {
+        try {
+            const link = await dynamicLinks().buildShortLink({
+                link: `https://chefuacademy.app/spark/${spark.id}`, // deep link path
+                domainUriPrefix: 'https://chefu.page.link', // Firebase Dynamic Links domain
+                android: {
+                    packageName: 'com.chefu.academy', // your Android app package
+                },
+            });
+
+            await Share.share({
+                message: `Check out this spark on CheFu Academy: ${link}`,
+            });
+        } catch (err) {
+            console.log('Error sharing spark:', err);
+        }
+    };
+
     const renderSpark = ({ item }: { item: Spark }) => {
         const hasLiked = item.likes?.some(
             (like) => like.createdBy.uid === userDetail?.uid,
@@ -147,14 +167,7 @@ const SparksFeed = () => {
                                 params: { category: item.category },
                             });
                         }}
-                        style={{
-                            backgroundColor: '#8FBC8F20',
-                            padding: 2,
-                            borderRadius: 8,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            minWidth: 80,
-                        }}
+                        style={styles.categoryCont}
                     >
                         <Text style={styles.category}>{item.category}</Text>
                     </TouchableOpacity>
@@ -181,7 +194,15 @@ const SparksFeed = () => {
                         </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            safePush({
+                                pathname: '/sparkDetail',
+                                params: { sparkId: item.id },
+                            });
+                        }}
+                        style={styles.actionButton}
+                    >
                         <FontAwesome
                             name="comment-o"
                             size={18}
@@ -192,7 +213,10 @@ const SparksFeed = () => {
                         </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity
+                        onPress={() => handleShare(item)}
+                        style={styles.actionButton}
+                    >
                         <AntDesign
                             name="sharealt"
                             size={18}
@@ -204,12 +228,7 @@ const SparksFeed = () => {
         );
     };
 
-    if (loading)
-        return (
-            <View style={styles.loading}>
-                <ActivityIndicator size="large" color={Colors.PRIMARY} />
-            </View>
-        );
+    if (loading) return <Loading />;
 
     return (
         <FlatList

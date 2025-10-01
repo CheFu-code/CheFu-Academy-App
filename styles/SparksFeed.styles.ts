@@ -31,6 +31,14 @@ export const styles = StyleSheet.create({
         fontWeight: '600',
         color: Colors.PRIMARY,
     },
+    categoryCont: {
+        backgroundColor: '#8FBC8F20',
+        padding: 2,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 80,
+    },
     timestamp: {
         fontSize: 12,
         color: '#888',

@@ -18,6 +18,7 @@ import { Colors } from '../constant/Colors';
 import { NetworkProvider, useNetwork } from '../context/NetworkContext';
 import { UserDetailContext } from '../context/UserDetailContext';
 import { useBiometricAuth } from '../hooks/useBiometricAuth';
+import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
 
 // ✅ Sentry Init
 Sentry.init({
@@ -75,6 +76,7 @@ function LayoutContent() {
     useLastSeenTracker();
     useNotifications();
     useDeepLinking();
+    useHandleDynamicLinks();
 
     if (!isConnected) return <OfflineScreen />;
 

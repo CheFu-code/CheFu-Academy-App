@@ -1,6 +1,6 @@
-import { SectionHeader } from "@/component/SectionHeader";
 import { ChatItem } from "@/component/chat/ChatItem";
 import { StartChatModal } from "@/component/chatScreen/StartChatModal";
+import { SectionHeader } from "@/component/SectionHeader";
 import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { useChats } from "@/hooks/useChats";

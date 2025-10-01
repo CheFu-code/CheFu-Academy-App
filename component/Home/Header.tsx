@@ -120,7 +120,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
         } else if (option === 'Favorite Videos') {
             safePush('/favoriteVideos');
         } else if (option === 'Add Sparks') {
-            safePush('/addSpark')
+            safePush('/addSpark');
         }
     };
 
@@ -223,14 +223,21 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     </Pressable>
 
                     {userDetail && (
-                        <TouchableOpacity onPress={() => setShowModal(true)}>
-                            <Feather
-                                style={styles.showMoreIcon}
-                                name="more-horizontal"
-                                size={18}
-                                color={'white'}
-                            />
-                        </TouchableOpacity>
+                        <View style={styles.bellCont}>
+                            <TouchableOpacity>
+                                <Feather name="bell" size={20} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setShowModal(true)}
+                            >
+                                <Feather
+                                    style={styles.showMoreIcon}
+                                    name="more-horizontal"
+                                    size={18}
+                                    color={'white'}
+                                />
+                            </TouchableOpacity>
+                        </View>
                     )}
                 </View>
 

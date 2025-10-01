@@ -14,7 +14,6 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         gap: 5,
-        // marginTop: 20,
     },
     greeting: {
         fontFamily: 'outfit-bold',
@@ -35,7 +34,6 @@ export const styles = StyleSheet.create({
     },
     modalSheet: {
         backgroundColor: Colors.BG_COLOR,
-        // padding: 20,
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
     },
@@ -90,5 +88,10 @@ export const styles = StyleSheet.create({
     text: {
         fontFamily: 'outfit-bold',
         color: Colors.GREEN,
+    },
+    bellCont: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
     },
 });
