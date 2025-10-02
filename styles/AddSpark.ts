@@ -1,6 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import { scale, verticalScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
@@ -8,42 +8,42 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
     },
     scroll: {
-        paddingVertical: 10,
+        paddingVertical: verticalScale(10),
     },
     heading: {
-        fontSize: 24,
+        fontSize: scale(20),
         fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
     },
     label: {
-        fontSize: 16,
+        fontSize: scale(13),
         fontFamily: 'outfit',
-        marginBottom: 8,
+        marginBottom: verticalScale(8),
         color: Colors.WHITE,
-        marginTop: 15,
+        marginTop: verticalScale(15),
     },
     input: {
         backgroundColor: '#fff',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        fontSize: RFValue(13),
-        marginBottom: 15,
+        borderRadius: scale(10),
+        paddingHorizontal: scale(15),
+        paddingVertical: verticalScale(10),
+        fontSize: scale(12),
+        marginBottom: verticalScale(15),
         borderWidth: 1,
         borderColor: '#ddd',
-        color:Colors.BLACK
+        color: Colors.BLACK,
     },
     textArea: {
-        height: 120,
+        height: verticalScale(120),
         textAlignVertical: 'top',
     },
     categoryButton: {
-        paddingHorizontal: 15,
-        paddingVertical: 8,
-        borderRadius: 20,
+        paddingHorizontal: scale(15),
+        paddingVertical: verticalScale(8),
+        borderRadius: scale(20),
         backgroundColor: '#eee',
-        marginRight: 10,
-        left: 10,
+        marginRight: scale(10),
+        left: scale(10),
     },
     categorySelected: {
         backgroundColor: Colors.PRIMARY,
@@ -56,22 +56,22 @@ export const styles = StyleSheet.create({
         color: '#fff',
     },
     postButton: {
-        marginTop: 30,
+        marginTop: verticalScale(30),
         backgroundColor: Colors.PRIMARY,
-        paddingVertical: 15,
-        borderRadius: 12,
+        paddingVertical: verticalScale(15),
+        borderRadius: scale(12),
         alignItems: 'center',
-        paddingHorizontal: 10,
+        paddingHorizontal: scale(10),
     },
     postButtonText: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: scale(12),
         fontFamily: 'outfit-bold',
     },
     backButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 5,
+        gap: scale(5),
     },
     wordCount: {
         textAlign: 'right',

@@ -9,7 +9,7 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import {
     addDoc,
     collection,
-    serverTimestamp
+    serverTimestamp,
 } from '@react-native-firebase/firestore';
 import { useContext, useState } from 'react';
 import {
@@ -20,6 +20,7 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale } from 'react-native-size-matters';
 
 const categories = [
     'Tip',
@@ -94,13 +95,17 @@ const AddSpark = () => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
-                <View style={{ paddingHorizontal: 10 }}>
+                <View style={{ paddingHorizontal: scale(10) }}>
                     <TouchableOpacity
                         onPress={safeBack}
                         style={styles.backButton}
                         disabled={loading}
                     >
-                        <AntDesign name="left" size={20} color={Colors.WHITE} />
+                        <AntDesign
+                            name="left"
+                            size={scale(20)}
+                            color={Colors.WHITE}
+                        />
                         <Text style={styles.heading}>Create a Spark</Text>
                     </TouchableOpacity>
 
