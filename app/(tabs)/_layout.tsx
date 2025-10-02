@@ -1,13 +1,13 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
-import { Tabs } from "expo-router";
-import { useCallback } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "../../constant/Colors";
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { Tabs } from 'expo-router';
+import { useCallback } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors } from '../../constant/Colors';
 
 // Extract correct icon prop type
 type TabBarIconProps = NonNullable<
-    BottomTabNavigationOptions["tabBarIcon"]
+    BottomTabNavigationOptions['tabBarIcon']
 > extends (props: infer P) => any
     ? P
     : never;
@@ -18,68 +18,68 @@ const TabLayout = () => {
     const renderHomeIcon = useCallback(
         ({ color, size }: TabBarIconProps) => (
             <Ionicons
-                style={{ marginTop: 25, height: "100%" }}
+                style={{ marginTop: 25, height: '100%' }}
                 name="home-outline"
                 size={size}
                 color={color}
             />
         ),
-        []
+        [],
     );
 
     const renderExploreIcon = useCallback(
         ({ color, size }: TabBarIconProps) => (
             <MaterialCommunityIcons
-                style={{ marginTop: 25, height: "100%" }}
+                style={{ marginTop: 25, height: '100%' }}
                 name="book-search"
                 size={size}
                 color={color}
             />
         ),
-        []
+        [],
     );
 
     const renderProgressIcon = useCallback(
-        ({ size }: TabBarIconProps) => (
+        ({ size, color }: TabBarIconProps) => (
             <Ionicons
                 style={{
                     marginTop: 25,
-                    height: "100%",
-                    backgroundColor: Colors.LIGHT_GREEN,
-                    padding: 18,
-                    borderRadius: 100,
-                    color: Colors.BLACK,
+                    height: '100%',
+                    // backgroundColor: Colors.LIGHT_GREEN,
+                    // padding: 18,
+                    // borderRadius: 100,
+                    // color: Colors.BLACK,
                 }}
                 name="bar-chart-outline"
-                size={size}
-                color={Colors.BLACK}
-            />
-        ),
-        []
-    );
-
-    const renderChatIcon = useCallback(
-        ({ color, size }: TabBarIconProps) => (
-            <Ionicons
-                style={{ marginTop: 25, height: "100%" }}
-                name="chatbubble-ellipses-outline"
                 size={size}
                 color={color}
             />
         ),
-        []
+        [],
     );
+
+    // const renderChatIcon = useCallback(
+    //     ({ color, size }: TabBarIconProps) => (
+    //         <Ionicons
+    //             style={{ marginTop: 25, height: '100%' }}
+    //             name="chatbubble-ellipses-outline"
+    //             size={size}
+    //             color={color}
+    //         />
+    //     ),
+    //     [],
+    // );
 
     const renderProfileIcon = useCallback(
         ({ color, size }: TabBarIconProps) => (
             <Ionicons
-                style={{ marginTop: 25, height: "100%" }}
+                style={{ marginTop: 25, height: '100%' }}
                 name="person-outline"
                 size={size}
                 color={color}
             />
         ),
-        []
+        [],
     );
 
     return (
@@ -91,10 +91,10 @@ const TabLayout = () => {
                 tabBarInactiveTintColor: Colors.YELLOW,
                 tabBarStyle: {
                     paddingBottom: insets.bottom,
-                    backgroundColor: "#121212",
+                    backgroundColor: '#121212',
                     marginHorizontal: 10,
                     elevation: 5,
-                    shadowColor: "#121212",
+                    shadowColor: '#121212',
                     shadowOffset: { width: 0, height: 1 },
                     shadowOpacity: 0.1,
                     shadowRadius: 4,
@@ -111,10 +111,10 @@ const TabLayout = () => {
                 name="progress"
                 options={{ tabBarIcon: renderProgressIcon }}
             />
-            <Tabs.Screen
+            {/* <Tabs.Screen
                 name="chats"
                 options={{ tabBarIcon: renderChatIcon }}
-            />
+            /> */}
             <Tabs.Screen
                 name="profile"
                 options={{ tabBarIcon: renderProfileIcon }}

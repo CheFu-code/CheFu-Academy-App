@@ -115,6 +115,7 @@ const AddSpark = () => {
                         placeholder="Enter a title for your Spark"
                         value={title}
                         onChangeText={setTitle}
+                        placeholderTextColor={Colors.GRAY}
                     />
 
                     <Text style={styles.label}>Content</Text>
