@@ -1,7 +1,7 @@
 import { auth, db } from '@/config/fireConfig';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { showToast } from '@/utils/toast';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signOut } from '@react-native-firebase/auth';
 import {
@@ -29,6 +29,7 @@ import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Header.styles';
 import AddVideoModal from './AddVideoModal';
+import { scale } from 'react-native-size-matters';
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function Header({ onPress }: { onPress?: () => void }) {
@@ -199,8 +200,8 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                             marginTop:
                                 auth.currentUser &&
                                 !auth.currentUser.emailVerified
-                                    ? 0
-                                    : 20,
+                                    ? scale(0)
+                                    : scale(18),
                         },
                     ]}
                 >
@@ -216,7 +217,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                         style={{
                             flexDirection: 'row',
                             alignItems: 'center',
-                            gap: 5,
+                            gap: scale(5),
                         }}
                     >
                         <Text
@@ -235,7 +236,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                         {userDetail?.member === true && (
                             <Ionicons
                                 color={Colors.PRIMARY}
-                                size={15}
+                                size={scale(15)}
                                 name="checkmark-circle"
                             />
                         )}
@@ -249,7 +250,11 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                                     safePush('/notification');
                                 }}
                             >
-                                <Feather name="bell" size={20} color="white" />
+                                <Feather
+                                    name="bell"
+                                    size={scale(20)}
+                                    color="white"
+                                />
 
                                 {unreadCount > 0 && (
                                     <View style={styles.badge}>
@@ -268,7 +273,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                                 <Feather
                                     style={styles.showMoreIcon}
                                     name="more-horizontal"
-                                    size={18}
+                                    size={scale(16)}
                                     color={'white'}
                                 />
                             </TouchableOpacity>
@@ -280,7 +285,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     <Text
                         numberOfLines={1}
                         ellipsizeMode={'tail'}
-                        style={[styles.text, { fontSize: 13 }]}
+                        style={[styles.text, { fontSize: scale(12) }]}
                     >
                         Expand your knowledge with our courses
                     </Text>
@@ -288,6 +293,16 @@ export default function Header({ onPress }: { onPress?: () => void }) {
 
                 {/*text input */}
                 <View style={styles.inputContainer}>
+                    {searchTerm.trim() && (
+                        <TouchableOpacity onPress={() => handleSearch()}>
+                            <Ionicons
+                                style={styles.search}
+                                size={scale(18)}
+                                color={Colors.GREEN}
+                                name="search"
+                            />
+                        </TouchableOpacity>
+                    )}
                     <TextInput
                         placeholder="Search courses, sparks, videos..."
                         placeholderTextColor={Colors.BLACK}
@@ -298,13 +313,12 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                         autoCapitalize="none"
                         style={[styles.text, { flex: 1, fontFamily: 'outfit' }]}
                     />
-                    {searchTerm.trim() && (
-                        <TouchableOpacity onPress={() => handleSearch()}>
-                            <Ionicons
-                                style={styles.search}
-                                size={20}
-                                color={Colors.GREEN}
-                                name="search"
+                    {searchTerm.trim() !== '' && (
+                        <TouchableOpacity onPress={() => setSearchTerm('')}>
+                            <MaterialIcons
+                                size={scale(18)}
+                                color={Colors.BLACK}
+                                name="cancel"
                             />
                         </TouchableOpacity>
                     )}

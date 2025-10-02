@@ -34,6 +34,7 @@ import {
     View,
 } from 'react-native';
 import Loading from '../Shared/Loading';
+import { sendNotification } from '@/utils/notifications';
 
 dayjs.extend(relativeTime);
 
@@ -125,7 +126,10 @@ const SparksFeed = () => {
             });
 
             // ✅ Send notification only if user is not liking their own spark
-            if (sparkData.createdBy?.uid !== userDetail.uid) {
+            if (
+                sparkData.createdBy?.uid !== userDetail?.uid &&
+                sparkData.createdBy?.email
+            ) {
                 const notificationRef = collection(db, 'notifications');
                 await addDoc(notificationRef, {
                     type: 'like',
@@ -139,9 +143,15 @@ const SparksFeed = () => {
                         userDetail?.fullname || 'Someone'
                     } liked your spark.`,
                     createdAt: Timestamp.now(),
-                    read: false, // for badge count
+                    read: false,
                 });
             }
+
+            await sendNotification(
+                sparkData.createdBy?.email,
+                'New Like',
+                `${userDetail?.fullname || 'Someone'} liked your spark.`,
+            );
         }
     };
 

@@ -1,62 +1,87 @@
-import React, { useState, useCallback } from 'react';
+import { db } from '@/config/fireConfig';
+import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { styles } from '@/styles/NotificationScreen.styles';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import {
-    StyleSheet,
-    Text,
-    View,
+    collection,
+    deleteDoc,
+    doc,
+    FirebaseFirestoreTypes,
+    onSnapshot,
+    query,
+    Timestamp,
+    updateDoc,
+    where,
+} from '@react-native-firebase/firestore';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { useContext, useEffect, useState } from 'react';
+import {
     FlatList,
     Pressable,
+    Text,
     TouchableOpacity,
+    View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constant/Colors';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { RFValue } from 'react-native-responsive-fontsize';
 import {
-    Swipeable,
     GestureHandlerRootView,
+    Swipeable,
 } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale } from 'react-native-size-matters';
+
+dayjs.extend(relativeTime);
 
 type NotificationType = 'like' | 'comment' | 'newCourse' | 'default';
 
 interface Notification {
     id: string;
+    sparkId: string;
     type: NotificationType;
     message: string;
-    time: string;
+    createdAt: Timestamp;
     read?: boolean;
 }
-
-const initialNotifications: Notification[] = [
-    {
-        id: '1',
-        type: 'like',
-        message: 'John liked your course',
-        time: '2h ago',
-        read: false,
-    },
-    {
-        id: '2',
-        type: 'comment',
-        message: 'Sarah commented on your video',
-        time: '5h ago',
-        read: true,
-    },
-    {
-        id: '3',
-        type: 'newCourse',
-        message: 'New course “React Native Basics” is now available!',
-        time: '1d ago',
-        read: false,
-    },
-];
 
 const ACTION_WIDTH = 70;
 
 const NotificationScreen = () => {
-    const { safeBack } = useSafeNavigation();
-    const [notifications, setNotifications] =
-        useState<Notification[]>(initialNotifications);
+    const { safeBack, safePush } = useSafeNavigation();
+    const { userDetail } = useContext(UserDetailContext); // ✅ get logged in user
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+
+    // ✅ fetch real-time notifications
+    useEffect(() => {
+        if (!userDetail) return;
+
+        const q = query(
+            collection(db, 'notifications'),
+            where('to', '==', userDetail?.uid),
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const data: Notification[] = snapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
+                    const { id, ...rest } = doc.data() as Notification;
+                    return {
+                        id: doc.id,
+                        ...rest,
+                    };
+                },
+            );
+
+            // Sort by newest
+            setNotifications(
+                data.sort(
+                    (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis(),
+                ),
+            );
+        });
+
+        return () => unsubscribe();
+    }, [userDetail]);
 
     const renderIcon = (type: NotificationType) => {
         switch (type) {
@@ -85,38 +110,49 @@ const NotificationScreen = () => {
         }
     };
 
-    const handlePress = useCallback((id: string) => {
-        setNotifications((prev) =>
-            prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-        );
-    }, []);
-
-    const handleDelete = (id: string) => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
+    // ✅ mark as read in Firestore
+    const handleMarkAsRead = async (id: string) => {
+        await updateDoc(doc(db, 'notifications', id), { read: true });
+    };
+    const handleMarkAsUnRead = async (id: string) => {
+        await updateDoc(doc(db, 'notifications', id), { read: false });
     };
 
-    const handleMarkAsRead = (id: string) => {
-        setNotifications((prev) =>
-            prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-        );
+    // ✅ delete notification in Firestore
+    const handleDelete = async (id: string) => {
+        await deleteDoc(doc(db, 'notifications', id));
     };
 
-    const renderRightActions = (id: string) => (
+    const renderRightActions = (item: Notification) => (
         <View style={[styles.actionsContainer, { width: ACTION_WIDTH * 2 }]}>
             <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: Colors.GREEN }]}
-                onPress={() => handleMarkAsRead(id)}
+                style={[
+                    styles.actionButton,
+                    {
+                        backgroundColor: item.read
+                            ? Colors.PRIMARY
+                            : Colors.GREEN,
+                    },
+                ]}
+                onPress={() =>
+                    item.read
+                        ? handleMarkAsUnRead(item.id)
+                        : handleMarkAsRead(item.id)
+                }
             >
                 <Ionicons
-                    name="checkmark-done"
+                    name={item.read ? 'notifications' : 'checkmark-done'}
                     size={20}
                     color={Colors.WHITE}
                 />
-                <Text style={styles.actionText}>Read</Text>
+                <Text style={styles.actionText}>
+                    {item.read ? 'Unread' : 'Read'}
+                </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: Colors.RED }]}
-                onPress={() => handleDelete(id)}
+                onPress={() => handleDelete(item.id)}
             >
                 <Ionicons name="trash" size={20} color={Colors.WHITE} />
                 <Text style={styles.actionText}>Delete</Text>
@@ -126,18 +162,24 @@ const NotificationScreen = () => {
 
     const renderItem = ({ item }: { item: Notification }) => (
         <Swipeable
-            renderRightActions={() => renderRightActions(item.id)}
+            renderRightActions={() => renderRightActions(item)}
             overshootRight={false}
         >
             <Pressable
-                onPress={() => handlePress(item.id)}
+                onPress={() => {
+                    safePush({
+                        pathname: '/sparkDetail',
+                        params: { sparkId: item.sparkId },
+                    });
+                    handleMarkAsRead(item.id);
+                }}
                 style={({ pressed }) => [
                     styles.card,
                     pressed && { opacity: 0.6 },
-                    !item.read && styles.unreadCard,
+                    !item.read
+                        ? styles.unreadCard
+                        : { backgroundColor: 'transparent' },
                 ]}
-                accessibilityRole="button"
-                accessibilityLabel={`Notification: ${item.message}`}
             >
                 <View style={styles.iconContainer}>
                     {renderIcon(item.type)}
@@ -146,12 +188,19 @@ const NotificationScreen = () => {
                     <Text
                         style={[
                             styles.message,
-                            !item.read && styles.unreadText,
+                            !item.read
+                                ? styles.unreadText
+                                : { fontFamily: 'outfit', color: Colors.WHITE },
                         ]}
                     >
                         {item.message}
                     </Text>
-                    <Text style={styles.time}>{item.time}</Text>
+
+                    <Text style={styles.time}>
+                        {item.createdAt
+                            ? dayjs(item.createdAt.toDate()).fromNow()
+                            : ''}
+                    </Text>
                 </View>
             </Pressable>
         </Swipeable>
@@ -161,7 +210,7 @@ const NotificationScreen = () => {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
                 <TouchableOpacity onPress={safeBack} style={styles.backButton}>
-                    <AntDesign name="left" size={20} color={'white'} />
+                    <AntDesign name="left" size={scale(20)} color={'white'} />
                     <Text style={styles.header}>Notifications</Text>
                 </TouchableOpacity>
 
@@ -169,7 +218,7 @@ const NotificationScreen = () => {
                     <View style={styles.emptyState}>
                         <Ionicons
                             name="notifications-off"
-                            size={40}
+                            size={scale(40)}
                             color={Colors.GRAY}
                         />
                         <Text style={styles.emptyText}>
@@ -182,7 +231,7 @@ const NotificationScreen = () => {
                         data={notifications}
                         keyExtractor={(item) => item.id}
                         renderItem={renderItem}
-                        contentContainerStyle={{ paddingBottom: 20 }}
+                        contentContainerStyle={{ paddingBottom: scale(20) }}
                         ItemSeparatorComponent={() => (
                             <View style={styles.separator} />
                         )}
@@ -194,54 +243,3 @@ const NotificationScreen = () => {
 };
 
 export default NotificationScreen;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-        paddingHorizontal: 16,
-    },
-    header: {
-        fontSize: RFValue(20),
-        fontWeight: 'bold',
-        marginVertical: 12,
-        color: Colors.WHITE,
-    },
-    card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        backgroundColor: 'transparent',
-        overflow: 'hidden',
-    },
-    unreadCard: {
-        backgroundColor: Colors.GRAY,
-        borderRadius: 8,
-        paddingHorizontal: 8,
-    },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: Colors.BG_GRAY,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
-    },
-    textContainer: { flex: 1 },
-    message: { fontSize: RFValue(13), color: Colors.WHITE },
-    unreadText: { fontWeight: 'bold', color: Colors.PRIMARY },
-    time: { fontSize: RFValue(11), color: Colors.WHITE, marginTop: 2 },
-    separator: { height: 1, backgroundColor: Colors.GRAY, opacity: 0.2 },
-    emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    emptyText: { marginTop: 8, fontSize: RFValue(14), color: Colors.GRAY },
-    backButton: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    actionsContainer: { flexDirection: 'row', alignItems: 'center' },
-    actionButton: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: ACTION_WIDTH,
-        height: '100%',
-    },
-    actionText: { color: Colors.WHITE, fontSize: RFValue(10), marginTop: 2 },
-});

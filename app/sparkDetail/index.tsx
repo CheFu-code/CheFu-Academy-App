@@ -9,20 +9,24 @@ import { UserDetailContext } from '@/context/UserDetailContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
 import { Likes, Replies, Spark } from '@/types/sparks';
+import { sendNotification } from '@/utils/notifications';
 import { showToast } from '@/utils/toast';
 import { AntDesign } from '@expo/vector-icons';
 import {
+    addDoc,
     arrayRemove,
     arrayUnion,
+    collection,
     doc,
     onSnapshot,
     Timestamp,
-    updateDoc
+    updateDoc,
 } from '@react-native-firebase/firestore';
 import { useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale } from 'react-native-size-matters';
 
 const SparkDetail = () => {
     const { safeBack } = useSafeNavigation();
@@ -113,8 +117,38 @@ const SparkDetail = () => {
                 }),
             });
 
+            // ✅ Send notification only if user is not liking their own spark
+            if (
+                spark.createdBy?.uid !== userDetail.uid &&
+                spark.createdBy?.email
+            ) {
+                const notificationRef = collection(db, 'notifications');
+                await addDoc(notificationRef, {
+                    type: 'comment',
+                    sparkId,
+                    from: {
+                        uid: userDetail.uid,
+                        fullname: userDetail.fullname || 'Anonymous',
+                    },
+                    to: spark.createdBy.uid,
+                    message: `${
+                        userDetail.fullname || 'Someone'
+                    } commented on your spark.`,
+                    createdAt: Timestamp.now(),
+                    read: false,
+                });
+
+                await sendNotification(
+                    spark.createdBy.email, 
+                    'New Comment',
+                    `${
+                        userDetail.fullname || 'Someone'
+                    } commented on your spark!`,
+                );
+            }
+
             setComment('');
-            showToast('Comment added successfully');
+            showToast('Commented');
         } catch (error) {
             console.log('Error adding comment:', error);
             showToast('Failed to add comment');
@@ -257,7 +291,7 @@ const SparkDetail = () => {
         return (
             <SafeAreaView style={styles.container}>
                 <TouchableOpacity onPress={safeBack} style={styles.backButton}>
-                    <AntDesign name="left" size={20} color={Colors.PRIMARY} />
+                    <AntDesign name="left" size={scale(20)} color={Colors.PRIMARY} />
                     <Text style={styles.backText}>Back</Text>
                 </TouchableOpacity>
                 <View style={styles.center}>
@@ -304,7 +338,7 @@ const SparkDetail = () => {
                 <CommentsList
                     comments={spark.comments || []}
                     currentUserId={userDetail?.uid || ''}
-                    sparkId={sparkId} 
+                    sparkId={sparkId}
                     onEdit={handleEditComment}
                     onDelete={handleDeleteComment}
                     onLike={handleLikeComment}
