@@ -1,18 +1,11 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import {
-    collection,
-    getDocs,
-    getFirestore,
-    query,
-    where,
-} from "@react-native-firebase/firestore";
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
-import * as Print from "expo-print";
-import { router } from "expo-router";
-import * as Sharing from "expo-sharing";
-import { useContext, useEffect, useState } from "react";
-import RNFS from "react-native-fs";
-
+import { useUserPayments } from '@/hooks/useUserPayments';
+import { styles } from '@/styles/SubscriptionAndBilling.styles';
+import * as Print from 'expo-print';
+import { router } from 'expo-router';
+import * as Sharing from 'expo-sharing';
+import { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -20,67 +13,47 @@ import {
     Platform,
     Pressable,
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
+} from 'react-native';
+import RNFS from 'react-native-fs';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
 
 export default function SubscriptionAndBilling() {
     const { userDetail } = useContext(UserDetailContext);
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { getUserPayments } = useUserPayments();
     const [loading2, setLoading2] = useState(false);
-
-    const db = getFirestore();
-
-    const getUserPayments = async (email) => {
-        if (!email) return [];
-        try {
-            const q = query(
-                collection(db, "payments"),
-                where("email", "==", email)
-            );
-            const snapshot = await getDocs(q);
-            const payments = [];
-            snapshot.forEach((doc) => {
-                payments.push({ id: doc.id, ...doc.data() });
-            });
-            return payments;
-        } catch (err) {
-            Alert.alert("Error", "Failed to fetch payment history.");
-            return [];
-        }
-    };
 
     useEffect(() => {
         const fetchPayments = async () => {
             setLoading(true);
-            const data = await getUserPayments(userDetail?.email);
+            const data = await getUserPayments();
             setPaymentHistory(data);
             setLoading(false);
         };
         fetchPayments();
-    }, [userDetail?.email]);
+    }, [userDetail?.email, getUserPayments]);
 
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+    const capitalize = (str?: string) =>
+        str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 
     async function requestStoragePermission() {
-        if (Platform.OS === "android" && Platform.Version < 33) {
+        if (Platform.OS === 'android' && Platform.Version < 33) {
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
                 {
-                    title: "Storage Permission Required",
+                    title: 'Storage Permission Required',
                     message:
-                        "This app needs access to your storage to save receipts",
-                    buttonPositive: "OK",
-                }
+                        'This app needs access to your storage to save receipts',
+                    buttonPositive: 'OK',
+                },
             );
             return granted === PermissionsAndroid.RESULTS.GRANTED;
         }
-        // For Android 13+ and iOS, permission is not required or handled differently
         return true;
     }
 
@@ -90,8 +63,8 @@ export default function SubscriptionAndBilling() {
             const hasPermission = await requestStoragePermission();
             if (!hasPermission) {
                 Alert.alert(
-                    "Permission Denied",
-                    "Cannot save receipt without storage permission."
+                    'Permission Denied',
+                    'Cannot save receipt without storage permission.',
                 );
                 setLoading2(false);
                 return;
@@ -181,8 +154,8 @@ export default function SubscriptionAndBilling() {
                 payment.orderID
             }</span></p>
             <p><span class="label">Payer Name:</span> <span class="value">${
-                payment.payerName?.given_name || ""
-            } ${payment.payerName?.surname || ""}</span></p>
+                payment.payerName?.given_name || ''
+            } ${payment.payerName?.surname || ''}</span></p>
             <p><span class="label">Payer Email:</span> <span class="value">${
                 payment.email
             }</span></p>
@@ -197,23 +170,23 @@ export default function SubscriptionAndBilling() {
             } ${payment.amount?.currency_code}</span></p>
             <p><span class="label">Status:</span> 
               <span class="${
-                  payment.status?.toLowerCase() === "paid" ||
-                  payment.status?.toLowerCase() === "completed"
-                      ? "status-paid"
-                      : "status-failed"
+                  payment.status?.toLowerCase() === 'paid' ||
+                  payment.status?.toLowerCase() === 'completed'
+                      ? 'status-paid'
+                      : 'status-failed'
               }">${payment.status}</span>
             </p>
             <p><span class="label">Transaction Date:</span> <span class="value">${new Date(
-                payment.timestamp
+                payment.timestamp,
             ).toLocaleString()}</span></p>
           </div>
 
           <div class="section">
             <p><span class="label">Membership Start:</span> <span class="value">${new Date(
-                userDetail?.subscribedAt
+                userDetail?.subscribedAt,
             ).toLocaleDateString()}</span></p>
             <p><span class="label">Membership Ends:</span> <span class="value">${new Date(
-                userDetail?.memberUntil
+                userDetail?.memberUntil,
             ).toLocaleDateString()}</span></p>
           </div>
 
@@ -228,23 +201,23 @@ export default function SubscriptionAndBilling() {
 
             const { uri } = await Print.printToFileAsync({ html });
 
-            if (Platform.OS === "android") {
+            if (Platform.OS === 'android') {
                 const fileName = `CheFu_Academy_subscription_receipt_${
                     payment.orderID || Date.now()
                 }.pdf`;
                 const downloadPath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
-                await RNFS.copyFile(uri.replace("file://", ""), downloadPath);
+                await RNFS.copyFile(uri.replace('file://', ''), downloadPath);
 
                 Alert.alert(
-                    "Success",
-                    `Receipt saved to Downloads folder:\n${downloadPath}`
+                    'Success',
+                    `Receipt saved to Downloads folder:\n${downloadPath}`,
                 );
             } else {
                 // iOS fallback: share instead of saving to Downloads
                 if (!(await Sharing.isAvailableAsync())) {
                     Alert.alert(
-                        "Error",
-                        "Sharing is not available on this device"
+                        'Error',
+                        'Sharing is not available on this device',
                     );
                     setLoading2(false);
                     return;
@@ -252,8 +225,8 @@ export default function SubscriptionAndBilling() {
                 await Sharing.shareAsync(uri);
             }
         } catch (error) {
-            console.error("Download failed", error);
-            Alert.alert("Error", "Failed to save receipt.");
+            console.error('Download failed', error);
+            Alert.alert('Error', 'Failed to save receipt.');
         } finally {
             setLoading2(false);
         }
@@ -346,8 +319,8 @@ export default function SubscriptionAndBilling() {
           payment.orderID
       }</span></p>
       <p><span class="label">Payer Name:</span> <span class="value">${
-          payment.payerName?.given_name || ""
-      } ${payment.payerName?.surname || ""}</span></p>
+          payment.payerName?.given_name || ''
+      } ${payment.payerName?.surname || ''}</span></p>
       <p><span class="label">Payer Email:</span> <span class="value">${
           payment.email
       }</span></p>
@@ -362,23 +335,23 @@ export default function SubscriptionAndBilling() {
       } ${payment.amount?.currency_code}</span></p>
       <p><span class="label">Status:</span> 
         <span class="${
-            payment.status?.toLowerCase() === "paid" ||
-            payment.status?.toLowerCase() === "completed"
-                ? "status-paid"
-                : "status-failed"
+            payment.status?.toLowerCase() === 'paid' ||
+            payment.status?.toLowerCase() === 'completed'
+                ? 'status-paid'
+                : 'status-failed'
         }">${payment.status}</span>
       </p>
       <p><span class="label">Transaction Date:</span> <span class="value">${new Date(
-          payment.timestamp
+          payment.timestamp,
       ).toLocaleString()}</span></p>
     </div>
 
     <div class="section">
       <p><span class="label">Membership Start:</span> <span class="value">${new Date(
-          userDetail?.subscribedAt
+          userDetail?.subscribedAt,
       ).toLocaleDateString()}</span></p>
       <p><span class="label">Membership Ends:</span> <span class="value">${new Date(
-          userDetail?.memberUntil
+          userDetail?.memberUntil,
       ).toLocaleDateString()}</span></p>
     </div>
 
@@ -394,15 +367,15 @@ export default function SubscriptionAndBilling() {
             const { uri } = await Print.printToFileAsync({ html });
 
             if (!(await Sharing.isAvailableAsync())) {
-                Alert.alert("Error", "Sharing is not available on this device");
+                Alert.alert('Error', 'Sharing is not available on this device');
                 setLoading(false);
                 return;
             }
 
             await Sharing.shareAsync(uri);
         } catch (err) {
-            console.error("Download failed", err);
-            Alert.alert("Error", "Failed to download transaction");
+            console.error('Download failed', err);
+            Alert.alert('Error', 'Failed to download transaction');
         } finally {
             setLoading(false);
         }
@@ -426,20 +399,20 @@ export default function SubscriptionAndBilling() {
                 <View style={styles.section}>
                     <View
                         style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
                         }}
                     >
                         <Text style={styles.sectionTitle}>Current Plan</Text>
 
-                        <View style={{ flexDirection: "row", gap: 10 }}>
+                        <View style={{ flexDirection: 'row', gap: 10 }}>
                             <TouchableOpacity
                                 disabled={loading || loading2}
                                 onPress={() =>
                                     paymentHistory.length > 0
                                         ? shareTransaction(paymentHistory[0])
-                                        : Alert.alert("No payment available")
+                                        : Alert.alert('No payment available')
                                 }
                             >
                                 {loading ? (
@@ -449,7 +422,7 @@ export default function SubscriptionAndBilling() {
                                         name="share"
                                         size={24}
                                         style={{
-                                            color: "green",
+                                            color: 'green',
                                             padding: 5,
                                             backgroundColor: Colors.LIGHT_GREEN,
                                             borderRadius: 15,
@@ -464,9 +437,9 @@ export default function SubscriptionAndBilling() {
                                     paymentHistory.length > 0
                                         ? downloadTransaction(
                                               paymentHistory[0],
-                                              userDetail
+                                              userDetail,
                                           )
-                                        : Alert.alert("No receipt available")
+                                        : Alert.alert('No receipt available')
                                 }
                             >
                                 {loading2 ? (
@@ -476,7 +449,7 @@ export default function SubscriptionAndBilling() {
                                         name="receipt"
                                         size={24}
                                         style={{
-                                            color: "green",
+                                            color: 'green',
                                             padding: 5,
                                             backgroundColor: Colors.LIGHT_GREEN,
                                             borderRadius: 15,
@@ -491,7 +464,7 @@ export default function SubscriptionAndBilling() {
                         {`${capitalize(userDetail.planType)} Plan`}
                     </Text>
                     <Text style={styles.renewalDate}>
-                        Your plan will expire on:{" "}
+                        Your plan will expire on:{' '}
                         {new Date(userDetail.memberUntil).toLocaleDateString()}
                     </Text>
 
@@ -500,7 +473,7 @@ export default function SubscriptionAndBilling() {
                         style={[styles.button, { opacity: loading ? 0.5 : 1 }]}
                         onPress={() => {
                             // Replace with real cancellation logic
-                            Alert.alert("Cancel Subscription pressed");
+                            Alert.alert('Cancel Subscription pressed');
                         }}
                     >
                         <Text style={styles.buttonText}>
@@ -512,14 +485,14 @@ export default function SubscriptionAndBilling() {
                 <View
                     style={{
                         marginTop: 20,
-                        alignItems: "center",
-                        justifyContent: "center",
+                        alignItems: 'center',
+                        justifyContent: 'center',
                     }}
                 >
                     <Text
                         style={{
                             color: Colors.BG_GRAY,
-                            fontFamily: "michroma",
+                            fontFamily: 'michroma',
                             fontSize: 12,
                         }}
                     >
@@ -537,21 +510,21 @@ export default function SubscriptionAndBilling() {
                         <View key={payment.id} style={styles.paymentRow}>
                             <Text style={styles.paymentText}>
                                 {new Date(
-                                    payment.timestamp
+                                    payment.timestamp,
                                 ).toLocaleDateString()}
                             </Text>
                             <Text style={styles.paymentText}>
-                                {payment.amount?.value}{" "}
+                                {payment.amount?.value}{' '}
                                 {payment.amount?.currency_code}
                             </Text>
                             <Text
                                 style={{
                                     color:
-                                        payment.status === "Paid" ||
-                                        payment.status === "COMPLETED"
-                                            ? "green"
-                                            : "red",
-                                    fontWeight: "bold",
+                                        payment.status === 'Paid' ||
+                                        payment.status === 'COMPLETED'
+                                            ? 'green'
+                                            : 'red',
+                                    fontWeight: 'bold',
                                 }}
                             >
                                 {payment.status}
@@ -563,71 +536,3 @@ export default function SubscriptionAndBilling() {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: Colors.BG_COLOR,
-        flex: 1,
-    },
-    icon: {
-        marginTop: 30,
-        backgroundColor: Colors.GRAY,
-        padding: 4,
-        borderRadius: 20,
-        color: "white",
-    },
-    heading: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginTop: 30,
-        color: Colors.PRIMARY,
-    },
-    headerRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-    },
-    section: {
-        marginTop: 30,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: "600",
-        marginBottom: 12,
-        color: "white",
-    },
-    planName: {
-        fontSize: 16,
-        marginBottom: 4,
-        color: Colors.GREEN,
-        fontFamily: "outfit-bold",
-    },
-    renewalDate: {
-        fontSize: 14,
-        color: "#ccc",
-        marginBottom: 12,
-        fontFamily: "outfit",
-    },
-    button: {
-        backgroundColor: "#007bff",
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        borderRadius: 6,
-        alignSelf: "flex-start",
-    },
-    buttonText: {
-        color: "white",
-        fontWeight: "600",
-    },
-    paymentRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderColor: "#333",
-    },
-    paymentText: {
-        color: "#ccc",
-        fontSize: 14,
-    },
-});

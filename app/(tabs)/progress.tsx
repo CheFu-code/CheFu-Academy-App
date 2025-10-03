@@ -78,7 +78,7 @@ export default function Progress({ enroll = false }) {
             setLoading(false);
             setFetching(false);
         }
-    }, [fetching, userDetail?.email]);
+    }, [userDetail?.email]);
 
     useEffect(() => {
         if (userDetail) GetCourseList();
