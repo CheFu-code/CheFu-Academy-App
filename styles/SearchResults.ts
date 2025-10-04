@@ -1,63 +1,66 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
+    container: { flex: 1, padding: moderateScale(20) },
     backButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: moderateScale(8),
         borderBottomWidth: 1,
         borderBottomColor: Colors.PRIMARY,
-        paddingBottom: 20,
+        paddingBottom: verticalScale(20),
     },
     header: {
         color: Colors.WHITE,
-        fontSize: 20,
+        fontSize: scale(20),
         fontFamily: 'outfit-bold',
-        maxWidth: 320,
+        maxWidth: '85%',
     },
     query: {
         color: Colors.PRIMARY,
         fontStyle: 'italic',
+        fontSize: scale(14),
     },
     emptyContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 50,
+        marginTop: verticalScale(50),
     },
     emptyHeader: {
         color: Colors.GRAY,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 50,
         fontFamily: 'outfit-bold',
-        fontSize: 18,
+        fontSize: scale(18),
         textAlign: 'center',
+        marginTop: verticalScale(50),
     },
     emptyMessage: {
         color: Colors.GRAY,
         fontFamily: 'outfit',
-        fontSize: 15,
-        marginTop: 25,
+        fontSize: scale(15),
+        marginTop: verticalScale(25),
+        textAlign: 'center',
     },
     createText: {
         color: Colors.PRIMARY,
         textDecorationLine: 'underline',
+        fontFamily: 'outfit-bold',
+        marginTop: verticalScale(10),
     },
     resultContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: verticalScale(20),
     },
     category: {
-        fontSize: 18,
+        fontSize: scale(18),
         color: Colors.WHITE,
         fontFamily: 'outfit-bold',
         textTransform: 'capitalize',
-        marginBottom: 10,
-        maxWidth: 250,
+        marginBottom: verticalScale(10),
+        maxWidth: '70%',
     },
     center: {
         alignItems: 'center',
@@ -65,10 +68,12 @@ export const styles = StyleSheet.create({
     },
     found: {
         fontFamily: 'outfit',
-        color: 'white',
+        color: Colors.WHITE,
+        fontSize: scale(14),
     },
     length: {
         fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
+        fontSize: scale(14),
     },
 });

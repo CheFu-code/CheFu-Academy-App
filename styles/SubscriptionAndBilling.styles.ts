@@ -1,5 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
@@ -7,49 +8,49 @@ export const styles = StyleSheet.create({
         flex: 1,
     },
     icon: {
-        marginTop: 30,
+        marginTop: verticalScale(30),
         backgroundColor: Colors.GRAY,
-        padding: 4,
-        borderRadius: 20,
+        padding: moderateScale(4),
+        borderRadius: moderateScale(20),
         color: "white",
     },
     heading: {
-        fontSize: 24,
+        fontSize: scale(24),
         fontWeight: "bold",
-        marginTop: 30,
+        marginTop: verticalScale(30),
         color: Colors.PRIMARY,
     },
     headerRow: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
+        gap: moderateScale(8),
     },
     section: {
-        marginTop: 30,
+        marginTop: verticalScale(30),
     },
     sectionTitle: {
-        fontSize: 18,
+        fontSize: scale(18),
         fontWeight: "600",
-        marginBottom: 12,
+        marginBottom: verticalScale(12),
         color: "white",
     },
     planName: {
-        fontSize: 16,
-        marginBottom: 4,
+        fontSize: scale(16),
+        marginBottom: verticalScale(4),
         color: Colors.GREEN,
         fontFamily: "outfit-bold",
     },
     renewalDate: {
-        fontSize: 14,
+        fontSize: scale(14),
         color: "#ccc",
-        marginBottom: 12,
+        marginBottom: verticalScale(12),
         fontFamily: "outfit",
     },
     button: {
         backgroundColor: "#007bff",
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        borderRadius: 6,
+        paddingVertical: verticalScale(10),
+        paddingHorizontal: moderateScale(16),
+        borderRadius: moderateScale(6),
         alignSelf: "flex-start",
     },
     buttonText: {
@@ -59,12 +60,12 @@ export const styles = StyleSheet.create({
     paymentRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: 10,
+        paddingVertical: verticalScale(10),
         borderBottomWidth: 1,
         borderColor: "#333",
     },
     paymentText: {
         color: "#ccc",
-        fontSize: 14,
+        fontSize: scale(14),
     },
 });

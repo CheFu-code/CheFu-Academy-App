@@ -1,5 +1,6 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
@@ -10,35 +11,35 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: 16,
-        paddingVertical: 20,
+        paddingHorizontal: moderateScale(16),
+        paddingVertical: verticalScale(20),
     },
     headerText: {
-        fontSize: 22,
+        fontSize: scale(22),
         fontWeight: "700",
         color: Colors.PRIMARY,
     },
     listContainer: {
-        padding: 16,
+        padding: moderateScale(16),
     },
     courseCard: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: Colors.WHITE,
-        borderRadius: 12,
-        marginBottom: 16,
-        padding: 12,
+        borderRadius: moderateScale(12),
+        marginBottom: verticalScale(16),
+        padding: moderateScale(12),
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: verticalScale(2) },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: moderateScale(4),
         elevation: 3,
     },
     courseImage: {
-        width: 60,
-        height: 60,
-        borderRadius: 8,
-        marginRight: 10,
+        width: scale(60),
+        height: scale(60),
+        borderRadius: moderateScale(8),
+        marginRight: moderateScale(10),
         borderWidth: 0.3,
         borderColor: Colors.BLACK,
     },
@@ -46,7 +47,7 @@ export const styles = StyleSheet.create({
         flex: 1,
     },
     courseTitle: {
-        fontSize: 16,
+        fontSize: scale(16),
         fontWeight: "600",
         color: Colors.PRIMARY,
     },
@@ -56,24 +57,24 @@ export const styles = StyleSheet.create({
         alignItems: "center",
     },
     emptyText: {
-        fontSize: 16,
+        fontSize: scale(16),
         color: Colors.GRAY,
     },
     backButton: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 5,
+        gap: moderateScale(5),
     },
     remove: {
         justifyContent: "center",
         alignItems: "center",
-        padding: 8,
-        borderRadius: 20,
+        padding: moderateScale(8),
+        borderRadius: moderateScale(20),
         backgroundColor: Colors.LIGHT_RED,
-        marginLeft: 8,
+        marginLeft: moderateScale(8),
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: { width: 0, height: verticalScale(1) },
         shadowOpacity: 0.2,
-        shadowRadius: 2,
+        shadowRadius: moderateScale(2),
     },
 });

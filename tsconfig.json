@@ -18,6 +18,6 @@
         "app/auth.jsx",
         "component/Spinner.js",
         "utils",
-        "styles/MyCourses.styles.js"
+        "styles/MyCourses.styles.ts"
     ]
 }

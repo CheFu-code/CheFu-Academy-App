@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { moderateScale, verticalScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
 
 export const styles = StyleSheet.create({
@@ -8,31 +9,31 @@ export const styles = StyleSheet.create({
     },
     image: {
         width: "100%",
-        height: 260,
+        height: verticalScale(260),
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
-        borderBottomRightRadius: 20,
-        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: moderateScale(20),
+        borderBottomLeftRadius: moderateScale(20),
         zIndex: 1,
     },
     backButton: {
         position: "absolute",
-        top: 50,
-        left: 20,
+        top: verticalScale(50),
+        left: moderateScale(20),
         zIndex: 2,
         backgroundColor: "rgba(255,255,255,0.6)",
-        borderRadius: 25,
-        padding: 6,
+        borderRadius: moderateScale(25),
+        padding: moderateScale(6),
     },
     downloadButton: {
         position: "absolute",
-        top: 50,
-        right: 20,
+        top: verticalScale(50),
+        right: moderateScale(20),
         zIndex: 2,
         backgroundColor: Colors.GREEN,
-        borderRadius: 25,
-        padding: 6,
+        borderRadius: moderateScale(25),
+        padding: moderateScale(6),
     },
 });

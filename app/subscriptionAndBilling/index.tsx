@@ -23,9 +23,9 @@ import { UserDetailContext } from '../../context/UserDetailContext';
 
 export default function SubscriptionAndBilling() {
     const { userDetail } = useContext(UserDetailContext);
+    const { getUserPayments } = useUserPayments();
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { getUserPayments } = useUserPayments();
     const [loading2, setLoading2] = useState(false);
 
     useEffect(() => {

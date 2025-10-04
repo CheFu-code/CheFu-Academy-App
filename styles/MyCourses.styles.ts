@@ -1,21 +1,22 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.BG_COLOR,
-        padding: 16,
+        padding: moderateScale(16),
     },
     backButton: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
-        marginBottom: 16,
+        gap: moderateScale(8),
+        marginBottom: verticalScale(16),
     },
     backButtonText: {
         color: Colors.WHITE,
-        fontSize: 18,
+        fontSize: scale(18),
         fontFamily: "outfit-bold",
     },
     emptyBox: {
@@ -25,63 +26,67 @@ export const styles = StyleSheet.create({
     },
     emptyText: {
         color: Colors.GRAY,
-        fontSize: 16,
+        fontSize: scale(16),
         fontFamily: "outfit",
     },
     courseCard: {
         backgroundColor: Colors.BG_GRAY,
-        borderRadius: 12,
-        padding: 12,
-        marginTop: 10,
+        borderRadius: moderateScale(12),
+        padding: moderateScale(12),
+        marginTop: verticalScale(10),
         width: "49%",
         marginRight: "1%",
     },
     courseTitle: {
-        fontSize: 16,
+        fontSize: scale(16),
         color: Colors.PRIMARY,
         fontFamily: "outfit-bold",
     },
     courseCategory: {
-        fontSize: 14,
+        fontSize: scale(14),
         color: Colors.GRAY,
     },
     bannerImage: {
         width: "100%",
-        height: 100,
-        borderRadius: 10,
+        height: verticalScale(100),
+        borderRadius: moderateScale(10),
     },
     chapterContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        gap: 18,
+        gap: moderateScale(18),
     },
     chapter: {
-        fontSize: 14,
+        fontSize: scale(14),
         color: Colors.BLACK,
         fontFamily: "outfit-bold",
     },
     time: {
-        fontSize: 10,
+        fontSize: scale(10),
         color: Colors.BLACK,
         fontFamily: "outfit-bold",
-        marginRight: 5,
+        marginRight: moderateScale(5),
     },
-    loader: { justifyContent: "center", alignItems: "center", flex: 1 },
+    loader: {
+        justifyContent: "center",
+        alignItems: "center",
+        flex: 1,
+    },
     detailsContainer: {
         flex: 1,
         justifyContent: "space-between",
-        minHeight: 80,
+        minHeight: verticalScale(80),
     },
     completedBadge: {
-        fontSize: 12,
+        fontSize: scale(12),
         color: Colors.GREEN,
         fontFamily: "outfit-bold",
     },
     checkmark: {
         position: "absolute",
-        top: 10, // distance from top of banner
-        right: 12, // distance from left of banner
+        top: verticalScale(10),
+        right: moderateScale(12),
         zIndex: 10,
     },
 });

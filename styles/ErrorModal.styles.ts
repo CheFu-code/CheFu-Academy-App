@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     modalContainer: {
@@ -10,42 +11,44 @@ export const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: "#121212",
-        padding: 30,
-        borderRadius: 16,
+        padding: moderateScale(30),
+        borderRadius: moderateScale(16),
         alignItems: "center",
-        width: 300,
+        width: scale(300),
     },
     title: {
-        fontSize: 20,
+        fontSize: moderateScale(20),
         fontFamily: "outfit-bold",
         color: Colors.RED,
-        marginBottom: 10,
+        marginBottom: verticalScale(10),
     },
     message: {
-        fontSize: 14,
+        fontSize: moderateScale(14),
         color: "#ccc",
         textAlign: "center",
         fontFamily: "outfit",
-        marginBottom: 20,
+        marginBottom: verticalScale(20),
     },
     buttonRow: {
         flexDirection: "row",
         width: "100%",
         justifyContent: "space-between",
-        gap: 10,
+        gap: moderateScale(10),
     },
     button: {
         flex: 1,
-        borderRadius: 10,
-        padding: 12,
+        borderRadius: moderateScale(10),
+        paddingVertical: verticalScale(12),
         borderWidth: 1,
         alignItems: "center",
     },
     confirmText: {
         fontWeight: "bold",
         color: Colors.WHITE,
+        fontSize: moderateScale(14),
     },
     cancelText: {
         fontFamily: "outfit-bold",
+        fontSize: moderateScale(14),
     },
 });

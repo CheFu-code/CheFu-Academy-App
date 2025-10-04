@@ -1,15 +1,16 @@
 import { StyleSheet } from "react-native";
+import { moderateScale, verticalScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.BG_COLOR,
-        padding: 20,
-        marginTop: 30,
+        padding: moderateScale(20),
+        marginTop: verticalScale(30),
     },
     heading: {
-        fontSize: 24,
+        fontSize: moderateScale(24),
         fontFamily: "outfit-bold",
         color: Colors.WHITE,
     },
@@ -17,22 +18,22 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 20,
-        gap: 8,
+        marginBottom: verticalScale(20),
+        gap: moderateScale(8),
     },
     label: {
-        fontSize: 16,
+        fontSize: moderateScale(16),
         fontFamily: "outfit-bold",
         color: Colors.WHITE,
     },
     subtext: {
-        fontSize: 13,
+        fontSize: moderateScale(13),
         fontFamily: "outfit",
         color: "#aaa",
     },
     note: {
-        marginTop: 30,
-        fontSize: 13,
+        marginTop: verticalScale(30),
+        fontSize: moderateScale(13),
         color: "#888",
         fontFamily: "outfit",
         textAlign: "center",
@@ -40,19 +41,19 @@ export const styles = StyleSheet.create({
     backButton: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 10,
+        gap: moderateScale(10),
         zIndex: 10,
     },
     resetButton: {
         backgroundColor: Colors.PRIMARY,
-        padding: 14,
-        borderRadius: 10,
+        paddingVertical: verticalScale(14),
+        borderRadius: moderateScale(10),
         alignItems: "center",
-        marginTop: 10,
+        marginTop: verticalScale(10),
     },
     resetButtonText: {
         color: "#fff",
         fontFamily: "outfit-bold",
-        fontSize: 16,
+        fontSize: moderateScale(16),
     },
 });

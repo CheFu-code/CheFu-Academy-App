@@ -1,14 +1,15 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.BG_COLOR,
-        padding: 20,
+        padding: moderateScale(20),
     },
     header: {
-        fontSize: 24,
+        fontSize: scale(24),
         fontWeight: "bold",
         color: Colors.PRIMARY,
     },
@@ -16,9 +17,9 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: Colors.BG_GRAY,
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 12,
+        padding: moderateScale(12),
+        borderRadius: moderateScale(12),
+        marginBottom: verticalScale(12),
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -26,14 +27,14 @@ export const styles = StyleSheet.create({
         elevation: 2,
     },
     courseTitle: {
-        fontSize: 18,
+        fontSize: scale(18),
         color: Colors.BLACK,
         fontFamily: "outfit-bold",
     },
     courseDate: {
-        fontSize: 14,
+        fontSize: scale(14),
         color: Colors.GREEN,
-        marginTop: 2,
+        marginTop: verticalScale(2),
         fontFamily: "outfit-bold",
     },
     emptyContainer: {
@@ -42,23 +43,23 @@ export const styles = StyleSheet.create({
         alignItems: "center",
     },
     emptyText: {
-        marginTop: 12,
-        fontSize: 18,
+        marginTop: verticalScale(12),
+        fontSize: scale(18),
         color: Colors.GRAY,
         fontFamily: "outfit-bold",
     },
     button: {
-        marginTop: 25,
+        marginTop: verticalScale(25),
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
-        marginBottom: 20,
+        gap: moderateScale(8),
+        marginBottom: verticalScale(20),
     },
     indicatorContainer: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: Colors.BG_COLOR,
-        padding: 20,
+        padding: moderateScale(20),
     },
 });

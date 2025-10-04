@@ -1,32 +1,32 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     backButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: moderateScale(10),
         borderBottomWidth: 0.7,
         borderBottomColor: Colors.GRAY,
-        paddingBottom: 5,
+        paddingBottom: verticalScale(5),
     },
     title: {
         color: Colors.WHITE,
-        fontSize: RFValue(18),
+        fontSize: scale(18),
         fontFamily: 'outfit-bold',
-        maxWidth: 320,
+        maxWidth: '85%',
     },
     queryContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingRight: 10,
+        paddingRight: moderateScale(10),
     },
     queryText: {
         color: Colors.GRAY,
         fontStyle: 'italic',
-        fontSize: RFValue(14),
+        fontSize: scale(14),
     },
     center: {
         alignItems: 'center',
@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
     },
     found: {
         fontFamily: 'outfit',
-        color: 'white',
+        color: Colors.WHITE,
     },
     total: {
         fontFamily: 'outfit-bold',
@@ -43,26 +43,27 @@ export const styles = StyleSheet.create({
     noResultsContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 50,
-        padding: 20,
+        marginTop: verticalScale(50),
+        paddingHorizontal: moderateScale(20),
     },
     noResultsText: {
         color: Colors.GRAY,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 50,
         fontFamily: 'outfit-bold',
-        fontSize: RFValue(16),
+        fontSize: scale(16),
         textAlign: 'center',
+        marginTop: verticalScale(20),
     },
     noResultsDescription: {
         color: Colors.GRAY,
         fontFamily: 'outfit',
-        fontSize: RFValue(13),
-        marginTop: 25,
+        fontSize: scale(13),
+        marginTop: verticalScale(15),
+        textAlign: 'center',
     },
     createText: {
         color: Colors.PRIMARY,
         textDecorationLine: 'underline',
+        fontFamily: 'outfit-bold',
+        marginTop: verticalScale(10),
     },
 });

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { moderateScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
 
 export const styles = StyleSheet.create({
@@ -7,33 +8,34 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
     },
     headerWrapper: {
-        padding: 10,
+        padding: moderateScale(10),
         backgroundColor: Colors.BG_COLOR,
     },
     headerText: {
         fontFamily: "outfit-bold",
-        fontSize: 26,
+        fontSize: moderateScale(26),
         color: Colors.PRIMARY,
     },
     scrollContent: {
-        padding: 20,
+        padding: moderateScale(20),
         backgroundColor: Colors.BG_COLOR,
     },
     categoryWrapper: {
-        marginTop: 10,
+        marginTop: moderateScale(10),
     },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: Colors.BG_GRAY,
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        marginBottom: 5,
+        borderRadius: moderateScale(12),
+        paddingHorizontal: moderateScale(12),
+        paddingVertical: moderateScale(8),
+        marginBottom: moderateScale(5),
         elevation: 3,
     },
     textInput: {
         flex: 1,
-        fontSize: 16,
+        fontSize: moderateScale(16),
         fontFamily: "outfit",
         color: Colors.GREEN,
     },

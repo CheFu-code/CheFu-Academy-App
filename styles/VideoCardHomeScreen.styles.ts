@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
-
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     cardWrapper: {
         position: "relative",
-        marginVertical: 10,
+        marginVertical: verticalScale(10),
         backgroundColor: Colors.BG_GRAY,
-        borderRadius: 10,
+        borderRadius: moderateScale(10),
     },
     card: {
         overflow: "hidden",
@@ -15,25 +15,25 @@ export const styles = StyleSheet.create({
         width: "100%",
     },
     thumbnail: {
-        height: 200,
-        borderTopLeftRadius:10,
-        borderTopRightRadius:10,
+        height: verticalScale(200),
+        borderTopLeftRadius: moderateScale(10),
+        borderTopRightRadius: moderateScale(10),
         backgroundColor: Colors.GRAY,
         width: "100%",
     },
     title: {
         color: "#000",
-        marginTop: 5,
-        fontSize: 16,
+        marginTop: verticalScale(5),
+        fontSize: scale(16),
         fontFamily: "outfit-bold",
-        paddingHorizontal: 6,
+        paddingHorizontal: moderateScale(6),
     },
     description: {
         color: Colors.BLACK,
-        marginBottom: 5,
-        fontSize: 16,
+        marginBottom: verticalScale(5),
+        fontSize: scale(16),
         fontFamily: "outfit",
-        paddingHorizontal: 6,
+        paddingHorizontal: moderateScale(6),
     },
     categoryText: {
         color: "#fff",
@@ -41,41 +41,41 @@ export const styles = StyleSheet.create({
     },
     category: {
         position: "absolute",
-        top: 10,
-        left: 10,
+        top: verticalScale(10),
+        left: moderateScale(10),
         zIndex: 10,
         backgroundColor: Colors.GREEN,
-        padding: 5,
-        borderRadius: 10,
+        padding: moderateScale(5),
+        borderRadius: moderateScale(10),
         borderWidth: 1,
         borderColor: Colors.BLACK,
     },
     durationContainer: {
-        paddingHorizontal: 6,
-        marginTop: 5,
+        paddingHorizontal: moderateScale(6),
+        marginTop: verticalScale(5),
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 8,
+        marginBottom: verticalScale(8),
     },
     duration: {
         color: Colors.BLACK,
-        fontSize: 14,
+        fontSize: scale(14),
         fontFamily: "outfit",
     },
     uploadedAt: {
         color: Colors.BLACK,
-        fontSize: 14,
+        fontSize: scale(14),
         fontFamily: "outfit-bold",
     },
     durationInfo: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 5,
+        gap: moderateScale(5),
     },
-    categoryRow:{
+    categoryRow: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-    }
+    },
 });
