@@ -1,32 +1,35 @@
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { Course, CourseProgressProps } from "@/types/course";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constant/Colors";
-import CourseProgressCard from "../Shared/CourseProgressCard";
-import { RFValue } from "react-native-responsive-fontsize";
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course, CourseProgressProps } from '@/types/course';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Colors } from '../../constant/Colors';
+import CourseProgressCard from '../Shared/CourseProgressCard';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+
+type ItemType = Course | { isViewAll: true };
 
 export default function CourseProgress({
     courseList,
     enroll = false,
 }: CourseProgressProps) {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const displayedCourses = courseList.slice(0, 4);
 
     useFocusEffect(
         useCallback(() => {
             setLoadingId(null);
-        }, [])
+        }, []),
     );
 
     const handlePress = (item: Course) => {
-        const id = item.id || item.courseTitle || "";
+        const id = item.id || item.courseTitle || '';
         setLoadingId(id);
 
         safePush({
-            pathname: "/courseView",
+            pathname: '/courseView',
             params: {
                 courseParams: JSON.stringify(item),
                 enroll: enroll.toString(),
@@ -38,56 +41,65 @@ export default function CourseProgress({
         <View>
             <View
                 style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: 10
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: moderateScale(8),
                 }}
             >
                 <Text
                     style={{
-                        fontFamily: "outfit-bold",
+                        fontFamily: 'outfit-bold',
                         fontSize: RFValue(18),
                         color: Colors.PRIMARY,
-
                     }}
                 >
                     Progress
                 </Text>
-                <TouchableOpacity
-                    onPress={() => safePush("/(tabs)/progress")}
-                >
-                    <Text
-                        style={{
-                            fontFamily: "outfit",
-                            fontSize: 14,
-                            color: Colors.PRIMARY,
-                            textDecorationLine: "underline",
-                        }}
-                    >
-                        View All
-                    </Text>
-                </TouchableOpacity>
             </View>
-            <FlatList
-                data={displayedCourses}
+            <FlatList<ItemType>
+                data={[...displayedCourses, { isViewAll: true }]}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item, index) =>
-                    item.docId ||
-                    item.id?.toString() ||
-                    `${item.courseTitle}-${index}`
+                    'isViewAll' in item
+                        ? 'view-all'
+                        : item.docId || item.id || index.toString()
                 }
-                renderItem={({ item }) => (
-                    <CourseProgressCard
-                        item={item}
-                        onPress={() => handlePress(item)}
-                        disabled={Boolean(loadingId)}
-                        loading={
-                            loadingId === (item.id || item.courseTitle || "")
-                        }
-                    />
-                )}
+                renderItem={({ item }) =>
+                    'isViewAll' in item ? (
+                        <TouchableOpacity
+                            onPress={() => safePush('/(tabs)/progress')}
+                            style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                paddingHorizontal: moderateScale(10),
+                                backgroundColor: Colors.BG,
+                                borderRadius: moderateScale(30),
+                                height: verticalScale(40),
+                                marginTop: verticalScale(25),
+                            }}>
+                            <Text
+                                style={{
+                                    fontFamily: 'outfit',
+                                    fontSize: RFValue(12),
+                                    color: Colors.PRIMARY,
+                                }}
+                            >
+                                View All
+                            </Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <CourseProgressCard
+                            item={item}
+                            onPress={() => handlePress(item)}
+                            disabled={Boolean(loadingId)}
+                            loading={
+                                loadingId === (item.id || item.courseTitle)
+                            }
+                        />
+                    )
+                }
             />
         </View>
     );

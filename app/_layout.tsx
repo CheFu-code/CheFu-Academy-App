@@ -45,6 +45,9 @@ const useProtectedRoute = (
             return;
         }
 
+        // 👇 Prevent early redirect while userDetail === undefined
+        if (userDetail === undefined) return;
+
         const inAuthGroup = segments[0] === 'auth';
 
         if (userDetail && inAuthGroup) {
@@ -84,7 +87,14 @@ function LayoutContent() {
 
     if (fontError) return <FontErrorScreen />;
 
-    if (!fontsLoaded || !authChecked || !authSuccess) return <LoadingScreen />;
+    if (
+        !fontsLoaded ||
+        !authChecked ||
+        !authSuccess ||
+        userDetail === undefined
+    ) {
+        return <LoadingScreen />;
+    }
 
     return (
         <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>

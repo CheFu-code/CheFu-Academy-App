@@ -59,8 +59,6 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: scale(10),
-        backgroundColor: Colors.BG,
-        borderRadius: scale(12),
         paddingHorizontal: scale(10),
     },
     icons: {

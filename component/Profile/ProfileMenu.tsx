@@ -3,7 +3,6 @@ import { Colors } from "@/constant/Colors";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { menuItems, url } from "@/data/menuItems";
 import { useRefreshProfile } from "@/hooks/useRefreshProfile";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { styles } from "@/styles/Profile.styles";
 import { showToast } from "@/utils/toast";
 import {
@@ -48,7 +47,7 @@ export const ProfileMenu = ({
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
     const renderedMenuItems = useMemo(
         () => menuItems(router, Linking, ToastAndroid, Colors),
-        [router]
+        []
     );
     return (
         <ScrollView

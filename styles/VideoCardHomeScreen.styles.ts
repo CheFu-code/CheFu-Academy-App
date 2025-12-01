@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
         width: "100%",
     },
     thumbnail: {
-        height: verticalScale(200),
+        height: verticalScale(170),
         borderTopLeftRadius: moderateScale(10),
         borderTopRightRadius: moderateScale(10),
         backgroundColor: Colors.GRAY,
@@ -24,14 +24,14 @@ export const styles = StyleSheet.create({
     title: {
         color: "#000",
         marginTop: verticalScale(5),
-        fontSize: scale(16),
+        fontSize: scale(14),
         fontFamily: "outfit-bold",
         paddingHorizontal: moderateScale(6),
     },
     description: {
         color: Colors.BLACK,
         marginBottom: verticalScale(5),
-        fontSize: scale(16),
+        fontSize: scale(12),
         fontFamily: "outfit",
         paddingHorizontal: moderateScale(6),
     },
@@ -60,12 +60,12 @@ export const styles = StyleSheet.create({
     },
     duration: {
         color: Colors.BLACK,
-        fontSize: scale(14),
+        fontSize: scale(12),
         fontFamily: "outfit",
     },
     uploadedAt: {
         color: Colors.BLACK,
-        fontSize: scale(14),
+        fontSize: scale(12),
         fontFamily: "outfit-bold",
     },
     durationInfo: {

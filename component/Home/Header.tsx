@@ -30,6 +30,7 @@ import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Header.styles';
 import AddVideoModal from './AddVideoModal';
 import { scale } from 'react-native-size-matters';
+import { RFValue } from 'react-native-responsive-fontsize';
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function Header({ onPress }: { onPress?: () => void }) {
@@ -285,7 +286,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     <Text
                         numberOfLines={1}
                         ellipsizeMode={'tail'}
-                        style={[styles.text, { fontSize: scale(12) }]}
+                        style={[styles.text, { fontSize: RFValue(12) }]}
                     >
                         Expand your knowledge with our courses
                     </Text>

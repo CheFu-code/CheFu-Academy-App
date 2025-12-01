@@ -15,6 +15,7 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
 
 interface CourseListProps {
     courseList: Course[];
@@ -90,9 +91,9 @@ export default function CourseList({
                         >
                             <Image
                                 style={{
-                                    width: 200,
-                                    height: 110,
-                                    borderRadius: 15,
+                                    width: moderateScale(190),
+                                    height: verticalScale(100),
+                                    borderRadius: moderateScale(15),
                                     opacity: loadingId ? 0.5 : 1,
                                 }}
                                 source={
@@ -126,13 +127,13 @@ export default function CourseList({
                             >
                                 <Ionicons
                                     name="book-outline"
-                                    size={18}
+                                    size={RFValue(16)}
                                     color={Colors.PRIMARY}
                                 />
                                 <Text
                                     style={{
                                         fontFamily: 'outfit',
-                                        fontSize: RFValue(10),
+                                        fontSize: RFValue(11),
                                     }}
                                 >
                                     {item?.chapters?.length} Chapters

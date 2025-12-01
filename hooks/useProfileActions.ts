@@ -21,6 +21,7 @@ export function useProfileActions(userDetail: any, setUserDetail: any, router: a
             setUserDetail(null);
             ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
         } catch (err) {
+            ToastAndroid.show("Failed to logout", ToastAndroid.SHORT);
             Sentry.captureException(err);
         } finally {
             setLoading(false);

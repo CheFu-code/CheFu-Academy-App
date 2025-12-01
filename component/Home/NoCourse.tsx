@@ -1,45 +1,55 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Image, Text, View } from "react-native";
-import Button from "../Shared/Button";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+import { useState } from 'react';
+import { Image, Text, View } from 'react-native';
+import Button from '../Shared/Button';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale } from 'react-native-size-matters';
 
 export default function NoCourse() {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     const [loading, setLoading] = useState(false);
 
     return (
-        <View style={{ marginTop: 60, display: "flex", alignItems: "center" }}>
+        <View
+            style={{
+                marginTop: moderateScale(60),
+                display: 'flex',
+                alignItems: 'center',
+                paddingHorizontal: scale(10),
+            }}
+        >
             <Image
                 style={{
-                    height: 200,
-                    width: 180,
+                    height: scale(180),
+                    width: scale(150),
+                    marginBottom: moderateScale(20),
                 }}
-                source={require("../../assets/images/book1.webp")}
+                source={require('../../assets/images/book1.webp')}
             />
             <Text
                 style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: 25,
-                    textAlign: "center",
-                    color: "#fff",
+                    fontFamily: 'outfit-bold',
+                    fontSize: RFValue(24),
+                    textAlign: 'center',
+                    color: '#fff',
+                    marginBottom: moderateScale(10),
                 }}
             >
-                You don't have any course yet
+                You don&apos;t have any course yet
             </Text>
 
             <Button
-                onPress={() => safePush("/addCourse")}
-                text={"+ Create new course"}
+                onPress={() => safePush('/addCourse')}
+                text={'+ Create new course'}
                 disabled={loading}
                 loading={false}
                 icon={null}
                 opacity={loading ? 0.5 : 1}
             />
             <Button
-                onPress={() => safePush("/(tabs)/explore")}
+                onPress={() => safePush('/(tabs)/explore')}
                 disabled={loading}
-                text={"Explore existing courses"}
+                text={'Explore existing courses'}
                 type="outline"
                 loading={false}
                 icon={null}

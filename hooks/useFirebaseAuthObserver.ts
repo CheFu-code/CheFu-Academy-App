@@ -57,7 +57,7 @@ function mapFirebaseUserToUserDetail(user: FirebaseAuthTypes.User): UserDetail {
 
 export function useFirebaseAuthObserver(authChecked: boolean, authSuccess: boolean) {
     const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
-    const { safeBack, safePush, safeReplace } = useSafeNavigation()
+    const { safeReplace } = useSafeNavigation()
     const alreadyRedirected = useRef(false);
 
     useEffect(() => {
@@ -72,8 +72,8 @@ export function useFirebaseAuthObserver(authChecked: boolean, authSuccess: boole
                 setUserDetail(null);
                 if (!alreadyRedirected.current) {
                     alreadyRedirected.current = true;
-                    console.log("User is not authenticated, redirecting to welcome screen");
-                    safeReplace("/");
+                    console.log("User is not authenticated, redirecting to sign in screen");
+                    safeReplace("/auth/signIn");
                 }
             }
         });

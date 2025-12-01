@@ -8,7 +8,7 @@ import {
     FirebaseFirestoreTypes,
     getDocs,
     orderBy,
-    query
+    query,
 } from '@react-native-firebase/firestore';
 import LottieView from 'lottie-react-native';
 import { useCallback, useContext, useEffect, useState } from 'react';
@@ -138,7 +138,7 @@ export default function ExploreScreen() {
                 <Text style={styles.headerText}>Explore courses</Text>
             </View>
 
-            <View style={{ padding: 15 }}>
+            <View style={styles.p}>
                 <View style={styles.inputContainer}>
                     <TextInput
                         placeholder="Search course, topic, category..."

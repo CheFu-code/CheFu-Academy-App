@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
 import { scale, verticalScale, moderateScale } from "react-native-size-matters";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     container: {
@@ -8,14 +9,13 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
         justifyContent: "center",
         alignItems: "center",
-        padding: moderateScale(20),
     },
     icon: {
         marginBottom: verticalScale(20),
     },
     title: {
         color: Colors.RED,
-        fontSize: scale(24),
+        fontSize: RFValue(22),
         fontFamily: "outfit-bold",
         marginBottom: verticalScale(8),
     },
@@ -24,6 +24,8 @@ export const styles = StyleSheet.create({
         fontSize: scale(16),
         textAlign: "center",
         fontFamily: "outfit",
+        padding: moderateScale(20),
+
     },
     lottie: {
         width: scale(180),

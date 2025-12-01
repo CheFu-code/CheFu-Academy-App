@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from '../constant/Colors';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export const styles = StyleSheet.create({
     headerContainer: {
@@ -18,7 +19,7 @@ export const styles = StyleSheet.create({
     },
     greeting: {
         fontFamily: 'outfit-bold',
-        fontSize: scale(20),
+        fontSize: RFValue(20),
         color: '#fff',
         maxWidth: scale(200),
     },

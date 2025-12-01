@@ -8,6 +8,8 @@ import { Image, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constant/Colors';
 import { styles } from '../styles/WelcomeScreen.styles';
+import { scale } from 'react-native-size-matters';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function Index() {
     const { safePush } = useSafeNavigation();
@@ -19,7 +21,7 @@ export default function Index() {
         <SafeAreaView style={styles.centeredContainer}>
             <Image
                 source={require('./../assets/images/landing.png')}
-                style={{ width: '100%', height: 430,  }}
+                style={{ width: '100%', height: scale(400),  }}
                 resizeMode="contain"
             />
 
@@ -54,10 +56,10 @@ export default function Index() {
                     style={styles.iconsContainer}
                     onPress={navigateGoogle}
                 >
-                    <AntDesign name="google" size={30} color="#fff" />
+                    <AntDesign name="google" size={scale(28)} color="#fff" />
                     <Text
                         style={{
-                            fontSize: 16,
+                            fontSize: RFValue(15),
                             fontFamily: 'outfit',
                             color: 'white',
                         }}

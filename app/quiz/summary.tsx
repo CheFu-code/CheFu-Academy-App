@@ -1,9 +1,10 @@
-import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
-import Button from "../../component/Shared/Button";
-import { Colors } from "../../constant/Colors";
+import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import Button from '../../component/Shared/Button';
+import { Colors } from '../../constant/Colors';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function QuizSummary() {
     const { quizResultParam } = useLocalSearchParams();
@@ -21,7 +22,7 @@ export default function QuizSummary() {
     const calculateResult = () => {
         if (quizResult !== undefined) {
             const correctAns_ = Object.entries(quizResult)?.filter(
-                ([key, value]) => value?.isCorrect == true
+                ([key, value]) => value?.isCorrect === true,
             );
             const totalQues_ = Object.keys(quizResult).length;
             setCorrectAns(correctAns_.length);
@@ -44,15 +45,15 @@ export default function QuizSummary() {
         >
             <Image
                 style={{
-                    width: "100%",
+                    width: '100%',
                     height: 500,
                 }}
-                source={require("../../assets/images/graph.png")}
+                source={require('../../assets/images/graph.png')}
             />
             <View
                 style={{
-                    position: "absolute",
-                    width: "100%",
+                    position: 'absolute',
+                    width: '100%',
                     padding: 35,
                     marginTop: 30,
                     flex: 1,
@@ -60,10 +61,10 @@ export default function QuizSummary() {
             >
                 <Text
                     style={{
-                        textAlign: "center",
-                        fontFamily: "outfit-bold",
+                        textAlign: 'center',
+                        fontFamily: 'outfit-bold',
                         color: Colors.PRIMARY,
-                        fontSize: 20,
+                        fontSize: RFValue(20),
                     }}
                 >
                     Quiz Summary
@@ -74,32 +75,35 @@ export default function QuizSummary() {
                         padding: 20,
                         borderRadius: 20,
                         marginTop: 40,
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                     }}
                 >
-                    <Image
-                        style={{
-                            width: 100,
-                            height: 100,
-                            marginTop: -55,
-                        }}
-                        source={require("../../assets/images/trophy.png")}
-                    />
+                    {getPercentageMark() > 60 && (
+                        <Image
+                            style={{
+                                width: 100,
+                                height: 100,
+                                marginTop: -55,
+                            }}
+                            source={require('../../assets/images/trophy.png')}
+                        />
+                    )}
+
                     <Text
                         style={{
-                            fontFamily: "outfit-bold",
-                            fontSize: 20,
+                            fontFamily: 'outfit-bold',
+                            fontSize: RFValue(20),
                         }}
                     >
                         {getPercentageMark() > 60
-                            ? "Congratulation!"
-                            : "Try again!"}
+                            ? 'Congratulation!'
+                            : 'Try again!'}
                     </Text>
                     <Text
                         style={{
-                            fontFamily: "outfit",
-                            fontSize: 15,
+                            fontFamily: 'outfit',
+                            fontSize: RFValue(15),
                             color:
                                 getPercentageMark() >= 60
                                     ? Colors.GREEN
@@ -146,14 +150,14 @@ export default function QuizSummary() {
                 </View>
                 <Button
                     loading={loading}
-                    onPress={() => router.replace("/(tabs)/home")}
-                    text={"Back to Home"}
+                    onPress={() => router.replace('/(tabs)/home')}
+                    text={'Back to Home'}
                     disabled={loading}
                 />
                 <Text
                     style={{
-                        fontFamily: "outfit-bold",
-                        fontSize: 15,
+                        fontFamily: 'outfit-bold',
+                        fontSize: RFValue(15),
                         marginTop: 20,
                         color: Colors.WHITE,
                     }}
@@ -183,16 +187,16 @@ export default function QuizSummary() {
                                         paddingVertical: 8,
                                         borderBottomWidth: 0.5,
                                         borderBottomColor: Colors.BLACK,
-                                        display: "flex",
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
                                     }}
                                 >
                                     <Text
                                         style={{
-                                            fontFamily: "outfit-bold",
-                                            fontSize: 14,
+                                            fontFamily: 'outfit-bold',
+                                            fontSize: RFValue(14),
                                             color: quizItem.isCorrect
                                                 ? Colors.GREEN
                                                 : Colors.LIGHT_RED,
@@ -204,10 +208,10 @@ export default function QuizSummary() {
                                     </Text>
                                     <Text
                                         style={{
-                                            fontSize: 16,
+                                            fontSize: RFValue(16),
                                             color: quizItem.isCorrect
                                                 ? Colors.GREEN
-                                                : "red",
+                                                : 'red',
                                         }}
                                     >
                                         {quizItem.isCorrect ? (
@@ -236,14 +240,14 @@ const styles = StyleSheet.create({
         elevation: 1,
         borderRadius: 15,
         marginTop: 5,
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         gap: 10,
         borderWidth: 0.6,
     },
     resultText: {
-        fontFamily: "outfit-bold",
-        fontSize: 14,
+        fontFamily: 'outfit-bold',
+        fontSize: RFValue(13),
     },
 });

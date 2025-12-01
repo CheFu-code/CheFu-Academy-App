@@ -1,30 +1,31 @@
 import { StyleSheet } from "react-native";
-import { moderateScale, verticalScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
 
 export const styles = StyleSheet.create({
     chapterText: {
         fontFamily: "outfit",
-        fontSize: moderateScale(16),
+        fontSize: 16,
     },
     buttonContainer: {
-        marginVertical: verticalScale(8),
-        padding: moderateScale(15),
+        marginVertical: 8,
+        padding: 15,
         backgroundColor: "#f0f0f0",
-        borderRadius: moderateScale(10),
-        borderWidth: moderateScale(1),
+        borderRadius: 10,
+        borderWidth: 1,
         borderStyle: "solid",
+        display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
     chapterTextContent: {
         fontFamily: "outfit-bold",
-        fontSize: moderateScale(20),
+        fontSize: 20,
         color: Colors.WHITE,
     },
     chapterNameContainer: {
+        display: "flex",
         flexDirection: "row",
-        gap: moderateScale(5),
+        gap: 5,
     },
 });

@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
         color: Colors.PRIMARY,
     },
     label: {
-        fontSize: scale(13),
+        fontSize: scale(15),
         fontFamily: 'outfit',
         marginBottom: verticalScale(8),
         color: Colors.WHITE,
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
         borderRadius: scale(10),
         paddingHorizontal: scale(15),
         paddingVertical: verticalScale(10),
-        fontSize: scale(12),
+        fontSize: scale(13),
         marginBottom: verticalScale(15),
         borderWidth: 1,
         borderColor: '#ddd',

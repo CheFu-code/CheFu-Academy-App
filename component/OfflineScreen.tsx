@@ -2,6 +2,7 @@ import LottieView from 'lottie-react-native';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { styles } from '../styles/OfflineScreen.style';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function OfflineScreen() {
     return (
@@ -16,7 +17,10 @@ export default function OfflineScreen() {
             <Text
                 style={[
                     styles.subtitle,
-                    { color: '#ccc', fontSize: 14, marginTop: 20 },
+                    {
+                        color: '#ccc',
+                        fontSize: RFValue(13),
+                    },
                 ]}
             >
                 Please connect to Wi-Fi or mobile data. Once a connection is

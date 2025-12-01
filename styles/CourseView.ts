@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     },
     image: {
         width: "100%",
-        height: verticalScale(260),
+        height: verticalScale(230),
         position: "absolute",
         top: 0,
         left: 0,

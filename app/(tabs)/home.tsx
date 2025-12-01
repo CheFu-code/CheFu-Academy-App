@@ -13,6 +13,7 @@ import LineLoader from '../../component/Home/LineLoader';
 import NoCourse from '../../component/Home/NoCourse';
 import PracticeSection from '../../component/Home/PracticeSection';
 import { Colors } from '../../constant/Colors';
+import { scale } from 'react-native-size-matters';
 
 export default function Home() {
     const flatListRef = useRef<FlatList>(null);
@@ -75,7 +76,7 @@ export default function Home() {
                             style={{
                                 position: 'absolute',
                                 width: '100%',
-                                height: 400,
+                                height: scale(400),
                             }}
                             source={require('../../assets/images/graph.png')}
                             resizeMode="cover"

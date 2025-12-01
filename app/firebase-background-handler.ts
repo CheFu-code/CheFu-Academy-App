@@ -1,4 +1,4 @@
-// app/firebase-background-handler.js
+// app/firebase-background-handler.ts
 import notifee from "@notifee/react-native";
 import messaging from "@react-native-firebase/messaging";
 

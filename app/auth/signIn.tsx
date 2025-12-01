@@ -29,6 +29,10 @@ import {
 import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/SignIn.styles';
+import FatalError from '@/component/auth/fatalError';
+import Loading from '@/component/auth/Loading';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { scale } from 'react-native-size-matters';
 
 const SignIn = () => {
     const { safePush, safeReplace } = useSafeNavigation();
@@ -259,57 +263,12 @@ const SignIn = () => {
     };
 
     if (loading) {
-        return (
-            <Modal animationType="fade" transparent={true} visible={loading}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <LottieView
-                            source={require('./../../assets/animations/GO TO SCHOOL ANIMATION.json')}
-                            autoPlay
-                            loop
-                            style={{ width: 150, height: 150 }}
-                        />
-                        <Text style={styles.modalTitle}>Signing you in...</Text>
-                        <Text style={styles.modalSubtext}>
-                            Just a moment while we load your profile.
-                        </Text>
-                    </View>
-                </View>
-            </Modal>
-        );
+        return <Loading loading={loading} />;
     }
 
     if (fatalError) {
         return (
-            <SafeAreaView
-                style={{
-                    flex: 1,
-                    backgroundColor: Colors.BG_COLOR,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                <Text style={{ color: 'red', fontSize: 18, marginBottom: 20 }}>
-                    A fatal error occurred.
-                </Text>
-                <Text style={{ color: 'red', fontSize: 14, marginBottom: 20 }}>
-                    {fatalError?.message || String(fatalError)}
-                </Text>
-
-                <TouchableOpacity
-                    onPress={() => setFatalError(null)}
-                    style={{
-                        backgroundColor: Colors.PRIMARY,
-                        padding: 12,
-                        borderRadius: 8,
-                        marginTop: 10,
-                    }}
-                >
-                    <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                        Try Again
-                    </Text>
-                </TouchableOpacity>
-            </SafeAreaView>
+            <FatalError fatalError={fatalError} setFatalError={setFatalError} />
         );
     }
 
@@ -427,12 +386,12 @@ const SignIn = () => {
                             <AntDesign
                                 style={styles.icons}
                                 name="google"
-                                size={24}
+                                size={scale(22)}
                                 color={'white'}
                             />
                             <Text
                                 style={{
-                                    fontSize: 16,
+                                    fontSize: RFValue(15),
                                     fontFamily: 'outfit',
                                     color: 'white',
                                 }}
