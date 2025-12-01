@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
 import { scale, verticalScale, moderateScale } from "react-native-size-matters";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     cardWrapper: {
@@ -24,7 +25,7 @@ export const styles = StyleSheet.create({
     title: {
         color: "#000",
         marginTop: verticalScale(5),
-        fontSize: scale(14),
+        fontSize: RFValue(14),
         fontFamily: "outfit-bold",
         paddingHorizontal: moderateScale(6),
     },
@@ -38,6 +39,7 @@ export const styles = StyleSheet.create({
     categoryText: {
         color: "#fff",
         fontFamily: "outfit-bold",
+        fontSize:RFValue(12)
     },
     category: {
         position: "absolute",

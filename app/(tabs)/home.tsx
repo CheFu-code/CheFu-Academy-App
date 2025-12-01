@@ -1,5 +1,4 @@
 import EmailVerificationBanner from '@/component/Home/EmailVerificationBanner';
-import SparksFeed from '@/component/Home/SparksFeed';
 import VideoCardHomeScreen from '@/component/Video/VideoCardHomeScreen';
 import { auth } from '@/config/fireConfig';
 import { useCourses } from '@/hooks/useCourses';
@@ -35,11 +34,7 @@ export default function Home() {
     }
 
     const randomizedBlocks = useMemo(
-        () =>
-            shuffleArray([
-                <VideoCardHomeScreen key="videos" />,
-                <SparksFeed key="sparks" />,
-            ]),
+        () => shuffleArray([<VideoCardHomeScreen key="videos" />]),
         [],
     );
 
@@ -88,12 +83,9 @@ export default function Home() {
                                 <>
                                     <CourseProgress courseList={courseList} />
 
-                                    <View style={{ padding: 10 }}>
-                                        {/* <Categories /> */}
+                                    <View style={{ padding: scale(10) }}>
                                         <PracticeSection />
-
                                         <CourseList courseList={courseList} />
-
                                         {randomizedBlocks}
                                     </View>
                                 </>

@@ -9,6 +9,7 @@ import { Colors } from '@/constant/Colors';
 import { Video } from '@/types/video';
 import { styles } from '@/styles/VideoCardHomeScreen.styles';
 import { useRenderTextWithLinks } from '@/helpers/detectLinks';
+import { scale } from 'react-native-size-matters';
 
 interface Props {
     item: Video;
@@ -48,12 +49,16 @@ const VideoCard: React.FC<Props> = ({ item, onPress, onCategoryPress }) => {
                     style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        gap: 5,
+                        gap: scale(5),
                     }}
                 >
                     <Text style={styles.categoryText}>{item.category}</Text>
                     {item.category === 'YouTube' && (
-                        <AntDesign name="youtube" color={'red'} size={15} />
+                        <AntDesign
+                            name="youtube"
+                            color={'red'}
+                            size={scale(15)}
+                        />
                     )}
                 </View>
             </TouchableOpacity>

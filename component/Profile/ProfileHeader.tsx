@@ -1,16 +1,16 @@
 // components/Profile/ProfileHeader.tsx
-import { Colors } from "@/constant/Colors";
-import { UserDetailContext } from "@/context/UserDetailContext";
-import { formatDate } from "@/helpers/formatDate";
-import { useProfileActions } from "@/hooks/useProfileActions";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { styles, styles2 } from "@/styles/Profile.styles";
-import { showToast } from "@/utils/toast";
-import { Ionicons } from "@expo/vector-icons";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import LottieView from "lottie-react-native";
-import { useContext, useState } from "react";
+import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { formatDate } from '@/helpers/formatDate';
+import { useProfileActions } from '@/hooks/useProfileActions';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { styles, styles2 } from '@/styles/Profile.styles';
+import { showToast } from '@/utils/toast';
+import { Ionicons } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import LottieView from 'lottie-react-native';
+import { useContext, useState } from 'react';
 import {
     Image,
     Modal,
@@ -18,9 +18,11 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from "react-native";
-import ErrorModal from "../Shared/ErrorModal";
-import { auth } from "@/config/fireConfig";
+} from 'react-native';
+import ErrorModal from '../Shared/ErrorModal';
+import { auth } from '@/config/fireConfig';
+import {  scale, verticalScale } from 'react-native-size-matters';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ProfileHeaderProps {
     profilePicture: string;
@@ -53,18 +55,18 @@ export const ProfileHeader = ({
     loadingName,
 }: ProfileHeaderProps) => {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
     const [modalVisible, setModalVisible] = useState(false);
     const [nameInput, setNameInput] = useState(fullname);
     const { loading, verifyEmail } = useProfileActions(
         userDetail,
         setUserDetail,
-        safePush
+        safePush,
     );
     const [error, setError] = useState({
-        message: "",
+        message: '',
         visible: false,
-        title: "",
+        title: '',
     });
 
     const handleSave = () => {
@@ -73,25 +75,25 @@ export const ProfileHeader = ({
         // Validation rules
         if (!trimmed) {
             setError({
-                message: "Name cannot be empty.",
+                message: 'Name cannot be empty.',
                 visible: true,
-                title: "Invalid Name",
+                title: 'Invalid Name',
             });
             return;
         }
         if (!/^[A-Za-z\s]+$/.test(trimmed)) {
             setError({
-                message: "Name can only contain letters and spaces.",
+                message: 'Name can only contain letters and spaces.',
                 visible: true,
-                title: "Invalid Name",
+                title: 'Invalid Name',
             });
             return;
         }
         if (trimmed.length > 30) {
             setError({
-                message: "Name cannot be longer than 30 characters.",
+                message: 'Name cannot be longer than 30 characters.',
                 visible: true,
-                title: "Invalid Name",
+                title: 'Invalid Name',
             });
             return;
         }
@@ -105,7 +107,7 @@ export const ProfileHeader = ({
             setError({
                 message: "You don't have a profile picture to download.",
                 visible: true,
-                title: "No Avatar",
+                title: 'No Avatar',
             });
             return;
         }
@@ -113,11 +115,11 @@ export const ProfileHeader = ({
         try {
             // Request permissions (iOS requires it)
             const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
+            if (status !== 'granted') {
                 setError({
-                    message: "Cannot save image without permission.",
+                    message: 'Cannot save image without permission.',
                     visible: true,
-                    title: "Permission Denied",
+                    title: 'Permission Denied',
                 });
                 return;
             }
@@ -126,42 +128,45 @@ export const ProfileHeader = ({
             const fileUri = `${FileSystem.cacheDirectory}avatar.jpg`;
             const downloadedFile = await FileSystem.downloadAsync(
                 profilePicture,
-                fileUri
+                fileUri,
             );
 
             // Save to media library
             const asset = await MediaLibrary.createAssetAsync(
-                downloadedFile.uri
+                downloadedFile.uri,
             );
-            await MediaLibrary.createAlbumAsync("CheFu Academy", asset, false);
+            await MediaLibrary.createAlbumAsync('CheFu Academy', asset, false);
 
-            showToast("Downloaded successfully");
+            showToast('Downloaded successfully');
         } catch (error) {
-            console.log("Download Avatar Error:", error);
+            console.log('Download Avatar Error:', error);
             setError({
-                message: "Failed to download profile picture. Try again later.",
+                message: 'Failed to download profile picture. Try again later.',
                 visible: true,
-                title: "Download Error",
+                title: 'Download Error',
             });
         }
     };
 
     return (
         <>
-            <View style={styles.header}>
+            <SafeAreaView style={styles.header}>
                 <View
                     style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        width: "90%",
-                        marginTop: 10,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: '90%',
                     }}
                 >
                     {auth.currentUser?.emailVerified ? (
                         <Text
                             style={[
                                 styles.profileEmail,
-                                { color: Colors.GREEN, marginTop: 10 },
+                                {
+                                    color: Colors.GREEN,
+                                    marginTop: verticalScale(10),
+                                    opacity: 0.6,
+                                },
                             ]}
                         >
                             Email Verified
@@ -176,8 +181,8 @@ export const ProfileHeader = ({
                                     styles.profileEmail,
                                     {
                                         color: Colors.RED,
-                                        textDecorationLine: "underline",
-                                        marginTop: 10,
+                                        textDecorationLine: 'underline',
+                                        marginTop: verticalScale(10),
                                     },
                                 ]}
                             >
@@ -185,15 +190,15 @@ export const ProfileHeader = ({
                             </Text>
                         </TouchableOpacity>
                     )}
-                    <TouchableOpacity onPress={() => safePush("/settings")}>
+                    <TouchableOpacity onPress={() => safePush('/settings')}>
                         <Ionicons
                             style={{
-                                marginTop: 3,
-                                alignItems: "flex-end",
-                                padding: 10,
+                                marginTop: verticalScale(3),
+                                alignItems: 'flex-end',
+                                padding: scale(10),
                             }}
                             name="settings-outline"
-                            size={20}
+                            size={scale(18)}
                             color={Colors.WHITE}
                         />
                     </TouchableOpacity>
@@ -206,7 +211,7 @@ export const ProfileHeader = ({
                 >
                     {loader ? (
                         <LottieView
-                            source={require("../../assets/animations/changingAvatar.json")}
+                            source={require('../../assets/animations/changingAvatar.json')}
                             autoPlay
                             loop
                             style={styles2.changingAvatar}
@@ -224,7 +229,7 @@ export const ProfileHeader = ({
                             source={
                                 profilePicture
                                     ? { uri: profilePicture }
-                                    : require("../../assets/images/logo.png")
+                                    : require('../../assets/images/logo.png')
                             }
                         />
                     )}
@@ -241,7 +246,7 @@ export const ProfileHeader = ({
                                     >
                                         {loadingName ? (
                                             <LottieView
-                                                source={require("../../assets/animations/changingName.json")}
+                                                source={require('../../assets/animations/changingName.json')}
                                                 autoPlay
                                                 loop
                                                 style={styles2.changingName}
@@ -278,13 +283,13 @@ export const ProfileHeader = ({
 
                         {planType && memberUntil && (
                             <Text style={styles.expiryText}>
-                                Your plan will expire on{" "}
-                                {memberUntil ? formatDate(memberUntil) : "N/A"}
+                                Your plan will expire on{' '}
+                                {memberUntil ? formatDate(memberUntil) : 'N/A'}
                             </Text>
                         )}
                     </>
                 )}
-            </View>
+            </SafeAreaView>
 
             <Modal
                 animationType="slide"

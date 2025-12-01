@@ -35,6 +35,7 @@ import {
 } from 'react-native';
 import Loading from '../Shared/Loading';
 import { sendNotification } from '@/utils/notifications';
+import { scale } from 'react-native-size-matters';
 
 dayjs.extend(relativeTime);
 
@@ -264,7 +265,7 @@ const SparksFeed = () => {
                     >
                         <AntDesign
                             name={hasLiked ? 'like1' : 'like2'}
-                            size={18}
+                            size={scale(16)}
                             color={hasLiked ? Colors.PRIMARY : Colors.GRAY}
                         />
                         <Text style={styles.actionText}>
@@ -283,7 +284,7 @@ const SparksFeed = () => {
                     >
                         <FontAwesome
                             name="comment-o"
-                            size={18}
+                            size={scale(16)}
                             color={Colors.PRIMARY}
                         />
                         <Text style={styles.actionText}>
@@ -291,16 +292,15 @@ const SparksFeed = () => {
                         </Text>
                     </TouchableOpacity>
 
-                    {/* <TouchableOpacity
-                        onPress={() => handleShare(item)}
+                    <TouchableOpacity
                         style={styles.actionButton}
                     >
                         <AntDesign
                             name="sharealt"
-                            size={18}
+                            size={scale(16)}
                             color={Colors.PRIMARY}
                         />
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                 </View>
             </TouchableOpacity>
         );

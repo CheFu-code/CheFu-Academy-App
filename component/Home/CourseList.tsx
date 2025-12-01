@@ -15,7 +15,7 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 interface CourseListProps {
     courseList: Course[];
@@ -57,7 +57,7 @@ export default function CourseList({
         <View
             style={{
                 pointerEvents: loadingId ? 'none' : 'auto',
-                marginHorizontal: -10,
+                marginHorizontal: scale(-10),
             }}
         >
             <View

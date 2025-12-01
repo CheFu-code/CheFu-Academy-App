@@ -1,11 +1,14 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+    Ionicons,
+    MaterialCommunityIcons,
+    MaterialIcons,
+} from '@expo/vector-icons';
 import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { Tabs } from 'expo-router';
 import { useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constant/Colors';
 
-// Extract correct icon prop type
 type TabBarIconProps = NonNullable<
     BottomTabNavigationOptions['tabBarIcon']
 > extends (props: infer P) => any
@@ -39,6 +42,21 @@ const TabLayout = () => {
         [],
     );
 
+    const renderSparkIcon = useCallback(
+        ({ size, color }: TabBarIconProps) => (
+            <MaterialIcons
+                style={{
+                    marginTop: 25,
+                    height: '100%',
+                }}
+                name="compost"
+                size={size}
+                color={color}
+            />
+        ),
+        [],
+    );
+
     const renderProgressIcon = useCallback(
         ({ size, color }: TabBarIconProps) => (
             <Ionicons
@@ -53,18 +71,6 @@ const TabLayout = () => {
         ),
         [],
     );
-
-    // const renderChatIcon = useCallback(
-    //     ({ color, size }: TabBarIconProps) => (
-    //         <Ionicons
-    //             style={{ marginTop: 25, height: '100%' }}
-    //             name="chatbubble-ellipses-outline"
-    //             size={size}
-    //             color={color}
-    //         />
-    //     ),
-    //     [],
-    // );
 
     const renderProfileIcon = useCallback(
         ({ color, size }: TabBarIconProps) => (
@@ -104,13 +110,14 @@ const TabLayout = () => {
                 options={{ tabBarIcon: renderExploreIcon }}
             />
             <Tabs.Screen
+                name="spark"
+                options={{ tabBarIcon: renderSparkIcon }}
+            />
+            <Tabs.Screen
                 name="progress"
                 options={{ tabBarIcon: renderProgressIcon }}
             />
-            {/* <Tabs.Screen
-                name="chats"
-                options={{ tabBarIcon: renderChatIcon }}
-            /> */}
+
             <Tabs.Screen
                 name="profile"
                 options={{ tabBarIcon: renderProfileIcon }}

@@ -72,8 +72,6 @@ export function useFirebaseAuthObserver(authChecked: boolean, authSuccess: boole
                 setUserDetail(null);
                 if (!alreadyRedirected.current) {
                     alreadyRedirected.current = true;
-                    console.log("User is not authenticated, redirecting to sign in screen");
-                    safeReplace("/auth/signIn");
                 }
             }
         });
