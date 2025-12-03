@@ -30,6 +30,5 @@ export const styles = StyleSheet.create({
     lottie: {
         width: scale(180),
         height: verticalScale(180),
-        marginBottom: verticalScale(20),
     },
 });
