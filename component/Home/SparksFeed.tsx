@@ -1,12 +1,11 @@
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparksFeed.styles';
 import { Likes, Spark } from '@/types/sparks';
-import { formatViews } from '@/utils/formatViews';
+import { sendNotification } from '@/utils/notifications';
 import { showToast } from '@/utils/toast';
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {
     addDoc,
     arrayRemove,
@@ -16,38 +15,35 @@ import {
     doc,
     FirebaseFirestoreTypes,
     getDoc,
-    onSnapshot,
+    getDocs,
+    limit,
     orderBy,
     query,
+    startAfter,
     Timestamp,
     updateDoc,
 } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useContext, useEffect, useState } from 'react';
-import {
-    Alert,
-    FlatList,
-    Image,
-    Text,
-    TouchableOpacity,
-    Vibration,
-    View,
-} from 'react-native';
-import Loading from '../Shared/Loading';
-import { sendNotification } from '@/utils/notifications';
+import { Alert, FlatList, Text, Vibration, View } from 'react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
+import Loading from '../Shared/Loading';
+import UISpark from '../Spark/UISpark';
 
 dayjs.extend(relativeTime);
 
 const SparksFeed = () => {
-    const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [likeLock, setLikeLock] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<boolean>(false);
     const [isVerified, setIsVerified] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const SPARKS_LIMIT = 6;
+    const [lastVisible, setLastVisible] =
+        useState<FirebaseFirestoreTypes.QueryDocumentSnapshot | null>(null);
 
     useEffect(() => {
         const checkVerified = async () => {
@@ -70,28 +66,65 @@ const SparksFeed = () => {
     }, [userDetail?.email]);
 
     useEffect(() => {
-        const q = query(collection(db, 'sparks'), orderBy('createdAt', 'desc'));
-
-        const unsubscribe = onSnapshot(
-            q,
-            (snapshot) => {
-                const fetchedSparks: Spark[] = snapshot.docs.map(
-                    (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                        id: doc.id,
-                        ...(doc.data() as Omit<Spark, 'id'>),
-                    }),
-                );
-                setSparks(fetchedSparks);
-                setLoading(false);
-            },
-            (error) => {
-                console.log('Error fetching sparks:', error);
-                setLoading(false);
-            },
-        );
-
-        return () => unsubscribe();
+        fetchInitialSparks();
     }, []);
+
+    const fetchInitialSparks = async () => {
+        setLoading(true);
+        try {
+            const q = query(
+                collection(db, 'sparks'),
+                orderBy('createdAt', 'desc'),
+                limit(SPARKS_LIMIT),
+            );
+
+            const snapshot = await getDocs(q);
+            const fetchedSparks: Spark[] = snapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
+                    id: doc.id,
+                    ...(doc.data() as Omit<Spark, 'id'>),
+                }),
+            );
+
+            setSparks(fetchedSparks);
+            setLastVisible(snapshot.docs[snapshot.docs.length - 1] || null);
+        } catch (error) {
+            console.log('Error fetching sparks:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchMoreSparks = async () => {
+        if (!lastVisible || loadingMore) return;
+
+        setLoadingMore(true);
+        try {
+            const q = query(
+                collection(db, 'sparks'),
+                orderBy('createdAt', 'desc'),
+                startAfter(lastVisible),
+                limit(SPARKS_LIMIT),
+            );
+
+            const snapshot = await getDocs(q);
+            const moreSparks: Spark[] = snapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
+                    id: doc.id,
+                    ...(doc.data() as Omit<Spark, 'id'>),
+                }),
+            );
+
+            setSparks((prev) => [...prev, ...moreSparks]);
+            setLastVisible(
+                snapshot.docs[snapshot.docs.length - 1] || lastVisible,
+            );
+        } catch (error) {
+            console.log('Error fetching more sparks:', error);
+        } finally {
+            setLoadingMore(false);
+        }
+    };
 
     const handleLike = async (sparkId: string, likes: Likes[] = []) => {
         if (!userDetail) return;
@@ -232,121 +265,14 @@ const SparksFeed = () => {
         );
 
         return (
-            <TouchableOpacity
-                disabled={deleting}
-                onPress={() => {
-                    safePush({
-                        pathname: '/sparkDetail',
-                        params: { sparkId: item.id },
-                    });
-                }}
-                onLongPress={() => handleDelete(item.id)}
-                style={styles.card}
-            >
-                <View style={styles.header}>
-                    <TouchableOpacity style={styles.authorContainer}>
-                        <Image
-                            source={
-                                item.createdBy?.profilePicture
-                                    ? { uri: item?.createdBy?.profilePicture }
-                                    : require('@/assets/images/avatar.jpg')
-                            }
-                            style={{ width: 35, height: 35, borderRadius: 20 }}
-                        />
-                        <View>
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    gap: scale(3),
-                                }}
-                            >
-                                <Text
-                                    numberOfLines={1}
-                                    style={{
-                                        maxWidth: 150,
-                                        fontFamily: 'outfit-bold',
-                                    }}
-                                >
-                                    {item.createdBy?.fullname || 'Anonymous'}
-                                </Text>
-                                {isVerified && (
-                                    <Ionicons
-                                        name="checkmark-circle"
-                                        size={13}
-                                        color={Colors.PRIMARY}
-                                    />
-                                )}
-                            </View>
-                            <Text style={styles.author}>
-                                {item.createdAt?.toDate
-                                    ? dayjs(item.createdAt.toDate()).fromNow()
-                                    : 'Just now'}
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => {
-                            safePush({
-                                pathname: '/categorySparks',
-                                params: { category: item.category },
-                            });
-                        }}
-                        style={styles.categoryCont}
-                    >
-                        <Text style={styles.category}>{item.category}</Text>
-                    </TouchableOpacity>
-                </View>
-                <Text numberOfLines={1} style={styles.title}>
-                    {item.title}
-                </Text>
-                <Text numberOfLines={3} style={styles.content}>
-                    {item.content}
-                </Text>
-
-                <View style={styles.actions}>
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={() => handleLike(item.id, item.likes)}
-                    >
-                        <AntDesign
-                            name={hasLiked ? 'like1' : 'like2'}
-                            size={scale(16)}
-                            color={hasLiked ? Colors.PRIMARY : Colors.GRAY}
-                        />
-                        <Text style={styles.actionText}>
-                            {formatViews(item.likes?.length || 0)}
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={() => {
-                            safePush({
-                                pathname: '/sparkDetail',
-                                params: { sparkId: item.id },
-                            });
-                        }}
-                        style={styles.actionButton}
-                    >
-                        <FontAwesome
-                            name="comment-o"
-                            size={scale(16)}
-                            color={Colors.PRIMARY}
-                        />
-                        <Text style={styles.actionText}>
-                            {formatViews(item.comments?.length || 0)}
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.actionButton}>
-                        <AntDesign
-                            name="sharealt"
-                            size={scale(16)}
-                            color={Colors.PRIMARY}
-                        />
-                    </TouchableOpacity>
-                </View>
-            </TouchableOpacity>
+            <UISpark
+                deleting={deleting}
+                handleDelete={handleDelete}
+                handleLike={handleLike}
+                item={item}
+                hasLiked={hasLiked}
+                isVerified={isVerified}
+            />
         );
     };
 
@@ -362,6 +288,9 @@ const SparksFeed = () => {
                 { flexGrow: 1 }, // ensures empty component is centered
             ]}
             showsVerticalScrollIndicator={false}
+            onEndReached={fetchMoreSparks}
+            onEndReachedThreshold={0.4}
+            ListFooterComponent={loadingMore ? <Loading /> : null}
             ListEmptyComponent={
                 <View style={styles.NoSparkFeedHeader}>
                     <Ionicons
