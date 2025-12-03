@@ -27,7 +27,7 @@ import {
     increment,
     serverTimestamp,
     setDoc,
-    updateDoc
+    updateDoc,
 } from '@react-native-firebase/firestore';
 import {
     deleteObject,
@@ -163,7 +163,7 @@ export default function VideoDetail() {
                 prev ? { ...prev, views: (prev.views || 0) + 1 } : prev,
             );
 
-            showToast('You have successfully enrolled!');
+            showToast('You have successfully enrolled');
         } catch (err) {
             console.error('Enrollment failed:', err);
             showToast('Something went wrong while enrolling.');
@@ -295,7 +295,6 @@ export default function VideoDetail() {
         try {
             setDeleting(true);
             showToast('Deleting video...');
-
 
             if (video.uploadedBy === 'YouTube') {
                 const docRef = doc(db, 'youTubeVideos', video.id);
@@ -614,7 +613,6 @@ export default function VideoDetail() {
             {!enrolled && video.uploadedBy !== 'YouTube' && (
                 <View style={styles.enrollContainer}>
                     <Button
-                        opacity={enrolling ? 0.5 : 1}
                         text={enrolled ? 'Enrolled' : 'Enroll Now'}
                         onPress={handleEnroll}
                         type="fill"

@@ -3,7 +3,7 @@ import { useVideos } from '@/hooks/useVideos';
 import { Video } from '@/types/video';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList } from 'react-native';
 import VideoCard from '../VideoCard';
 
