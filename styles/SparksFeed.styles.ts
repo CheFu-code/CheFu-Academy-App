@@ -6,6 +6,7 @@ import { scale, verticalScale } from "react-native-size-matters";
 export const styles = StyleSheet.create({
     list: {
         padding: 16,
+        flexGrow: 1
     },
     loading: {
         flex: 1,
@@ -29,7 +30,7 @@ export const styles = StyleSheet.create({
         marginBottom: 8,
     },
     category: {
-        fontSize: 12,
+        fontSize: RFValue(10),
         fontWeight: '600',
         color: Colors.PRIMARY,
     },
@@ -42,7 +43,7 @@ export const styles = StyleSheet.create({
         minWidth: 80,
     },
     timestamp: {
-        fontSize: 12,
+        fontSize: RFValue(10),
         color: '#888',
     },
     title: {

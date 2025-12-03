@@ -1,6 +1,7 @@
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import { fetchInitialSparks, fetchMoreSparks } from '@/services/sparksService';
 import { styles } from '@/styles/SparksFeed.styles';
 import { Likes, Spark } from '@/types/sparks';
 import { sendNotification } from '@/utils/notifications';
@@ -15,18 +16,20 @@ import {
     doc,
     FirebaseFirestoreTypes,
     getDoc,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    startAfter,
     Timestamp,
     updateDoc,
 } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useContext, useEffect, useState } from 'react';
-import { Alert, FlatList, Text, Vibration, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Text,
+    Vibration,
+    View,
+} from 'react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
 import Loading from '../Shared/Loading';
 import UISpark from '../Spark/UISpark';
@@ -66,64 +69,18 @@ const SparksFeed = () => {
     }, [userDetail?.email]);
 
     useEffect(() => {
-        fetchInitialSparks();
+        fetchInitialSparks(SPARKS_LIMIT, setSparks, setLastVisible, setLoading);
     }, []);
 
-    const fetchInitialSparks = async () => {
-        setLoading(true);
-        try {
-            const q = query(
-                collection(db, 'sparks'),
-                orderBy('createdAt', 'desc'),
-                limit(SPARKS_LIMIT),
-            );
-
-            const snapshot = await getDocs(q);
-            const fetchedSparks: Spark[] = snapshot.docs.map(
-                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                    id: doc.id,
-                    ...(doc.data() as Omit<Spark, 'id'>),
-                }),
-            );
-
-            setSparks(fetchedSparks);
-            setLastVisible(snapshot.docs[snapshot.docs.length - 1] || null);
-        } catch (error) {
-            console.log('Error fetching sparks:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchMoreSparks = async () => {
-        if (!lastVisible || loadingMore) return;
-
-        setLoadingMore(true);
-        try {
-            const q = query(
-                collection(db, 'sparks'),
-                orderBy('createdAt', 'desc'),
-                startAfter(lastVisible),
-                limit(SPARKS_LIMIT),
-            );
-
-            const snapshot = await getDocs(q);
-            const moreSparks: Spark[] = snapshot.docs.map(
-                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                    id: doc.id,
-                    ...(doc.data() as Omit<Spark, 'id'>),
-                }),
-            );
-
-            setSparks((prev) => [...prev, ...moreSparks]);
-            setLastVisible(
-                snapshot.docs[snapshot.docs.length - 1] || lastVisible,
-            );
-        } catch (error) {
-            console.log('Error fetching more sparks:', error);
-        } finally {
-            setLoadingMore(false);
-        }
+    const handleLoadMore = () => {
+        fetchMoreSparks(
+            SPARKS_LIMIT,
+            lastVisible,
+            setSparks,
+            setLastVisible,
+            loadingMore,
+            setLoadingMore,
+        );
     };
 
     const handleLike = async (sparkId: string, likes: Likes[] = []) => {
@@ -283,14 +240,19 @@ const SparksFeed = () => {
             data={sparks}
             keyExtractor={(item) => item.id}
             renderItem={renderSpark}
-            contentContainerStyle={[
-                styles.list,
-                { flexGrow: 1 }, // ensures empty component is centered
-            ]}
+            contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
-            onEndReached={fetchMoreSparks}
+            onEndReached={handleLoadMore}
             onEndReachedThreshold={0.4}
-            ListFooterComponent={loadingMore ? <Loading /> : null}
+            ListFooterComponent={
+                loadingMore ? (
+                    <ActivityIndicator
+                        style={{ marginVertical: verticalScale(10) }}
+                        size="small"
+                        color={Colors.PRIMARY}
+                    />
+                ) : null
+            }
             ListEmptyComponent={
                 <View style={styles.NoSparkFeedHeader}>
                     <Ionicons
