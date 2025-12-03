@@ -1,37 +1,126 @@
+import { useEffect, useRef } from "react";
+import { AppState, AppStateStatus } from "react-native";
 import { auth, db } from "@/config/fireConfig";
 import { doc, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
-import { useEffect } from "react";
-import { AppState } from "react-native";
+
+const HEARTBEAT_INTERVAL_MS = 30_000;      // send heartbeat every 30 seconds
+const HEARTBEAT_MIN_DELAY_MS = 25_000;     // minimum spacing between writes
+const BASE_RETRY_MS = 1000;
+const MAX_RETRIES = 3;
 
 export default function useLastSeenTracker() {
+    const mounted = useRef(true);
+    const heartbeatTimer = useRef<number | null>(null);
+    const lastHeartbeatAt = useRef<number>(0);
+    const retryCount = useRef(0);
+    const currentEmail = useRef<string | null>(null);
 
     useEffect(() => {
+        mounted.current = true;
+
         const updateOnlineStatus = async (online: boolean) => {
-            const email = auth.currentUser?.email;
-            if (!email) return;
+            const email = currentEmail.current;
+            if (!email || !mounted.current) return;
+
+            const ref = doc(db, "users", email);
 
             try {
-                await updateDoc(doc(db, "users", email), {
+                retryCount.current = 0;
+
+                await updateDoc(ref, {
                     online,
-                    ...(online ? {} : { lastSeen: serverTimestamp() }),
+                    ...(online
+                        ? { lastHeartbeat: serverTimestamp() }
+                        : { lastSeen: serverTimestamp() }
+                    ),
                 });
-                console.log(`[LastSeenTracker] Set online=${online}`);
-            } catch (error) {
-                console.error("[LastSeenTracker] Error updating Firestore:", error);
+
+                if (online) lastHeartbeatAt.current = Date.now();
+            } catch (err) {
+                console.error("[LastSeenTracker] Firestore error:", err);
+
+                // Retry (exponential backoff)
+                if (retryCount.current < MAX_RETRIES && mounted.current) {
+                    retryCount.current++;
+                    const delay = BASE_RETRY_MS * 2 ** (retryCount.current - 1);
+
+                    setTimeout(() => {
+                        if (mounted.current) updateOnlineStatus(online);
+                    }, delay);
+                }
             }
         };
 
-        const subscription = AppState.addEventListener("change", (state) => {
-            if (state === "active") updateOnlineStatus(true);
-            else updateOnlineStatus(false);
+        const sendHeartbeat = async () => {
+            const now = Date.now();
+            if (now - lastHeartbeatAt.current < HEARTBEAT_MIN_DELAY_MS) return;
+            await updateOnlineStatus(true);
+        };
+
+        const startHeartbeat = () => {
+            stopHeartbeat();
+            heartbeatTimer.current = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
+        };
+
+        const stopHeartbeat = () => {
+            if (heartbeatTimer.current) {
+                clearInterval(heartbeatTimer.current);
+                heartbeatTimer.current = null;
+            }
+        };
+
+        const handleAppState = (state: AppStateStatus) => {
+            if (!currentEmail.current) return;
+
+            if (state === "active") {
+                updateOnlineStatus(true).then(startHeartbeat);
+            } else {
+                stopHeartbeat();
+                updateOnlineStatus(false);
+            }
+        };
+
+        const appStateListener = AppState.addEventListener("change", handleAppState);
+
+        // Auth state listener (production best practice)
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // signed out
+                stopHeartbeat();
+                currentEmail.current = null;
+                return;
+            }
+
+            const email = user.email ?? null;
+            if (!email) return;
+
+            currentEmail.current = email;
+
+            updateOnlineStatus(true).then(startHeartbeat);
         });
 
-        // Set online initially
-        updateOnlineStatus(true);
+        // Initial boot condition
+        if (auth.currentUser?.email) {
+            currentEmail.current = auth.currentUser.email;
+            updateOnlineStatus(true).then(startHeartbeat);
+        }
 
         return () => {
-            subscription.remove();
-            updateOnlineStatus(false); // optional: set offline on unmount
+            mounted.current = false;
+            stopHeartbeat();
+            appStateListener.remove();
+            unsubscribeAuth();
+
+            const email = currentEmail.current;
+            if (!email) return;
+
+            const ref = doc(db, "users", email);
+
+            // Fire-and-forget offline write
+            updateDoc(ref, {
+                online: false,
+                lastSeen: serverTimestamp(),
+            }).catch(() => { });
         };
-    }, [auth.currentUser]);
+    }, []);
 }
