@@ -1,5 +1,7 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import { scale, verticalScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     list: {
@@ -44,39 +46,51 @@ export const styles = StyleSheet.create({
         color: '#888',
     },
     title: {
-        fontSize: 16,
+        fontSize: RFValue(15),
         fontWeight: '700',
-        marginBottom: 6,
+        marginBottom: verticalScale(6),
     },
     content: {
-        fontSize: 14,
+        fontSize: RFValue(13),
         color: '#333',
-        marginBottom: 10,
+        marginBottom: verticalScale(10),
     },
     author: {
-        fontSize: 12,
+        fontSize: RFValue(12),
         color: '#555',
     },
     actions: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginTop: 6,
-        borderTopWidth: 0.2,
+        marginTop: verticalScale(6),
+        borderTopWidth: scale(0.2),
         borderColor: Colors.GRAY,
-        paddingTop: 8,
+        paddingTop: verticalScale(8),
     },
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: scale(4),
         backgroundColor: Colors.BG_GRAY,
-        padding: 8,
+        padding: verticalScale(8),
         borderRadius: 10,
-        paddingHorizontal: 18,
+        paddingHorizontal: verticalScale(18),
+        opacity: 0.6,
     },
     actionText: {
-        fontSize: 12,
+        fontSize: RFValue(12),
         color: Colors.PRIMARY,
     },
-    authorContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    authorContainer: { flexDirection: 'row', alignItems: 'center', gap: scale(8) },
+    NoSparkFeedHeader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: verticalScale(100),
+    },
+    NoSparkFeedText: {
+        fontFamily: 'outfit-bold',
+        fontSize: RFValue(16),
+        color: Colors.GRAY,
+    }
 });

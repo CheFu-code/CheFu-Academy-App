@@ -31,11 +31,12 @@ import {
     Image,
     Text,
     TouchableOpacity,
+    Vibration,
     View,
 } from 'react-native';
 import Loading from '../Shared/Loading';
 import { sendNotification } from '@/utils/notifications';
-import { scale } from 'react-native-size-matters';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 dayjs.extend(relativeTime);
 
@@ -45,6 +46,7 @@ const SparksFeed = () => {
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [isVerified, setIsVerified] = useState(false);
+
 
     useEffect(() => {
         const checkVerified = async () => {
@@ -157,6 +159,8 @@ const SparksFeed = () => {
     };
 
     const handleDelete = (sparkId: string) => {
+        Vibration.vibrate(100);
+
         Alert.alert(
             'Delete Spark',
             'Are you sure you want to delete this spark?',
@@ -212,7 +216,7 @@ const SparksFeed = () => {
                                 style={{
                                     flexDirection: 'row',
                                     alignItems: 'center',
-                                    gap: 3,
+                                    gap: scale(3),
                                 }}
                             >
                                 <Text
@@ -292,9 +296,7 @@ const SparksFeed = () => {
                         </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={styles.actionButton}
-                    >
+                    <TouchableOpacity style={styles.actionButton}>
                         <AntDesign
                             name="sharealt"
                             size={scale(16)}
@@ -313,8 +315,24 @@ const SparksFeed = () => {
             data={sparks}
             keyExtractor={(item) => item.id}
             renderItem={renderSpark}
-            contentContainerStyle={styles.list}
+            contentContainerStyle={[
+                styles.list,
+                { flexGrow: 1 }, // ensures empty component is centered
+            ]}
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+                <View style={styles.NoSparkFeedHeader}>
+                    <Ionicons
+                        name="sparkles-outline"
+                        size={scale(50)}
+                        color={Colors.GRAY}
+                        style={{ marginBottom: verticalScale(10) }}
+                    />
+                    <Text style={styles.NoSparkFeedText}>
+                        No Spark Feed yet
+                    </Text>
+                </View>
+            }
         />
     );
 };
