@@ -45,8 +45,8 @@ const SparksFeed = () => {
     const { userDetail } = useContext(UserDetailContext);
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
+    const [likeLock, setLikeLock] = useState<string | null>(null);
     const [isVerified, setIsVerified] = useState(false);
-
 
     useEffect(() => {
         const checkVerified = async () => {
@@ -92,69 +92,79 @@ const SparksFeed = () => {
         return () => unsubscribe();
     }, []);
 
+
     const handleLike = async (sparkId: string, likes: Likes[] = []) => {
         if (!userDetail) return;
 
-        const sparkRef = doc(db, 'sparks', sparkId);
-        const sparkSnap = await getDoc(sparkRef);
-        const sparkData = sparkSnap.data();
+        // ⛔ prevent double tap
+        if (likeLock === sparkId) return;
+        setLikeLock(sparkId);
 
-        if (!sparkData) return;
+        try {
+            const sparkRef = doc(db, 'sparks', sparkId);
+            const sparkSnap = await getDoc(sparkRef);
+            const sparkData = sparkSnap.data();
 
-        // Check if the user already liked
-        const existingLike = likes.find(
-            (like) => like.createdBy.uid === userDetail?.uid,
-        );
+            if (!sparkData) return;
 
-        if (existingLike) {
-            // Unlike → remove the like object
-            await updateDoc(sparkRef, {
-                likes: arrayRemove(existingLike),
-            });
-        } else {
-            // Like → add a new like object
-            const newLike: Likes = {
-                id: userDetail?.uid,
-                text: 'Liked',
-                createdBy: {
-                    uid: userDetail?.uid,
-                    fullname: userDetail?.fullname || 'Anonymous',
-                    profilePicture: userDetail?.profilePicture || '',
-                },
-                createdAt: Timestamp.now(),
-            };
+            const existingLike = likes.find(
+                (like) => like.createdBy.uid === userDetail?.uid,
+            );
 
-            await updateDoc(sparkRef, {
-                likes: arrayUnion(newLike),
-            });
-
-            // ✅ Send notification only if user is not liking their own spark
-            if (
-                sparkData.createdBy?.uid !== userDetail?.uid &&
-                sparkData.createdBy?.email
-            ) {
-                const notificationRef = collection(db, 'notifications');
-                await addDoc(notificationRef, {
-                    type: 'like',
-                    sparkId,
-                    from: {
+            if (existingLike) {
+                // Unlike → remove
+                await updateDoc(sparkRef, {
+                    likes: arrayRemove(existingLike),
+                });
+            } else {
+                // Like → add new object
+                const newLike: Likes = {
+                    id: userDetail?.uid,
+                    text: 'Liked',
+                    createdBy: {
                         uid: userDetail?.uid,
                         fullname: userDetail?.fullname || 'Anonymous',
+                        profilePicture: userDetail?.profilePicture || '',
                     },
-                    to: sparkData.createdBy?.uid,
-                    message: `${
-                        userDetail?.fullname || 'Someone'
-                    } liked your spark.`,
                     createdAt: Timestamp.now(),
-                    read: false,
-                });
-            }
+                };
 
-            await sendNotification(
-                sparkData.createdBy?.email,
-                'New Like',
-                `${userDetail?.fullname || 'Someone'} liked your spark.`,
-            );
+                await updateDoc(sparkRef, {
+                    likes: arrayUnion(newLike),
+                });
+
+                // Send notification if not liking own spark
+                if (
+                    sparkData.createdBy?.uid !== userDetail?.uid &&
+                    sparkData.createdBy?.email
+                ) {
+                    await addDoc(collection(db, 'notifications'), {
+                        type: 'like',
+                        sparkId,
+                        from: {
+                            uid: userDetail?.uid,
+                            fullname: userDetail?.fullname || 'Anonymous',
+                        },
+                        to: sparkData.createdBy?.uid,
+                        message: `${
+                            userDetail?.fullname || 'Someone'
+                        } liked your spark.`,
+                        createdAt: Timestamp.now(),
+                        read: false,
+                    });
+                }
+
+                await sendNotification(
+                    sparkData.createdBy?.email,
+                    'New Like',
+                    `${userDetail?.fullname || 'Someone'} liked your spark.`,
+                );
+            }
+        } catch (e) {
+            console.log('Like error:', e);
+        } finally {
+            // 🔓 Unlock after Firestore completes
+            setLikeLock(null);
         }
     };
 
