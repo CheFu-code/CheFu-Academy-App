@@ -1,8 +1,9 @@
-// components/Shared/Loading.tsx
-import React from 'react';
-import { View, Text } from 'react-native';
-import LottieView from 'lottie-react-native';
 import { Colors } from '@/constant/Colors';
+import LottieView from 'lottie-react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Dimensions, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
 
 interface LoadingProps {
     message?: string;
@@ -10,11 +11,38 @@ interface LoadingProps {
     size?: number;
 }
 
+const { width } = Dimensions.get('window');
+
 export default function Loading({
     message = 'Loading...',
     animationSource,
-    size = 150,
+    size,
 }: LoadingProps) {
+    const animationSize = size ?? Math.min(width * 0.3, 200);
+
+    // Animated opacity for text
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        const pulse = Animated.loop(
+            Animated.sequence([
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 800,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(fadeAnim, {
+                    toValue: 0.3,
+                    duration: 800,
+                    useNativeDriver: true,
+                }),
+            ]),
+        );
+        pulse.start();
+
+        return () => pulse.stop();
+    }, [fadeAnim]);
+
     return (
         <View
             style={{
@@ -22,6 +50,7 @@ export default function Loading({
                 justifyContent: 'center',
                 alignItems: 'center',
                 backgroundColor: Colors.BG_COLOR,
+                paddingHorizontal: moderateScale(10),
             }}
         >
             <LottieView
@@ -31,18 +60,23 @@ export default function Loading({
                     animationSource ??
                     require('../../assets/animations/Loading.json')
                 }
-                style={{ width: size, height: size }}
-            />
-            <Text
                 style={{
-                    marginTop: 10,
+                    width: animationSize,
+                    height: animationSize,
+                }}
+            />
+            <Animated.Text
+                style={{
+                    marginTop: verticalScale(10),
                     fontFamily: 'outfit',
-                    fontSize: 16,
+                    fontSize: RFValue(15),
                     color: Colors.PRIMARY,
+                    textAlign: 'center',
+                    opacity: fadeAnim, // animated
                 }}
             >
                 {message}
-            </Text>
+            </Animated.Text>
         </View>
     );
 }
