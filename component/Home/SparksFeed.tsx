@@ -366,7 +366,7 @@ const SparksFeed = () => {
                 <View style={styles.NoSparkFeedHeader}>
                     <Ionicons
                         name="sparkles-outline"
-                        size={scale(50)}
+                        size={scale(40)}
                         color={Colors.GRAY}
                         style={{ marginBottom: verticalScale(10) }}
                     />

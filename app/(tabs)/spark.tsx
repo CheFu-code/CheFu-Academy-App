@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
     },
     title: {
-        color: Colors.WHITE,
+        color: Colors.PRIMARY,
         fontSize: RFValue(22),
         fontWeight: 'bold',
     },
