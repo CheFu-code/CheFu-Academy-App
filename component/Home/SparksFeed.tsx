@@ -46,6 +46,7 @@ const SparksFeed = () => {
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [likeLock, setLikeLock] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState<boolean>(false);
     const [isVerified, setIsVerified] = useState(false);
 
     useEffect(() => {
@@ -91,7 +92,6 @@ const SparksFeed = () => {
 
         return () => unsubscribe();
     }, []);
-
 
     const handleLike = async (sparkId: string, likes: Likes[] = []) => {
         if (!userDetail) return;
@@ -181,12 +181,43 @@ const SparksFeed = () => {
                     style: 'destructive',
                     onPress: async () => {
                         try {
+                            setDeleting(true);
+
                             const sparkRef = doc(db, 'sparks', sparkId);
+                            const snap = await getDoc(sparkRef);
+
+                            if (!snap.exists()) {
+                                showToast('Spark no longer exists.');
+                                return;
+                            }
+
+                            const data = snap.data()!;
+
+                            // Security guard
+                            if (data.createdBy.uid !== userDetail?.uid) {
+                                showToast("You can't delete this spark.");
+                                return;
+                            }
+
+                            // Optimistic UI (only AFTER permission check)
+                            setSparks((prev) =>
+                                prev.filter((s) => s.id !== sparkId),
+                            );
+
+                            // Delete in Firestore
                             await deleteDoc(sparkRef);
+
                             showToast('Spark deleted successfully!');
-                        } catch (error) {
-                            console.error('Error deleting spark:', error);
-                            showToast('Failed to delete spark.');
+                        } catch (error: any) {
+                            if (error.code === 'permission-denied') {
+                                showToast(
+                                    "You don't have permission to delete this spark.",
+                                );
+                            } else {
+                                showToast('Error deleting spark.');
+                            }
+                        } finally {
+                            setDeleting(false);
                         }
                     },
                 },
@@ -202,6 +233,7 @@ const SparksFeed = () => {
 
         return (
             <TouchableOpacity
+                disabled={deleting}
                 onPress={() => {
                     safePush({
                         pathname: '/sparkDetail',
