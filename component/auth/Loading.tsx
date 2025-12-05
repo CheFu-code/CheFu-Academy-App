@@ -1,8 +1,7 @@
-import { View, Text, Modal } from 'react-native';
-import React from 'react';
-import LottieView from 'lottie-react-native';
 import { styles } from '@/styles/SignIn.styles';
-import { scale } from 'react-native-size-matters';
+import LottieView from 'lottie-react-native';
+import { Modal, Text, View } from 'react-native';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 const Loading = ({ loading }: { loading: boolean }) => {
     return (
@@ -13,7 +12,10 @@ const Loading = ({ loading }: { loading: boolean }) => {
                         source={require('../../assets/animations/GO TO SCHOOL ANIMATION.json')}
                         autoPlay
                         loop
-                        style={{ width: scale(150), height: scale(150) }}
+                        style={{
+                            width: scale(150),
+                            height: verticalScale(150),
+                        }}
                     />
                     <Text style={styles.modalTitle}>Signing you in...</Text>
                     <Text style={styles.modalSubtext}>

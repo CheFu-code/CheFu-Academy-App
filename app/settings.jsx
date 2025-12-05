@@ -229,7 +229,6 @@ export default function SettingsScreen() {
             await AsyncStorage.removeItem("userDetail");
             await AsyncStorage.removeItem(CACHE_KEY);
             setUserDetail(null);
-            ToastAndroid.show("Logout successfully", ToastAndroid.SHORT);
             await AsyncStorage.removeItem("useBiometrics");
         } catch (err) {
             setFatalError(err);

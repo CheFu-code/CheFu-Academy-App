@@ -1,13 +1,14 @@
 import { StyleSheet } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../constant/Colors';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     textInput: {
         width: '100%',
         borderWidth: 1,
         padding: verticalScale(12),
-        fontSize: moderateScale(16),
+        fontSize: RFValue(14),
         marginTop: verticalScale(15),
         borderRadius: scale(8),
         color: '#ffffff',
@@ -15,7 +16,7 @@ export const styles = StyleSheet.create({
     },
     passwordInput: {
         flex: 1,
-        fontSize: moderateScale(16),
+        fontSize: RFValue(14),
         paddingVertical: verticalScale(12),
         color: '#ffffff',
     },
@@ -43,13 +44,13 @@ export const styles = StyleSheet.create({
         width: scale(300),
     },
     modalTitle: {
-        fontSize: moderateScale(20),
+        fontSize: RFValue(18),
         fontFamily: 'outfit-bold',
         color: Colors.GREEN,
         marginTop: verticalScale(10),
     },
     modalSubtext: {
-        fontSize: moderateScale(13),
+        fontSize: RFValue(12),
         color: '#ccc',
         textAlign: 'center',
         marginTop: verticalScale(8),
@@ -65,7 +66,7 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         marginVertical: verticalScale(10),
     },
-    signInButonContaner: {
+    signInButtonContainer: {
         padding: verticalScale(12),
         backgroundColor: Colors.PRIMARY,
         width: '100%',
@@ -74,18 +75,18 @@ export const styles = StyleSheet.create({
     },
     signInButton: {
         fontFamily: 'outfit',
-        fontSize: moderateScale(18),
+        fontSize: RFValue(17),
         textAlign: 'center',
         color: Colors.WHITE,
     },
     welcomeText: {
-        fontSize: moderateScale(26),
+        fontSize: RFValue(24),
         fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
     },
     lottieView: {
         width: scale(160),
-        height: scale(160),
+        height: verticalScale(160),
         marginBottom: verticalScale(12),
         resizeMode: 'contain',
     },

@@ -1,4 +1,5 @@
 import { Colors } from '@/constant/Colors';
+import AnimatedText from '@/helpers/animateText';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SignIn.styles';
 import { SignInUIProps } from '@/types/signIn';
@@ -14,7 +15,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { scale, verticalScale } from 'react-native-size-matters';
@@ -31,7 +32,7 @@ const SignInUI = ({
     loading,
     handleSignIn,
     email,
-    password
+    password,
 }: SignInUIProps) => {
     const { safePush, safeReplace } = useSafeNavigation();
     const google = () => {
@@ -51,12 +52,13 @@ const SignInUI = ({
                         paddingBottom: verticalScale(40),
                     }}
                     keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
                 >
                     <View
                         style={{
                             alignItems: 'center',
                             paddingTop: verticalScale(30),
-                            padding: 25,
+                            padding: scale(20),
                         }}
                     >
                         <LottieView
@@ -65,7 +67,7 @@ const SignInUI = ({
                             source={require('./../../assets/animations/Login.json')}
                             style={styles.lottieView}
                         />
-                        <Text style={styles.welcomeText}>Welcome back</Text>
+                        <AnimatedText text="Welcome back" />
 
                         <TextInput
                             placeholder="Email"
@@ -128,7 +130,10 @@ const SignInUI = ({
 
                         <Pressable
                             onPress={() => safePush('/auth/forgotPassword')}
-                            style={{ alignSelf: 'flex-end', marginTop: 10 }}
+                            style={{
+                                alignSelf: 'flex-end',
+                                marginTop: verticalScale(8),
+                            }}
                         >
                             <Text
                                 style={{
@@ -163,7 +168,7 @@ const SignInUI = ({
 
                         <TouchableOpacity
                             style={[
-                                styles.signInButonContaner,
+                                styles.signInButtonContainer,
                                 {
                                     opacity:
                                         loading || !email || !password
@@ -181,7 +186,12 @@ const SignInUI = ({
                             )}
                         </TouchableOpacity>
 
-                        <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                marginTop: verticalScale(16),
+                            }}
+                        >
                             <Text style={{ color: Colors.WHITE }}>
                                 Don&apos;t have an account?{' '}
                             </Text>
