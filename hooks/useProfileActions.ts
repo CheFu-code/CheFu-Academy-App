@@ -33,6 +33,7 @@ export function useProfileActions(
             await signOut(auth);
             await AsyncStorage.removeItem('userDetail');
             await AsyncStorage.removeItem(CACHE_KEY);
+            await AsyncStorage.removeItem('useBiometrics');
             setUserDetail(null);
         } catch (err) {
             ToastAndroid.show('Failed to logout', ToastAndroid.SHORT);

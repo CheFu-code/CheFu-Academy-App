@@ -6,7 +6,7 @@ import { Colors } from '../constant/Colors';
 export const styles = StyleSheet.create({
     textInput: {
         width: '100%',
-        borderWidth: 1,
+        borderWidth: 0.5,
         padding: verticalScale(12),
         fontSize: RFValue(14),
         marginTop: verticalScale(15),
@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: 0.5,
         paddingHorizontal: scale(12),
         borderRadius: scale(8),
         borderColor: '#858585',

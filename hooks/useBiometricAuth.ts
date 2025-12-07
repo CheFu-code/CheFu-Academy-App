@@ -38,7 +38,6 @@ export function useBiometricAuth() {
                 setAuthSuccess(result.success);
             } catch (error: unknown) {
                 Sentry.captureException(error instanceof Error ? error : new Error("Unknown biometric error"));
-                console.error("Biometric error:", error);
                 setAuthSuccess(true); // Default to success to avoid locking out user
             } finally {
                 setAuthChecked(true);

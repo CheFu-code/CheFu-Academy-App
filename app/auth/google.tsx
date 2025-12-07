@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { styles } from '../../styles/GitHub.styles';
 import { saveUser } from '../../utils/authService';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 export default function GoogleAuthScreen() {
     const [loading, setLoading] = useState(false);
@@ -41,9 +42,9 @@ export default function GoogleAuthScreen() {
 
             if (!userInfo?.data?.idToken) {
                 throw new Error('No ID token returned from Google Sign-In');
-              }
+            }
 
-              const { idToken } = userInfo.data;
+            const { idToken } = userInfo.data;
             const credential = GoogleAuthProvider.credential(idToken);
             const firebaseUserCredential = await signInWithCredential(
                 auth,
@@ -95,7 +96,7 @@ export default function GoogleAuthScreen() {
                     source={require('../../assets/animations/Google Logo Effect.json')}
                     autoPlay
                     loop
-                    style={{ width: 140, height: 140 }}
+                    style={{ width: scale(130), height: verticalScale(130) }}
                 />
                 <Text style={styles.message}>Signing in with Google...</Text>
             </View>
@@ -110,12 +111,17 @@ export default function GoogleAuthScreen() {
                 <Text style={styles.message}>Please try again.</Text>
 
                 <Button
-                    opacity={loading ? 0.5 : 1}
                     disabled={loading}
                     loading={loading}
                     text="Try again"
                     onPress={() => signInWithGoogle()}
-                    icon={<Ionicons name="refresh" size={20} color="#fff" />}
+                    icon={
+                        <Ionicons
+                            name="refresh"
+                            size={scale(20)}
+                            color="#fff"
+                        />
+                    }
                 />
             </View>
         );
@@ -128,7 +134,7 @@ export default function GoogleAuthScreen() {
                 source={require('../../assets/animations/GO TO SCHOOL ANIMATION.json')}
                 autoPlay
                 loop
-                style={{ width: 150, height: 150 }}
+                style={{ width: scale(130), height: verticalScale(150) }}
             />
             <Text style={styles.message}>Finishing setup...</Text>
         </View>

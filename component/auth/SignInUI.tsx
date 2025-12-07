@@ -36,7 +36,7 @@ const SignInUI = ({
 }: SignInUIProps) => {
     const { safePush, safeReplace } = useSafeNavigation();
     const google = () => {
-        safePush('/auth/google');
+        safeReplace('/auth/google');
     };
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>

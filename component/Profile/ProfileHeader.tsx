@@ -186,7 +186,7 @@ export const ProfileHeader = ({
                                     },
                                 ]}
                             >
-                                Email not verified
+                                email not verified
                             </Text>
                         </TouchableOpacity>
                     )}
