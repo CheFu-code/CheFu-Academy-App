@@ -6,7 +6,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
         paddingHorizontal: verticalScale(10),
     },
     header: {
@@ -18,7 +17,6 @@ export const styles = StyleSheet.create({
     title: {
         fontFamily: 'outfit-bold',
         fontSize: RFValue(22),
-        color: 'white',
     },
     icon: {
         backgroundColor: 'gray',
@@ -52,7 +50,6 @@ export const styles = StyleSheet.create({
     heading: {
         fontSize: RFValue(18),
         fontFamily: 'outfit-bold',
-        color: Colors.WHITE,
         marginTop: verticalScale(20),
         marginBottom: verticalScale(10),
     },
@@ -71,7 +68,6 @@ export const styles = StyleSheet.create({
     label: {
         fontSize: RFValue(15),
         fontFamily: 'outfit',
-        color: Colors.WHITE,
     },
     codeBlock: {
         backgroundColor: '#1e1e1e',

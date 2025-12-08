@@ -34,6 +34,7 @@ export function useProfileActions(
             await AsyncStorage.removeItem('userDetail');
             await AsyncStorage.removeItem(CACHE_KEY);
             await AsyncStorage.removeItem('useBiometrics');
+            await AsyncStorage.removeItem('email_preferences');
             setUserDetail(null);
         } catch (err) {
             ToastAndroid.show('Failed to logout', ToastAndroid.SHORT);

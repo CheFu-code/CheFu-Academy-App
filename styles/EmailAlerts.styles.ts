@@ -1,39 +1,36 @@
 import { StyleSheet } from "react-native";
-import { moderateScale, verticalScale } from "react-native-size-matters";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-        padding: moderateScale(20),
-        marginTop: verticalScale(30),
+        padding: moderateScale(10),
     },
     heading: {
-        fontSize: moderateScale(24),
+        fontSize: RFValue(20),
         fontFamily: "outfit-bold",
-        color: Colors.WHITE,
     },
     switchContainer: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         marginBottom: verticalScale(20),
-        gap: moderateScale(8),
+        gap: scale(8),
     },
     label: {
-        fontSize: moderateScale(16),
+        fontSize: RFValue(15),
         fontFamily: "outfit-bold",
-        color: Colors.WHITE,
     },
     subtext: {
-        fontSize: moderateScale(13),
+        fontSize: RFValue(12),
         fontFamily: "outfit",
-        color: "#aaa",
     },
     note: {
-        marginTop: verticalScale(30),
-        fontSize: moderateScale(13),
+        marginTop: verticalScale(5),
+        marginBottom: verticalScale(3),
+        fontSize: RFValue(13),
         color: "#888",
         fontFamily: "outfit",
         textAlign: "center",
@@ -41,12 +38,10 @@ export const styles = StyleSheet.create({
     backButton: {
         flexDirection: "row",
         alignItems: "center",
-        gap: moderateScale(10),
-        zIndex: 10,
     },
     resetButton: {
         backgroundColor: Colors.PRIMARY,
-        paddingVertical: verticalScale(14),
+        paddingVertical: verticalScale(10),
         borderRadius: moderateScale(10),
         alignItems: "center",
         marginTop: verticalScale(10),
@@ -54,6 +49,12 @@ export const styles = StyleSheet.create({
     resetButtonText: {
         color: "#fff",
         fontFamily: "outfit-bold",
-        fontSize: moderateScale(16),
+        fontSize: RFValue(15),
     },
+    header: {
+        alignItems: 'center',
+        marginBottom: verticalScale(20),
+        justifyContent: 'center',
+        marginTop: verticalScale(20),
+    }
 });

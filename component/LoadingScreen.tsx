@@ -1,4 +1,3 @@
-import { checkBiometrics } from '@/helpers/biometrics';
 import { Feather } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { useState } from 'react';
@@ -14,7 +13,11 @@ import { scale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../constant/Colors';
 import Button from './Shared/Button';
 
-const LoadingScreen = () => {
+type LoadingScreenProps = {
+    retryAuth: () => Promise<void>;
+};
+
+const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
     const scheme = useColorScheme();
     const textColor = scheme === 'dark' ? Colors.GREEN : Colors.BLACK;
     const [triggering, setTriggering] = useState<boolean>(false);
@@ -23,7 +26,7 @@ const LoadingScreen = () => {
     const trigger = async () => {
         try {
             setTriggering(true);
-            await checkBiometrics();
+            await retryAuth();
         } catch (error: unknown) {
             ToastAndroid.show('Error unlocking your app', ToastAndroid.LONG);
             console.log('Biometrics error', error);

@@ -5,13 +5,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { doc, getDoc } from '@react-native-firebase/firestore';
 import * as Sentry from '@sentry/react-native';
 import { useState } from 'react';
-import { TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
+import {
+    TextInput,
+    ToastAndroid,
+    TouchableOpacity,
+    useColorScheme,
+    View,
+} from 'react-native';
 import { scale } from 'react-native-size-matters';
 import ChangePasswordUI from '@/component/Setting/ChangePasswordUI';
 import authModule from '@react-native-firebase/auth';
+import { Colors } from '@/constant/Colors';
 
 export default function ChangePassword() {
     const user = auth.currentUser;
+    const scheme = useColorScheme();
+    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
     const { safeBack } = useSafeNavigation();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -76,7 +85,7 @@ export default function ChangePassword() {
             await user.reauthenticateWithCredential(credential);
             await user.updatePassword(newPwd);
 
-            ToastAndroid.show('Password updated!', ToastAndroid.SHORT);
+            ToastAndroid.show('Password updated', ToastAndroid.SHORT);
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
@@ -129,9 +138,11 @@ export default function ChangePassword() {
     ) => (
         <View style={styles.inputContainer}>
             <TextInput
-                style={styles.input}
+                style={[styles.input, { color: textColor }]}
                 placeholder={label}
-                placeholderTextColor="#aaa"
+                placeholderTextColor={
+                    scheme === 'dark' ? Colors.GRAY : Colors.BLACK
+                }
                 secureTextEntry={!show[field]}
                 value={value}
                 onChangeText={setter}
@@ -145,7 +156,7 @@ export default function ChangePassword() {
                 <Ionicons
                     name={show[field] ? 'eye-off' : 'eye'}
                     size={scale(20)}
-                    color="#aaa"
+                    color={textColor}
                 />
             </TouchableOpacity>
         </View>

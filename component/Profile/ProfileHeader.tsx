@@ -305,7 +305,7 @@ export const ProfileHeader = ({
                             onChangeText={setNameInput}
                             style={styles.input}
                             placeholder="Enter new name"
-                            placeholderTextColor={Colors.WHITE}
+                            placeholderTextColor={Colors.GRAY}
                         />
                         <View style={styles2.buttons}>
                             <TouchableOpacity

@@ -18,6 +18,7 @@ import {
     Text,
     ToastAndroid,
     TouchableOpacity,
+    useColorScheme,
     View,
 } from 'react-native';
 import AppModal from '../component/Shared/AppModal';
@@ -39,7 +40,7 @@ export default function SettingsScreen() {
     const [fatalError, setFatalError] = useState(null);
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const CACHE_KEY = '@cached_courses';
-    const { safePush, safeBack, safeReplace } = useSafeNavigation();
+    const { safePush, safeBack } = useSafeNavigation();
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: '',
@@ -50,6 +51,10 @@ export default function SettingsScreen() {
         title: '',
         message: '',
     });
+
+    const scheme = useColorScheme();
+    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
+    const backgroundColor = scheme === 'dark' ? Colors.BG_COLOR : Colors.WHITE;
 
     const options = ['Report a bug']; // when i add more options i should uncomment out these styles on the styles file
 
@@ -364,7 +369,14 @@ export default function SettingsScreen() {
             );
         } else {
             content = (
-                <SafeAreaView style={styles.container}>
+                <SafeAreaView
+                    style={[
+                        styles.container,
+                        {
+                            backgroundColor: backgroundColor,
+                        },
+                    ]}
+                >
                     {/* Header + Dropdown Button */}
                     <View style={styles.header}>
                         <TouchableOpacity
@@ -378,9 +390,11 @@ export default function SettingsScreen() {
                             <AntDesign
                                 name="left"
                                 size={scale(22)}
-                                color="#fff"
+                                color={textColor}
                             />
-                            <Text style={styles.title}>Settings</Text>
+                            <Text style={[styles.title, { color: textColor }]}>
+                                Settings
+                            </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
@@ -420,7 +434,9 @@ export default function SettingsScreen() {
                         showsVerticalScrollIndicator={false}
                         style={styles.container}
                     >
-                        <Text style={styles.heading}>General</Text>
+                        <Text style={[styles.heading, { color: textColor }]}>
+                            General
+                        </Text>
 
                         <SettingItem
                             label="Change Password"
@@ -445,7 +461,9 @@ export default function SettingsScreen() {
                             />
                         )}
 
-                        <Text style={styles.heading}>Notifications</Text>
+                        <Text style={[styles.heading, { color: textColor }]}>
+                            Notifications
+                        </Text>
                         <SettingItem
                             label="Push Notifications"
                             icon="notifications"
@@ -465,7 +483,9 @@ export default function SettingsScreen() {
                             onPress={() => safePush('/emailAlerts')}
                         />
 
-                        <Text style={styles.heading}>Privacy & Security</Text>
+                        <Text style={[styles.heading, { color: textColor }]}>
+                            Privacy & Security
+                        </Text>
                         <SettingItem
                             label="Privacy Policy"
                             icon="shield-checkmark"
@@ -497,7 +517,9 @@ export default function SettingsScreen() {
                             disabled={loading}
                         />
 
-                        <Text style={styles.heading}>About</Text>
+                        <Text style={[styles.heading, { color: textColor }]}>
+                            About
+                        </Text>
                         <SettingItem
                             label="About this App"
                             icon="information-circle-outline"
@@ -537,7 +559,9 @@ export default function SettingsScreen() {
                             onPress={() => handleShare()}
                         />
 
-                        <Text style={styles.heading}>Account</Text>
+                        <Text style={[styles.heading, { color: textColor }]}>
+                            Account
+                        </Text>
 
                         {userDetail?.member === true && (
                             <SettingItem

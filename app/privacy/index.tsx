@@ -1,5 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { Ionicons } from '@expo/vector-icons';
 import {
     Linking,
     Pressable,
@@ -8,20 +7,18 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
+} from 'react-native';
+import { Colors } from '../../constant/Colors';
+import { useSafeNavigation } from '../../hooks/useSafeNavigation';
 
 export default function Privacy() {
-    const router = useRouter();
+    const { safeBack } = useSafeNavigation();
     return (
         <SafeAreaView style={styles.container}>
             {/* Back Button */}
             <TouchableOpacity
                 style={styles.backButton}
-                onPress={() => {
-                    if (router && typeof router.back === "function")
-                        router.back();
-                }}
+                onPress={() => safeBack()}
                 accessible={true}
                 accessibilityLabel="Go back"
             >
@@ -67,21 +64,21 @@ export default function Privacy() {
                 <Text style={styles.subtitle}>5. Contact Us</Text>
                 <Text style={styles.paragraph}>
                     If you have any questions about our privacy policy, please
-                    contact us at:{" "}
+                    contact us at:{' '}
                     <Pressable
                         onPress={() =>
                             Linking.openURL(
-                                "mailto:kurisanimaluleke77@gmail.com"
+                                'mailto:kurisanimaluleke77@gmail.com',
                             )
                         }
                     >
                         <Text
                             style={{
                                 color: Colors.PRIMARY,
-                                textDecorationLine: "underline",
+                                textDecorationLine: 'underline',
                             }}
                         >
-                            {" "}
+                            {' '}
                             kurisanimaluleke77@gmail.com
                         </Text>
                     </Pressable>
@@ -106,33 +103,33 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
         marginBottom: 15,
         marginTop: 10,
     },
     backButton: {
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         marginBottom: 15,
         marginTop: 20,
     },
     backText: {
         fontSize: 16,
         color: Colors.PRIMARY,
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
         marginLeft: 5,
     },
     subtitle: {
         fontSize: 18,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
         marginTop: 20,
         marginBottom: 5,
     },
     paragraph: {
         fontSize: 16,
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
         color: Colors.GRAY,
         lineHeight: 24,
     },
@@ -140,7 +137,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         fontSize: 14,
         color: Colors.GRAY,
-        fontFamily: "outfit",
-        textAlign: "center",
+        fontFamily: 'outfit',
+        textAlign: 'center',
     },
 });

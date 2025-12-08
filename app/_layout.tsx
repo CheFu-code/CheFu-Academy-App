@@ -70,7 +70,7 @@ function LayoutContent() {
         'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
     });
 
-    const { authChecked, authSuccess } = useBiometricAuth();
+    const { authChecked, authSuccess, retryAuth } = useBiometricAuth();
     const { userDetail, setUserDetail } = useFirebaseAuthObserver(
         authChecked,
         authSuccess,
@@ -83,7 +83,7 @@ function LayoutContent() {
     useDeepLinking();
     useHandleDynamicLinks();
 
-    // if (!isConnected) return <OfflineScreen />;
+    if (!isConnected) return <OfflineScreen />;
 
     if (fontError) return <FontErrorScreen />;
 
@@ -93,7 +93,7 @@ function LayoutContent() {
         !authSuccess ||
         userDetail === undefined
     ) {
-        return <LoadingScreen />;
+        return <LoadingScreen retryAuth={retryAuth} />;
     }
 
     return (

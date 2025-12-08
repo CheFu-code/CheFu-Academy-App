@@ -6,7 +6,6 @@ import { scale, verticalScale } from "react-native-size-matters";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
         padding: scale(20),
         justifyContent: 'center',
     },
@@ -16,7 +15,6 @@ export const styles = StyleSheet.create({
         marginBottom: verticalScale(10),
     },
     input: {
-        color: Colors.WHITE,
         borderRadius: scale(8),
         padding: scale(10),
         fontFamily: 'outfit',
@@ -30,11 +28,11 @@ export const styles = StyleSheet.create({
         top: verticalScale(10),
     },
     button: {
-        backgroundColor: Colors.PRIMARY,
         padding: scale(14),
         borderRadius: scale(10),
         alignItems: 'center',
         marginTop: verticalScale(10),
+        backgroundColor: Colors.PRIMARY,
     },
     buttonText: {
         color: '#fff',
