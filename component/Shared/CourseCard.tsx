@@ -19,6 +19,7 @@ import { imageAssets } from '../../constant/Option';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/CourseCard.styles';
 import AppModal from './AppModal';
+import { scale } from 'react-native-size-matters';
 
 export default function CourseCard({
     course,
@@ -114,7 +115,7 @@ export default function CourseCard({
                     style={{
                         flex: 1,
                         justifyContent: 'space-between',
-                        minHeight: 80,
+                        minHeight: scale(75),
                     }}
                 >
                     <Text numberOfLines={3} style={styles.courseTitle}>

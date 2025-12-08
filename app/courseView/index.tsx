@@ -8,6 +8,7 @@ import { generateCourseHTML } from '@/helpers/generateCourseHTML';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import {
+    AntDesign,
     Ionicons,
     MaterialCommunityIcons,
     MaterialIcons,
@@ -26,6 +27,7 @@ import {
     Image,
     Platform,
     Pressable,
+    Text,
     ToastAndroid,
     TouchableOpacity,
     View,
@@ -35,10 +37,13 @@ import Intro from '../../component/CourseView/Intro';
 import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
 import { styles } from '../../styles/CourseView';
+import useDarkMode from '@/hooks/useDarkMode';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 export default function CourseView() {
     const { courseParams, enroll } = useLocalSearchParams();
     const { safeReplace, safePush } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     const [course, setCourse] = useState<Course>({
         id: '',
         courseTitle: '',
@@ -270,7 +275,7 @@ export default function CourseView() {
     }, [course]);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor }]}>
             <Image
                 source={
                     imageAssets[course.banner_image as keyof typeof imageAssets]
@@ -283,7 +288,10 @@ export default function CourseView() {
                 onPress={() => safeReplace('/(tabs)/home')}
                 style={styles.backButton}
             >
-                <Ionicons size={24} color={Colors.BLACK} name="arrow-back" />
+                <AntDesign size={scale(20)} color={textColor} name="left" />
+                <Text style={[styles.backText, { color: textColor }]}>
+                    Back
+                </Text>
             </TouchableOpacity>
 
             {auth.currentUser?.emailVerified ? (
@@ -315,7 +323,7 @@ export default function CourseView() {
                             >
                                 <MaterialIcons
                                     name="download-done"
-                                    size={24}
+                                    size={scale(22)}
                                     color="white"
                                 />
                             </Animated.View>
@@ -323,7 +331,7 @@ export default function CourseView() {
                     ) : (
                         <MaterialIcons
                             name="file-download"
-                            size={24}
+                            size={scale(22)}
                             color="white"
                         />
                     )}
@@ -338,8 +346,8 @@ export default function CourseView() {
                     ]}
                 >
                     <MaterialCommunityIcons
-                        style={{ marginTop: -1 }}
-                        size={24}
+                        style={{ marginTop: verticalScale(-1) }}
+                        size={scale(22)}
                         color={Colors.RED}
                         name="download-off-outline"
                     />
@@ -347,7 +355,7 @@ export default function CourseView() {
             )}
 
             {/* Spacer below the image */}
-            <View style={{ height: 260 }} />
+            <View style={{ height: verticalScale(220) }} />
 
             {/* Scrollable content below */}
             <FlatList

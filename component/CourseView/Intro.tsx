@@ -1,19 +1,22 @@
-import { db } from "@/config/fireConfig";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { Course } from "@/types/course";
-import { Ionicons } from "@expo/vector-icons";
-import { doc, setDoc } from "@react-native-firebase/firestore";
-import { useContext, useState } from "react";
+import { db } from '@/config/fireConfig';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { Ionicons } from '@expo/vector-icons';
+import { doc, setDoc } from '@react-native-firebase/firestore';
+import { useContext, useState } from 'react';
 import {
     ScrollView,
     Text,
     ToastAndroid,
     TouchableOpacity,
     View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import Button from "../Shared/Button";
+} from 'react-native';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import Button from '../Shared/Button';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { RFValue } from 'react-native-responsive-fontsize';
+import useDarkMode from '@/hooks/useDarkMode';
 
 interface IntroProps {
     course: Course;
@@ -22,7 +25,8 @@ interface IntroProps {
 
 export default function Intro({ course, enroll }: IntroProps) {
     const { userDetail } = useContext(UserDetailContext);
-    const { safeReplace } = useSafeNavigation()
+    const { safeReplace } = useSafeNavigation();
+    const { textColor } = useDarkMode();
     const [loading, setLoading] = useState(false);
     const [showFull, setShowFull] = useState(false);
     const maxLines = showFull ? undefined : 4;
@@ -34,16 +38,16 @@ export default function Intro({ course, enroll }: IntroProps) {
     const onEnrollCourse = async () => {
         if (isCourseCompleted && userDetail?.member === false) {
             ToastAndroid.show(
-                "You completed this course. Subscribe to revisit it.",
-                ToastAndroid.SHORT
+                'You completed this course. Subscribe to revisit it.',
+                ToastAndroid.SHORT,
             );
             return; // Early return to prevent further execution
         }
 
         try {
             setLoading(true);
-            const emailSafe = userDetail?.email.replace(/[@.]/g, "_");
-            const docId = emailSafe + "_" + Date.now().toString();
+            const emailSafe = userDetail?.email.replace(/[@.]/g, '_');
+            const docId = emailSafe + '_' + Date.now().toString();
             const data = {
                 ...course,
                 createdBy: userDetail?.email,
@@ -51,20 +55,20 @@ export default function Intro({ course, enroll }: IntroProps) {
                 enrolled: true,
             };
 
-            await setDoc(doc(db, "course", docId), data);
+            await setDoc(doc(db, 'course', docId), data);
 
             safeReplace({
-                pathname: "/courseView",
+                pathname: '/courseView',
                 params: {
                     courseParams: JSON.stringify(data),
                     enroll: enroll.toString(),
                 },
             });
         } catch (error) {
-            console.error("Failed to enroll course:", error);
+            console.error('Failed to enroll course:', error);
             ToastAndroid.show(
-                "Failed to enroll. Please try again.",
-                ToastAndroid.SHORT
+                'Failed to enroll. Please try again.',
+                ToastAndroid.SHORT,
             );
         } finally {
             setLoading(false);
@@ -74,13 +78,13 @@ export default function Intro({ course, enroll }: IntroProps) {
         <View>
             <View
                 style={{
-                    padding: 20,
+                    padding: moderateScale(15),
                 }}
             >
                 <Text
                     style={{
-                        fontFamily: "outfit-bold",
-                        fontSize: 20,
+                        fontFamily: 'outfit-bold',
+                        fontSize: RFValue(18),
                         color: Colors.PRIMARY,
                     }}
                 >
@@ -88,24 +92,23 @@ export default function Intro({ course, enroll }: IntroProps) {
                 </Text>
                 <View
                     style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        gap: 5,
-                        alignItems: "center",
-                        marginTop: 5,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: moderateScale(5),
+                        alignItems: 'center',
+                        marginTop: verticalScale(5),
                     }}
                 >
                     <Ionicons
                         name="book-outline"
-                        size={18}
-                        color={Colors.PRIMARY}
+                        size={moderateScale(18)}
+                        color={textColor}
                     />
                     <Text
                         style={{
-                            fontFamily: "outfit",
-                            textDecorationLine: "underline",
-                            fontSize: 18,
-                            color: Colors.WHITE,
+                            fontFamily: 'outfit',
+                            fontSize: RFValue(16),
+                            color: textColor,
                         }}
                     >
                         {course?.chapters?.length} Chapters
@@ -114,10 +117,10 @@ export default function Intro({ course, enroll }: IntroProps) {
 
                 <Text
                     style={{
-                        fontFamily: "outfit-bold",
-                        fontSize: 20,
-                        marginTop: 10,
-                        color: Colors.WHITE,
+                        fontFamily: 'outfit-bold',
+                        fontSize: RFValue(18),
+                        marginTop: verticalScale(10),
+                        color: textColor,
                     }}
                 >
                     Description:
@@ -127,8 +130,8 @@ export default function Intro({ course, enroll }: IntroProps) {
                     <Text
                         numberOfLines={maxLines}
                         style={{
-                            fontFamily: "outfit",
-                            fontSize: 16,
+                            fontFamily: 'outfit',
+                            fontSize: RFValue(14),
                             color: Colors.GRAY,
                         }}
                     >
@@ -144,41 +147,40 @@ export default function Intro({ course, enroll }: IntroProps) {
                                     color: showFull
                                         ? Colors.YELLOW
                                         : Colors.GREEN,
-                                    marginTop: 5,
+                                    marginTop: verticalScale(5),
                                 }}
                             >
-                                {showFull ? "Read less ▲" : "Read more ▼"}
+                                {showFull ? 'Read less ▲' : 'Read more ▼'}
                             </Text>
                         </TouchableOpacity>
                     )}
                 </ScrollView>
 
-                {enroll === "true" && course?.createdBy !== userDetail?.email ? (
+                {enroll === 'true' &&
+                course?.createdBy !== userDetail?.email ? (
                     <Button
-                        opacity={loading ? 0.5 : 1}
-                        text={"Enroll Now"}
+                        text={'Enroll Now'}
                         loading={loading}
                         onPress={onEnrollCourse}
                         disabled={loading || isCourseCompleted}
                         icon={
                             <Ionicons
                                 name="download-outline"
-                                size={18}
-                                color="white"
+                                size={moderateScale(18)}
+                                color={textColor}
                             />
                         }
                     />
                 ) : isCourseCompleted ? (
                     <Button
-                        opacity={loading ? 0.5 : 1}
                         text="Completed"
                         disabled={true}
                         loading={false}
-                        onPress={() => { }}
+                        onPress={() => {}}
                         icon={
                             <Ionicons
                                 name="checkmark-circle"
-                                size={20}
+                                size={moderateScale(18)}
                                 color="green"
                             />
                         }

@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from '../constant/Colors';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export const styles = StyleSheet.create({
     buttonContainer: {
@@ -16,9 +17,9 @@ export const styles = StyleSheet.create({
         borderRadius: moderateScale(10),
     },
     courseTitle: {
-        fontSize: scale(12),
+        fontSize: RFValue(12),
         fontWeight: 'bold',
-        marginTop: verticalScale(8),
+        marginTop: verticalScale(5),
         color: Colors.PRIMARY,
     },
     chapterContainer: {
@@ -28,12 +29,12 @@ export const styles = StyleSheet.create({
         gap: moderateScale(16),
     },
     chapter: {
-        fontSize: scale(12),
+        fontSize: RFValue(12),
         color: Colors.BLACK,
         fontFamily: 'outfit-bold',
     },
     time: {
-        fontSize: scale(10),
+        fontSize: RFValue(10),
         color: Colors.BLACK,
         fontFamily: 'outfit-bold',
         justifyContent: 'flex-end',
@@ -55,7 +56,7 @@ export const styles = StyleSheet.create({
     },
     ownerLabel: {
         marginTop: verticalScale(1),
-        fontSize: scale(8),
+        fontSize: RFValue(8),
         color: Colors.GREEN,
         fontWeight: 'bold',
         textAlign: 'center',
