@@ -23,6 +23,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
 import { UserDetailContext } from '../../context/UserDetailContext';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 interface CourseProgressCardProps {
     item: Course;
@@ -139,10 +140,10 @@ export default function CourseProgressCard({
             onPress={onPress}
             disabled={disabled || loading}
             style={{
-                margin: 5,
-                padding: 2,
+                margin: moderateScale(3),
+                padding: moderateScale(2),
                 backgroundColor: Colors.BG_GRAY,
-                borderRadius: 12,
+                borderRadius: moderateScale(12),
                 width: width as number | undefined,
                 opacity: disabled || loading ? 0.5 : 1,
                 position: 'relative',
@@ -179,7 +180,7 @@ export default function CourseProgressCard({
                             item.chapters?.length && (
                             <Ionicons
                                 color={'green'}
-                                size={16}
+                                size={scale(15)}
                                 name="checkmark"
                             />
                         )}
@@ -189,26 +190,26 @@ export default function CourseProgressCard({
 
             <View
                 style={{
-                    marginTop: 10,
-                    paddingHorizontal: 5,
-                    paddingBottom: 4,
+                    marginTop: verticalScale(10),
+                    paddingHorizontal: moderateScale(5),
+                    paddingBottom: verticalScale(4),
                 }}
             >
                 <Progress.Bar
                     color={Colors.GREEN}
                     progress={GetCompletedChapters(item)}
-                    width={width - 24}
+                    width={width - moderateScale(24)}
                 />
 
                 <View style={styles.commonStyles}>
                     {item?.completedChapter?.length ===
                         item.chapters?.length && (
-                        <FontAwesome color={'green'} name="flag-checkered" />
+                        <FontAwesome size={scale(15)} color={'green'} name="flag-checkered" />
                     )}
 
                     <Text
                         style={{
-                            marginTop: 2,
+                            marginTop: verticalScale(2),
                             fontFamily: 'outfit',
                         }}
                     >
@@ -241,7 +242,11 @@ export default function CourseProgressCard({
 }
 
 export const styles = StyleSheet.create({
-    bannerImage: { height: 60, width: 60, borderRadius: 8 },
+    bannerImage: {
+        height: verticalScale(50),
+        width: scale(60),
+        borderRadius: moderateScale(8),
+    },
     courseTitle: {
         fontFamily: 'outfit-bold',
         fontSize: RFValue(12),
@@ -251,7 +256,7 @@ export const styles = StyleSheet.create({
     commonStyles: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 5,
+        gap: moderateScale(5),
     },
     chapter: {
         fontFamily: 'outfit',

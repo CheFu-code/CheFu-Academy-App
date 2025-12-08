@@ -4,10 +4,10 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, Image, Text, ToastAndroid, View } from 'react-native';
 import NoCourse from '../../component/Home/NoCourse';
 import CourseProgressCard from '../../component/Shared/CourseProgressCard';
-import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 
 import { db } from '@/config/fireConfig';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import {
@@ -20,15 +20,20 @@ import {
 } from '@react-native-firebase/firestore';
 import LottieView from 'lottie-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { styles } from '../../styles/Progress.styles';
 
 export default function Progress({ enroll = false }) {
-    const [courseList, setCourseList] = useState<Course[]>([]);
+    const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
+    const { backgroundColor } = useDarkMode();
+    const [courseList, setCourseList] = useState<Course[]>([]);
     const [loading, setLoading] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [fetching, setFetching] = useState(false);
-    const { safePush } = useSafeNavigation();
+    const [lastDoc, setLastDoc] = useState(null);
+    const [loadingMore, setLoadingMore] = useState(false);
+
     useFocusEffect(
         useCallback(() => {
             setLoadingId(null);
@@ -99,14 +104,14 @@ export default function Progress({ enroll = false }) {
 
     if (loading && courseList.length === 0) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={[styles.loadingContainer, { backgroundColor }]}>
                 <LottieView
                     autoPlay
                     loop
                     source={require('../../assets/animations/Loading.json')}
                     style={{
-                        width: 150,
-                        height: 150,
+                        width: scale(150),
+                        height: verticalScale(150),
                     }}
                 />
                 <Text style={styles.loadingText}>Loading your progress...</Text>
@@ -115,10 +120,14 @@ export default function Progress({ enroll = false }) {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <Image
                 source={require('../../assets/images/graph.png')}
-                style={{ position: 'absolute', width: '100%', height: 500 }}
+                style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: verticalScale(500),
+                }}
             />
             <View>
                 <Text style={styles.headerText}>Course Progress</Text>
@@ -144,7 +153,7 @@ export default function Progress({ enroll = false }) {
                                 />
                             );
                         }}
-                        contentContainerStyle={{ padding: 10 }}
+                        contentContainerStyle={{ padding: scale(10) }}
                     />
                 ) : (
                     !loading && <NoCourse />
