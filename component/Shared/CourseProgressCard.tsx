@@ -1,5 +1,7 @@
 import { auth, db } from '@/config/fireConfig';
+import { styles } from '@/styles/CourseProgressCard.styles';
 import { Course } from '@/types/course';
+import { CourseProgressCardProps } from '@/types/courseProgressCard';
 import { sendNotification } from '@/utils/notifications';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,25 +15,15 @@ import { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
 import * as Progress from 'react-native-progress';
-import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
 import { UserDetailContext } from '../../context/UserDetailContext';
-import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
-
-interface CourseProgressCardProps {
-    item: Course;
-    width?: number | string; // Allow both number and string for width
-    loading?: boolean;
-    disabled?: boolean;
-    onPress?: () => void;
-}
 
 export default function CourseProgressCard({
     item,
@@ -40,8 +32,6 @@ export default function CourseProgressCard({
     disabled = false,
     onPress,
 }: CourseProgressCardProps) {
-    if (!item) return null;
-
     const { userDetail } = useContext(UserDetailContext);
     const [userData, setUserData] =
         useState<FirebaseFirestoreTypes.DocumentData | null>(null);
@@ -132,7 +122,12 @@ export default function CourseProgressCard({
         item?.completedChapter?.length,
         item?.chapters?.length,
         item?.courseTitle,
+        userDetail?.email,
+        notificationSentKey,
+        item,
     ]);
+
+    if (!item) return null;
 
     return (
         <TouchableOpacity
@@ -204,7 +199,11 @@ export default function CourseProgressCard({
                 <View style={styles.commonStyles}>
                     {item?.completedChapter?.length ===
                         item.chapters?.length && (
-                        <FontAwesome size={scale(15)} color={'green'} name="flag-checkered" />
+                        <FontAwesome
+                            size={scale(15)}
+                            color={'green'}
+                            name="flag-checkered"
+                        />
                     )}
 
                     <Text
@@ -240,37 +239,3 @@ export default function CourseProgressCard({
         </TouchableOpacity>
     );
 }
-
-export const styles = StyleSheet.create({
-    bannerImage: {
-        height: verticalScale(50),
-        width: scale(60),
-        borderRadius: moderateScale(8),
-    },
-    courseTitle: {
-        fontFamily: 'outfit-bold',
-        fontSize: RFValue(12),
-        flexWrap: 'wrap',
-        maxWidth: '90%',
-    },
-    commonStyles: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: moderateScale(5),
-    },
-    chapter: {
-        fontFamily: 'outfit',
-        fontSize: RFValue(10),
-    },
-    activityIndicatorContainer: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(255,255,255,0.5)',
-        borderRadius: 15,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});

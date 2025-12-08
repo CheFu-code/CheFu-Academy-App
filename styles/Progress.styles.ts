@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '../constant/Colors';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { scale, verticalScale } from 'react-native-size-matters';
+import { Colors } from '../constant/Colors';
 
 export const styles = StyleSheet.create({
     loadingContainer: {

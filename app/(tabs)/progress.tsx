@@ -14,14 +14,17 @@ import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
+    limit,
     orderBy,
     query,
+    startAfter,
     where,
 } from '@react-native-firebase/firestore';
 import LottieView from 'lottie-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { styles } from '../../styles/Progress.styles';
+import { Colors } from '@/constant/Colors';
 
 export default function Progress({ enroll = false }) {
     const { safePush } = useSafeNavigation();
@@ -44,7 +47,8 @@ export default function Progress({ enroll = false }) {
         if (fetching) return;
         setLoading(true);
         setFetching(true);
-        setCourseList([]);
+        setLastDoc(null);
+
         if (!userDetail?.email) {
             setLoading(false);
             setFetching(false);
@@ -57,33 +61,63 @@ export default function Progress({ enroll = false }) {
                 courseRef,
                 where('createdBy', '==', userDetail?.email),
                 orderBy('createdOn', 'desc'),
+                limit(7),
             );
-            const querySnapshot = await getDocs(q);
 
-            const courses = querySnapshot.docs.map(
-                (
-                    doc: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>,
-                ) => ({
+            const snapshot = await getDocs(q);
+
+            const data = snapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
                     ...doc.data(),
                     id: doc.id,
                 }),
             );
 
-            setCourseList(courses);
+            setCourseList(data);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
         } catch (error) {
             console.error(error);
             Sentry.captureException(error);
-            if (typeof ToastAndroid !== 'undefined') {
-                ToastAndroid.show(
-                    'Failed to load progress',
-                    ToastAndroid.SHORT,
-                );
-            }
+            ToastAndroid.show('Failed to load progress', ToastAndroid.SHORT);
         } finally {
             setLoading(false);
             setFetching(false);
         }
     }, [userDetail?.email]);
+
+    const loadMore = async () => {
+        if (loadingMore || !lastDoc) return;
+
+        setLoadingMore(true);
+
+        try {
+            const courseRef = collection(db, 'course');
+            const q = query(
+                courseRef,
+                where('createdBy', '==', userDetail?.email),
+                orderBy('createdOn', 'desc'),
+                startAfter(lastDoc),
+                limit(7),
+            );
+
+            const snapshot = await getDocs(q);
+
+            const data = snapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
+                    ...doc.data(),
+                    id: doc.id,
+                }),
+            );
+
+            setCourseList((prev) => [...prev, ...data]);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+        } catch (error) {
+            console.error(error);
+            Sentry.captureException(error);
+        } finally {
+            setLoadingMore(false);
+        }
+    };
 
     useEffect(() => {
         if (userDetail) GetCourseList();
@@ -153,7 +187,24 @@ export default function Progress({ enroll = false }) {
                                 />
                             );
                         }}
-                        contentContainerStyle={{ padding: scale(10) }}
+                        onEndReached={loadMore}
+                        onEndReachedThreshold={0.3}
+                        ListFooterComponent={
+                            loadingMore ? (
+                                <Text
+                                    style={{
+                                        color: Colors.WHITE,
+                                        textAlign: 'center',
+                                        padding: scale(10),
+                                    }}
+                                >
+                                    Loading more...
+                                </Text>
+                            ) : null
+                        }
+                        contentContainerStyle={{
+                            padding: scale(10),
+                        }}
                     />
                 ) : (
                     !loading && <NoCourse />
