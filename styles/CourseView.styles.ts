@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
-import { Colors } from "../constant/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
+import { scale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     chapterText: {
         fontFamily: "outfit",
-        fontSize: 16,
+        fontSize: RFValue(15),
     },
     buttonContainer: {
         marginVertical: 8,
@@ -20,12 +21,11 @@ export const styles = StyleSheet.create({
     },
     chapterTextContent: {
         fontFamily: "outfit-bold",
-        fontSize: 20,
-        color: Colors.WHITE,
+        fontSize: RFValue(18),
     },
     chapterNameContainer: {
         display: "flex",
         flexDirection: "row",
-        gap: 5,
+        gap: scale(5),
     },
 });

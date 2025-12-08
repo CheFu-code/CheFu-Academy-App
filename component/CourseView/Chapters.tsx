@@ -1,30 +1,32 @@
-import { Course } from "@/types/course";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { Ionicons } from '@expo/vector-icons';
+import { useContext } from 'react';
 import {
     FlatList,
     Text,
     ToastAndroid,
     TouchableOpacity,
     View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import { UserDetailContext } from "../../context/UserDetailContext";
-import { styles } from "../../styles/CourseView.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+} from 'react-native';
+import { Colors } from '../../constant/Colors';
+import { UserDetailContext } from '../../context/UserDetailContext';
+import { styles } from '../../styles/CourseView.styles';
+import { moderateScale, scale } from 'react-native-size-matters';
+import useDarkMode from '@/hooks/useDarkMode';
 
 interface ChaptersProps {
     course: Course;
 }
 
 export default function Chapters({ course }: ChaptersProps) {
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
+    const { userDetail } = useContext(UserDetailContext);
+    const { textColor } = useDarkMode();
     const isChapterCompleted = (index: number) => {
         if (!Array.isArray(course?.completedChapter)) return false;
         const isCompleted = course.completedChapter.find(
-            (item) => item === index.toString()
+            (item) => item === index.toString(),
         );
         return isCompleted ? true : false;
     };
@@ -32,13 +34,15 @@ export default function Chapters({ course }: ChaptersProps) {
     return (
         <View
             style={{
-                padding: 20,
+                padding: moderateScale(15),
             }}
         >
-            <Text style={styles.chapterTextContent}>Chapters</Text>
+            <Text style={[styles.chapterTextContent, { color: textColor }]}>
+                Chapters
+            </Text>
 
             <FlatList
-                style={{ marginBottom: 40 }}
+                style={{ marginBottom: moderateScale(40) }}
                 data={course?.chapters || []}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => {
@@ -53,22 +57,22 @@ export default function Chapters({ course }: ChaptersProps) {
 
                                 if (!isOwner && !isEnrolled) {
                                     ToastAndroid.show(
-                                        "Please enroll in this course to access chapters.",
-                                        ToastAndroid.LONG
+                                        'Please enroll in this course to access chapters.',
+                                        ToastAndroid.LONG,
                                     );
                                     return;
                                 }
 
                                 if (completed && userDetail.member === false) {
                                     ToastAndroid.show(
-                                        "You completed this chapter. Subscribe to revisit it.",
-                                        ToastAndroid.SHORT
+                                        'You completed this chapter. Subscribe to revisit it.',
+                                        ToastAndroid.SHORT,
                                     );
                                     return;
                                 }
 
                                 safePush({
-                                    pathname: "/chapterView",
+                                    pathname: '/chapterView',
                                     params: {
                                         chapterParams: JSON.stringify(item),
                                         docId: course?.docId,
@@ -82,14 +86,14 @@ export default function Chapters({ course }: ChaptersProps) {
                                 {
                                     opacity:
                                         completed &&
-                                            userDetail.member === false &&
-                                            course?.createdBy === userDetail?.email
+                                        userDetail.member === false &&
+                                        course?.createdBy === userDetail?.email
                                             ? 0.6
                                             : 1,
 
                                     borderColor: completed
                                         ? Colors.GREEN
-                                        : "#ccc",
+                                        : '#ccc',
                                 },
                             ]}
                         >
@@ -98,7 +102,7 @@ export default function Chapters({ course }: ChaptersProps) {
                                     style={[
                                         styles.chapterText,
                                         completed &&
-                                            course?.createdBy === userDetail?.email
+                                        course?.createdBy === userDetail?.email
                                             ? { color: Colors.GREEN }
                                             : null,
                                         // ✨ dim completed items
@@ -109,9 +113,9 @@ export default function Chapters({ course }: ChaptersProps) {
                                 <Text
                                     style={[
                                         styles.chapterText,
-                                        { maxWidth: 210 },
+                                        { maxWidth: scale(210) },
                                         completed &&
-                                            course?.createdBy === userDetail?.email
+                                        course?.createdBy === userDetail?.email
                                             ? { color: Colors.GREEN }
                                             : null,
                                     ]}
@@ -122,17 +126,17 @@ export default function Chapters({ course }: ChaptersProps) {
                                 </Text>
                             </View>
                             {completed &&
-                                course?.createdBy === userDetail?.email ? (
+                            course?.createdBy === userDetail?.email ? (
                                 <Ionicons
                                     name="checkmark-circle"
-                                    size={24}
+                                    size={scale(22)}
                                     color="green"
                                 />
                             ) : (
                                 <Ionicons
                                     name="play"
                                     color={Colors.PRIMARY}
-                                    size={24}
+                                    size={scale(22)}
                                 />
                             )}
                         </TouchableOpacity>
