@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { moderateScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     container: {
@@ -8,13 +9,12 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
     },
     headerWrapper: {
-        padding: moderateScale(10),
-        backgroundColor: Colors.BG_COLOR,
+        paddingHorizontal: moderateScale(10),
     },
     p: { padding: moderateScale(10), },
     headerText: {
         fontFamily: "outfit-bold",
-        fontSize: moderateScale(22),
+        fontSize: RFValue(20),
         color: Colors.PRIMARY,
     },
     scrollContent: {
@@ -36,8 +36,8 @@ export const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
-        fontSize: moderateScale(14),
+        fontSize: RFValue(13),
         fontFamily: "outfit",
-        color: Colors.GREEN,
+        color: Colors.BLACK,
     },
 });

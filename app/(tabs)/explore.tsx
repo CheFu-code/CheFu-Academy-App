@@ -1,4 +1,6 @@
+import Loading from '@/component/Explore/Loading';
 import { db } from '@/config/fireConfig';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,7 +12,6 @@ import {
     orderBy,
     query,
 } from '@react-native-firebase/firestore';
-import LottieView from 'lottie-react-native';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import {
     FlatList,
@@ -22,6 +23,7 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import CourseCard from '../../component/Shared/CourseCard';
 import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
@@ -32,6 +34,7 @@ export default function ExploreScreen() {
     const [courseData, setCourseData] = useState<Course[]>([]);
     const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
     const [refreshing, setRefreshing] = useState(false);
+    const { backgroundColor } = useDarkMode();
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const { safePush } = useSafeNavigation();
@@ -97,42 +100,19 @@ export default function ExploreScreen() {
 
     if (loading) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: Colors.BG_COLOR,
-                }}
-            >
-                <LottieView
-                    autoPlay
-                    loop
-                    source={require('../../assets/animations/Loading.json')}
-                    style={{
-                        width: 150,
-                        height: 150,
-                    }}
-                />
-                <Text
-                    style={{
-                        marginTop: 10,
-                        fontFamily: 'outfit-bold',
-                        fontSize: 16,
-                        color: Colors.PRIMARY,
-                    }}
-                >
-                    Loading...
-                </Text>
-            </View>
+            <Loading/>
         );
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <Image
                 source={require('../../assets/images/graph.png')}
-                style={{ position: 'absolute', width: '100%', height: 500 }}
+                style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: verticalScale(500),
+                }}
             />
             <View style={styles.headerWrapper}>
                 <Text style={styles.headerText}>Explore courses</Text>
@@ -142,7 +122,7 @@ export default function ExploreScreen() {
                 <View style={styles.inputContainer}>
                     <TextInput
                         placeholder="Search course, topic, category..."
-                        placeholderTextColor={Colors.BLACK}
+                        placeholderTextColor={Colors.GRAY}
                         value={searchTerm}
                         onChangeText={setSearchTerm}
                         onSubmitEditing={handleSearch}
@@ -152,9 +132,9 @@ export default function ExploreScreen() {
                     <TouchableOpacity onPress={() => handleSearch()}>
                         <Ionicons
                             name="search"
-                            size={20}
-                            color={Colors.GREEN}
-                            style={{ marginRight: 8 }}
+                            size={scale(20)}
+                            color={Colors.BLACK}
+                            style={{ marginRight: moderateScale(8) }}
                         />
                     </TouchableOpacity>
                 </View>
@@ -165,21 +145,24 @@ export default function ExploreScreen() {
                     keyExtractor={(item) => item.id}
                     numColumns={2}
                     contentContainerStyle={{
-                        paddingBottom: 90,
+                        paddingBottom: moderateScale(50),
                     }}
                     columnWrapperStyle={{ justifyContent: 'space-between' }}
                     renderItem={({ item }) => (
                         <CourseCard
                             course={item}
                             enroll={true}
-                            style={{ width: '48%', marginBottom: 10 }}
+                            style={{
+                                width: '48%',
+                                marginBottom: moderateScale(10),
+                            }}
                         />
                     )}
                     ListEmptyComponent={
                         <Text
                             style={{
                                 textAlign: 'center',
-                                marginTop: 20,
+                                marginTop: verticalScale(20),
                                 color: '#999',
                             }}
                         >
