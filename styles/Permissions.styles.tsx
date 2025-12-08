@@ -6,13 +6,11 @@ import { scale, verticalScale } from 'react-native-size-matters';
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
         padding: scale(15),
     },
     title: {
         fontSize: RFValue(20),
         fontFamily: 'outfit-bold',
-        color: Colors.WHITE,
     },
     item: {
         flexDirection: 'row',
@@ -25,7 +23,6 @@ export const styles = StyleSheet.create({
     label: {
         fontSize: RFValue(15),
         fontFamily: 'outfit',
-        color: Colors.WHITE,
     },
     button: {
         flexDirection: 'row',
@@ -41,7 +38,6 @@ export const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,0,0,0.1)',
     },
     buttonText: {
-        color: Colors.WHITE,
         fontFamily: 'outfit',
     },
     settingsButton: {

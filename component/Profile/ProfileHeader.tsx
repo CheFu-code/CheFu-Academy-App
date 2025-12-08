@@ -21,8 +21,9 @@ import {
 } from 'react-native';
 import ErrorModal from '../Shared/ErrorModal';
 import { auth } from '@/config/fireConfig';
-import {  scale, verticalScale } from 'react-native-size-matters';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import useDarkMode from '@/hooks/useDarkMode';
 
 interface ProfileHeaderProps {
     profilePicture: string;
@@ -54,10 +55,11 @@ export const ProfileHeader = ({
     loader,
     loadingName,
 }: ProfileHeaderProps) => {
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { safePush } = useSafeNavigation();
-    const [modalVisible, setModalVisible] = useState(false);
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const { textColor, backgroundColor } = useDarkMode();
     const [nameInput, setNameInput] = useState(fullname);
+    const [modalVisible, setModalVisible] = useState(false);
     const { loading, verifyEmail } = useProfileActions(
         userDetail,
         setUserDetail,
@@ -165,7 +167,6 @@ export const ProfileHeader = ({
                                 {
                                     color: Colors.GREEN,
                                     marginTop: verticalScale(10),
-                                    opacity: 0.6,
                                 },
                             ]}
                         >
@@ -199,7 +200,7 @@ export const ProfileHeader = ({
                             }}
                             name="settings-outline"
                             size={scale(18)}
-                            color={Colors.WHITE}
+                            color={textColor}
                         />
                     </TouchableOpacity>
                 </View>
@@ -263,21 +264,27 @@ export const ProfileHeader = ({
                                     {member && !loadingName && (
                                         <Ionicons
                                             color={Colors.PRIMARY}
-                                            size={20}
+                                            size={scale(18)}
                                             name="checkmark-circle"
                                         />
                                     )}
                                 </View>
                                 <Text
                                     numberOfLines={1}
-                                    style={styles.profileEmail}
+                                    style={[
+                                        styles.profileEmail,
+                                        { color: textColor },
+                                    ]}
                                 >
                                     Joined {formatDate(createdAt)}
                                 </Text>
                             </View>
                         </View>
 
-                        <Text numberOfLines={1} style={styles.profileEmail}>
+                        <Text
+                            numberOfLines={1}
+                            style={[styles.profileEmail, { color: textColor }]}
+                        >
                             {email}
                         </Text>
 
@@ -298,12 +305,16 @@ export const ProfileHeader = ({
                 onRequestClose={() => setModalVisible(false)}
             >
                 <View style={styles2.modalBackground}>
-                    <View style={styles2.modalContainer}>
-                        <Text style={styles2.modalTitle}>Change Name</Text>
+                    <View style={[styles2.modalContainer, { backgroundColor }]}>
+                        <Text
+                            style={[styles2.modalTitle, { color: textColor }]}
+                        >
+                            Change Name
+                        </Text>
                         <TextInput
                             value={nameInput}
                             onChangeText={setNameInput}
-                            style={styles.input}
+                            style={[styles.input, { color: textColor }]}
                             placeholder="Enter new name"
                             placeholderTextColor={Colors.GRAY}
                         />
@@ -316,7 +327,14 @@ export const ProfileHeader = ({
                                 ]}
                                 onPress={() => setModalVisible(false)}
                             >
-                                <Text style={styles2.buttonText}>Cancel</Text>
+                                <Text
+                                    style={[
+                                        styles2.buttonText,
+                                        { color: textColor },
+                                    ]}
+                                >
+                                    Cancel
+                                </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 disabled={loader}
@@ -326,7 +344,14 @@ export const ProfileHeader = ({
                                 ]}
                                 onPress={handleSave}
                             >
-                                <Text style={styles2.buttonText}>Save</Text>
+                                <Text
+                                    style={[
+                                        styles2.buttonText,
+                                        { color: backgroundColor },
+                                    ]}
+                                >
+                                    Save
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>

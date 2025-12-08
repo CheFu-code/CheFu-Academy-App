@@ -20,6 +20,8 @@ import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Profile.styles';
 import { auth, db } from '@/config/fireConfig';
+import useDarkMode from '@/hooks/useDarkMode';
+import { verticalScale } from 'react-native-size-matters';
 
 export default function Profile() {
     const { safePush, safeReplace } = useSafeNavigation();
@@ -45,6 +47,7 @@ export default function Profile() {
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const { backgroundColor } = useDarkMode();
     const isFreeUser = !member;
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
     const { error, setError } = usePickImage();
@@ -137,10 +140,10 @@ export default function Profile() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <Image
                 source={require('../../assets/images/graph.png')}
-                style={{ position: 'absolute', width: '100%', height: 500 }}
+                style={{ position: 'absolute', width: '100%', height: verticalScale(500) }}
             />
             {!userDetail ? (
                 <LoggedOutMessage />

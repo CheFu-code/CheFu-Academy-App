@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
 import { scale, verticalScale, moderateScale } from "react-native-size-matters";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     header: {
-        fontSize: scale(18),
+        fontSize: RFValue(18),
         marginBottom: verticalScale(8),
         fontFamily: "outfit-bold",
     },
@@ -21,7 +22,7 @@ export const styles = StyleSheet.create({
         flex: 1,
     },
     date: {
-        fontSize: scale(14),
+        fontSize: RFValue(12),
         color: Colors.BLACK,
         fontFamily: "outfit",
     },
@@ -51,7 +52,7 @@ export const styles = StyleSheet.create({
     addRating: {
         backgroundColor: Colors.BG_GRAY,
         padding: moderateScale(5),
-        borderRadius: moderateScale(12),
+        borderRadius: moderateScale(15),
     },
     container: {
         flexDirection: "row",
@@ -74,20 +75,20 @@ export const styles = StyleSheet.create({
         alignItems: "center",
     },
     reviewText: {
-        fontSize: scale(14),
+        fontSize: RFValue(14),
         fontFamily: "outfit",
     },
     box: {
         backgroundColor: Colors.BG_GRAY,
         borderRadius: moderateScale(10),
-        borderWidth: 0.7,
+        borderWidth: 0.4,
         borderColor: Colors.GRAY,
         padding: moderateScale(12),
         marginBottom: verticalScale(10),
     },
     image: {
-        width: scale(50),
-        height: scale(50),
+        width: scale(40),
+        height: scale(40),
         borderRadius: scale(50),
         backgroundColor: Colors.WHITE,
         borderWidth: 0.4,
@@ -95,7 +96,7 @@ export const styles = StyleSheet.create({
     },
     username: {
         fontFamily: "outfit-bold",
-        fontSize: scale(16),
+        fontSize: RFValue(14),
     },
     modalOverlay: {
         flex: 1,
@@ -105,7 +106,6 @@ export const styles = StyleSheet.create({
     },
     modalContent: {
         width: "90%",
-        backgroundColor: Colors.WHITE,
         borderRadius: moderateScale(12),
         padding: moderateScale(20),
         shadowColor: "#000",
@@ -114,7 +114,7 @@ export const styles = StyleSheet.create({
         elevation: 5,
     },
     modalTitle: {
-        fontSize: scale(18),
+        fontSize: RFValue(18),
         fontFamily: "outfit-bold",
         marginBottom: verticalScale(12),
     },

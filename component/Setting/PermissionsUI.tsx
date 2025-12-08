@@ -1,3 +1,4 @@
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/Permissions.styles';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
@@ -21,8 +22,9 @@ const PermissionsUI = ({
     permissionDisplayNames,
 }: PermissionsUIProps) => {
     const { safeBack } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <TouchableOpacity
                 onPress={safeBack}
                 style={{
@@ -31,13 +33,15 @@ const PermissionsUI = ({
                     gap: scale(10),
                 }}
             >
-                <AntDesign size={scale(20)} name="left" color={'white'} />
-                <Text style={styles.title}>App Permissions</Text>
+                <AntDesign size={scale(20)} name="left" color={textColor} />
+                <Text style={[styles.title, { color: textColor }]}>
+                    App Permissions
+                </Text>
             </TouchableOpacity>
 
             {Object.entries(permissions).map(([key, granted]) => (
                 <View key={key} style={styles.item}>
-                    <Text style={styles.label}>
+                    <Text style={[styles.label, { color: textColor }]}>
                         {permissionDisplayNames[key as PermissionKeys]}
                     </Text>
 
@@ -54,7 +58,7 @@ const PermissionsUI = ({
                             color={granted ? 'green' : 'red'}
                             style={{ marginRight: verticalScale(6) }}
                         />
-                        <Text style={styles.buttonText}>
+                        <Text style={[styles.buttonText, { color: textColor }]}>
                             {granted ? 'Granted' : 'Request'}
                         </Text>
                     </TouchableOpacity>

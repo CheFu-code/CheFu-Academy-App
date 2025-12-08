@@ -3,10 +3,10 @@ import { Course, CourseProgressProps } from '@/types/course';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 import CourseProgressCard from '../Shared/CourseProgressCard';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 type ItemType = Course | { isViewAll: true };
 
@@ -15,6 +15,7 @@ export default function CourseProgress({
     enroll = false,
 }: CourseProgressProps) {
     const { safePush } = useSafeNavigation();
+
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const displayedCourses = courseList.slice(0, 4);
 
@@ -78,7 +79,8 @@ export default function CourseProgress({
                                 borderRadius: moderateScale(30),
                                 height: verticalScale(40),
                                 marginTop: verticalScale(25),
-                            }}>
+                            }}
+                        >
                             <Text
                                 style={{
                                     fontFamily: 'outfit',

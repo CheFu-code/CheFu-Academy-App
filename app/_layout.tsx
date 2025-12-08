@@ -83,7 +83,7 @@ function LayoutContent() {
     useDeepLinking();
     useHandleDynamicLinks();
 
-    if (!isConnected) return <OfflineScreen />;
+    // if (!isConnected) return <OfflineScreen />;
 
     if (fontError) return <FontErrorScreen />;
 

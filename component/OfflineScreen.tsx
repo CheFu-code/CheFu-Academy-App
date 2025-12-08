@@ -3,10 +3,13 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { styles } from '../styles/OfflineScreen.style';
 import { RFValue } from 'react-native-responsive-fontsize';
+import useDarkMode from '@/hooks/useDarkMode';
+import { Colors } from '@/constant/Colors';
 
 export default function OfflineScreen() {
+    const {backgroundColor}=useDarkMode()
     return (
-        <View style={styles.container}>
+        <View style={[ styles.container,{backgroundColor} ]}>
             <LottieView
                 source={require('../assets/animations/no internet.json')}
                 autoPlay
@@ -18,7 +21,7 @@ export default function OfflineScreen() {
                 style={[
                     styles.subtitle,
                     {
-                        color: '#ccc',
+                        color: Colors.GRAY,
                         fontSize: RFValue(13),
                     },
                 ]}

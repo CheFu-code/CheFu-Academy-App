@@ -29,6 +29,7 @@ import { styles } from '../styles/Settings.styles';
 import SettingItem from '@/component/Setting/settingItem';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
+import useDarkMode from '@/hooks/useDarkMode';
 
 export default function SettingsScreen() {
     const [notifications, setNotifications] = useState(true);
@@ -38,9 +39,10 @@ export default function SettingsScreen() {
     const [isOpen, setIsOpen] = useState(false);
     const [fetching, setFetching] = useState(false);
     const [fatalError, setFatalError] = useState(null);
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const CACHE_KEY = '@cached_courses';
     const { safePush, safeBack } = useSafeNavigation();
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const { textColor, backgroundColor } = useDarkMode();
+    const CACHE_KEY = '@cached_courses';
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: '',
@@ -51,10 +53,6 @@ export default function SettingsScreen() {
         title: '',
         message: '',
     });
-
-    const scheme = useColorScheme();
-    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
-    const backgroundColor = scheme === 'dark' ? Colors.BG_COLOR : Colors.WHITE;
 
     const options = ['Report a bug']; // when i add more options i should uncomment out these styles on the styles file
 
@@ -434,7 +432,12 @@ export default function SettingsScreen() {
                         showsVerticalScrollIndicator={false}
                         style={styles.container}
                     >
-                        <Text style={[styles.heading, { color: textColor }]}>
+                        <Text
+                            style={[
+                                styles.heading,
+                                { color: textColor, marginTop: 0 },
+                            ]}
+                        >
                             General
                         </Text>
 

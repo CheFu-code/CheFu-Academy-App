@@ -1,14 +1,11 @@
-import { db } from "@/config/fireConfig";
-import { Colors } from "@/constant/Colors";
-import { UserDetailContext } from "@/context/UserDetailContext";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
-import {
-    doc,
-    getDoc,
-    updateDoc
-} from "@react-native-firebase/firestore";
-import { router } from "expo-router";
-import { useCallback, useContext, useState } from "react";
+import { db } from '@/config/fireConfig';
+import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import useDarkMode from '@/hooks/useDarkMode';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
+import { useCallback, useContext, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -18,7 +15,10 @@ import {
     ToastAndroid,
     TouchableOpacity,
     View,
-} from "react-native";
+} from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 type TrustedDevice = {
     brand?: string;
@@ -29,29 +29,29 @@ type TrustedDevice = {
 };
 
 export default function TrustedDevices() {
+    const { safeBack } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
-
     const [loadingDevice, setLoadingDevice] = useState<string | null>(null);
-
     const [refreshing, setRefreshing] = useState(false);
 
     const fetchUserDetail = useCallback(async () => {
         if (!userDetail?.email) return;
 
         try {
-            const snapshot = await getDoc(doc(db, "users", userDetail?.email)); // 👈 wrap with doc()
+            const snapshot = await getDoc(doc(db, 'users', userDetail?.email)); // 👈 wrap with doc()
             if (snapshot.exists()) {
                 const data = snapshot.data();
                 setUserDetail({ ...userDetail, ...data });
             }
         } catch (err) {
-            console.error("Failed to fetch user detail:", err);
-            ToastAndroid.show("Failed to refresh data", ToastAndroid.SHORT);
+            console.error('Failed to fetch user detail:', err);
+            ToastAndroid.show('Failed to refresh data', ToastAndroid.SHORT);
         } finally {
             setLoading(false);
         }
-    }, [userDetail?.email]);
+    }, [setUserDetail, userDetail]);
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -61,13 +61,13 @@ export default function TrustedDevices() {
 
     const deleteFromTrustedDevices = (device: TrustedDevice) => {
         Alert.alert(
-            "Confirm Removal",
-            "Are you sure you want to remove this device from your trusted devices?",
+            'Confirm Removal',
+            'Are you sure you want to remove this device from your trusted devices?',
             [
-                { text: "Cancel", style: "cancel" },
+                { text: 'Cancel', style: 'cancel' },
                 {
-                    text: "Remove",
-                    style: "destructive",
+                    text: 'Remove',
+                    style: 'destructive',
                     onPress: async () => {
                         try {
                             if (
@@ -75,12 +75,12 @@ export default function TrustedDevices() {
                                 !userDetail?.trustedDevices
                             ) {
                                 ToastAndroid.show(
-                                    "Your data not found",
-                                    ToastAndroid.SHORT
+                                    'Your data not found',
+                                    ToastAndroid.SHORT,
                                 );
                                 return;
                             }
-                            setLoadingDevice(device.modelName || "unknown");
+                            setLoadingDevice(device.modelName || 'unknown');
                             const filteredDevices =
                                 userDetail.trustedDevices.filter(
                                     (d: TrustedDevice) =>
@@ -90,58 +90,55 @@ export default function TrustedDevices() {
                                             d.osName === device.osName &&
                                             d.osVersion === device.osVersion &&
                                             d.deviceType === device.deviceType
-                                        )
+                                        ),
                                 );
                             await updateDoc(
-                                doc(db, "users", userDetail?.email),
+                                doc(db, 'users', userDetail?.email),
                                 {
                                     trustedDevices: filteredDevices,
-                                }
+                                },
                             );
                             setUserDetail({
                                 ...userDetail,
                                 trustedDevices: filteredDevices,
                             });
                             Alert.alert(
-                                "Success",
-                                "Device removed from trusted list"
+                                'Success',
+                                'Device removed from trusted list',
                             );
                         } catch (error) {
                             console.error(
-                                "Error removing trusted device:",
-                                error
+                                'Error removing trusted device:',
+                                error,
                             );
-                            Alert.alert("Error", "Failed to remove device");
+                            Alert.alert('Error', 'Failed to remove device');
                         } finally {
                             setLoadingDevice(null);
                         }
                     },
                 },
             ],
-            { cancelable: false }
+            { cancelable: false },
         );
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor }}>
             {/* Header */}
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => safeBack()}
                 style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingTop: 50,
-                    paddingHorizontal: 20,
-                    marginBottom: 20,
-                    gap: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingHorizontal: verticalScale(15),
                 }}
             >
-                <AntDesign name="left" size={24} color={Colors.PRIMARY} />
+                <AntDesign name="left" size={scale(20)} color={textColor} />
                 <Text
                     style={{
-                        fontFamily: "outfit-bold",
-                        fontSize: 20,
-                        color: Colors.PRIMARY,
+                        fontFamily: 'outfit-bold',
+                        fontSize: RFValue(20),
+                        color: textColor,
                     }}
                 >
                     Trusted Devices
@@ -156,20 +153,25 @@ export default function TrustedDevices() {
                         tintColor={Colors.PRIMARY}
                     />
                 }
-                contentContainerStyle={{ paddingHorizontal: 20, gap: 20 }}
+                contentContainerStyle={{
+                    paddingHorizontal: verticalScale(15),
+                    gap: scale(20),
+                }}
             >
                 {/* Info Section */}
                 <View>
-                    {(userDetail?.trustedDevices || []).length > 0 && (
+                    {userDetail?.trustedDevices?.length > 0 && (
                         <Text
                             style={{
-                                fontFamily: "outfit-medium",
-                                fontSize: 16,
-                                color: Colors.WHITE,
-                                marginBottom: 5,
+                                fontFamily: 'outfit',
+                                fontSize: RFValue(14),
+                                color: textColor,
+                                marginTop: verticalScale(15),
                             }}
                         >
-                            These are your trusted devices:
+                            {userDetail.trustedDevices.length > 1
+                                ? 'These are your trusted devices:'
+                                : 'This is your trusted device:'}
                         </Text>
                     )}
                 </View>
@@ -181,98 +183,98 @@ export default function TrustedDevices() {
                             <View
                                 key={index}
                                 style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
                                     backgroundColor: Colors.LIGHT_GREEN,
-                                    borderRadius: 12,
-                                    padding: 15,
+                                    borderRadius: scale(12),
+                                    padding: scale(15),
                                 }}
                             >
                                 <Ionicons
                                     name="shield-checkmark"
-                                    size={24}
+                                    size={scale(22)}
                                     color="green"
-                                    style={{ marginRight: 10 }}
+                                    style={{ marginRight: scale(10) }}
                                 />
                                 <View
                                     style={{
                                         flex: 1,
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        gap: 10,
-                                        maxWidth: 290,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: scale(10),
+                                        maxWidth: scale(290),
                                     }}
                                 >
                                     <View>
                                         <Text
                                             style={{
-                                                fontSize: 15,
+                                                fontSize: RFValue(15),
                                                 color: Colors.BLACK,
-                                                fontFamily: "outfit-bold",
-                                                marginBottom: 5,
+                                                fontFamily: 'outfit-bold',
+                                                marginBottom: verticalScale(5),
                                             }}
                                         >
                                             {device.modelName ||
-                                                "Unknown Device"}
+                                                'Unknown Device'}
                                         </Text>
 
                                         <Text
                                             numberOfLines={3}
                                             style={{
-                                                fontFamily: "outfit",
-                                                fontSize: 12,
+                                                fontFamily: 'outfit',
+                                                fontSize: RFValue(12),
                                                 color: Colors.GRAY,
-                                                maxWidth: 210,
+                                                maxWidth: scale(190),
                                             }}
                                         >
                                             <Text
                                                 style={{
-                                                    fontFamily: "outfit-bold",
+                                                    fontFamily: 'outfit-bold',
                                                     color: Colors.BLACK,
                                                 }}
                                             >
                                                 Operating System:
-                                            </Text>{" "}
-                                            {device.osName || "Unknown OS"}
+                                            </Text>{' '}
+                                            {device.osName || 'Unknown OS'}
                                         </Text>
 
                                         <Text
                                             numberOfLines={1}
                                             style={{
-                                                fontFamily: "outfit",
-                                                fontSize: 12,
+                                                fontFamily: 'outfit',
+                                                fontSize: RFValue(12),
                                                 color: Colors.GRAY,
-                                                maxWidth: 210,
+                                                maxWidth: scale(200),
                                             }}
                                         >
                                             <Text
                                                 style={{
-                                                    fontFamily: "outfit-bold",
+                                                    fontFamily: 'outfit-bold',
                                                     color: Colors.BLACK,
                                                 }}
                                             >
-                                                Version:{" "}
+                                                Version:{' '}
                                             </Text>
-                                            {device.osVersion || "N/A"}
+                                            {device.osVersion || 'N/A'}
                                         </Text>
 
                                         <Text
                                             style={{
-                                                fontFamily: "outfit",
-                                                fontSize: 12,
+                                                fontFamily: 'outfit',
+                                                fontSize: RFValue(12),
                                                 color: Colors.BLACK,
                                             }}
                                         >
                                             <Text
                                                 style={{
-                                                    fontFamily: "outfit-bold",
+                                                    fontFamily: 'outfit-bold',
                                                     color: Colors.BLACK,
                                                 }}
                                             >
                                                 Brand:
-                                            </Text>{" "}
-                                            {device.brand || "Unknown Brand"}
+                                            </Text>{' '}
+                                            {device.brand || 'Unknown Brand'}
                                         </Text>
                                     </View>
                                     <TouchableOpacity
@@ -283,9 +285,9 @@ export default function TrustedDevices() {
                                             deleteFromTrustedDevices(device)
                                         }
                                         style={{
-                                            paddingHorizontal: 10,
-                                            paddingVertical: 8,
-                                            borderRadius: 12,
+                                            paddingHorizontal: scale(10),
+                                            paddingVertical: verticalScale(8),
+                                            borderRadius: scale(12),
                                             backgroundColor: Colors.LIGHT_RED,
                                             opacity:
                                                 loadingDevice ===
@@ -296,14 +298,14 @@ export default function TrustedDevices() {
                                     >
                                         {loadingDevice === device.modelName ? (
                                             <ActivityIndicator
-                                                color={Colors.WHITE}
+                                                color={textColor}
                                                 size="small"
                                             />
                                         ) : (
                                             <Text
                                                 style={{
-                                                    fontFamily: "outfit-bold",
-                                                    fontSize: 12,
+                                                    fontFamily: 'outfit-bold',
+                                                    fontSize: RFValue(12),
                                                     color: Colors.RED,
                                                 }}
                                             >
@@ -313,30 +315,30 @@ export default function TrustedDevices() {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        )
+                        ),
                     )
                 ) : (
                     <>
                         <Text
                             style={{
                                 color: Colors.GRAY,
-                                fontSize: 14,
-                                alignItems: "center",
-                                justifyContent: "center",
-                                textAlign: "center",
-                                fontFamily: "outfit-bold",
+                                fontSize: RFValue(14),
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                textAlign: 'center',
+                                fontFamily: 'outfit-bold',
                             }}
                         >
                             No trusted devices added yet.
                         </Text>
                         <Text
                             style={{
-                                fontFamily: "outfit",
-                                fontSize: 14,
+                                fontFamily: 'outfit',
+                                fontSize: RFValue(14),
                                 color: Colors.GRAY,
-                                lineHeight: 20,
-                                textAlign: "center",
-                                marginTop: 10,
+                                lineHeight: scale(20),
+                                textAlign: 'center',
+                                marginTop: verticalScale(10),
                             }}
                         >
                             Trusted devices will be added automatically as you
@@ -351,10 +353,10 @@ export default function TrustedDevices() {
                     <View>
                         <Text
                             style={{
-                                fontFamily: "outfit",
-                                fontSize: 14,
+                                fontFamily: 'outfit',
+                                fontSize: RFValue(12),
                                 color: Colors.GRAY,
-                                lineHeight: 20,
+                                lineHeight: scale(20),
                             }}
                         >
                             Any logins not done on trusted devices listed above
@@ -368,6 +370,6 @@ export default function TrustedDevices() {
                     </View>
                 )}
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }

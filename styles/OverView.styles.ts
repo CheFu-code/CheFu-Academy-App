@@ -1,27 +1,28 @@
 import { StyleSheet } from 'react-native';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     header: {
-        fontSize: moderateScale(18),
+        fontSize: RFValue(16),
         marginBottom: verticalScale(8),
         fontFamily: 'outfit-bold',
     },
     description: {
-        fontSize: moderateScale(16),
+        fontSize: RFValue(14),
         lineHeight: verticalScale(24),
         fontFamily: 'outfit',
     },
     instructorImage: {
         width: scale(40),
-        height: scale(40),
+        height: verticalScale(40),
         borderRadius: scale(20),
         borderWidth: 0.5,
         borderColor: 'black',
     },
     instructorName: {
         fontFamily: 'outfit-bold',
-        fontSize: moderateScale(16),
+        fontSize: RFValue(16),
     },
     profilePictureContainer: {
         flexDirection: 'row',
@@ -32,6 +33,6 @@ export const styles = StyleSheet.create({
         marginLeft: scale(8),
         marginBottom: verticalScale(4),
         fontFamily: 'outfit',
-        fontSize: moderateScale(16),
+        fontSize: RFValue(14),
     },
 });

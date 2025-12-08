@@ -1,20 +1,24 @@
-import { Ionicons } from '@expo/vector-icons';
+import useDarkMode from '@/hooks/useDarkMode';
+import { AntDesign } from '@expo/vector-icons';
 import {
     Linking,
     Pressable,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
 } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 import { useSafeNavigation } from '../../hooks/useSafeNavigation';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Privacy() {
     const { safeBack } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Back Button */}
             <TouchableOpacity
                 style={styles.backButton}
@@ -22,8 +26,10 @@ export default function Privacy() {
                 accessible={true}
                 accessibilityLabel="Go back"
             >
-                <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
-                <Text style={styles.backText}>Back</Text>
+                <AntDesign name="left" size={scale(22)} color={textColor} />
+                <Text style={[styles.backText, { color: textColor }]}>
+                    Back
+                </Text>
             </TouchableOpacity>
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -79,10 +85,27 @@ export default function Privacy() {
                             }}
                         >
                             {' '}
-                            kurisanimaluleke77@gmail.com
+                            chefu.inc@gmail.com
                         </Text>
                     </Pressable>
                 </Text>
+
+                <TouchableOpacity
+                    onPress={() =>
+                        Linking.openURL('https://chefu-academy.vercel.app/privacy-policy')
+                    }
+                >
+                    <Text
+                        style={{
+                            fontFamily: 'outfit',
+                            fontSize: RFValue(15),
+                            marginTop: verticalScale(10),
+                            color: textColor,
+                        }}
+                    >
+                        ...more
+                    </Text>
+                </TouchableOpacity>
 
                 <Text style={styles.footer}>Last updated: July 10, 2025</Text>
             </ScrollView>
@@ -92,50 +115,43 @@ export default function Privacy() {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
-        backgroundColor: Colors.BG_COLOR,
+        padding: verticalScale(15),
         flex: 1,
-        marginBottom: 50,
     },
     container2: {
-        backgroundColor: Colors.BG_COLOR,
         flex: 1,
     },
     title: {
-        fontSize: 24,
+        fontSize: RFValue(24),
         fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
-        marginBottom: 15,
-        marginTop: 10,
+        marginBottom: verticalScale(10),
+        marginTop: verticalScale(10),
     },
     backButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 15,
-        marginTop: 20,
+        marginBottom: verticalScale(5),
     },
     backText: {
-        fontSize: 16,
-        color: Colors.PRIMARY,
-        fontFamily: 'outfit',
-        marginLeft: 5,
+        fontSize: RFValue(18),
+        fontFamily: 'outfit-bold',
     },
     subtitle: {
-        fontSize: 18,
+        fontSize: RFValue(18),
         fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
-        marginTop: 20,
-        marginBottom: 5,
+        marginTop: verticalScale(20),
     },
     paragraph: {
-        fontSize: 16,
+        fontSize: RFValue(15),
         fontFamily: 'outfit',
         color: Colors.GRAY,
-        lineHeight: 24,
+        lineHeight: scale(20),
     },
     footer: {
-        marginTop: 30,
-        fontSize: 14,
+        marginTop: verticalScale(30),
+        fontSize: RFValue(12),
         color: Colors.GRAY,
         fontFamily: 'outfit',
         textAlign: 'center',

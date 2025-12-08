@@ -2,21 +2,22 @@ import EmailVerificationBanner from '@/component/Home/EmailVerificationBanner';
 import VideoCardHomeScreen from '@/component/Video/VideoCardHomeScreen';
 import { auth } from '@/config/fireConfig';
 import { useCourses } from '@/hooks/useCourses';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useMemo, useRef } from 'react';
 import { FlatList, Image, View } from 'react-native';
+import { scale } from 'react-native-size-matters';
 import CourseList from '../../component/Home/CourseList';
 import CourseProgress from '../../component/Home/CourseProgress';
 import Header from '../../component/Home/Header';
 import LineLoader from '../../component/Home/LineLoader';
 import NoCourse from '../../component/Home/NoCourse';
 import PracticeSection from '../../component/Home/PracticeSection';
-import { Colors } from '../../constant/Colors';
-import { scale } from 'react-native-size-matters';
 
 export default function Home() {
     const flatListRef = useRef<FlatList>(null);
     const { courseList, fetchCourses, loading } = useCourses();
+    const { backgroundColor } = useDarkMode();
 
     useFocusEffect(
         useCallback(() => {
@@ -56,7 +57,7 @@ export default function Home() {
                 ref={flatListRef}
                 data={courseList}
                 keyExtractor={(item) => item.id}
-                style={{ backgroundColor: Colors.BG_COLOR }}
+                style={{ backgroundColor }}
                 onRefresh={() => {
                     if (auth.currentUser) {
                         fetchCourses(true);

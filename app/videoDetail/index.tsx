@@ -6,6 +6,7 @@ import { auth, db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { formatDuration } from '@/helpers/formatDateVideoCard';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { fetchVideoById, formatYouTubeDuration } from '@/services/videoService';
 import { styles } from '@/styles/VideoDetail.styles';
@@ -48,7 +49,9 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { Video as VideoView } from 'react-native-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
 
@@ -56,6 +59,7 @@ export default function VideoDetail() {
     const { safeReplace, safeBack } = useSafeNavigation();
     const { id, ytVideo } = useLocalSearchParams();
     const { userDetail } = useContext(UserDetailContext);
+    const { textColor, backgroundColor } = useDarkMode();
     const [video, setVideo] = useState<Video | null>(null);
     const [adding, setAdding] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -394,17 +398,19 @@ export default function VideoDetail() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <View
                 style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    padding: 10,
+                    paddingHorizontal: verticalScale(10),
                 }}
             >
                 <TouchableOpacity style={styles.backButton} onPress={safeBack}>
-                    <AntDesign name="left" size={24} color={Colors.BLACK} />
-                    <Text style={styles.backText}>Back</Text>
+                    <AntDesign name="left" size={scale(20)} color={textColor} />
+                    <Text style={[styles.backText, { color: textColor }]}>
+                        Back
+                    </Text>
                 </TouchableOpacity>
 
                 <View style={styles.backButton}>
@@ -422,9 +428,9 @@ export default function VideoDetail() {
                                 ) : (
                                     <AntDesign
                                         name={favorite ? 'heart' : 'hearto'}
-                                        size={24}
+                                        size={scale(22)}
                                         color={
-                                            favorite ? Colors.RED : Colors.BLACK
+                                            favorite ? Colors.RED : textColor
                                         }
                                     />
                                 )}
@@ -441,8 +447,8 @@ export default function VideoDetail() {
                                 ) : (
                                     <Feather
                                         name="download-cloud"
-                                        size={24}
-                                        color={Colors.BLACK}
+                                        size={scale(22)}
+                                        color={textColor}
                                     />
                                 )}
                             </TouchableOpacity>
@@ -454,8 +460,8 @@ export default function VideoDetail() {
                     >
                         <MaterialIcons
                             name="more-vert"
-                            size={24}
-                            color={Colors.BLACK}
+                            size={scale(22)}
+                            color={textColor}
                         />
                     </TouchableOpacity>
                 </View>
@@ -470,7 +476,7 @@ export default function VideoDetail() {
 
                     return (
                         <YoutubePlayer
-                            height={230}
+                            height={verticalScale(230)}
                             play={true}
                             videoId={videoId}
                         />
@@ -498,65 +504,81 @@ export default function VideoDetail() {
             })()}
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                <Text style={styles.title}>{video.title}</Text>
+                <Text style={[styles.title, { color: textColor }]}>
+                    {video.title}
+                </Text>
                 <View
                     style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        gap: 3,
+                        gap: scale(3),
                     }}
                 >
-                    <Text style={styles.uploadedBy}>
+                    <Text style={[styles.uploadedBy, { color: textColor }]}>
                         by{' '}
                         <Text style={{ fontFamily: 'outfit-bold' }}>
                             {uploaderName || video.uploadedBy}
                         </Text>
                     </Text>
                     {video.uploadedBy === 'YouTube' ? (
-                        <AntDesign name="youtube" size={14} color={'red'} />
+                        <AntDesign
+                            name="youtube"
+                            size={scale(14)}
+                            color={'red'}
+                        />
                     ) : (
                         <Ionicons
                             name="checkmark-circle"
                             color={Colors.PRIMARY}
-                            size={14}
+                            size={scale(14)}
                         />
                     )}
                 </View>
 
                 <View style={styles.durationContainer}>
-                    <View style={[styles.durationInfo, { left: 5 }]}>
+                    <View style={[styles.durationInfo, { left: scale(5) }]}>
                         {video?.uploadedBy !== 'YouTube' && (
                             <>
                                 <FontAwesome
                                     name="calendar"
-                                    size={14}
-                                    color={Colors.BLACK}
+                                    size={scale(12)}
+                                    color={textColor}
                                 />
-                                <Text style={styles.uploadedAt}>
+                                <Text
+                                    style={[
+                                        styles.uploadedAt,
+                                        { color: textColor },
+                                    ]}
+                                >
                                     {uploadedAtText}
                                 </Text>
                             </>
                         )}
                     </View>
-                    <View style={[styles.durationInfo, { left: 40 }]}>
+                    <View style={[styles.durationInfo, { left: scale(40) }]}>
                         <AntDesign
                             name="clockcircleo"
-                            size={14}
-                            color={Colors.BLACK}
+                            size={scale(12)}
+                            color={textColor}
                         />
-                        <Text style={styles.duration}>
+                        <Text style={[styles.duration, { color: textColor }]}>
                             {typeof video.duration === 'string'
                                 ? formatYouTubeDuration(video.duration)
                                 : formatDuration(video.duration)}{' '}
                         </Text>
                     </View>
-                    <View style={[styles.durationInfo, { maxWidth: 100 }]}>
+                    <View
+                        style={[styles.durationInfo, { maxWidth: scale(100) }]}
+                    >
                         <FontAwesome5
                             name="users"
-                            size={14}
-                            color={Colors.BLACK}
+                            size={scale(12)}
+                            color={textColor}
                         />
-                        <Text numberOfLines={1} style={styles.duration}>
+                        <Text
+                            numberOfLines={1}
+                            style={[styles.duration, { color: textColor }]}
+                        >
                             {formatViews(video.views)}
                         </Text>
                     </View>
@@ -606,7 +628,12 @@ export default function VideoDetail() {
                     ))}
                 </View>
 
-                <View style={{ marginHorizontal: 12, marginTop: 10 }}>
+                <View
+                    style={{
+                        marginHorizontal: moderateScale(12),
+                        marginTop: verticalScale(10),
+                    }}
+                >
                     {renderTabContent()}
                 </View>
             </ScrollView>
@@ -621,7 +648,7 @@ export default function VideoDetail() {
                         icon={
                             <AntDesign
                                 name="playcircleo"
-                                size={20}
+                                size={scale(18)}
                                 color={Colors.WHITE}
                             />
                         }
@@ -664,7 +691,7 @@ export default function VideoDetail() {
                         >
                             <Text
                                 style={{
-                                    padding: 8,
+                                    padding: scale(5),
                                     color: 'red',
                                 }}
                             >
@@ -679,7 +706,7 @@ export default function VideoDetail() {
                             setShowReportModal(true);
                         }}
                     >
-                        <Text style={{ padding: 8 }}>Report</Text>
+                        <Text style={{ padding: scale(5) }}>Report</Text>
                     </TouchableOpacity>
                 </View>
             )}
@@ -690,46 +717,54 @@ export default function VideoDetail() {
                         flex: 1,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     }}
                 >
                     <View
                         style={{
                             width: '80%',
-                            backgroundColor: Colors.WHITE,
-                            borderRadius: 8,
-                            padding: 20,
+                            backgroundColor: textColor,
+                            borderRadius: scale(8),
+                            padding: scale(15),
                         }}
                     >
                         <Text
                             style={{
-                                fontSize: 18,
+                                fontSize: RFValue(17),
                                 fontWeight: 'bold',
-                                marginBottom: 10,
+                                marginBottom: verticalScale(10),
+                                color: backgroundColor,
                             }}
                         >
                             Report Video
                         </Text>
-                        <Text style={{ marginBottom: 20 }}>
+                        <Text
+                            style={{
+                                marginBottom: verticalScale(20),
+                                color: backgroundColor,
+                            }}
+                        >
                             Please provide a reason for reporting this video.
                         </Text>
                         <TextInput
                             style={{
                                 borderWidth: 1,
                                 borderColor: Colors.GRAY,
-                                borderRadius: 4,
-                                padding: 10,
-                                marginBottom: 20,
+                                borderRadius: scale(4),
+                                padding: scale(10),
+                                marginBottom: verticalScale(10),
+                                color: backgroundColor,
                             }}
-                            placeholder="Reason"
+                            placeholder="Reason..."
                             value={reportReason}
                             onChangeText={setReportReason}
+                            placeholderTextColor={Colors.GRAY}
                         />
                         <View
                             style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                gap: 12,
+                                gap: scale(12),
                                 justifyContent: 'flex-end',
                             }}
                         >
@@ -749,8 +784,8 @@ export default function VideoDetail() {
                             <TouchableOpacity
                                 style={{
                                     backgroundColor: Colors.LIGHT_RED,
-                                    padding: 8,
-                                    borderRadius: 8,
+                                    padding: scale(6),
+                                    borderRadius: scale(8),
                                 }}
                                 disabled={reporting}
                                 onPress={handleReport}

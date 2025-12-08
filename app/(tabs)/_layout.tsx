@@ -8,6 +8,7 @@ import { Tabs } from 'expo-router';
 import { useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constant/Colors';
+import useDarkMode from '@/hooks/useDarkMode';
 
 type TabBarIconProps = NonNullable<
     BottomTabNavigationOptions['tabBarIcon']
@@ -17,7 +18,7 @@ type TabBarIconProps = NonNullable<
 
 const TabLayout = () => {
     const insets = useSafeAreaInsets();
-
+    const { backgroundColor } = useDarkMode();
     const renderHomeIcon = useCallback(
         ({ color, size }: TabBarIconProps) => (
             <Ionicons
@@ -93,14 +94,14 @@ const TabLayout = () => {
                 tabBarInactiveTintColor: Colors.YELLOW,
                 tabBarStyle: {
                     paddingBottom: insets.bottom,
-                    backgroundColor: '#121212',
-                    marginHorizontal: 10,
+                    backgroundColor: backgroundColor,
                     elevation: 5,
                     shadowColor: '#121212',
                     shadowOffset: { width: 0, height: 1 },
                     shadowOpacity: 0.1,
                     shadowRadius: 4,
-                    borderTopWidth: 0,
+                    borderTopWidth: 0.3,
+                    borderTopColor: Colors.YELLOW
                 },
             }}
         >

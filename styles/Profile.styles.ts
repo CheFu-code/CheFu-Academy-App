@@ -6,7 +6,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
     },
     header: {
         alignItems: 'center',
@@ -33,7 +32,6 @@ export const styles = StyleSheet.create({
     profileEmail: {
         fontSize: RFValue(13),
         fontFamily: 'outfit',
-        color: Colors.WHITE,
         maxWidth: scale(250),
         textAlign: 'center',
     },
@@ -44,7 +42,7 @@ export const styles = StyleSheet.create({
         color: Colors.WHITE,
     },
     menuSection: {
-        paddingHorizontal: scale(20),
+        paddingHorizontal: moderateScale(20),
     },
     menuItem: {
         flexDirection: 'row',
@@ -88,13 +86,13 @@ export const styles = StyleSheet.create({
         marginBottom: verticalScale(15),
     },
     input: {
-        backgroundColor: '#333',
         padding: moderateScale(12),
         borderRadius: moderateScale(8),
-        color: '#fff',
         fontFamily: 'outfit',
         fontSize: RFValue(13),
         marginBottom: verticalScale(20),
+        borderWidth: 0.5,
+        borderColor: Colors.GRAY,
     },
     modalButtons: {
         flexDirection: 'row',
@@ -172,14 +170,12 @@ export const styles2 = StyleSheet.create({
     },
     modalContainer: {
         width: '80%',
-        backgroundColor: '#222',
         borderRadius: moderateScale(10),
         padding: moderateScale(20),
     },
     modalTitle: {
         fontSize: RFValue(17),
         fontWeight: 'bold',
-        color: 'white',
         marginBottom: verticalScale(15),
     },
     input: {
@@ -204,7 +200,6 @@ export const styles2 = StyleSheet.create({
         borderRadius: moderateScale(8),
     },
     buttonText: {
-        color: 'white',
         fontWeight: 'bold',
         fontSize: RFValue(13),
     },

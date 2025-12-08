@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
         marginVertical: verticalScale(10),
         backgroundColor: Colors.BG_GRAY,
         borderRadius: moderateScale(10),
+        borderWidth: 0.3
     },
     card: {
         overflow: "hidden",
@@ -39,7 +40,7 @@ export const styles = StyleSheet.create({
     categoryText: {
         color: "#fff",
         fontFamily: "outfit-bold",
-        fontSize:RFValue(12)
+        fontSize: RFValue(12)
     },
     category: {
         position: "absolute",

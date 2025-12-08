@@ -29,7 +29,7 @@ const VideoCard: React.FC<Props> = ({ item, onPress, onCategoryPress }) => {
                     <Image
                         source={{ uri: item.thumbnailURL }}
                         style={styles.thumbnail}
-                        resizeMode="cover"
+                        resizeMode="contain"
                     />
                 )}
             </View>

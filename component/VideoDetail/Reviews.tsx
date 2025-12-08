@@ -31,6 +31,8 @@ import {
     View,
 } from 'react-native';
 import { styles } from '../../styles/Reviews.styles';
+import useDarkMode from '@/hooks/useDarkMode';
+import { scale } from 'react-native-size-matters';
 
 type Props = {
     video: Video | null;
@@ -40,16 +42,17 @@ type Props = {
 dayjs.extend(relativeTime);
 
 export default function Reviews({ video, enrolled }: Props) {
-    const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+    const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const [editReviewModal, setEditReviewModal] = useState(false);
-    const [addReviewModal, setAddReviewModal] = useState(false);
-    const [deleteReviewModal, setDeleteReviewModal] = useState(false);
-    const [reviewText, setReviewText] = useState('');
+    const { textColor, backgroundColor } = useDarkMode();
+    const [rating, setRating] = useState(0);
     const [reviews, setReviews] = useState<UserReviews[]>([]);
     const [loading, setLoading] = useState(false);
-    const [rating, setRating] = useState(0);
-    const { safePush } = useSafeNavigation();
+    const [reviewText, setReviewText] = useState('');
+    const [addReviewModal, setAddReviewModal] = useState(false);
+    const [editReviewModal, setEditReviewModal] = useState(false);
+    const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+    const [deleteReviewModal, setDeleteReviewModal] = useState(false);
 
     const hasReviewed = () => {
         if (!userDetail?.uid) return false;
@@ -248,11 +251,17 @@ export default function Reviews({ video, enrolled }: Props) {
         <>
             <View>
                 <View style={styles.container}>
-                    <Text style={styles.header}>Student Reviews</Text>
+                    <Text style={[styles.header, { color: textColor }]}>
+                        Student Reviews
+                    </Text>
                     <View style={styles.ratingContainer}>
                         <View style={styles.ratingContainer2}>
-                            <AntDesign name="star" size={20} color="yellow" />
-                            <Text>
+                            <AntDesign
+                                name="star"
+                                size={scale(18)}
+                                color="yellow"
+                            />
+                            <Text style={{ color: textColor }}>
                                 {getAverageRating().toFixed(1)} (
                                 {reviews.length})
                             </Text>
@@ -277,7 +286,11 @@ export default function Reviews({ video, enrolled }: Props) {
                             }}
                             style={styles.addRating}
                         >
-                            <FontAwesome6 name="add" size={20} color="black" />
+                            <FontAwesome6
+                                name="add"
+                                size={scale(18)}
+                                color="black"
+                            />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -285,7 +298,14 @@ export default function Reviews({ video, enrolled }: Props) {
                 <>
                     {reviews.length === 0 ? (
                         <View style={styles.noReviewsContainer}>
-                            <Text style={styles.noReviewsText}>No reviews</Text>
+                            <Text
+                                style={[
+                                    styles.noReviewsText,
+                                    { color: textColor },
+                                ]}
+                            >
+                                No reviews yet...
+                            </Text>
                         </View>
                     ) : (
                         reviews.map((rev) => (
@@ -320,8 +340,19 @@ export default function Reviews({ video, enrolled }: Props) {
                                             <Text style={styles.username}>
                                                 {rev.username}
                                             </Text>
-                                            <Text>
-                                                {'⭐'.repeat(rev.rating)}
+                                            <Text
+                                                style={{ flexDirection: 'row' }}
+                                            >
+                                                {Array.from({
+                                                    length: rev.rating,
+                                                }).map((_, i) => (
+                                                    <AntDesign
+                                                        key={i}
+                                                        name="star"
+                                                        color="gold"
+                                                        size={scale(13)}
+                                                    />
+                                                ))}
                                             </Text>
                                         </View>
                                         <View>
@@ -350,7 +381,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                                 >
                                                     <AntDesign
                                                         name="edit"
-                                                        size={18}
+                                                        size={scale(18)}
                                                         color={'black'}
                                                     />
                                                 </TouchableOpacity>
@@ -365,7 +396,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                                     >
                                                         <MaterialIcons
                                                             name="delete-outline"
-                                                            size={18}
+                                                            size={scale(18)}
                                                             color="red"
                                                         />
                                                     </TouchableOpacity>
@@ -394,8 +425,10 @@ export default function Reviews({ video, enrolled }: Props) {
                 onRequestClose={() => setAddReviewModal(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Add your review</Text>
+                    <View style={[styles.modalContent, { backgroundColor }]}>
+                        <Text style={[styles.modalTitle, { color: textColor }]}>
+                            Add your review
+                        </Text>
 
                         {/* Rating stars */}
                         <View style={styles.starsRow}>
@@ -406,7 +439,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                 >
                                     <AntDesign
                                         name="star"
-                                        size={28}
+                                        size={scale(26)}
                                         color={star <= rating ? 'gold' : 'gray'}
                                     />
                                 </TouchableOpacity>
@@ -418,8 +451,9 @@ export default function Reviews({ video, enrolled }: Props) {
                             numberOfLines={4}
                             value={reviewText}
                             onChangeText={setReviewText}
-                            style={styles.textInput}
+                            style={[styles.textInput, { color: textColor }]}
                             placeholder="Write your review here..."
+                            placeholderTextColor={textColor}
                         />
 
                         <View style={styles.modalButtons}>

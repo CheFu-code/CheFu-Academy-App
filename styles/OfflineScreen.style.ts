@@ -6,7 +6,6 @@ import { RFValue } from "react-native-responsive-fontsize";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
         justifyContent: "center",
         alignItems: "center",
     },

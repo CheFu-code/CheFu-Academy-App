@@ -1,12 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from '../constant/Colors';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: Colors.WHITE },
+    container: { flex: 1, },
     video: {
         width: '100%',
-        height: verticalScale(300),
+        height: verticalScale(250),
         backgroundColor: '#000',
         marginTop: verticalScale(10),
     },
@@ -49,7 +50,7 @@ export const styles = StyleSheet.create({
         marginTop: verticalScale(25),
     },
     title: {
-        fontSize: scale(20),
+        fontSize: scale(17),
         fontFamily: 'outfit-bold',
         marginVertical: verticalScale(8),
         marginHorizontal: moderateScale(12),
@@ -77,9 +78,8 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
     },
     backText: {
-        color: Colors.BLACK,
         fontFamily: 'outfit-bold',
-        fontSize: scale(18),
+        fontSize: scale(20),
     },
     backButton: {
         flexDirection: 'row',
@@ -97,8 +97,7 @@ export const styles = StyleSheet.create({
         gap: moderateScale(5),
     },
     duration: {
-        color: Colors.BLACK,
-        fontSize: scale(14),
+        fontSize: RFValue(12),
         fontFamily: 'outfit',
     },
     durationContainer: {
@@ -110,14 +109,12 @@ export const styles = StyleSheet.create({
         marginBottom: verticalScale(8),
     },
     uploadedAt: {
-        color: Colors.BLACK,
-        fontSize: scale(14),
+        fontSize: RFValue(12),
         fontFamily: 'outfit-bold',
     },
     common: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginHorizontal: moderateScale(12),
         marginTop: verticalScale(8),
         alignItems: 'center',
     },
@@ -127,7 +124,7 @@ export const styles = StyleSheet.create({
         borderRadius: moderateScale(8),
         marginHorizontal: moderateScale(4),
         height: verticalScale(100),
-        width: scale(170),
+        width: scale(160),
         borderWidth: 0.6,
         borderColor: Colors.GRAY,
     },
