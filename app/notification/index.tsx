@@ -1,6 +1,7 @@
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/NotificationScreen.styles';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
@@ -50,6 +51,7 @@ const ACTION_WIDTH = 70;
 const NotificationScreen = () => {
     const { safeBack, safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext); // ✅ get logged in user
+    const { textColor, backgroundColor } = useDarkMode();
     const [notifications, setNotifications] = useState<Notification[]>([]);
 
     // ✅ fetch real-time notifications
@@ -86,24 +88,34 @@ const NotificationScreen = () => {
     const renderIcon = (type: NotificationType) => {
         switch (type) {
             case 'like':
-                return <Ionicons name="heart" size={22} color={Colors.RED} />;
+                return (
+                    <Ionicons
+                        name="heart"
+                        size={scale(20)}
+                        color={Colors.RED}
+                    />
+                );
             case 'comment':
                 return (
                     <Ionicons
                         name="chatbubble"
-                        size={22}
+                        size={scale(20)}
                         color={Colors.GREEN}
                     />
                 );
             case 'newCourse':
                 return (
-                    <Ionicons name="book" size={22} color={Colors.PRIMARY} />
+                    <Ionicons
+                        name="book"
+                        size={scale(20)}
+                        color={Colors.PRIMARY}
+                    />
                 );
             default:
                 return (
                     <Ionicons
                         name="notifications"
-                        size={22}
+                        size={scale(20)}
                         color={Colors.GRAY}
                     />
                 );
@@ -142,7 +154,7 @@ const NotificationScreen = () => {
             >
                 <Ionicons
                     name={item.read ? 'notifications' : 'checkmark-done'}
-                    size={20}
+                    size={scale(20)}
                     color={Colors.WHITE}
                 />
                 <Text style={styles.actionText}>
@@ -154,7 +166,7 @@ const NotificationScreen = () => {
                 style={[styles.actionButton, { backgroundColor: Colors.RED }]}
                 onPress={() => handleDelete(item.id)}
             >
-                <Ionicons name="trash" size={20} color={Colors.WHITE} />
+                <Ionicons name="trash" size={scale(20)} color={Colors.WHITE} />
                 <Text style={styles.actionText}>Delete</Text>
             </TouchableOpacity>
         </View>
@@ -208,10 +220,12 @@ const NotificationScreen = () => {
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor }]}>
                 <TouchableOpacity onPress={safeBack} style={styles.backButton}>
-                    <AntDesign name="left" size={scale(20)} color={'white'} />
-                    <Text style={styles.header}>Notifications</Text>
+                    <AntDesign name="left" size={scale(20)} color={textColor} />
+                    <Text style={[styles.header, { color: textColor }]}>
+                        Notifications
+                    </Text>
                 </TouchableOpacity>
 
                 {notifications.length === 0 ? (

@@ -31,11 +31,10 @@ export const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,0.7)',
         justifyContent: 'flex-end',
     },
     modalSheet: {
-        backgroundColor: Colors.BG_COLOR,
         borderTopLeftRadius: scale(25),
         borderTopRightRadius: scale(25),
     },
@@ -50,7 +49,7 @@ export const styles = StyleSheet.create({
     },
     modalTitle: {
         fontFamily: 'outfit-bold',
-        fontSize: scale(20),
+        fontSize: RFValue(20),
         color: Colors.PRIMARY,
         marginBottom: verticalScale(5),
         margin: scale(13),
@@ -71,7 +70,7 @@ export const styles = StyleSheet.create({
     },
     modalText: {
         fontFamily: 'outfit',
-        fontSize: scale(16),
+        fontSize: RFValue(16),
         color: Colors.PRIMARY,
     },
     search: {

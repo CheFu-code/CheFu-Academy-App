@@ -29,12 +29,14 @@ import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Header.styles';
 import AddVideoModal from './AddVideoModal';
-import { scale } from 'react-native-size-matters';
+import { moderateScale, scale } from 'react-native-size-matters';
 import { RFValue } from 'react-native-responsive-fontsize';
+import useDarkMode from '@/hooks/useDarkMode';
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function Header({ onPress }: { onPress?: () => void }) {
     const { safePush, safeReplace } = useSafeNavigation();
+    const { backgroundColor } = useDarkMode();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -336,11 +338,11 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     onPress={() => setShowModal(false)}
                     style={styles.modalOverlay}
                 >
-                    <View style={styles.modalSheet}>
+                    <View style={[styles.modalSheet, { backgroundColor }]}>
                         <Text style={styles.modalTitle}>Options</Text>
                         <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            style={{ maxHeight: 230 }}
+                            showsVerticalScrollIndicator={true}
+                            style={{ maxHeight: moderateScale(230) }}
                         >
                             {modalOptions.map(({ label, icon, color }) => (
                                 <TouchableOpacity
@@ -350,7 +352,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                                 >
                                     <Ionicons
                                         name={icon}
-                                        size={24}
+                                        size={scale(22)}
                                         color={color || Colors.PRIMARY}
                                         style={styles.modalIcon}
                                     />
