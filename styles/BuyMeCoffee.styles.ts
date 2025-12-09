@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "../constant/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
+import { moderateScale, verticalScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
@@ -8,52 +10,48 @@ export const styles = StyleSheet.create({
         padding: 20,
     },
     heading: {
-        fontSize: 23,
+        fontSize: RFValue(20),
         fontWeight: "bold",
-        marginBottom: 15,
+        marginBottom: moderateScale(20),
         color: Colors.PRIMARY,
-        marginTop:25,
-        textAlign: "center",
+        marginTop: verticalScale(10),
     },
     paragraph: {
-        fontSize: 16,
-        lineHeight: 24,
-        color: "#fff",
-        marginBottom: 15,
+        fontSize: RFValue(14),
+        lineHeight: moderateScale(22),
+        marginBottom: moderateScale(13),
     },
     quote: {
         fontStyle: "italic",
-        fontSize: 16,
+        fontSize: RFValue(14),
         color: "#666",
-        marginVertical: 20,
-        paddingLeft: 10,
-        borderLeftWidth: 3,
+        marginVertical: verticalScale(20),
+        paddingLeft: moderateScale(10),
+        borderLeftWidth: moderateScale(3),
         borderLeftColor: "#ccc",
     },
     buttonContainer: {
-        borderRadius: 20,
+        borderRadius: moderateScale(20),
         backgroundColor: Colors.YELLOW,
-        padding: 10,
-        maxWidth: 200,
+        paddingHorizontal: moderateScale(20),
+        paddingVertical: verticalScale(10),
+        maxWidth: moderateScale(200),
         alignItems: "center",
         alignSelf: "center",
-        marginBottom: 80,
+        marginBottom: verticalScale(20),
     },
     buttonText: {
         textAlign: "center",
-        padding: 5,
         fontFamily: "outfit-bold",
-        fontSize: 16,
+        fontSize: RFValue(15),
     },
     backButton: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
-        marginTop: 20,
+
     },
     buyMeCoffee: {
-        color: Colors.YELLOW,
-        fontFamily: "space-mono",
-        fontSize: 20,
+        fontFamily: "outfit-bold",
+        fontSize: RFValue(20),
     },
 });

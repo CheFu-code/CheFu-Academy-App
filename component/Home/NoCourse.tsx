@@ -1,12 +1,14 @@
+import useDarkMode from '@/hooks/useDarkMode';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { useState } from 'react';
 import { Image, Text, View } from 'react-native';
-import Button from '../Shared/Button';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import Button from '../Shared/Button';
 
 export default function NoCourse() {
     const { safePush } = useSafeNavigation();
+    const {textColor} = useDarkMode();
     const [loading, setLoading] = useState(false);
 
     return (
@@ -20,7 +22,7 @@ export default function NoCourse() {
         >
             <Image
                 style={{
-                    height: scale(180),
+                    height: verticalScale(160),
                     width: scale(150),
                     marginBottom: moderateScale(20),
                 }}
@@ -31,7 +33,7 @@ export default function NoCourse() {
                     fontFamily: 'outfit-bold',
                     fontSize: RFValue(24),
                     textAlign: 'center',
-                    color: '#fff',
+                    color: textColor,
                     marginBottom: moderateScale(10),
                 }}
             >
@@ -44,7 +46,6 @@ export default function NoCourse() {
                 disabled={loading}
                 loading={false}
                 icon={null}
-                opacity={loading ? 0.5 : 1}
             />
             <Button
                 onPress={() => safePush('/(tabs)/explore')}
@@ -53,7 +54,6 @@ export default function NoCourse() {
                 type="outline"
                 loading={false}
                 icon={null}
-                opacity={loading ? 0.5 : 1}
             />
         </View>
     );

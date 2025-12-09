@@ -74,7 +74,6 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalContent: {
-        backgroundColor: Colors.BG_COLOR,
         width: '85%',
         borderRadius: moderateScale(12),
         padding: moderateScale(20),
@@ -113,15 +112,15 @@ export const styles = StyleSheet.create({
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#333',
         paddingHorizontal: scale(12),
         paddingVertical: verticalScale(6),
         borderRadius: moderateScale(8),
         marginBottom: verticalScale(10),
+        borderWidth: 0.7,
+        borderColor: Colors.GRAY,
     },
     inputWithIcon: {
         flex: 1,
-        color: '#fff',
         fontFamily: 'outfit',
         fontSize: RFValue(14),
         paddingRight: scale(10),

@@ -1,42 +1,45 @@
-import { AntDesign, Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
+import useDarkMode from '@/hooks/useDarkMode';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { AntDesign, Feather } from '@expo/vector-icons';
 import {
     Linking,
     ScrollView,
     Text,
     TouchableOpacity,
     View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import { styles } from "../../styles/BuyMeCoffee.styles";
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale, scale } from 'react-native-size-matters';
+import { styles } from '../../styles/BuyMeCoffee.styles';
 
 export default function BuyMeCoffee() {
+    const { safeBack } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     return (
-        <View style={{ backgroundColor: Colors.BG_COLOR, padding: 20 }}>
+        <SafeAreaView
+            style={{ backgroundColor, padding: moderateScale(15), flex: 1 }}
+        >
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => safeBack()}
                 style={styles.backButton}
             >
-                <AntDesign
-                    style={{ marginTop: 5 }}
-                    name="left"
-                    size={24}
-                    color="white"
-                />
-                <Text style={styles.buyMeCoffee}>Buy me coffee</Text>
+                <AntDesign name="left" size={scale(20)} color={textColor} />
+                <Text style={[styles.buyMeCoffee, { color: textColor }]}>
+                    Buy me coffee
+                </Text>
             </TouchableOpacity>
             <ScrollView showsVerticalScrollIndicator={false}>
-                <Text style={styles.heading}>☕ Support CheFu Academy</Text>
+                <Text style={styles.heading}>Support CheFu Academy</Text>
 
-                <Text style={styles.paragraph}>
+                <Text style={[styles.paragraph, { color: textColor }]}>
                     CheFu Academy is built with love, purpose, and long nights
                     of coding. Every feature you use — from lessons to quizzes,
                     chat, progress tracking and more — has been
-                    <Text style={{ fontStyle: "italic" }}> carefully </Text>
+                    <Text style={{ fontStyle: 'italic' }}> carefully </Text>
                     crafted to empower your learning journey.
                 </Text>
 
-                <Text style={styles.paragraph}>
+                <Text style={[styles.paragraph, { color: textColor }]}>
                     But building and maintaining an app like this takes time,
                     resources, and dedication. Your support helps keep this
                     platform alive and improving. Whether it’s for hosting
@@ -44,46 +47,49 @@ export default function BuyMeCoffee() {
                     bugs — every little contribution goes a long way.
                 </Text>
 
-                <Text style={styles.paragraph}>
+                <Text style={[styles.paragraph, { color: textColor }]}>
                     If CheFu Academy has helped you, inspired you, or made
                     learning easier, please consider buying me a coffee. It’s a
                     small gesture with a big impact.
                 </Text>
 
                 <Text style={styles.quote}>
-                    "Small acts, when multiplied by millions of people, can
-                    transform the world." – Howard Zinn
+                    &quot;Small acts, when multiplied by millions of people, can
+                    transform the world.&quot; – Howard Zinn
                 </Text>
 
-                <Text style={styles.paragraph}>
+                <Text style={[styles.paragraph, { color: textColor }]}>
                     I’m not backed by a big company. Just an indie creator on a
-                    mission to make learning accessible and powerful for{" "}
-                    <Text style={{ fontWeight: 600 }}>everyone</Text>.
+                    mission to make learning accessible and powerful for{' '}
+                    <Text style={{ fontWeight: 600, color: textColor }}>
+                        everyone
+                    </Text>
+                    .
                 </Text>
             </ScrollView>
 
             <TouchableOpacity
                 onPress={() => {
-                    Linking.openURL("https://www.buymeacoffee.com/chefu");
+                    Linking.openURL('https://www.buymeacoffee.com/chefu');
                 }}
                 style={styles.buttonContainer}
             >
                 <View
                     style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 5,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: scale(5),
                     }}
                 >
                     <Feather
-                        style={{ alignItems: "center" }}
+                        style={{ alignItems: 'center' }}
                         name="coffee"
-                        size={22}
+                        size={scale(20)}
                         color="black"
                     />
                     <Text style={styles.buttonText}>Buy me a coffee</Text>
                 </View>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 }

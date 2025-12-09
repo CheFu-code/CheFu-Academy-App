@@ -1,9 +1,9 @@
-import { Colors } from "@/constant/Colors";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { styles } from "@/styles/Profile.styles";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { Dispatch, SetStateAction } from "react";
+import { Colors } from '@/constant/Colors';
+import useDarkMode from '@/hooks/useDarkMode';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { styles } from '@/styles/Profile.styles';
+import { Ionicons } from '@expo/vector-icons';
+import { Dispatch, SetStateAction } from 'react';
 import {
     ActivityIndicator,
     Modal,
@@ -11,7 +11,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from "react-native";
+} from 'react-native';
+import { scale } from 'react-native-size-matters';
 
 interface ConfirmPasswordModalProps {
     visible: boolean;
@@ -34,11 +35,12 @@ export default function ConfirmPasswordModal({
     onConfirm,
     loading,
 }: ConfirmPasswordModalProps) {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     return (
         <Modal transparent visible={visible} animationType="slide">
             <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
+                <View style={[styles.modalContent, { backgroundColor }]}>
                     <Text style={styles.modalTitle}>Confirm Deletion</Text>
                     <View style={styles.inputWrapper}>
                         <TextInput
@@ -46,7 +48,7 @@ export default function ConfirmPasswordModal({
                             secureTextEntry={!showPassword}
                             value={password}
                             onChangeText={setPassword}
-                            style={styles.inputWithIcon}
+                            style={[styles.inputWithIcon, { color: textColor }]}
                             placeholderTextColor="#ccc"
                             autoCapitalize="none"
                             autoCorrect={false}
@@ -56,15 +58,15 @@ export default function ConfirmPasswordModal({
                             onPress={() => setShowPassword((prev) => !prev)}
                         >
                             <Ionicons
-                                name={showPassword ? "eye-off" : "eye"}
-                                size={22}
+                                name={showPassword ? 'eye-off' : 'eye'}
+                                size={scale(20)}
                                 color="#aaa"
                             />
                         </TouchableOpacity>
                     </View>
 
                     <TouchableOpacity
-                        onPress={() => safePush("/auth/forgotPassword")}
+                        onPress={() => safePush('/auth/forgotPassword')}
                     >
                         <Text style={styles.forgotPasswordText}>
                             Forgot Password?
@@ -95,7 +97,10 @@ export default function ConfirmPasswordModal({
                             ]}
                         >
                             {loading ? (
-                                <ActivityIndicator color="#fff" />
+                                <ActivityIndicator
+                                    size={'small'}
+                                    color="#fff"
+                                />
                             ) : (
                                 <Text style={styles.modalButtonText}>
                                     Delete
