@@ -1,4 +1,4 @@
-import { Colors } from '@/constant/Colors';
+import useDarkMode from '@/hooks/useDarkMode';
 import LottieView from 'lottie-react-native';
 import { useEffect, useRef } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
@@ -19,7 +19,7 @@ export default function Loading({
     size,
 }: LoadingProps) {
     const animationSize = size ?? Math.min(width * 0.3, 200);
-
+    const { textColor, backgroundColor } = useDarkMode();
     // Animated opacity for text
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -49,8 +49,8 @@ export default function Loading({
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: Colors.BG_COLOR,
                 paddingHorizontal: moderateScale(10),
+                backgroundColor,
             }}
         >
             <LottieView
@@ -70,7 +70,7 @@ export default function Loading({
                     marginTop: verticalScale(10),
                     fontFamily: 'outfit',
                     fontSize: RFValue(15),
-                    color: Colors.PRIMARY,
+                    color: textColor,
                     textAlign: 'center',
                     opacity: fadeAnim, // animated
                 }}
