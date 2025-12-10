@@ -11,14 +11,12 @@ export const styles = StyleSheet.create({
         fontSize: RFValue(14),
         marginTop: verticalScale(15),
         borderRadius: scale(8),
-        color: '#ffffff',
         borderColor: '#858585',
     },
     passwordInput: {
         flex: 1,
         fontSize: RFValue(14),
         paddingVertical: verticalScale(12),
-        color: '#ffffff',
     },
     passwordContainer: {
         width: '100%',

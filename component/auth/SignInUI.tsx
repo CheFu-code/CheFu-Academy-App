@@ -1,5 +1,6 @@
 import { Colors } from '@/constant/Colors';
 import AnimatedText from '@/helpers/animateText';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SignIn.styles';
 import { SignInUIProps } from '@/types/signIn';
@@ -35,11 +36,12 @@ const SignInUI = ({
     password,
 }: SignInUIProps) => {
     const { safePush, safeReplace } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     const google = () => {
         safeReplace('/auth/google');
     };
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -71,7 +73,7 @@ const SignInUI = ({
 
                         <TextInput
                             placeholder="Email"
-                            style={styles.textInput}
+                            style={[styles.textInput, { color: textColor }]}
                             placeholderTextColor={Colors.GRAY}
                             onChangeText={(value) => {
                                 setEmail(value.trim());
@@ -101,7 +103,10 @@ const SignInUI = ({
                                     if (passwordError) setPasswordError('');
                                 }}
                                 autoCapitalize="none"
-                                style={styles.passwordInput}
+                                style={[
+                                    styles.passwordInput,
+                                    { color: textColor },
+                                ]}
                                 onSubmitEditing={() => {
                                     if (!loading) handleSignIn();
                                 }}
@@ -153,13 +158,13 @@ const SignInUI = ({
                                 style={styles.icons}
                                 name="google"
                                 size={scale(20)}
-                                color={'white'}
+                                color={textColor}
                             />
                             <Text
                                 style={{
                                     fontSize: RFValue(15),
                                     fontFamily: 'outfit',
-                                    color: 'white',
+                                    color: textColor,
                                 }}
                             >
                                 Google
@@ -192,7 +197,7 @@ const SignInUI = ({
                                 marginTop: verticalScale(16),
                             }}
                         >
-                            <Text style={{ color: Colors.WHITE }}>
+                            <Text style={{ color: textColor }}>
                                 Don&apos;t have an account?{' '}
                             </Text>
                             <Pressable

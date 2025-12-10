@@ -11,7 +11,6 @@ export const styles = StyleSheet.create({
         fontSize: RFValue(14),
         marginTop: verticalScale(15),
         borderRadius: scale(8),
-        color: Colors.WHITE,
         borderColor: Colors.PRIMARY,
     },
     conditions: {
@@ -48,12 +47,12 @@ export const styles = StyleSheet.create({
         marginTop: verticalScale(8),
     },
     logo: {
-        width: scale(150),
-        height: verticalScale(140),
+        width: scale(120),
+        height: verticalScale(110),
         borderRadius: scale(75),
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: Colors.PRIMARY,
-        marginBottom: verticalScale(15),
+        marginBottom: verticalScale(10),
     },
     title: {
         fontSize: RFValue(26),

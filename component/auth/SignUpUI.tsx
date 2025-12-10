@@ -1,5 +1,6 @@
 import { Colors } from '@/constant/Colors';
 import AnimatedText from '@/helpers/animateText';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SignUp.styles';
 import { SignUpUIProps } from '@/types/signUp';
@@ -34,8 +35,9 @@ const SignUpUI = ({
     errorMsg,
 }: SignUpUIProps) => {
     const { safeReplace } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -68,6 +70,7 @@ const SignUpUI = ({
                             style={[
                                 styles.textInput,
                                 fullNameError && { borderColor: 'red' },
+                                { color: textColor },
                             ]}
                             placeholderTextColor={Colors.GRAY}
                             onChangeText={(v) => {
@@ -99,7 +102,7 @@ const SignUpUI = ({
 
                         <TextInput
                             placeholder="Email"
-                            style={styles.textInput}
+                            style={[styles.textInput, { color: textColor }]}
                             placeholderTextColor={Colors.GRAY}
                             onChangeText={(v) => setEmail(v.trim())}
                             keyboardType="email-address"
@@ -112,7 +115,7 @@ const SignUpUI = ({
                         <View style={{ width: '100%', position: 'relative' }}>
                             <TextInput
                                 placeholder="Password"
-                                style={styles.textInput}
+                                style={[styles.textInput, { color: textColor }]}
                                 placeholderTextColor={Colors.GRAY}
                                 secureTextEntry={!showPassword}
                                 onChangeText={(v) => setPassword(v)}
@@ -203,7 +206,7 @@ const SignUpUI = ({
                                 marginTop: verticalScale(20),
                             }}
                         >
-                            <Text style={{ color: Colors.WHITE }}>
+                            <Text style={{ color: textColor }}>
                                 Already have an account?{' '}
                             </Text>
 
