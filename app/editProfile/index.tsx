@@ -1,5 +1,6 @@
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
+import { styles } from '@/styles/EditProfile.styles';
 import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import firestore, {
     FirebaseFirestoreTypes,
@@ -12,14 +13,13 @@ import {
     Alert,
     Button,
     Image,
-    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    View
 } from 'react-native';
-import { RFValue } from 'react-native-responsive-fontsize';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { scale } from 'react-native-size-matters';
 
 export default function EditProfileScreen() {
     const { userDetail } = useContext(UserDetailContext);
@@ -61,7 +61,6 @@ export default function EditProfileScreen() {
         try {
             let photoURL = profilePicture;
 
-            // Upload new profile picture if changed
             if (
                 profilePicture &&
                 profilePicture !== userDetail.profilePicture
@@ -99,7 +98,7 @@ export default function EditProfileScreen() {
                 </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.avatarCont} onPress={pickImage}>
+            <View style={styles.avatarCont}>
                 <Image
                     source={
                         profilePicture
@@ -108,8 +107,24 @@ export default function EditProfileScreen() {
                     }
                     style={styles.avatar}
                 />
-                <EvilIcons name="camera" size={scale(20)} color={textColor} />
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={pickImage}
+                    style={styles.cameraBtn}
+                    hitSlop={{
+                        top: scale(10),
+                        bottom: scale(10),
+                        left: scale(10),
+                        right: scale(10),
+                    }}
+                    activeOpacity={0.8}
+                >
+                    <EvilIcons
+                        name="camera"
+                        size={scale(20)}
+                        color={textColor}
+                    />
+                </TouchableOpacity>
+            </View>
 
             <TextInput
                 style={styles.input}
@@ -140,30 +155,4 @@ export default function EditProfileScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: { flex: 1, paddingHorizontal: moderateScale(15) },
-    title: {
-        fontSize: RFValue(20),
-        fontFamily: 'outfit-bold',
-    },
-    avatar: {
-        width: moderateScale(100),
-        height: moderateScale(100),
-        borderRadius: scale(50),
-        alignSelf: 'center',
-        marginBottom: moderateScale(10),
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 15,
-    },
-    backButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: moderateScale(20),
-    },
-    avatarCont: {},
-});
+

@@ -55,8 +55,9 @@ export default function Index() {
                 <TouchableOpacity
                     style={styles.iconsContainer}
                     onPress={navigateGoogle}
+                    disabled={loading}
                 >
-                    <AntDesign name="google" size={scale(28)} color="#fff" />
+                    <AntDesign name="google" size={scale(24)} color="#fff" />
                     <Text
                         style={{
                             fontSize: RFValue(15),

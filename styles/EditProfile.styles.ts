@@ -1,106 +1,55 @@
-import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import { moderateScale, scale } from "react-native-size-matters";
+
+const AVATAR_SIZE = moderateScale(100);
+const CAMERA_SIZE = scale(34);
+
 
 export const styles = StyleSheet.create({
-    container: {
-        padding: 20,
-        paddingBottom: 40,
-        backgroundColor: Colors.BG_COLOR,
-        flexGrow: 1,
-        marginTop: 60,
+    container: { flex: 1, paddingHorizontal: moderateScale(15) },
+    title: {
+        fontSize: RFValue(20),
+        fontFamily: 'outfit-bold',
     },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: Colors.PRIMARY,
-    },
-    imagePicker: {
-        alignSelf: 'center',
-        marginBottom: 30,
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#eee',
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    countryPickerContainer: {
+    backButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 10,
-        backgroundColor: 'white',
+        marginBottom: moderateScale(20),
     },
-    countryPickerButton: {
-        flex: 1,
+    avatarCont: {
+        alignSelf: 'center',
+        width: AVATAR_SIZE,
+        height: AVATAR_SIZE,
+        marginBottom: moderateScale(10),
+        position: 'relative',
     },
-    callingCodeText: {
-        fontSize: 16,
-        marginLeft: 10,
-        color: Colors.GREEN,
+    avatar: {
+        width: '100%',
+        height: '100%',
+        borderRadius: scale(50),
     },
-
-    imagePlaceholder: {
-        color: '#999',
-        textAlign: 'center',
-        paddingHorizontal: 10,
-    },
-    label: {
-        fontSize: 16,
-        marginBottom: 6,
-        fontWeight: '600',
-        color: 'white',
+    cameraBtn: {
+        position: 'absolute',
+        right: -scale(4), // slightly outside for overlap
+        bottom: -scale(4),
+        width: CAMERA_SIZE,
+        height: CAMERA_SIZE,
+        borderRadius: CAMERA_SIZE / 2,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
     },
     input: {
         borderWidth: 1,
-        borderColor: '#bbb',
+        borderColor: '#ccc',
         borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        fontSize: 16,
-        marginBottom: 10,
-        color: Colors.GREEN,
-    },
-    bioInput: {
-        height: 80,
-        textAlignVertical: 'top',
-    },
-    errorInput: {
-        borderColor: 'red',
-    },
-    errorText: {
-        color: 'red',
-        marginBottom: 10,
-    },
-    buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 20,
-    },
-    button: {
-        flex: 1,
-        paddingVertical: 14,
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    cancelButton: {
-        backgroundColor: '#ccc',
-        marginRight: 10,
-    },
-    cancelButtonText: {
-        color: '#333',
-        fontWeight: '600',
-    },
-    saveButton: {
-        backgroundColor: '#007bff',
-        marginLeft: 10,
-    },
-    saveButtonText: {
-        color: '#fff',
-        fontWeight: '600',
+        padding: scale(10),
+        marginBottom: moderateScale(10),
     },
 });

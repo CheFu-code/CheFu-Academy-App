@@ -1,25 +1,23 @@
 import * as Sentry from '@sentry/react-native';
 import { useFonts } from 'expo-font';
-import { Stack, useSegments } from 'expo-router';
-import { useEffect } from 'react';
+import { Stack } from 'expo-router';
 import './firebase-background-handler';
 
 import FontErrorScreen from '@/component/FontErrorScreen';
 import LoadingScreen from '@/component/LoadingScreen';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
 import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
+import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
+import { useImmersiveMode } from '@/hooks/useImmersiveMode';
 import useLastSeenTracker from '@/hooks/useLastSeenTracker';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { UserDetail } from '@/types/UserDetail';
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { MenuProvider } from 'react-native-popup-menu';
 import OfflineScreen from '../component/OfflineScreen';
 import { Colors } from '../constant/Colors';
 import { NetworkProvider, useNetwork } from '../context/NetworkContext';
 import { UserDetailContext } from '../context/UserDetailContext';
 import { useBiometricAuth } from '../hooks/useBiometricAuth';
-import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
-import { useImmersiveMode } from '@/hooks/useImmersiveMode';
 
 // ✅ Sentry Init
 Sentry.init({
@@ -33,33 +31,10 @@ Sentry.init({
     ],
 });
 
-const useProtectedRoute = (
-    userDetail: UserDetail | null | undefined,
-    authChecked: boolean,
-) => {
-    const segments = useSegments();
-    const { safeReplace } = useSafeNavigation();
-
-    useEffect(() => {
-        if (!authChecked) return;
-        if (userDetail === undefined) return; // still resolving auth
-
-        const first = segments?.[0];
-        const inAuthGroup = first === 'auth';
-
-        // Avoid repeated replaces when already in the right place
-        if (userDetail && inAuthGroup) {
-            safeReplace('/(tabs)/home');
-            return;
-        }
-        if (!userDetail && !inAuthGroup) {
-            safeReplace('/auth/signIn');
-        }
-    }, [authChecked, userDetail, segments, safeReplace]);
-};
 
 function LayoutContent() {
     const { isConnected } = useNetwork();
+    const { authChecked, authSuccess, retryAuth } = useBiometricAuth();
 
     const [fontsLoaded, fontError] = useFonts({
         outfit: require('../assets/fonts/Outfit-Regular.ttf'),
@@ -68,7 +43,6 @@ function LayoutContent() {
         'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
     });
 
-    const { authChecked, authSuccess, retryAuth } = useBiometricAuth();
     const { userDetail, setUserDetail } = useFirebaseAuthObserver(
         authChecked,
         authSuccess,

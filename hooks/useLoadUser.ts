@@ -60,7 +60,7 @@ export const useLoadUser = () => {
                             await AsyncStorage.setItem("userDetail", JSON.stringify(userData));
                             safeReplace("/(tabs)/home");
                         }
-
+                        console.log('user loaded, redirecting')
                         setLoading(false);
                     } catch (error: unknown) {
                         if (isErrorWithCode(error) && error.code.includes("unavailable") && Platform.OS === "android") {

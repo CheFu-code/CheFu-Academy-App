@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../constant/Colors';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     centeredContainer: {
@@ -13,7 +14,7 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         color: Colors.WHITE,
         marginTop: verticalScale(30),
-        fontSize: scale(11),
+        fontSize: RFValue(11),
         fontFamily: 'outfit',
     },
     bottomSheet: {
@@ -23,20 +24,20 @@ export const styles = StyleSheet.create({
         borderTopRightRadius: moderateScale(35),
     },
     title: {
-        fontSize: scale(24),
+        fontSize: RFValue(22),
         textAlign: 'center',
         color: Colors.WHITE,
         fontFamily: 'outfit-bold',
     },
     subtitle: {
-        fontSize: scale(17),
+        fontSize: RFValue(16),
         color: Colors.WHITE,
         marginTop: verticalScale(5),
         textAlign: 'center',
         fontFamily: 'outfit',
     },
     button: {
-        padding: moderateScale(15),
+        padding: moderateScale(12),
         backgroundColor: Colors.WHITE,
         marginTop: verticalScale(20),
         borderRadius: moderateScale(10),
@@ -55,7 +56,7 @@ export const styles = StyleSheet.create({
     },
     buttonText: {
         textAlign: 'center',
-        fontSize: scale(17),
+        fontSize: RFValue(16),
         fontFamily: 'outfit-bold',
     },
     gitHub: {
