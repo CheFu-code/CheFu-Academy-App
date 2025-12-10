@@ -28,7 +28,7 @@ const SignIn = () => {
     const [passwordError, setPasswordError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [fatalError, setFatalError] = useState<Error | null>(null);
-    const SUPPORT_EMAIL = 'kurisanimaluleke77@gmail.com';
+    const SUPPORT_EMAIL = 'chefu.inc@gmail.com';
 
     const getUserDetail = async (email: string) => {
         try {

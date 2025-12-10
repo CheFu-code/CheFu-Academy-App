@@ -39,25 +39,23 @@ const useProtectedRoute = (
 ) => {
     const segments = useSegments();
     const { safeReplace } = useSafeNavigation();
+
     useEffect(() => {
-        // Wait until the auth state is actually checked before redirecting.
-        if (!authChecked) {
+        if (!authChecked) return;
+        if (userDetail === undefined) return; // still resolving auth
+
+        const first = segments?.[0];
+        const inAuthGroup = first === 'auth';
+
+        // Avoid repeated replaces when already in the right place
+        if (userDetail && inAuthGroup) {
+            safeReplace('/(tabs)/home');
             return;
         }
-
-        // 👇 Prevent early redirect while userDetail === undefined
-        if (userDetail === undefined) return;
-
-        const inAuthGroup = segments[0] === 'auth';
-
-        if (userDetail && inAuthGroup) {
-            // User is signed in and on an auth screen, redirect to home.
-            safeReplace('/(tabs)/home');
-        } else if (!userDetail && !inAuthGroup) {
-            // User is not signed in and not on a protected screen, redirect to sign in.
+        if (!userDetail && !inAuthGroup) {
             safeReplace('/auth/signIn');
         }
-    }, [userDetail, segments, authChecked, safeReplace]);
+    }, [authChecked, userDetail, segments, safeReplace]);
 };
 
 function LayoutContent() {
@@ -83,16 +81,14 @@ function LayoutContent() {
     useDeepLinking();
     useHandleDynamicLinks();
 
-    // if (!isConnected) return <OfflineScreen />;
-
+    
+    if (!isConnected) return <OfflineScreen />;
     if (fontError) return <FontErrorScreen />;
 
-    if (
-        !fontsLoaded ||
-        !authChecked ||
-        !authSuccess ||
-        userDetail === undefined
-    ) {
+    const isUiReady = fontsLoaded;
+    const isAuthReady = authChecked && authSuccess && userDetail !== undefined;
+
+    if (!isUiReady || !isAuthReady) {
         return <LoadingScreen retryAuth={retryAuth} />;
     }
 

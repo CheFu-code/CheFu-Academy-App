@@ -3,7 +3,9 @@ import { sendEmailVerification } from '@react-native-firebase/auth';
 import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 import * as LocalAuthentication from 'expo-local-authentication';
 
+import SettingItem from '@/component/Setting/settingItem';
 import { auth, db } from '@/config/fireConfig';
+import useDarkMode from '@/hooks/useDarkMode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as FileSystem from 'expo-file-system';
@@ -18,18 +20,15 @@ import {
     Text,
     ToastAndroid,
     TouchableOpacity,
-    useColorScheme,
-    View,
+    View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale, verticalScale } from 'react-native-size-matters';
 import AppModal from '../component/Shared/AppModal';
 import { Colors } from '../constant/Colors';
 import { UserDetailContext } from '../context/UserDetailContext';
 import { useSafeNavigation } from '../hooks/useSafeNavigation';
 import { styles } from '../styles/Settings.styles';
-import SettingItem from '@/component/Setting/settingItem';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale, verticalScale } from 'react-native-size-matters';
-import useDarkMode from '@/hooks/useDarkMode';
 
 export default function SettingsScreen() {
     const [notifications, setNotifications] = useState(true);
@@ -441,6 +440,11 @@ export default function SettingsScreen() {
                             General
                         </Text>
 
+                        <SettingItem
+                            label="Edit Profile"
+                            icon="person"
+                            onPress={() => safePush('/editProfile')}
+                        />
                         <SettingItem
                             label="Change Password"
                             icon="lock-closed"

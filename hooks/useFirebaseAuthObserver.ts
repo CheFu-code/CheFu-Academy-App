@@ -6,8 +6,7 @@ import {
     onAuthStateChanged,
 } from "@react-native-firebase/auth";
 import { Timestamp } from "@react-native-firebase/firestore";
-import { useEffect, useRef, useState } from "react";
-import { useSafeNavigation } from "./useSafeNavigation";
+import { useEffect, useState } from "react";
 
 // 🔹 Map Firebase User → UserDetail
 function mapFirebaseUserToUserDetail(user: FirebaseAuthTypes.User): UserDetail {
@@ -56,28 +55,25 @@ function mapFirebaseUserToUserDetail(user: FirebaseAuthTypes.User): UserDetail {
 }
 
 export function useFirebaseAuthObserver(authChecked: boolean, authSuccess: boolean) {
-    const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
-    const { safeReplace } = useSafeNavigation()
-    const alreadyRedirected = useRef(false);
+    const [userDetail, setUserDetail] = useState<UserDetail | null | undefined>(undefined);
 
     useEffect(() => {
         if (!authChecked || !authSuccess) return;
 
         const auth = getAuth(getApp());
+        // On subscribe, mark as "loading" again to avoid stale null from previous runs
+        setUserDetail(undefined);
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                const mappedUser = mapFirebaseUserToUserDetail(user);
-                setUserDetail(mappedUser);
+                setUserDetail(mapFirebaseUserToUserDetail(user));
             } else {
-                setUserDetail(null);
-                if (!alreadyRedirected.current) {
-                    alreadyRedirected.current = true;
-                }
+                setUserDetail(null); // definitively signed out
             }
         });
 
         return unsubscribe;
-    }, [authChecked, authSuccess, safeReplace]);
+    }, [authChecked, authSuccess]);
 
     return { userDetail, setUserDetail };
 }

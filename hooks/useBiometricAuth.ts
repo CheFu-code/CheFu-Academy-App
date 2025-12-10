@@ -13,35 +13,33 @@ export function useBiometricAuth() {
             const biometricEnabled = await AsyncStorage.getItem("useBiometrics");
             if (biometricEnabled !== "true") {
                 setAuthSuccess(true);
-                return;
+            } else {
+                const hasHardware = await LocalAuthentication.hasHardwareAsync();
+                const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+                if (!hasHardware || !isEnrolled) {
+                    Alert.alert(
+                        "Biometric unavailable",
+                        "Your device does not support biometric authentication."
+                    );
+                    setAuthSuccess(true);
+                } else {
+                    const result = await LocalAuthentication.authenticateAsync({
+                        promptMessage: "Unlock CheFu Academy",
+                        fallbackLabel: "Use device PIN",
+                        cancelLabel: "Cancel",
+                    });
+                    setAuthSuccess(result.success);
+                }
             }
-
-            const hasHardware = await LocalAuthentication.hasHardwareAsync();
-            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-            if (!hasHardware || !isEnrolled) {
-                Alert.alert(
-                    "Biometric unavailable",
-                    "Your device does not support biometric authentication."
-                );
-                setAuthSuccess(true);
-                return;
-            }
-
-            const result = await LocalAuthentication.authenticateAsync({
-                promptMessage: "Unlock CheFu Academy",
-                fallbackLabel: "Use device PIN",
-                cancelLabel: "Cancel",
-            });
-
-            setAuthSuccess(result.success);
         } catch (error) {
             Sentry.captureException(error);
             setAuthSuccess(true);
         } finally {
-            setAuthChecked(true);
+            setAuthChecked(true); // ✅ always set
         }
     };
+
 
     useEffect(() => {
         runBiometrics(); // first run on startup

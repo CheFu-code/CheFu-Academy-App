@@ -13,11 +13,13 @@ import { Text, View } from 'react-native';
 import { styles } from '../../styles/GitHub.styles';
 import { saveUser } from '../../utils/authService';
 import { scale, verticalScale } from 'react-native-size-matters';
+import useDarkMode from '@/hooks/useDarkMode';
 
 export default function GoogleAuthScreen() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { safeReplace } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
 
     function isFirebaseError(
         error: unknown,
@@ -91,24 +93,30 @@ export default function GoogleAuthScreen() {
 
     if (loading) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, { backgroundColor }]}>
                 <LottieView
                     source={require('../../assets/animations/Google Logo Effect.json')}
                     autoPlay
                     loop
                     style={{ width: scale(130), height: verticalScale(130) }}
                 />
-                <Text style={styles.message}>Signing in with Google...</Text>
+                <Text style={[styles.message, { color: textColor }]}>
+                    Signing in with Google...
+                </Text>
             </View>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, { backgroundColor }]}>
                 <Text style={styles.errorText}>Error:</Text>
-                <Text style={styles.message}>{error}</Text>
-                <Text style={styles.message}>Please try again.</Text>
+                <Text style={[styles.message, { color: textColor }]}>
+                    {error}
+                </Text>
+                <Text style={[styles.message, { color: textColor }]}>
+                    Please try again.
+                </Text>
 
                 <Button
                     disabled={loading}
@@ -119,7 +127,7 @@ export default function GoogleAuthScreen() {
                         <Ionicons
                             name="refresh"
                             size={scale(20)}
-                            color="#fff"
+                            color={textColor}
                         />
                     }
                 />
