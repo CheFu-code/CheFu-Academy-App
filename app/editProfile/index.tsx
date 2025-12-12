@@ -1,5 +1,6 @@
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/EditProfile.styles';
 import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import firestore, {
@@ -16,13 +17,14 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale } from 'react-native-size-matters';
 
 export default function EditProfileScreen() {
     const { userDetail } = useContext(UserDetailContext);
+    const { safeBack, safeReplace } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
     const [fullname, setFullname] = useState(userDetail?.fullname || '');
     const [bio, setBio] = useState(userDetail?.bio || '');
@@ -91,7 +93,10 @@ export default function EditProfileScreen() {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
-            <TouchableOpacity style={styles.backButton}>
+            <TouchableOpacity
+                onPress={() => safeBack()}
+                style={styles.backButton}
+            >
                 <AntDesign name="left" color={textColor} size={scale(20)} />
                 <Text style={[styles.title, { color: textColor }]}>
                     Edit Profile
@@ -127,23 +132,26 @@ export default function EditProfileScreen() {
             </View>
 
             <TextInput
-                style={styles.input}
+                style={[styles.input, { color: textColor }]}
                 placeholder="Full Name"
                 value={fullname}
                 onChangeText={setFullname}
+                placeholderTextColor={textColor}
             />
             <TextInput
-                style={styles.input}
+                style={[styles.input, { color: textColor }]}
                 placeholder="Bio"
                 value={bio}
                 onChangeText={setBio}
                 multiline
+                placeholderTextColor={textColor}
             />
             <TextInput
-                style={styles.input}
+                style={[styles.input, { color: textColor }]}
                 placeholder="Country"
                 value={country}
                 onChangeText={setCountry}
+                placeholderTextColor={textColor}
             />
 
             {loading ? (
@@ -154,5 +162,3 @@ export default function EditProfileScreen() {
         </SafeAreaView>
     );
 }
-
-
