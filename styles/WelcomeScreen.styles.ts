@@ -11,9 +11,9 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
     },
     conditions: {
-        textAlign: 'center',
+        textAlign: 'justify',
         color: Colors.WHITE,
-        marginTop: verticalScale(30),
+        marginTop: verticalScale(40),
         fontSize: RFValue(11),
         fontFamily: 'outfit',
     },
@@ -73,5 +73,50 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG,
         borderRadius: moderateScale(12),
         paddingVertical: verticalScale(10),
+    },
+
+    quote: {
+        fontSize: 14,
+        fontFamily: 'outfit-regular',
+        color: '#999',
+        textAlign: 'center',
+        marginBottom: 20,
+        fontStyle: 'italic',
+    },
+
+
+    socialContainer: {
+        marginTop: 10,
+    },
+
+    socialButton: {
+        backgroundColor: '#f5f5f5',
+        paddingVertical: 12,
+        borderRadius: 20,
+        marginVertical: 8,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+
+    socialText: {
+        fontSize: 16,
+        fontFamily: 'outfit-medium',
+        color: '#333',
+    },
+
+    footer: {
+        marginTop: verticalScale(30),
+        alignItems: 'center',
+        justifyContent: "center"
+    },
+
+    footerText: {
+        fontSize: RFValue(14),
+        fontFamily: 'outfit',
+        color: '#aaa',
     },
 });
