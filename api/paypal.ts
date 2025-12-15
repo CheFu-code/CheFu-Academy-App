@@ -1,27 +1,28 @@
-const express = require("express");
-const axios = require("axios");
-const nodemailer = require("nodemailer");
-require("dotenv").config();
-const admin = require("firebase-admin");
-const serviceAccount = require("../key.json");
+import axios from "axios";
+import dotenv from "dotenv";
+import express, { Request, Response, Router } from "express";
+import admin from "firebase-admin";
+import nodemailer from "nodemailer";
+import serviceAccount from "../key.json";
+import { loadEmailTemplate } from "./helper/loadEmailTemplate";
 
+dotenv.config();
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
 });
 
-const router = express.Router();
-
-const PAYPAL_API = "https://api-m.paypal.com"; 
+const router: Router = express.Router();
+const PAYPAL_API = "https://api-m.paypal.com";
 const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
+
 if (!CLIENT_ID || !CLIENT_SECRET) {
-    console.error("❌ PayPal credentials not set in environment variables!");
-    return;
+    throw new Error("❌ PayPal credentials not set in environment variables!");
 }
 
 // Nodemailer transporter setup
 const transporter = nodemailer.createTransport({
-    service: "gmail", // or another SMTP service
+    service: "gmail",
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -41,7 +42,7 @@ async function getAccessToken() {
 }
 
 // Create order
-router.post("/create-order", async (req, res) => {
+router.post("/create-order", async (req: Request<{}, {}, CreateOrderBody>, res: Response) => {
     try {
         const { amount, return_url, cancel_url } = req.body;
 
@@ -92,7 +93,7 @@ async function checkOrderStatus(orderID, accessToken) {
 }
 
 // Capture payment AND write to Firestore + send confirmation email
-router.post("/capture-order", async (req, res) => {
+router.post("/capture-order", async (req: Request<{}, {}, CaptureOrderBody>, res: Response) => {
     try {
         const { orderID, email, planType } = req.body;
 
@@ -144,7 +145,7 @@ router.post("/capture-order", async (req, res) => {
         const db = admin.firestore();
 
         const emailSafe = email.replace(/[@.]/g, "_"); // Replace unsafe characters
-        const id = `${emailSafe}_${orderID}`; 
+        const id = `${emailSafe}_${orderID}`;
 
         await db.collection("payments").doc(id).set({
             email,
@@ -182,105 +183,15 @@ router.post("/capture-order", async (req, res) => {
             from: `"CheFu Academy" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `Subscription Confirmed - ${planType} Plan`,
-            html: `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background-color: #f9f9f9;">
-    <div style="background-color: #1a73e8; color: white; padding: 20px; text-align: center;">
-      <h1 style="margin: 0; font-size: 28px;">Welcome to CheFu Academy!</h1>
-    </div>
-    <div style="padding: 30px; color: #333;">
-      <p style="font-size: 18px; margin-top: 0;">
-        Hi <strong>${details.payer.name?.given_name || "Learner"}</strong>,
-      </p>
-      <p style="font-size: 16px; line-height: 1.5;">
-        Thank you for subscribing to the <strong style="color: #1a73e8;">${
-            planType.charAt(0).toUpperCase() + planType.slice(1)
-        } Plan</strong>. We’re excited to have you join our community of passionate learners!
-      </p>
-
-      <h2 style="color: #1a73e8; margin-top: 40px; margin-bottom: 10px;">Subscription Details</h2>
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-        <tbody>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Plan Name:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-                planType.charAt(0).toUpperCase() + planType.slice(1)
-            }</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Duration:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-                planType === "basic"
-                    ? "30 days"
-                    : planType === "pro"
-                      ? "60 days"
-                      : planType === "premium"
-                        ? "90 days"
-                        : "30 days"
-            }</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Amount Paid:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-                details.purchase_units[0].payments.captures[0].amount
-                    .currency_code
-            } ${
-                details.purchase_units[0].payments.captures[0].amount.value
-            }</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Payment Status:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-                details.status
-            }</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Payment Date:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${new Date(
-                details.update_time || details.create_time
-            ).toLocaleString()}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2 style="color: #1a73e8; margin-top: 0; margin-bottom: 10px;">Payer Information</h2>
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-        <tbody>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Name:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-                details.payer.name?.full_name ||
-                `${details.payer.name?.given_name} ${details.payer.name?.surname}`
-            }</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Email:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${
-                details.payer.email_address
-            }</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; font-weight: bold;">Member Until:</td>
-            <td style="padding: 8px;">${memberUntil.toDateString()}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <a href="https://chefu-academy.com/dashboard" 
-         style="display: inline-block; background-color: #1a73e8; color: white; padding: 12px 24px; margin: 20px 0; text-decoration: none; border-radius: 5px; font-weight: bold;">
-        Go to Your Dashboard
-      </a>
-
-      <p style="font-size: 14px; color: #555; margin-top: 40px;">
-        If you have any questions or need assistance, feel free to contact our support team anytime.
-      </p>
-
-      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-      <p style="font-size: 12px; color: #999; text-align: center;">
-        &copy; ${new Date().getFullYear()} CheFu Academy. All rights reserved.
-      </p>
-    </div>
-  </div>
-  `,
+            html: loadEmailTemplate("subscription-confirmation", {
+                given_name: details.payer.name?.given_name || "Learner",
+                planType: planType.charAt(0).toUpperCase() + planType.slice(1),
+                currency: details.purchase_units[0].payments.captures[0].amount.currency_code,
+                amount: details.purchase_units[0].payments.captures[0].amount.value,
+                status: details.status,
+                memberUntil: memberUntil.toDateString(),
+                year: new Date().getFullYear(),
+            }),
         };
 
         await transporter.sendMail(mailOptions);
