@@ -1,8 +1,7 @@
+import EditProfile from '@/component/Profile/EditProfileUI';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { styles } from '@/styles/EditProfile.styles';
-import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import firestore, {
     FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
@@ -10,21 +9,12 @@ import storage from '@react-native-firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import { useContext, useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Button,
-    Image,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+    Alert
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale } from 'react-native-size-matters';
 
 export default function EditProfileScreen() {
     const { userDetail } = useContext(UserDetailContext);
-    const { safeBack, safeReplace } = useSafeNavigation();
+    const { safeBack } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
     const [fullname, setFullname] = useState(userDetail?.fullname || '');
     const [bio, setBio] = useState(userDetail?.bio || '');
@@ -92,73 +82,20 @@ export default function EditProfileScreen() {
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor }]}>
-            <TouchableOpacity
-                onPress={() => safeBack()}
-                style={styles.backButton}
-            >
-                <AntDesign name="left" color={textColor} size={scale(20)} />
-                <Text style={[styles.title, { color: textColor }]}>
-                    Edit Profile
-                </Text>
-            </TouchableOpacity>
-
-            <View style={styles.avatarCont}>
-                <Image
-                    source={
-                        profilePicture
-                            ? { uri: profilePicture }
-                            : require('../../assets/images/avatar.jpg')
-                    }
-                    style={styles.avatar}
-                />
-                <TouchableOpacity
-                    onPress={pickImage}
-                    style={styles.cameraBtn}
-                    hitSlop={{
-                        top: scale(10),
-                        bottom: scale(10),
-                        left: scale(10),
-                        right: scale(10),
-                    }}
-                    activeOpacity={0.8}
-                >
-                    <EvilIcons
-                        name="camera"
-                        size={scale(20)}
-                        color={textColor}
-                    />
-                </TouchableOpacity>
-            </View>
-
-            <TextInput
-                style={[styles.input, { color: textColor }]}
-                placeholder="Full Name"
-                value={fullname}
-                onChangeText={setFullname}
-                placeholderTextColor={textColor}
-            />
-            <TextInput
-                style={[styles.input, { color: textColor }]}
-                placeholder="Bio"
-                value={bio}
-                onChangeText={setBio}
-                multiline
-                placeholderTextColor={textColor}
-            />
-            <TextInput
-                style={[styles.input, { color: textColor }]}
-                placeholder="Country"
-                value={country}
-                onChangeText={setCountry}
-                placeholderTextColor={textColor}
-            />
-
-            {loading ? (
-                <ActivityIndicator size="large" color="#000" />
-            ) : (
-                <Button title="Save Changes" onPress={handleSave} />
-            )}
-        </SafeAreaView>
+        <EditProfile
+            backgroundColor={backgroundColor}
+            textColor={textColor}
+            safeBack={safeBack}
+            profilePicture={profilePicture}
+            fullname={fullname}
+            setFullname={setFullname}
+            bio={bio}
+            setBio={setBio}
+            country={country}
+            setCountry={setCountry}
+            loading={loading}
+            handleSave={handleSave}
+            pickImage={pickImage}
+        />
     );
 }
