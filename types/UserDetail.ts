@@ -40,4 +40,8 @@ export interface UserDetail {
         screenWidth: number;
         totalMemory: number;
     };
+
+    planType?: string;
+    subscribedAt?: string;
+    memberUntil?: string;
 }
