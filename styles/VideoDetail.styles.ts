@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '../constant/Colors';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { Colors } from '../constant/Colors';
 
 export const styles = StyleSheet.create({
     container: { flex: 1, },
@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
         marginTop: verticalScale(25),
     },
     title: {
-        fontSize: scale(17),
+        fontSize: RFValue(17),
         fontFamily: 'outfit-bold',
         marginVertical: verticalScale(8),
         marginHorizontal: moderateScale(12),

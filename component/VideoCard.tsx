@@ -1,15 +1,15 @@
-import React, { memo } from 'react';
-import { TouchableOpacity, View, Image, Text } from 'react-native';
-import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
-import dayjs from 'dayjs';
+import { Colors } from '@/constant/Colors';
+import { useRenderTextWithLinks } from '@/helpers/detectLinks';
 import { formatDuration } from '@/helpers/formatDateVideoCard';
 import { formatYouTubeDuration } from '@/services/videoService';
-import { formatViews } from '@/utils/formatViews';
-import { Colors } from '@/constant/Colors';
-import { Video } from '@/types/video';
 import { styles } from '@/styles/VideoCardHomeScreen.styles';
-import { useRenderTextWithLinks } from '@/helpers/detectLinks';
-import { scale } from 'react-native-size-matters';
+import { Video } from '@/types/video';
+import { formatViews } from '@/utils/formatViews';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
+import dayjs from 'dayjs';
+import React, { memo } from 'react';
+import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { moderateScale, scale } from 'react-native-size-matters';
 
 interface Props {
     item: Video;
@@ -20,7 +20,7 @@ interface Props {
 const VideoCard: React.FC<Props> = ({ item, onPress, onCategoryPress }) => {
     const { renderTextWithLinks } = useRenderTextWithLinks();
     return (
-        <TouchableOpacity
+        <Pressable
             style={styles.cardWrapper}
             onPress={() => onPress(item)}
         >
@@ -94,14 +94,14 @@ const VideoCard: React.FC<Props> = ({ item, onPress, onCategoryPress }) => {
                             : formatDuration(item.duration)}{' '}
                     </Text>
                 </View>
-                <View style={[styles.durationInfo, { maxWidth: 100 }]}>
+                <View style={[styles.durationInfo, { maxWidth: moderateScale(100) }]}>
                     <FontAwesome5 name="users" size={14} color={Colors.BLACK} />
                     <Text numberOfLines={1} style={styles.duration}>
                         {formatViews(item.views)}
                     </Text>
                 </View>
             </View>
-        </TouchableOpacity>
+        </Pressable>
     );
 };
 

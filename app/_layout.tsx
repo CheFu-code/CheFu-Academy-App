@@ -5,6 +5,7 @@ import './firebase-background-handler';
 
 import FontErrorScreen from '@/component/FontErrorScreen';
 import LoadingScreen from '@/component/LoadingScreen';
+import OfflineScreen from '@/component/OfflineScreen';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
 import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
 import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
@@ -13,7 +14,6 @@ import useLastSeenTracker from '@/hooks/useLastSeenTracker';
 import { useNotifications } from '@/hooks/useNotifications';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { MenuProvider } from 'react-native-popup-menu';
-import OfflineScreen from '../component/OfflineScreen';
 import { Colors } from '../constant/Colors';
 import { NetworkProvider, useNetwork } from '../context/NetworkContext';
 import { UserDetailContext } from '../context/UserDetailContext';
