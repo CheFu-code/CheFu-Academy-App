@@ -334,15 +334,15 @@ export default function TrustedDevices() {
                         <Text
                             style={{
                                 fontFamily: 'outfit',
-                                fontSize: RFValue(14),
+                                fontSize: RFValue(13),
                                 color: Colors.GRAY,
                                 lineHeight: scale(20),
                                 textAlign: 'center',
-                                marginTop: verticalScale(10),
+                                marginTop: verticalScale(20),
                             }}
                         >
                             Trusted devices will be added automatically as you
-                            continue using the app. You can revisit this page
+                            continue using the app. You can revisit this screen
                             after multiple logins to see them.
                         </Text>
                     </>
