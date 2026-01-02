@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect } from "react";
-import { AppState, Platform, Dimensions } from "react-native";
+import { AppState, Dimensions, Platform } from "react-native";
 import ImmersiveMode from "react-native-immersive-mode";
 
 // Reusable hook for sticky immersive mode (insists no matter what)

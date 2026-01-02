@@ -1,7 +1,8 @@
+import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/SparkDetail';
+import { Likes, Replies } from '@/types/sparks';
 import { Text, View } from 'react-native';
 import CommentItem from './CommentItem';
-import { Likes, Replies } from '@/types/sparks';
 
 interface Props {
     comments: any[];
@@ -22,13 +23,16 @@ export default function CommentsList({
     onLike,
     onReply,
 }: Props) {
+    const { textColor } = useDarkMode();
     if (!comments.length) {
         return <Text style={styles.noComments}>No comments yet</Text>;
     }
 
     return (
-        <View style={styles.commentsSection}>
-            <Text style={styles.commentsHeader}>Comments</Text>
+        <View>
+            <Text style={[styles.commentsHeader, { color: textColor }]}>
+                Comments
+            </Text>
             {comments.map((c, i) => (
                 <CommentItem
                     key={c.id}

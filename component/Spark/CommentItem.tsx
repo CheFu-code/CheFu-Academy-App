@@ -1,4 +1,4 @@
-import { Colors } from '@/constant/Colors';
+import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/SparkDetail';
 import { Comment, Likes, Replies } from '@/types/sparks';
 import dayjs from 'dayjs';
@@ -34,6 +34,7 @@ export default function CommentItem({
     const [editText, setEditText] = useState(comment.text);
     const [modalVisible, setModalVisible] = useState(false);
     const [repliesVisible, setRepliesVisible] = useState(false);
+    const { textColor } = useDarkMode();
 
     const openReplies = () => {
         setRepliesVisible(true);
@@ -68,10 +69,10 @@ export default function CommentItem({
         <View
             style={[
                 styles.comment,
-                {
-                    backgroundColor:
-                        index % 2 === 0 ? Colors.BG_COLOR : '#25252A',
-                },
+                // {
+                //     backgroundColor:
+                //         index % 2 === 0 ? Colors.BG_COLOR : '#25252A',
+                // },
             ]}
         >
             {/* Comment Header */}
@@ -95,7 +96,9 @@ export default function CommentItem({
                     </Text>
                 </View>
 
-                <Text style={styles.commentText}>{comment.text}</Text>
+                <Text style={[styles.commentText, { color: textColor }]}>
+                    {comment.text}
+                </Text>
 
                 {/* Actions */}
                 <CommentActions
@@ -128,7 +131,7 @@ export default function CommentItem({
                 slideAnim={slideAnim}
                 closeReplies={closeReplies}
                 comment={comment}
-                sparkId={sparkId} 
+                sparkId={sparkId}
                 onAddReply={(commentId, reply) => onReply?.(commentId, reply)}
             />
         </View>

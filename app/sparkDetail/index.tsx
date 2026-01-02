@@ -6,6 +6,7 @@ import SparkHeader from '@/component/Spark/SparkHeaser';
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
 import { Likes, Replies, Spark } from '@/types/sparks';
@@ -32,6 +33,7 @@ const SparkDetail = () => {
     const { safeBack } = useSafeNavigation();
     const { sparkId } = useLocalSearchParams<{ sparkId: string }>();
     const { userDetail } = useContext(UserDetailContext);
+    const { textColor, backgroundColor } = useDarkMode();
     const [comment, setComment] = useState('');
     const [commenting, setCommenting] = useState(false);
     const [spark, setSpark] = useState<Spark | null>(null);
@@ -139,7 +141,7 @@ const SparkDetail = () => {
                 });
 
                 await sendNotification(
-                    spark.createdBy.email, 
+                    spark.createdBy.email,
                     'New Comment',
                     `${
                         userDetail.fullname || 'Someone'
@@ -148,7 +150,6 @@ const SparkDetail = () => {
             }
 
             setComment('');
-            showToast('Commented');
         } catch (error) {
             console.log('Error adding comment:', error);
             showToast('Failed to add comment');
@@ -289,9 +290,13 @@ const SparkDetail = () => {
 
     if (!spark) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor }]}>
                 <TouchableOpacity onPress={safeBack} style={styles.backButton}>
-                    <AntDesign name="left" size={scale(20)} color={Colors.PRIMARY} />
+                    <AntDesign
+                        name="left"
+                        size={scale(20)}
+                        color={Colors.PRIMARY}
+                    />
                     <Text style={styles.backText}>Back</Text>
                 </TouchableOpacity>
                 <View style={styles.center}>
@@ -302,10 +307,14 @@ const SparkDetail = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Back button */}
             <TouchableOpacity onPress={safeBack} style={styles.backButton}>
-                <AntDesign name="left" size={20} color={Colors.PRIMARY} />
+                <AntDesign
+                    name="left"
+                    size={scale(20)}
+                    color={Colors.PRIMARY}
+                />
                 <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
 
@@ -313,8 +322,12 @@ const SparkDetail = () => {
             <SparkHeader spark={spark} />
 
             {/* Title & Content */}
-            <Text style={styles.title}>{spark.title}</Text>
-            <Text style={styles.content}>{spark.content}</Text>
+            <Text style={[styles.title, { color: textColor }]}>
+                {spark.title}
+            </Text>
+            <Text style={[styles.content, { color: textColor }]}>
+                {spark.content}
+            </Text>
 
             {/* Actions */}
             <SparkActions

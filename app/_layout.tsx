@@ -9,7 +9,6 @@ import OfflineScreen from '@/component/OfflineScreen';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
 import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
 import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
-import { useImmersiveMode } from '@/hooks/useImmersiveMode';
 import useLastSeenTracker from '@/hooks/useLastSeenTracker';
 import { useNotifications } from '@/hooks/useNotifications';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
@@ -51,7 +50,7 @@ function LayoutContent() {
     useProtectedRoute(userDetail, authChecked);
     useLastSeenTracker();
     useNotifications();
-    useImmersiveMode();
+    // useImmersiveMode();
     useDeepLinking();
     useHandleDynamicLinks();
 

@@ -1,5 +1,4 @@
 import * as Linking from "expo-linking";
-import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useSafeNavigation } from "./useSafeNavigation";
 

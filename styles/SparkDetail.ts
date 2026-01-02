@@ -1,11 +1,11 @@
-import { Colors } from "@/constant/Colors";
-import { StyleSheet } from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
+import { Colors } from '@/constant/Colors';
+import { StyleSheet } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
     },
     loading: {
         flex: 1,
@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
         fontFamily: 'outfit-bold',
     },
     timestamp: {
-        fontSize: scale(10),
+        fontSize: RFValue(10),
         color: '#777',
     },
     categoryBox: {
@@ -65,7 +65,6 @@ export const styles = StyleSheet.create({
         fontSize: scale(14),
         marginBottom: verticalScale(8),
         fontFamily: 'outfit-bold',
-        color: Colors.WHITE,
         paddingHorizontal: scale(10),
     },
     content: {
@@ -92,12 +91,10 @@ export const styles = StyleSheet.create({
         fontSize: scale(14),
         color: Colors.PRIMARY,
     },
-    commentsSection: {},
     commentsHeader: {
         fontSize: scale(14),
         marginBottom: verticalScale(10),
         fontFamily: 'outfit-bold',
-        color: Colors.WHITE,
     },
     comment: {
         flexDirection: 'row',
@@ -111,6 +108,8 @@ export const styles = StyleSheet.create({
         width: scale(30),
         height: scale(30),
         borderRadius: scale(14),
+        borderWidth: 0.8,
+        borderColor: Colors.GRAY,
     },
     commentAuthor: {
         fontSize: scale(14),
@@ -120,7 +119,6 @@ export const styles = StyleSheet.create({
     },
     commentText: {
         fontSize: scale(14),
-        color: Colors.WHITE,
         fontFamily: 'outfit',
     },
     noComments: {
@@ -141,12 +139,12 @@ export const styles = StyleSheet.create({
         fontSize: scale(14),
         color: Colors.BLACK,
         backgroundColor: Colors.BG_GRAY,
-        maxWidth: "65%",
+        maxWidth: '65%',
         borderRadius: scale(20),
         flex: 1,
         fontFamily: 'outfit',
         marginLeft: scale(10),
-        marginTop: verticalScale(10)
+        marginTop: verticalScale(10),
     },
     addButtonContainer: {
         flexDirection: 'row',
@@ -164,13 +162,13 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         gap: scale(6),
         marginRight: scale(10),
-        marginTop: verticalScale(10)
+        marginTop: verticalScale(10),
     },
     commentHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: scale(8),
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     commentTimestamp: {
         fontSize: scale(10),
@@ -186,7 +184,6 @@ export const styles = StyleSheet.create({
     },
     menuTrigger: {
         padding: scale(2),
-        backgroundColor: '#1E1E1E',
         borderRadius: scale(20),
     },
     editInput: {
@@ -203,7 +200,7 @@ export const styles = StyleSheet.create({
         textAlignVertical: 'top',
         minHeight: verticalScale(40),
         maxHeight: verticalScale(100),
-        backgroundColor: Colors.BG_COLOR,
+        backgroundColor: Colors.GRAY,
     },
     editHeader: {
         backgroundColor: Colors.BG_COLOR,
@@ -258,7 +255,6 @@ export const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: Colors.BG_COLOR,
         padding: scale(8),
         borderTopLeftRadius: scale(22),
         borderTopRightRadius: scale(22),
@@ -277,8 +273,7 @@ export const styles = StyleSheet.create({
         borderRadius: scale(22),
     },
     replyText: {
-        color: Colors.WHITE,
-        fontSize: scale(14),
+        fontSize: RFValue(14),
         fontFamily: 'outfit-bold',
     },
     noReplyText: {
@@ -294,7 +289,8 @@ export const styles = StyleSheet.create({
     },
     fullname: {
         color: Colors.WHITE,
-        fontSize: scale(10),
+        fontSize: RFValue(10),
+        fontFamily: 'outfit-bold',
     },
     fullnameCont: {
         flexDirection: 'row',
@@ -304,8 +300,9 @@ export const styles = StyleSheet.create({
     containerReply: {
         paddingVertical: verticalScale(10),
         paddingHorizontal: scale(10),
-        backgroundColor: Colors.BG_COLOR,
         borderRadius: scale(10),
+        marginTop: scale(8),
+        backgroundColor: Colors.BG_GRAY,
     },
     X: {
         flexDirection: 'row',
@@ -332,5 +329,5 @@ export const styles = StyleSheet.create({
         paddingHorizontal: scale(8),
         backgroundColor: Colors.LIGHT_RED,
         borderRadius: scale(50), // replaced '50%' with scaled value
-    }
+    },
 });

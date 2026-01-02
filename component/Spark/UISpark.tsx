@@ -1,12 +1,12 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { Colors } from '@/constant/Colors';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparksFeed.styles';
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
-import { scale } from 'react-native-size-matters';
-import { Colors } from '@/constant/Colors';
-import dayjs from 'dayjs';
-import { formatViews } from '@/utils/formatViews';
 import { Likes, Spark } from '@/types/sparks';
+import { formatViews } from '@/utils/formatViews';
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import dayjs from 'dayjs';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 interface UISparkProps {
     deleting: boolean;
@@ -46,7 +46,11 @@ const UISpark = ({
                                 ? { uri: item?.createdBy?.profilePicture }
                                 : require('@/assets/images/avatar.jpg')
                         }
-                        style={{ width: 35, height: 35, borderRadius: 20 }}
+                        style={{
+                            width: scale(35),
+                            height: verticalScale(35),
+                            borderRadius: scale(20),
+                        }}
                     />
                     <View>
                         <View

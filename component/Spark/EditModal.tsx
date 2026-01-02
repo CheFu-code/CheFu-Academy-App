@@ -1,7 +1,7 @@
 import { Colors } from '@/constant/Colors';
+import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/SparkDetail';
-import React from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface Props {
     visible: boolean;
@@ -18,6 +18,7 @@ export default function EditModal({
     onClose,
     onSave,
 }: Props) {
+    const { textColor, backgroundColor } = useDarkMode();
     return (
         <Modal
             transparent
@@ -26,12 +27,14 @@ export default function EditModal({
             onRequestClose={onClose}
         >
             <TouchableOpacity
-                style={styles.modal}
+                style={[styles.modal, { backgroundColor }]}
                 activeOpacity={1}
                 onPressOut={onClose}
             >
                 <View style={styles.editHeader}>
-                    <Text style={styles.editText}>Edit Comment</Text>
+                    <Text style={[styles.editText, { color: textColor }]}>
+                        Edit Comment
+                    </Text>
                     <TextInput
                         value={editText}
                         onChangeText={setEditText}

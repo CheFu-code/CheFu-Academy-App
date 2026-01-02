@@ -1,4 +1,5 @@
 import { Colors } from '@/constant/Colors';
+import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/SparkDetail';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from 'react-native';
@@ -8,6 +9,8 @@ import {
     MenuOptions,
     MenuTrigger,
 } from 'react-native-popup-menu';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { scale } from 'react-native-size-matters';
 
 interface Props {
     setModalVisible: (visible: boolean) => void;
@@ -15,24 +18,37 @@ interface Props {
 }
 
 export default function CommentMenu({ setModalVisible, onDelete }: Props) {
+    const { textColor, backgroundColor } = useDarkMode();
     return (
         <Menu>
             <MenuTrigger style={styles.menuTrigger}>
                 <Ionicons
                     name="ellipsis-vertical"
-                    size={16}
+                    size={scale(15)}
                     color={Colors.GRAY}
                 />
             </MenuTrigger>
-            <MenuOptions optionsContainerStyle={styles.optionsContainerStyle}>
+
+            <MenuOptions
+                optionsContainerStyle={[
+                    styles.optionsContainerStyle,
+                    { backgroundColor },
+                ]}
+            >
                 <MenuOption onSelect={() => setModalVisible(true)}>
                     <View style={styles.menuOption1}>
                         <Ionicons
                             name="pencil"
-                            size={15}
-                            color={Colors.WHITE}
+                            size={scale(15)}
+                            color={textColor}
                         />
-                        <Text style={{ color: Colors.WHITE, fontSize: 15 }}>
+                        <Text
+                            style={{
+                                color: textColor,
+                                fontSize: RFValue(14),
+                                fontFamily: 'outfit-bold',
+                            }}
+                        >
                             Edit
                         </Text>
                     </View>
@@ -41,10 +57,16 @@ export default function CommentMenu({ setModalVisible, onDelete }: Props) {
                     <View style={styles.menuOption2}>
                         <Ionicons
                             name="trash-bin"
-                            size={15}
+                            size={scale(15)}
                             color={Colors.RED}
                         />
-                        <Text style={{ color: Colors.RED, fontSize: 15 }}>
+                        <Text
+                            style={{
+                                color: Colors.RED,
+                                fontSize: RFValue(14),
+                                fontFamily: 'outfit-bold',
+                            }}
+                        >
                             Delete
                         </Text>
                     </View>

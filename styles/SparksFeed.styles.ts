@@ -1,12 +1,12 @@
-import { Colors } from "@/constant/Colors";
-import { StyleSheet } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { scale, verticalScale } from "react-native-size-matters";
+import { Colors } from '@/constant/Colors';
+import { StyleSheet } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     list: {
-        padding: 16,
-        flexGrow: 1
+        padding: scale(15),
+        flexGrow: 1,
     },
     loading: {
         flex: 1,
@@ -15,19 +15,19 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
     },
     card: {
-        backgroundColor: '#fff',
-        padding: 10,
-        marginBottom: 12,
-        borderRadius: 12,
+        backgroundColor: Colors.GRAY,
+        padding: scale(10),
+        marginBottom: moderateScale(12),
+        borderRadius: scale(12),
         shadowColor: '#000',
         shadowOpacity: 0.05,
         shadowRadius: 8,
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: verticalScale(2) },
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 8,
+        marginBottom: moderateScale(8),
     },
     category: {
         fontSize: RFValue(10),
@@ -82,7 +82,11 @@ export const styles = StyleSheet.create({
         fontSize: RFValue(12),
         color: Colors.PRIMARY,
     },
-    authorContainer: { flexDirection: 'row', alignItems: 'center', gap: scale(8) },
+    authorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: scale(8),
+    },
     NoSparkFeedHeader: {
         flex: 1,
         justifyContent: 'center',
@@ -92,5 +96,5 @@ export const styles = StyleSheet.create({
         fontFamily: 'outfit-bold',
         fontSize: RFValue(16),
         color: Colors.GRAY,
-    }
+    },
 });

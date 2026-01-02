@@ -1,14 +1,15 @@
+import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useRenderTextWithLinks } from '@/helpers/detectLinks';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
 import { Comment, Replies } from '@/types/sparks';
+import { showToast } from '@/utils/toast';
+import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import { useContext, useState } from 'react';
-import * as Haptics from 'expo-haptics';
-import { db } from '@/config/fireConfig';
-import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 import {
     ActivityIndicator,
     Alert,
@@ -23,10 +24,11 @@ import {
     TextInput,
     TouchableOpacity,
     useWindowDimensions,
+    Vibration,
     View,
 } from 'react-native';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
 import NoReply from './NoReply';
-import { showToast } from '@/utils/toast';
 
 interface Props {
     visible: boolean;
@@ -45,12 +47,13 @@ export default function RepliesSheet({
     onAddReply,
     sparkId,
 }: Props) {
+    const [replying, setReplying] = useState(false);
     const [replyText, setReplyText] = useState('');
     const { safePush } = useSafeNavigation();
-    const [replying, setReplying] = useState(false);
     const { userDetail } = useContext(UserDetailContext);
-    const { height: screenHeight } = useWindowDimensions();
     const { renderTextWithLinks } = useRenderTextWithLinks();
+    const { height: screenHeight } = useWindowDimensions();
+    const { textColor, backgroundColor } = useDarkMode();
 
     const handleAddReply = () => {
         if (!replyText.trim()) return;
@@ -73,6 +76,7 @@ export default function RepliesSheet({
             setReplyText('');
         } catch (error) {
             console.error('Error adding reply:', error);
+            showToast('Failed to add reply');
         } finally {
             setReplying(false);
         }
@@ -145,6 +149,7 @@ export default function RepliesSheet({
                         transform: [{ translateY: slideAnim }],
                         height: screenHeight * 0.6,
                         shadowOffset: { width: 0, height: -2 },
+                        backgroundColor,
                     },
                 ]}
             >
@@ -154,20 +159,24 @@ export default function RepliesSheet({
                 >
                     {/* Header */}
                     <View style={{ alignItems: 'center' }}>
-                        <Text style={styles.replyText}>Replies</Text>
+                        <Text style={[styles.replyText, { color: textColor }]}>
+                            Replies
+                        </Text>
                     </View>
 
                     {/* Replies List */}
                     <ScrollView
-                        style={{ flex: 1, marginVertical: 10 }}
-                        contentContainerStyle={{ paddingBottom: 20 }}
+                        style={{ flex: 1, marginVertical: verticalScale(10) }}
+                        contentContainerStyle={{
+                            paddingBottom: moderateScale(20),
+                        }}
                         showsVerticalScrollIndicator={false}
                     >
                         {comment.replies && comment.replies.length > 0 ? (
                             comment.replies.map((reply: Replies) => (
                                 <View
                                     key={reply.id}
-                                    style={styles.containerReply}
+                                    style={[styles.containerReply]}
                                 >
                                     <View style={styles.X}>
                                         <Image
@@ -219,11 +228,7 @@ export default function RepliesSheet({
                                                             .email ===
                                                         userDetail?.email
                                                     ) {
-                                                        Haptics.impactAsync(
-                                                            Haptics
-                                                                .ImpactFeedbackStyle
-                                                                .Medium,
-                                                        );
+                                                        Vibration.vibrate();
                                                         handleDeleteReply(
                                                             reply.id,
                                                         );
@@ -250,6 +255,7 @@ export default function RepliesSheet({
                         style={{
                             flexDirection: 'row',
                             alignItems: 'center',
+                            justifyContent: 'center',
                         }}
                     >
                         <TextInput
