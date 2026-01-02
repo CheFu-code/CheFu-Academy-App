@@ -3,14 +3,21 @@ import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { fetchInitialSparks, fetchMoreSparks } from '@/services/sparksService';
 import { styles } from '@/styles/SparksFeed.styles';
-import { Spark } from '@/types/sparks';
+import { Likes, Spark } from '@/types/sparks';
+import { sendNotification } from '@/utils/notifications';
 import { showToast } from '@/utils/toast';
 import { Ionicons } from '@expo/vector-icons';
 import {
+    addDoc,
+    arrayRemove,
+    arrayUnion,
+    collection,
     deleteDoc,
     doc,
     FirebaseFirestoreTypes,
-    getDoc
+    getDoc,
+    Timestamp,
+    updateDoc,
 } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -76,7 +83,80 @@ const SparksFeed = () => {
         );
     };
 
-    
+    const handleLike = async (sparkId: string, likes: Likes[] = []) => {
+        if (!userDetail) return;
+
+        // ⛔ prevent double tap
+        if (likeLock === sparkId) return;
+        setLikeLock(sparkId);
+
+        try {
+            const sparkRef = doc(db, 'sparks', sparkId);
+            const sparkSnap = await getDoc(sparkRef);
+            const sparkData = sparkSnap.data();
+
+            if (!sparkData) return;
+
+            const existingLike = likes.find(
+                (like) => like.createdBy.uid === userDetail?.uid,
+            );
+
+            if (existingLike) {
+                // Unlike → remove
+                await updateDoc(sparkRef, {
+                    likes: arrayRemove(existingLike),
+                });
+            } else {
+                // Like → add new object
+                const newLike: Likes = {
+                    id: userDetail?.uid,
+                    text: 'Liked',
+                    createdBy: {
+                        uid: userDetail?.uid,
+                        fullname: userDetail?.fullname || 'Anonymous',
+                        profilePicture: userDetail?.profilePicture || '',
+                    },
+                    createdAt: Timestamp.now(),
+                };
+
+                await updateDoc(sparkRef, {
+                    likes: arrayUnion(newLike),
+                });
+
+                // Send notification if not liking own spark
+                if (
+                    sparkData.createdBy?.uid !== userDetail?.uid &&
+                    sparkData.createdBy?.email
+                ) {
+                    await addDoc(collection(db, 'notifications'), {
+                        type: 'like',
+                        sparkId,
+                        from: {
+                            uid: userDetail?.uid,
+                            fullname: userDetail?.fullname || 'Anonymous',
+                        },
+                        to: sparkData.createdBy?.uid,
+                        message: `${
+                            userDetail?.fullname || 'Someone'
+                        } liked your spark.`,
+                        createdAt: Timestamp.now(),
+                        read: false,
+                    });
+                }
+
+                await sendNotification(
+                    sparkData.createdBy?.email,
+                    'New Like',
+                    `${userDetail?.fullname || 'Someone'} liked your spark.`,
+                );
+            }
+        } catch (e) {
+            console.log('Like error:', e);
+        } finally {
+            // 🔓 Unlock after Firestore completes
+            setLikeLock(null);
+        }
+    };
 
     const handleDelete = (sparkId: string) => {
         Vibration.vibrate(100);
