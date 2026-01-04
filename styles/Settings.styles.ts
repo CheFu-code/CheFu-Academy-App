@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { Colors } from '../constant/Colors';
-import { scale, verticalScale } from 'react-native-size-matters';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { Colors } from '../constant/Colors';
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: verticalScale(10),
+        paddingHorizontal: moderateScale(10),
     },
     header: {
         flexDirection: 'row',

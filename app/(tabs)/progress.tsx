@@ -1,7 +1,14 @@
 import { useFocusEffect } from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { FlatList, Image, Text, ToastAndroid, View } from 'react-native';
+import {
+    ActivityIndicator,
+    FlatList,
+    Image,
+    Text,
+    ToastAndroid,
+    View,
+} from 'react-native';
 import NoCourse from '../../component/Home/NoCourse';
 import CourseProgressCard from '../../component/Shared/CourseProgressCard';
 import { UserDetailContext } from '../../context/UserDetailContext';
@@ -190,16 +197,28 @@ export default function Progress({ enroll = false }) {
                         onEndReachedThreshold={0.3}
                         ListFooterComponent={
                             loadingMore ? (
-                                <Text
+                                <View
                                     style={{
-                                        color: textColor,
-                                        textAlign: 'center',
-                                        padding: scale(10),
-                                        margin: scale(5),
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: scale(5),
                                     }}
                                 >
-                                    Loading more...
-                                </Text>
+                                    <Text
+                                        style={{
+                                            color: textColor,
+                                            textAlign: 'center',
+                                            padding: scale(10),
+                                            margin: scale(5),
+                                        }}
+                                    >
+                                        Loading more...
+                                    </Text>
+                                    <ActivityIndicator
+                                        size={'small'}
+                                        color={textColor}
+                                    />
+                                </View>
                             ) : null
                         }
                         contentContainerStyle={{

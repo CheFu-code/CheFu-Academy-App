@@ -1,3 +1,4 @@
+import useDarkMode from '@/hooks/useDarkMode';
 import {
     Ionicons,
     MaterialCommunityIcons,
@@ -8,7 +9,6 @@ import { Tabs } from 'expo-router';
 import { useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constant/Colors';
-import useDarkMode from '@/hooks/useDarkMode';
 
 type TabBarIconProps = NonNullable<
     BottomTabNavigationOptions['tabBarIcon']
