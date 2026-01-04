@@ -1,5 +1,8 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constant/Colors";
+import useDarkMode from '@/hooks/useDarkMode';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale } from 'react-native-size-matters';
+import { Colors } from '../../constant/Colors';
 
 const AppModal = ({
     visible,
@@ -7,12 +10,13 @@ const AppModal = ({
     message,
     onCancel,
     onConfirm,
-    cancelText = "Cancel",
-    confirmText = "OK",
+    cancelText = 'Cancel',
+    confirmText = 'OK',
     showCancel = true,
     confirmColor = Colors.GREEN,
-    cancelColor = "red",
+    cancelColor = 'red',
 }) => {
+    const { backgroundColor } = useDarkMode();
     return (
         <Modal
             animationType="fade"
@@ -21,7 +25,7 @@ const AppModal = ({
             onRequestClose={onCancel}
         >
             <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
+                <View style={[styles.modalContent, { backgroundColor }]}>
                     {title && <Text style={styles.title}>{title}</Text>}
                     {message && <Text style={styles.message}>{message}</Text>}
 
@@ -67,34 +71,33 @@ export default AppModal;
 const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
-        backgroundColor: "rgba(0,0,0,0.6)",
-        justifyContent: "center",
-        alignItems: "center",
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     modalContent: {
-        backgroundColor: "#121212",
-        padding: 30,
-        borderRadius: 16,
-        alignItems: "center",
-        width: 300,
+        padding: moderateScale(30),
+        borderRadius: moderateScale(16),
+        alignItems: 'center',
+        width: moderateScale(300),
     },
     title: {
-        fontSize: 20,
-        fontFamily: "outfit-bold",
+        fontSize: RFValue(19),
+        fontFamily: 'outfit-bold',
         color: Colors.GREEN,
-        marginBottom: 10,
+        marginBottom: moderateScale(10),
     },
     message: {
-        fontSize: 14,
-        color: "#ccc",
-        textAlign: "center",
-        fontFamily: "outfit",
-        marginBottom: 20,
+        fontSize: RFValue(14),
+        color: Colors.GRAY,
+        textAlign: 'center',
+        fontFamily: 'outfit',
+        marginBottom: moderateScale(20),
     },
     buttonRow: {
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: "space-between",
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'space-between',
         gap: 10,
     },
     button: {
@@ -102,13 +105,13 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 12,
         borderWidth: 1,
-        alignItems: "center",
+        alignItems: 'center',
     },
     confirmText: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
         color: Colors.WHITE,
     },
     cancelText: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
     },
 });

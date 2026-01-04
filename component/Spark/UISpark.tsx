@@ -35,7 +35,6 @@ const UISpark = ({
                     params: { sparkId: item.id },
                 });
             }}
-            // onLongPress={() => handleDelete(item.id)}
             style={styles.card}
         >
             <View style={styles.header}>

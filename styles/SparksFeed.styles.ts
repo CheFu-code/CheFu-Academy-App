@@ -20,9 +20,11 @@ export const styles = StyleSheet.create({
         marginBottom: moderateScale(12),
         borderRadius: scale(12),
         shadowColor: '#000',
-        shadowOpacity: 0.20,
+        shadowOpacity: 1,
         shadowRadius: 8,
-        shadowOffset: { width: 0, height: verticalScale(2) },
+        shadowOffset: { width: moderateScale(2), height: verticalScale(2) },
+        borderWidth: scale(0.6),
+        borderColor: Colors.BG_GRAY,
     },
     header: {
         flexDirection: 'row',

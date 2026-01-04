@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constant/Colors";
-import { styles } from "../../styles/ErrorModal.styles";
+import useDarkMode from '@/hooks/useDarkMode';
+import { useEffect, useState } from 'react';
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { Colors } from '../../constant/Colors';
+import { styles } from '../../styles/ErrorModal.styles';
 
 interface ErrorModalProps {
     visible: boolean;
@@ -17,11 +18,11 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
     title,
     message,
     onConfirm,
-    confirmText = "OK",
+    confirmText = 'OK',
     confirmColor = Colors.RED,
 }) => {
+    const { backgroundColor } = useDarkMode();
     const [pressOutsideModal, setPressOutsideModal] = useState(false);
-
     useEffect(() => {
         if (pressOutsideModal) {
             onConfirm();
@@ -37,7 +38,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
             onDismiss={() => setPressOutsideModal(false)}
         >
             <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
+                <View style={[styles.modalContent, { backgroundColor }]}>
                     {title && <Text style={styles.title}>{title}</Text>}
                     {message && <Text style={styles.message}>{message}</Text>}
 

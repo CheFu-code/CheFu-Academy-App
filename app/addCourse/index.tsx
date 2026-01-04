@@ -147,7 +147,7 @@ export default function AddCourse() {
             setErrorModal({
                 visible: true,
                 title: 'Error',
-                message: 'Failed to generate topic.',
+                message: `Failed to generate topic. \n ${error}`,
             });
             topicIdea = [];
         } finally {

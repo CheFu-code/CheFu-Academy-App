@@ -201,7 +201,8 @@ export default function Progress({ enroll = false }) {
                                     style={{
                                         flexDirection: 'row',
                                         alignItems: 'center',
-                                        gap: scale(5),
+                                        justifyContent: 'center',
+                                        gap: scale(3),
                                     }}
                                 >
                                     <Text

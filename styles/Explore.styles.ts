@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
-import { RFValue } from "react-native-responsive-fontsize";
 
 export const styles = StyleSheet.create({
     container: {
@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: moderateScale(10),
         paddingVertical: moderateScale(6),
         marginBottom: moderateScale(3),
-        elevation: 3,
+        elevation: 7,
     },
     textInput: {
         flex: 1,
