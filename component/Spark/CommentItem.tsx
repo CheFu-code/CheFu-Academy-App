@@ -31,10 +31,10 @@ export default function CommentItem({
     sparkId,
 }: Props) {
     const slideAnim = useRef(new Animated.Value(300)).current;
+    const { textColor } = useDarkMode();
     const [editText, setEditText] = useState(comment.text);
     const [modalVisible, setModalVisible] = useState(false);
     const [repliesVisible, setRepliesVisible] = useState(false);
-    const { textColor } = useDarkMode();
 
     const openReplies = () => {
         setRepliesVisible(true);
@@ -66,15 +66,7 @@ export default function CommentItem({
     };
 
     return (
-        <View
-            style={[
-                styles.comment,
-                // {
-                //     backgroundColor:
-                //         index % 2 === 0 ? Colors.BG_COLOR : '#25252A',
-                // },
-            ]}
-        >
+        <View style={styles.comment}>
             {/* Comment Header */}
             <Image
                 source={
@@ -92,7 +84,7 @@ export default function CommentItem({
                     <Text style={styles.commentTimestamp}>
                         {comment.createdAt?.toDate
                             ? dayjs(comment.createdAt.toDate()).fromNow()
-                            : 'Just now'}
+                            : 'N/A'}
                     </Text>
                 </View>
 

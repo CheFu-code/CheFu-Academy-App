@@ -1,7 +1,7 @@
 import { Colors } from '@/constant/Colors';
 import { StyleSheet } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { scale, verticalScale } from 'react-native-size-matters';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     container: {
@@ -195,12 +195,12 @@ export const styles = StyleSheet.create({
         flex: 1,
         maxWidth: '75%',
         paddingHorizontal: scale(10),
-        paddingVertical: verticalScale(8),
+        paddingVertical: verticalScale(3),
         fontFamily: 'outfit',
         textAlignVertical: 'top',
         minHeight: verticalScale(40),
         maxHeight: verticalScale(100),
-        backgroundColor: Colors.GRAY,
+        backgroundColor: Colors.BG_GRAY,
     },
     editHeader: {
         backgroundColor: Colors.BG_COLOR,
@@ -248,7 +248,7 @@ export const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,0.3)',
     },
     sheetContainer: {
         position: 'absolute',
@@ -266,7 +266,7 @@ export const styles = StyleSheet.create({
     },
     replyButton: {
         backgroundColor: Colors.PRIMARY,
-        padding: verticalScale(10),
+        padding: moderateScale(10),
         alignItems: 'center',
         marginLeft: scale(10),
         paddingHorizontal: scale(14),
@@ -288,7 +288,7 @@ export const styles = StyleSheet.create({
         maxWidth: scale(270),
     },
     fullname: {
-        color: Colors.WHITE,
+        color: Colors.BLACK,
         fontSize: RFValue(10),
         fontFamily: 'outfit-bold',
     },
@@ -322,7 +322,7 @@ export const styles = StyleSheet.create({
     A: {
         color: Colors.WHITE,
         fontFamily: 'outfit',
-        fontSize: scale(10),
+        fontSize: RFValue(10),
     },
     delete: {
         padding: verticalScale(6),

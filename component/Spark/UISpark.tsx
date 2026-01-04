@@ -3,10 +3,10 @@ import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparksFeed.styles';
 import { Likes, Spark } from '@/types/sparks';
 import { formatViews } from '@/utils/formatViews';
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import dayjs from 'dayjs';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { scale, verticalScale } from 'react-native-size-matters';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 
 interface UISparkProps {
     deleting: boolean;
@@ -35,7 +35,7 @@ const UISpark = ({
                     params: { sparkId: item.id },
                 });
             }}
-            onLongPress={() => handleDelete(item.id)}
+            // onLongPress={() => handleDelete(item.id)}
             style={styles.card}
         >
             <View style={styles.header}>
@@ -63,24 +63,24 @@ const UISpark = ({
                             <Text
                                 numberOfLines={1}
                                 style={{
-                                    maxWidth: 150,
+                                    maxWidth: moderateScale(150),
                                     fontFamily: 'outfit-bold',
                                 }}
                             >
                                 {item.createdBy?.fullname || 'Anonymous'}
                             </Text>
-                            {isVerified && (
+                            {/* {isVerified && (
                                 <Ionicons
                                     name="checkmark-circle"
                                     size={scale(12)}
                                     color={Colors.PRIMARY}
                                 />
-                            )}
+                            )} */}
                         </View>
                         <Text style={styles.author}>
                             {item.createdAt?.toDate
                                 ? dayjs(item.createdAt.toDate()).fromNow()
-                                : 'Just now'}
+                                : 'N/A'}
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -137,7 +137,15 @@ const UISpark = ({
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                    onPress={() =>
+                        Alert.alert(
+                            'Coming Soon',
+                            "This feature is not available yet. We're working on it.",
+                        )
+                    }
+                    style={styles.actionButton}
+                >
                     <AntDesign
                         name="sharealt"
                         size={scale(16)}

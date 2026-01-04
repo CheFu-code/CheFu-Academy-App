@@ -1,6 +1,7 @@
 import { auth, db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { UserReviews, Video } from '@/types/video';
 import { showToast } from '@/utils/toast';
@@ -30,9 +31,8 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { styles } from '../../styles/Reviews.styles';
-import useDarkMode from '@/hooks/useDarkMode';
 import { scale } from 'react-native-size-matters';
+import { styles } from '../../styles/Reviews.styles';
 
 type Props = {
     video: Video | null;
@@ -362,7 +362,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                                     ? dayjs(
                                                           rev.createdAt.toDate(),
                                                       ).fromNow()
-                                                    : 'Just now'}
+                                                    : 'N/A'}
                                             </Text>
                                             <View style={styles.deleteButton}>
                                                 <TouchableOpacity

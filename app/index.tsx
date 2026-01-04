@@ -1,5 +1,4 @@
 import { TermsText } from '@/component/TermsText';
-import { useImmersiveMode } from '@/hooks/useImmersiveMode';
 import { useLoadUser } from '@/hooks/useLoadUser';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Entypo, FontAwesome } from '@expo/vector-icons';
@@ -14,7 +13,7 @@ import { styles } from '../styles/WelcomeScreen.styles';
 export default function Index() {
     const { safePush } = useSafeNavigation();
     const { loading } = useLoadUser();
-    useImmersiveMode();
+    // useImmersiveMode();
 
     const [showWelcome, setShowWelcome] = useState(false);
 

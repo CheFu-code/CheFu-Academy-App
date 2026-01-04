@@ -22,19 +22,18 @@ import {
 } from '@react-native-firebase/firestore';
 import LottieView from 'lottie-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale, verticalScale } from 'react-native-size-matters';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { styles } from '../../styles/Progress.styles';
-import { Colors } from '@/constant/Colors';
 
 export default function Progress({ enroll = false }) {
     const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const { backgroundColor } = useDarkMode();
-    const [courseList, setCourseList] = useState<Course[]>([]);
+    const { textColor, backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(false);
-    const [loadingId, setLoadingId] = useState<string | null>(null);
-    const [fetching, setFetching] = useState(false);
     const [lastDoc, setLastDoc] = useState(null);
+    const [fetching, setFetching] = useState(false);
+    const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [courseList, setCourseList] = useState<Course[]>([]);
     const [loadingMore, setLoadingMore] = useState(false);
 
     useFocusEffect(
@@ -168,7 +167,7 @@ export default function Progress({ enroll = false }) {
 
                 {courseList.length > 0 ? (
                     <FlatList
-                        showsVerticalScrollIndicator={false}
+                        showsVerticalScrollIndicator={true}
                         onRefresh={GetCourseList}
                         refreshing={loading}
                         data={courseList}
@@ -193,9 +192,10 @@ export default function Progress({ enroll = false }) {
                             loadingMore ? (
                                 <Text
                                     style={{
-                                        color: Colors.WHITE,
+                                        color: textColor,
                                         textAlign: 'center',
                                         padding: scale(10),
+                                        margin: scale(5),
                                     }}
                                 >
                                     Loading more...
@@ -204,6 +204,7 @@ export default function Progress({ enroll = false }) {
                         }
                         contentContainerStyle={{
                             padding: scale(10),
+                            marginBottom: moderateScale(10),
                         }}
                     />
                 ) : (

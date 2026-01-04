@@ -43,7 +43,7 @@ export default function CommentsList({
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onLike={onLike}
-                    onReply={onReply} // <-- pass down the new prop
+                    onReply={onReply}
                 />
             ))}
         </View>

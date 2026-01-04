@@ -1,17 +1,15 @@
 import { db } from '@/config/fireConfig';
-import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useRenderTextWithLinks } from '@/helpers/detectLinks';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
-import { Comment, Replies } from '@/types/sparks';
+import { Comment, Props, Replies } from '@/types/sparks';
 import { showToast } from '@/utils/toast';
 import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import { useContext, useState } from 'react';
 import {
-    ActivityIndicator,
     Alert,
     Animated,
     Image,
@@ -21,7 +19,6 @@ import {
     Pressable,
     ScrollView,
     Text,
-    TextInput,
     TouchableOpacity,
     useWindowDimensions,
     Vibration,
@@ -29,15 +26,7 @@ import {
 } from 'react-native';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import NoReply from './NoReply';
-
-interface Props {
-    visible: boolean;
-    slideAnim: Animated.Value;
-    closeReplies: () => void;
-    comment: { id: string; replies?: Replies[] };
-    onAddReply?: (commentId: string, reply: Replies) => void;
-    sparkId: string;
-}
+import ReplyTextInput from './RepliesSheet/TextInput';
 
 export default function RepliesSheet({
     visible,
@@ -170,7 +159,7 @@ export default function RepliesSheet({
                         contentContainerStyle={{
                             paddingBottom: moderateScale(20),
                         }}
-                        showsVerticalScrollIndicator={false}
+                        showsVerticalScrollIndicator={true}
                     >
                         {comment.replies && comment.replies.length > 0 ? (
                             comment.replies.map((reply: Replies) => (
@@ -217,7 +206,7 @@ export default function RepliesSheet({
                                                         ? dayjs(
                                                               reply.createdAt.toDate(),
                                                           ).fromNow()
-                                                        : 'Just now'}
+                                                        : 'N/A'}
                                                 </Text>
                                             </Pressable>
 
@@ -251,43 +240,12 @@ export default function RepliesSheet({
                     </ScrollView>
 
                     {/* Reply Input */}
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <TextInput
-                            placeholder="Write a reply..."
-                            placeholderTextColor={Colors.GRAY}
-                            style={styles.editInput}
-                            multiline
-                            value={replyText}
-                            onChangeText={setReplyText}
-                        />
-                        <TouchableOpacity
-                            onPress={handleAddReply}
-                            style={[
-                                styles.replyButton,
-                                {
-                                    backgroundColor: replyText.trim()
-                                        ? Colors.PRIMARY
-                                        : Colors.GRAY,
-                                },
-                            ]}
-                            disabled={replying || !replyText.trim()}
-                        >
-                            {replying ? (
-                                <ActivityIndicator
-                                    size="small"
-                                    color={Colors.WHITE}
-                                />
-                            ) : (
-                                <Text style={styles.A}>Reply</Text>
-                            )}
-                        </TouchableOpacity>
-                    </View>
+                    <ReplyTextInput
+                        replyText={replyText}
+                        setReplyText={setReplyText}
+                        handleAddReply={handleAddReply}
+                        replying={replying}
+                    />
                 </KeyboardAvoidingView>
             </Animated.View>
         </Modal>

@@ -75,7 +75,7 @@ const VideoCard: React.FC<Props> = ({ item, onPress, onCategoryPress }) => {
                         {item.uploadedBy !== 'YouTube'
                             ? item.uploadedAt && 'toDate' in item.uploadedAt
                                 ? dayjs(item.uploadedAt.toDate()).fromNow()
-                                : 'Just now'
+                                : 'N/A'
                             : item.uploadedBy}
                     </Text>
                     {item.uploadedBy === 'YouTube' && (

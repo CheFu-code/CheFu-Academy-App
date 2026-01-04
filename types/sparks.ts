@@ -1,3 +1,5 @@
+import { Animated } from 'react-native';
+
 export interface Comment {
     id: string;
     text: string;
@@ -20,7 +22,6 @@ export interface Replies {
         email?: string;
     };
     createdAt: any;
-
 }
 export interface Likes {
     id: string;
@@ -47,4 +48,20 @@ export interface Spark {
     createdAt: any;
     likes: Likes[];
     comments: Comment[];
+}
+
+export interface ReplyProps {
+    replyText: string;
+    setReplyText: (v: string) => void;
+    handleAddReply: () => void;
+    replying: boolean;
+}
+
+export interface Props {
+    visible: boolean;
+    slideAnim: Animated.Value;
+    closeReplies: () => void;
+    comment: { id: string; replies?: Replies[] };
+    onAddReply?: (commentId: string, reply: Replies) => void;
+    sparkId: string;
 }

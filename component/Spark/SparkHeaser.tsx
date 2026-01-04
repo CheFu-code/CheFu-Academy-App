@@ -1,11 +1,10 @@
 import { db } from '@/config/fireConfig';
-import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SparkDetail';
 import { Spark } from '@/types/sparks';
 import { showToast } from '@/utils/toast';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { deleteDoc, doc, getDoc } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
 import { useContext, useEffect, useState } from 'react';
@@ -89,18 +88,18 @@ export default function SparkHeader({ spark }: Props) {
                         <Text style={styles.author}>
                             {spark.createdBy.fullname}
                         </Text>
-                        {isVerified && (
+                        {/* {isVerified && (
                             <Ionicons
                                 name="checkmark-circle"
                                 size={13}
                                 color={Colors.PRIMARY}
                             />
-                        )}
+                        )} */}
                     </View>
                     <Text style={styles.timestamp}>
                         {spark.createdAt?.toDate
                             ? dayjs(spark.createdAt.toDate()).fromNow()
-                            : 'Just now'}
+                            : 'N/A'}
                     </Text>
                 </View>
             </View>
