@@ -5,7 +5,7 @@ import './firebase-background-handler';
 
 import FontErrorScreen from '@/component/FontErrorScreen';
 import LoadingScreen from '@/component/LoadingScreen';
-import OfflineScreen from '@/component/OfflineScreen';
+import OfflineScreen from '@/component/Offline/OfflineScreen';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
 import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
 import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
@@ -74,7 +74,7 @@ function LayoutContent() {
                         statusBarStyle: 'light',
                         statusBarAnimation: 'slide',
                         gestureEnabled: true,
-                        animation: 'slide_from_right',
+                        animation: 'slide_from_bottom',
                         contentStyle: {
                             backgroundColor: Colors.BG_COLOR,
                         },

@@ -1,13 +1,13 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "../constant/Colors";
-import { scale, verticalScale, moderateScale } from "react-native-size-matters";
-import { RFValue } from "react-native-responsive-fontsize";
+import { StyleSheet } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { Colors } from '../constant/Colors';
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     icon: {
         marginBottom: verticalScale(20),
@@ -15,16 +15,15 @@ export const styles = StyleSheet.create({
     title: {
         color: Colors.RED,
         fontSize: RFValue(22),
-        fontFamily: "outfit-bold",
-        marginBottom: verticalScale(8),
+        fontFamily: 'outfit-bold',
+        marginBottom: verticalScale(3),
     },
     subtitle: {
-        color: "#fff",
-        fontSize: scale(16),
-        textAlign: "center",
-        fontFamily: "outfit",
+        textAlign: 'center',
+        fontFamily: 'outfit',
         padding: moderateScale(20),
-
+        color: Colors.GRAY,
+        fontSize: RFValue(13),
     },
     lottie: {
         width: scale(180),
