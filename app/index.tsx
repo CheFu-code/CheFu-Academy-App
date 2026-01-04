@@ -11,7 +11,7 @@ import { Colors } from '../constant/Colors';
 import { styles } from '../styles/WelcomeScreen.styles';
 
 export default function Index() {
-    const { safePush } = useSafeNavigation();
+    const { safeReplace } = useSafeNavigation();
     const { loading } = useLoadUser();
     // useImmersiveMode();
 
@@ -29,7 +29,7 @@ export default function Index() {
 
     const handleGetStarted = async () => {
         await AsyncStorage.setItem('hasSeenWelcome', 'true');
-        safePush('/auth/signUp');
+        safeReplace('/auth/signUp');
     };
 
     if (!showWelcome) return null; // don't render until check is done

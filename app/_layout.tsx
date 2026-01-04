@@ -6,6 +6,7 @@ import './firebase-background-handler';
 import FontErrorScreen from '@/component/FontErrorScreen';
 import LoadingScreen from '@/component/LoadingScreen';
 import OfflineScreen from '@/component/Offline/OfflineScreen';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
 import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
 import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
@@ -13,7 +14,6 @@ import useLastSeenTracker from '@/hooks/useLastSeenTracker';
 import { useNotifications } from '@/hooks/useNotifications';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { MenuProvider } from 'react-native-popup-menu';
-import { Colors } from '../constant/Colors';
 import { NetworkProvider, useNetwork } from '../context/NetworkContext';
 import { UserDetailContext } from '../context/UserDetailContext';
 import { useBiometricAuth } from '../hooks/useBiometricAuth';
@@ -30,11 +30,10 @@ Sentry.init({
     ],
 });
 
-
 function LayoutContent() {
     const { isConnected } = useNetwork();
     const { authChecked, authSuccess, retryAuth } = useBiometricAuth();
-
+    const { backgroundColor } = useDarkMode();
     const [fontsLoaded, fontError] = useFonts({
         outfit: require('../assets/fonts/Outfit-Regular.ttf'),
         'outfit-bold': require('../assets/fonts/Outfit-Bold.ttf'),
@@ -54,7 +53,6 @@ function LayoutContent() {
     useDeepLinking();
     useHandleDynamicLinks();
 
-    
     if (!isConnected) return <OfflineScreen />;
     if (fontError) return <FontErrorScreen />;
 
@@ -76,7 +74,7 @@ function LayoutContent() {
                         gestureEnabled: true,
                         animation: 'slide_from_bottom',
                         contentStyle: {
-                            backgroundColor: Colors.BG_COLOR,
+                            backgroundColor,
                         },
                     }}
                 />

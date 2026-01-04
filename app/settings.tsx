@@ -20,7 +20,7 @@ import {
     Text,
     ToastAndroid,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
@@ -31,6 +31,7 @@ import { useSafeNavigation } from '../hooks/useSafeNavigation';
 import { styles } from '../styles/Settings.styles';
 
 export default function SettingsScreen() {
+    const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState(true);
     const [useBiometrics, setUseBiometrics] = useState(true);
     const [showVersion, setShowVersion] = useState(false);
@@ -103,7 +104,7 @@ export default function SettingsScreen() {
         }
     }, []);
 
-    const toggleSetting = async (name, stateSetter, current) => {
+    const toggleSetting = async (name: string, stateSetter, current) => {
         try {
             const newValue = !current;
 
@@ -296,6 +297,7 @@ export default function SettingsScreen() {
         confirmText="OK"
         showCancel={false}
         onConfirm={() => setSuccessModal({ ...successModal, visible: false })}
+        onCancel={null}
     />;
 
     const verify = async () => {
@@ -324,6 +326,8 @@ export default function SettingsScreen() {
             });
         }
     };
+
+    
     let content;
     try {
         if (fatalError) {
@@ -455,6 +459,14 @@ export default function SettingsScreen() {
                             icon="share-outline"
                             onPress={exportUserData}
                             disabled={loading}
+                        />
+
+                        <SettingItem
+                            label="Toggle Dark Mode"
+                            icon="moon"
+                            toggle
+                            value={darkMode}
+                            onToggle={}
                         />
 
                         {loading && (
