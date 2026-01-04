@@ -1,7 +1,11 @@
-import { auth, db } from '@/config/fireConfig';
+import ChangePasswordUI from '@/component/Setting/ChangePasswordUI';
+import { db, user } from '@/config/fireConfig';
+import { Colors } from '@/constant/Colors';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/ChangePassword.styles';
 import { Ionicons } from '@expo/vector-icons';
+import authModule from '@react-native-firebase/auth';
 import { doc, getDoc } from '@react-native-firebase/firestore';
 import * as Sentry from '@sentry/react-native';
 import { useState } from 'react';
@@ -13,15 +17,11 @@ import {
     View,
 } from 'react-native';
 import { scale } from 'react-native-size-matters';
-import ChangePasswordUI from '@/component/Setting/ChangePasswordUI';
-import authModule from '@react-native-firebase/auth';
-import { Colors } from '@/constant/Colors';
 
 export default function ChangePassword() {
-    const user = auth.currentUser;
     const scheme = useColorScheme();
-    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
     const { safeBack } = useSafeNavigation();
+    const { textColor } = useDarkMode();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');

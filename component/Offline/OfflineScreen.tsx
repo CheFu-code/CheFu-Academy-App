@@ -8,7 +8,7 @@ export default function OfflineScreen() {
     return (
         <View style={[styles.container, { backgroundColor }]}>
             <LottieView
-                source={require('../assets/animations/no internet.json')}
+                source={require('../../assets/animations/no internet.json')}
                 autoPlay
                 loop
                 style={styles.lottie}

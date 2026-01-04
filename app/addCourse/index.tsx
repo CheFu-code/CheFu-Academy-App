@@ -1,9 +1,11 @@
 import ErrorModal from '@/component/Shared/ErrorModal';
 import { db } from '@/config/fireConfig';
+import { REWARDED_AD_UNIT_ID, support } from '@/constant/random';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { checkDailyLimit } from '@/utils/firestoreUtils';
 import { showToast } from '@/utils/toast';
-import { Ionicons } from '@expo/vector-icons';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { doc, setDoc } from '@react-native-firebase/firestore';
 import * as Sentry from '@sentry/react-native';
 import LottieView from 'lottie-react-native';
@@ -16,6 +18,7 @@ import {
     Text,
     TextInput,
     ToastAndroid,
+    TouchableOpacity,
     View,
 } from 'react-native';
 import {
@@ -23,6 +26,8 @@ import {
     RewardedAd,
     RewardedAdEventType,
 } from 'react-native-google-mobile-ads';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale, scale } from 'react-native-size-matters';
 import AppModal from '../../component/Shared/AppModal';
 import Button from '../../component/Shared/Button';
 import { generateCourse, generateTopics } from '../../config/AiModel';
@@ -36,14 +41,13 @@ export default function AddCourse() {
     const [loading, setLoading] = useState(false);
     const { userDetail } = useContext(UserDetailContext);
     const { safeReplace, safeBack } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     const [userInput, setUserInput] = useState('');
     const [topics, setTopics] = useState<string[]>([]);
     const [selectedTopic, setSelectedTopic] = useState<string[]>([]);
     const [generatingTopic, setGeneratingTopic] = useState(false);
-    const REWARDED_AD_UNIT_ID = 'ca-app-pub-8952058057579255/8646813913';
     const [limitModalVisible, setLimitModalVisible] = useState(false);
     const [extraCourseUnlocked, setExtraCourseUnlocked] = useState(false);
-    const support = 'chefu.inc@gmail.com';
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: '',
@@ -344,34 +348,36 @@ export default function AddCourse() {
 
     return (
         <>
-            <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
-                <View style={styles.container}>
-                    <Pressable
-                        onPress={() => {
-                            if (!loading) safeBack();
-                        }}
-                    >
-                        <Ionicons
-                            style={styles.backIcon}
-                            name="arrow-back"
-                            size={24}
-                            color={Colors.PRIMARY}
-                        />
-                    </Pressable>
+            <SafeAreaView style={{ flex: 1, backgroundColor }}>
+                <TouchableOpacity
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: scale(8),
+                    }}
+                    onPress={() => {
+                        if (!loading) safeBack();
+                    }}
+                >
+                    <AntDesign
+                        name="left"
+                        size={scale(22)}
+                        color={Colors.PRIMARY}
+                    />
                     <Text style={styles.header}>Create new course</Text>
-                </View>
+                </TouchableOpacity>
 
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{
-                        padding: 30,
+                        padding: moderateScale(20),
                         flexGrow: 1,
-                        backgroundColor: Colors.BG_COLOR,
+                        backgroundColor,
                     }}
                     keyboardShouldPersistTaps="handled"
                 >
                     <View style={{ flex: 1 }}>
-                        <Text style={styles.title}>
+                        <Text style={[styles.title, { color: textColor }]}>
                             What do you want to learn today?
                         </Text>
                         <Text style={styles.subtitle}>
@@ -395,9 +401,6 @@ export default function AddCourse() {
                             onPress={generateTopic}
                             loading={loading}
                             disabled={generatingTopic || !userInput.trim()}
-                            opacity={
-                                generatingTopic || !userInput.trim() ? 0.4 : 1
-                            }
                             icon={
                                 <Ionicons name="add" size={16} color="#fff" />
                             }
@@ -410,7 +413,12 @@ export default function AddCourse() {
                             }}
                         >
                             {topics.length > 0 && (
-                                <Text style={styles.selectTopic}>
+                                <Text
+                                    style={[
+                                        styles.selectTopic,
+                                        { color: textColor },
+                                    ]}
+                                >
                                     Select all topics which you want to add in
                                     this course
                                 </Text>
@@ -450,13 +458,12 @@ export default function AddCourse() {
                                     text="Generate Course"
                                     disabled={loading}
                                     icon={null}
-                                    opacity={loading ? 0.4 : 1}
                                 />
                             </View>
                         )}
                     </View>
                 </ScrollView>
-            </View>
+            </SafeAreaView>
 
             <ErrorModal
                 visible={errorModal.visible}

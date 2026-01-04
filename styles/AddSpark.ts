@@ -5,7 +5,6 @@ import { scale, verticalScale } from "react-native-size-matters";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
     },
     scroll: {
         paddingVertical: verticalScale(10),
@@ -19,7 +18,6 @@ export const styles = StyleSheet.create({
         fontSize: scale(15),
         fontFamily: 'outfit',
         marginBottom: verticalScale(8),
-        color: Colors.WHITE,
         marginTop: verticalScale(15),
     },
     input: {

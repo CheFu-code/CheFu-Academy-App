@@ -1,46 +1,38 @@
-import { Colors } from "@/constant/Colors";
-import {
-    View,
-    Text,
-    StyleSheet,
-    FlatList,
-    TouchableOpacity,
-    Image,
-    ActivityIndicator,
-    Pressable,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { useEffect, useState, useContext, useCallback } from "react";
-import {
-    getFirestore,
-    collection,
-    getDocs,
-    FirebaseFirestoreTypes,
-    doc,
-    getDoc,
-    deleteDoc,
-    setDoc,
-    serverTimestamp,
-} from "@react-native-firebase/firestore";
-import { UserDetailContext } from "@/context/UserDetailContext";
-import { FavoriteCourse, Video } from "@/types/video";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import { showToast } from "@/utils/toast";
-import { useFocusEffect } from "@react-navigation/native";
-import { styles } from "@/styles/FavoriteVideos";
+import { Colors } from '@/constant/Colors';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import useDarkMode from '@/hooks/useDarkMode';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import {
     fetchFavoritesFromFirestore,
     removeFavoriteFromFirestore,
-} from "@/services/favorites";
+} from '@/services/favorites';
+import { styles } from '@/styles/FavoriteVideos';
+import { FavoriteCourse } from '@/types/video';
+import { showToast } from '@/utils/toast';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useContext, useState } from 'react';
+import {
+    ActivityIndicator,
+    FlatList,
+    Image,
+    Pressable,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale } from 'react-native-size-matters';
 
 export default function FavoriteVideos() {
     const { safeBack, safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const [favoriteCourses, setFavoriteCourses] = useState<FavoriteCourse[]>(
-        []
-    );
+    const { textColor, backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(true);
+    const [favoriteCourses, setFavoriteCourses] = useState<FavoriteCourse[]>(
+        [],
+    );
 
     const fetchFavorites = useCallback(async () => {
         if (!userDetail?.email) return;
@@ -56,23 +48,22 @@ export default function FavoriteVideos() {
     }, [userDetail]);
 
     const handleRemoveFavorite = async (videoId: string) => {
-        if (!userDetail) return showToast("Please log in to remove favorites.");
+        if (!userDetail) return showToast('Please log in to remove favorites.');
         try {
             await removeFavoriteFromFirestore(userDetail.email, videoId);
             setFavoriteCourses((prev) =>
-                prev.filter((item) => item.videoId !== videoId)
+                prev.filter((item) => item.videoId !== videoId),
             );
-            showToast("Removed from favorites.");
+            showToast('Removed from favorites.');
         } catch (err) {
-            console.error(err);
-            showToast("Something went wrong while removing favorite.");
+            showToast('Something went wrong while removing favorite.');
         }
     };
 
     useFocusEffect(
         useCallback(() => {
             fetchFavorites();
-        }, [fetchFavorites])
+        }, [fetchFavorites]),
     );
 
     const renderCourse = ({ item }: { item: FavoriteCourse }) => (
@@ -80,7 +71,7 @@ export default function FavoriteVideos() {
             style={styles.courseCard}
             onPress={() => {
                 safePush({
-                    pathname: "/videoDetail",
+                    pathname: '/videoDetail',
                     params: {
                         id: item.videoId, // always send videoId
                     },
@@ -91,7 +82,7 @@ export default function FavoriteVideos() {
                 source={{
                     uri:
                         item.thumbnailURL ||
-                        "https://d2uolguxr56s4e.cloudfront.net/img/kartrapages/video_player_placeholder.gif",
+                        'https://d2uolguxr56s4e.cloudfront.net/img/kartrapages/video_player_placeholder.gif',
                 }}
                 style={styles.courseImage}
             />
@@ -104,41 +95,47 @@ export default function FavoriteVideos() {
                 onPress={() => handleRemoveFavorite(item.videoId)}
                 style={styles.remove}
             >
-                <Ionicons name="heart" size={24} color={Colors.RED} />
+                <Ionicons name="heart" size={scale(24)} color={Colors.RED} />
             </TouchableOpacity>
         </Pressable>
     );
 
     if (loading) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor }]}>
                 <TouchableOpacity
                     onPress={safeBack}
-                    style={{ flexDirection: "row", gap: 8, marginTop: 8 }}
+                    style={{
+                        flexDirection: 'row',
+                        gap: scale(8),
+                        alignItems: 'center',
+                    }}
                 >
-                    <AntDesign name="left" color={"white"} size={20} />
-                    <Text style={{ color: Colors.WHITE, fontSize: 18 }}>
+                    <AntDesign name="left" color={textColor} size={scale(20)} />
+                    <Text style={{ color: textColor, fontSize: RFValue(18) }}>
                         Back
                     </Text>
                 </TouchableOpacity>
                 <ActivityIndicator
                     size="large"
-                    color={Colors.PRIMARY}
-                    style={{ marginTop: 70 }}
+                    color={textColor}
+                    style={{ alignItems: 'center', justifyContent: 'center' }}
                 />
             </SafeAreaView>
         );
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Header */}
-            <View style={styles.headerContainer}>
-                <TouchableOpacity style={styles.backButton} onPress={safeBack}>
-                    <AntDesign name="left" size={24} color={Colors.PRIMARY} />
-                    <Text style={styles.headerText}>Favorite Videos</Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.backButton} onPress={safeBack}>
+                <AntDesign
+                    name="left"
+                    size={scale(24)}
+                    color={Colors.PRIMARY}
+                />
+                <Text style={styles.headerText}>Favorite Videos</Text>
+            </TouchableOpacity>
 
             {favoriteCourses.length === 0 ? (
                 <View style={styles.emptyState}>

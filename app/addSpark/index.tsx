@@ -1,7 +1,9 @@
 import Button from '@/component/Shared/Button';
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
+import { categories, MAX_WORDS } from '@/constant/random';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/AddSpark';
 import { showToast } from '@/utils/toast';
@@ -20,25 +22,16 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale } from 'react-native-size-matters';
-
-const categories = [
-    'Tip',
-    'Question',
-    'Project',
-    'Resource',
-    'Achievement',
-    'Discussion',
-];
+import { moderateScale, scale } from 'react-native-size-matters';
 
 const AddSpark = () => {
     const { userDetail } = useContext(UserDetailContext);
     const { safeBack, safeReplace } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('');
-    const MAX_WORDS = 60;
     const wordCount =
         content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
 
@@ -93,7 +86,7 @@ const AddSpark = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={{ paddingHorizontal: scale(10) }}>
                     <TouchableOpacity
@@ -104,12 +97,14 @@ const AddSpark = () => {
                         <AntDesign
                             name="left"
                             size={scale(20)}
-                            color={Colors.WHITE}
+                            color={Colors.PRIMARY}
                         />
                         <Text style={styles.heading}>Create a Spark</Text>
                     </TouchableOpacity>
 
-                    <Text style={styles.label}>Title</Text>
+                    <Text style={[styles.label, { color: textColor }]}>
+                        Title
+                    </Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Enter a title for your Spark"
@@ -118,7 +113,9 @@ const AddSpark = () => {
                         placeholderTextColor={Colors.GRAY}
                     />
 
-                    <Text style={styles.label}>Content</Text>
+                    <Text style={[styles.label, { color: textColor }]}>
+                        Content
+                    </Text>
                     <TextInput
                         style={[styles.input, styles.textArea]}
                         placeholder="Write something interesting..."
@@ -137,14 +134,22 @@ const AddSpark = () => {
                                     wordCount > MAX_WORDS
                                         ? Colors.RED
                                         : Colors.GRAY,
-                            }, // turn red if exceeded
+                            },
                         ]}
                     >
                         {wordCount} / {MAX_WORDS} words
                     </Text>
                 </View>
 
-                <Text style={[styles.label, { paddingHorizontal: 10 }]}>
+                <Text
+                    style={[
+                        styles.label,
+                        {
+                            paddingHorizontal: moderateScale(10),
+                            color: textColor,
+                        },
+                    ]}
+                >
                     Category
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -170,9 +175,8 @@ const AddSpark = () => {
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
-                <View style={{ paddingHorizontal: 10 }}>
+                <View style={{ paddingHorizontal: moderateScale(10) }}>
                     <Button
-                        opacity={loading ? 0.5 : 1}
                         loading={loading}
                         onPress={handlePost}
                         text={'Post Spark'}
@@ -182,7 +186,7 @@ const AddSpark = () => {
                         icon={
                             <MaterialIcons
                                 name="post-add"
-                                size={20}
+                                size={scale(19)}
                                 color={'white'}
                             />
                         }
