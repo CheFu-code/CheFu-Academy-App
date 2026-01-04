@@ -7,25 +7,19 @@ import { styles } from '@/styles/SparkDetail';
 import { Comment, Props, Replies } from '@/types/sparks';
 import { showToast } from '@/utils/toast';
 import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
-import dayjs from 'dayjs';
+
 import { useContext, useState } from 'react';
 import {
     Alert,
     Animated,
-    Image,
     KeyboardAvoidingView,
     Modal,
     Platform,
-    Pressable,
-    ScrollView,
-    Text,
     TouchableOpacity,
     useWindowDimensions,
-    Vibration,
-    View,
 } from 'react-native';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
-import NoReply from './NoReply';
+import RepliesList from './RepliesSheet/RepliesList';
+import ReplyHeader from './RepliesSheet/ReplyHeader';
 import ReplyTextInput from './RepliesSheet/TextInput';
 
 export default function RepliesSheet({
@@ -40,9 +34,9 @@ export default function RepliesSheet({
     const [replyText, setReplyText] = useState('');
     const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
+    const { backgroundColor } = useDarkMode();
     const { renderTextWithLinks } = useRenderTextWithLinks();
     const { height: screenHeight } = useWindowDimensions();
-    const { textColor, backgroundColor } = useDarkMode();
 
     const handleAddReply = () => {
         if (!replyText.trim()) return;
@@ -147,97 +141,16 @@ export default function RepliesSheet({
                     behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 >
                     {/* Header */}
-                    <View style={{ alignItems: 'center' }}>
-                        <Text style={[styles.replyText, { color: textColor }]}>
-                            Replies
-                        </Text>
-                    </View>
+                    <ReplyHeader />
 
                     {/* Replies List */}
-                    <ScrollView
-                        style={{ flex: 1, marginVertical: verticalScale(10) }}
-                        contentContainerStyle={{
-                            paddingBottom: moderateScale(20),
-                        }}
-                        showsVerticalScrollIndicator={true}
-                    >
-                        {comment.replies && comment.replies.length > 0 ? (
-                            comment.replies.map((reply: Replies) => (
-                                <View
-                                    key={reply.id}
-                                    style={[styles.containerReply]}
-                                >
-                                    <View style={styles.X}>
-                                        <Image
-                                            source={{
-                                                uri: reply.createdBy
-                                                    .profilePicture,
-                                            }}
-                                            style={styles.commentAvatar}
-                                        />
-                                        <View style={{ flex: 1 }}>
-                                            <Pressable
-                                                onPress={() => {
-                                                    safePush({
-                                                        pathname:
-                                                            '/profileView',
-                                                        params: {
-                                                            userId: reply
-                                                                .createdBy
-                                                                .email,
-                                                        },
-                                                    });
-                                                }}
-                                                style={styles.fullnameCont}
-                                            >
-                                                <Text
-                                                    numberOfLines={1}
-                                                    style={styles.fullname}
-                                                >
-                                                    {reply.createdBy.fullname}
-                                                </Text>
-
-                                                <Text
-                                                    style={
-                                                        styles.commentTimestamp
-                                                    }
-                                                >
-                                                    {reply.createdAt?.toDate
-                                                        ? dayjs(
-                                                              reply.createdAt.toDate(),
-                                                          ).fromNow()
-                                                        : 'N/A'}
-                                                </Text>
-                                            </Pressable>
-
-                                            <Pressable
-                                                onLongPress={() => {
-                                                    if (
-                                                        reply.createdBy
-                                                            .email ===
-                                                        userDetail?.email
-                                                    ) {
-                                                        Vibration.vibrate();
-                                                        handleDeleteReply(
-                                                            reply.id,
-                                                        );
-                                                    }
-                                                }}
-                                            >
-                                                <Text style={styles.reply}>
-                                                    {renderTextWithLinks(
-                                                        reply.text,
-                                                    )}
-                                                </Text>
-                                            </Pressable>
-                                        </View>
-                                    </View>
-                                </View>
-                            ))
-                        ) : (
-                            <NoReply />
-                        )}
-                    </ScrollView>
+                    <RepliesList
+                        comment={comment}
+                        userDetail={userDetail}
+                        safePush={safePush}
+                        handleDeleteReply={handleDeleteReply}
+                        renderTextWithLinks={renderTextWithLinks}
+                    />
 
                     {/* Reply Input */}
                     <ReplyTextInput

@@ -1,4 +1,6 @@
+import { Href } from 'expo-router';
 import { Animated } from 'react-native';
+import { UserDetail } from './UserDetail';
 
 export interface Comment {
     id: string;
@@ -64,4 +66,12 @@ export interface Props {
     comment: { id: string; replies?: Replies[] };
     onAddReply?: (commentId: string, reply: Replies) => void;
     sparkId: string;
+}
+
+export interface RepliesListProps {
+    comment: { id: string; replies?: Replies[] };
+    safePush: (path: Href) => void;
+    userDetail: UserDetail;
+    handleDeleteReply: (replyId: string) => void;
+    renderTextWithLinks: (text: string) => React.ReactNode;
 }
