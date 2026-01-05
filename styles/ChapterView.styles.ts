@@ -1,11 +1,11 @@
 import { StyleSheet } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../constant/Colors';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
     container: {
-        padding: moderateScale(25),
-        backgroundColor: Colors.BG_COLOR,
+        padding: moderateScale(20),
         flex: 1,
     },
     backButtonContainer: {
@@ -15,9 +15,9 @@ export const styles = StyleSheet.create({
     },
     topic: {
         fontFamily: 'outfit-bold',
-        fontSize: scale(20),
+        fontSize: RFValue(20),
         color: Colors.PRIMARY,
-        marginBottom: verticalScale(10),
+        marginBottom: moderateScale(10),
     },
     codeExampleText: {
         backgroundColor: Colors.GREEN,
@@ -87,7 +87,7 @@ export const styles = StyleSheet.create({
     },
     advancedCodeBlock: {
         fontFamily: 'monospace',
-        fontSize: scale(15),
+        fontSize: RFValue(15),
         color: '#abb2bf',
         padding: moderateScale(15),
         lineHeight: verticalScale(22),
@@ -95,7 +95,7 @@ export const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     explainContainer: {
-        marginTop: verticalScale(10),
+        marginTop: moderateScale(10),
         flexDirection: 'row',
         flexWrap: 'wrap',
     },
@@ -110,8 +110,7 @@ export const styles = StyleSheet.create({
     },
     exampleText: {
         fontFamily: 'outfit',
-        fontSize: scale(16),
-        color: Colors.WHITE,
+        fontSize: RFValue(16),
         marginTop: verticalScale(20),
     },
 });

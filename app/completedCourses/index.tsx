@@ -1,10 +1,12 @@
+import HeaderText from '@/component/common/Header';
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/CompletedCourse.styles';
 import { Course } from '@/types/course';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {
     collection,
     FirebaseFirestoreTypes,
@@ -13,17 +15,14 @@ import {
     where,
 } from '@react-native-firebase/firestore';
 import { useContext, useEffect, useState } from 'react';
-import {
-    ActivityIndicator,
-    FlatList,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale, scale } from 'react-native-size-matters';
 
 const CompletedChapters = () => {
-    const { safeReplace, safeBack } = useSafeNavigation();
+    const { safeReplace } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
+    const { textColor, backgroundColor } = useDarkMode();
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -77,9 +76,16 @@ const CompletedChapters = () => {
 
     const renderItem = ({ item }: { item: Course }) => (
         <View style={styles.courseItem}>
-            <Ionicons name="checkmark-circle" size={28} color={Colors.GREEN} />
-            <View style={{ marginLeft: 12, width: '80%' }}>
-                <Text numberOfLines={2} style={styles.courseTitle}>
+            <Ionicons
+                name="checkmark-circle"
+                size={scale(26)}
+                color={Colors.GREEN}
+            />
+            <View style={{ marginLeft: scale(12), width: '80%' }}>
+                <Text
+                    numberOfLines={2}
+                    style={[styles.courseTitle, { color: textColor }]}
+                >
                     {item.courseTitle}
                 </Text>
                 <Text style={styles.courseDate}>
@@ -91,12 +97,12 @@ const CompletedChapters = () => {
 
     if (loading) {
         return (
-            <View style={styles.indicatorContainer}>
+            <View style={[styles.indicatorContainer, { backgroundColor }]}>
                 <ActivityIndicator size="large" color={Colors.GREEN} />
                 <Text
                     style={[
                         styles.courseTitle,
-                        { color: 'white', marginTop: 16 },
+                        { color: textColor, marginTop: moderateScale(16) },
                     ]}
                 >
                     Loading...
@@ -106,17 +112,14 @@ const CompletedChapters = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity onPress={safeBack} style={styles.button}>
-                <AntDesign name="left" size={24} color={Colors.WHITE} />
-                <Text style={styles.header}>Completed Courses</Text>
-            </TouchableOpacity>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
+            <HeaderText title="Completed Courses" />
 
             {courses.length === 0 ? (
                 <View style={styles.emptyContainer}>
                     <Ionicons
                         name="sad-outline"
-                        size={50}
+                        size={scale(50)}
                         color={Colors.GRAY}
                     />
                     <Text style={styles.emptyText}>
@@ -132,7 +135,7 @@ const CompletedChapters = () => {
                     contentContainerStyle={{ paddingBottom: 20 }}
                 />
             )}
-        </View>
+        </SafeAreaView>
     );
 };
 

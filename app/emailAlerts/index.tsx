@@ -1,14 +1,12 @@
 import EmailAlertsUI from '@/component/Setting/EmailAlertsUI';
 import { auth, db } from '@/config/fireConfig';
 import { DEFAULT_PREFS, PREF_KEY, PrefKey } from '@/constant/Preferences';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, getDoc, setDoc } from '@react-native-firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
 export default function EmailAlerts() {
-    const { safeBack } = useSafeNavigation();
     const [loading, setLoading] = useState(false);
     const [preferences, setPreferences] = useState(DEFAULT_PREFS);
 
@@ -95,7 +93,6 @@ export default function EmailAlerts() {
 
     return (
         <EmailAlertsUI
-            safeBack={safeBack}
             preferences={preferences}
             toggle={toggle}
             resetToDefault={resetToDefault}

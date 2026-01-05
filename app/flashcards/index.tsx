@@ -1,25 +1,23 @@
-import { AntDesign } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import HeaderText from '@/component/common/Header';
+import { useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import {
     Dimensions,
     FlatList,
     Image,
     StyleSheet,
     Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import FlipCard from "react-native-flip-card";
-import { Colors } from "../../constant/Colors";
+    View
+} from 'react-native';
+import FlipCard from 'react-native-flip-card';
+import { Colors } from '../../constant/Colors';
 
 export default function Flashcards() {
     const { courseParams } = useLocalSearchParams();
     const course = JSON.parse(courseParams);
     const flashcard = course?.flashcards;
-    const router = useRouter();
     const [currentPage, setCurrentPage] = useState(0);
-    const width = Dimensions.get("screen").width;
+    const width = Dimensions.get('screen').width;
 
     const onMomentumScrollEnd = (event) => {
         const contentOffsetX = event.nativeEvent.contentOffset.x;
@@ -31,57 +29,32 @@ export default function Flashcards() {
         <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
             <Image
                 style={{
-                    position: "absolute",
-                    width: "100%",
+                    position: 'absolute',
+                    width: '100%',
                     height: 500,
                 }}
-                source={require("../../assets/images/graph.png")}
+                source={require('../../assets/images/graph.png')}
             />
             <View
                 style={{
-                    position: "absolute",
+                    position: 'absolute',
                     padding: 25,
                     marginTop: 25,
-                    width: "100%",
+                    width: '100%',
                 }}
             >
                 <View
                     style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                     }}
                 >
-                    <TouchableOpacity
-                        style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            gap: 10,
-                        }}
-                        onPress={() => {
-                            if (router && typeof router.back === "function")
-                                router.back();
-                        }}
-                        accessible={true}
-                        accessibilityLabel="Go back"
-                    >
-                        <AntDesign name="left" size={22} color={"white"} />
-                        <Text
-                            style={{
-                                fontFamily: "outfit-bold",
-                                fontSize: 17,
-                                color: Colors.PRIMARY,
-                            }}
-                        >
-                            Flashcards
-                        </Text>
-                    </TouchableOpacity>
+                    <HeaderText title="Flashcards" />
                     <Text
                         style={{
-                            fontFamily: "outfit-bold",
+                            fontFamily: 'outfit-bold',
                             fontSize: 17,
                             color: Colors.WHITE,
                         }}
@@ -102,16 +75,16 @@ export default function Flashcards() {
                             style={{
                                 height: 500,
                                 marginTop: 20,
-                                display: "flex",
+                                display: 'flex',
                             }}
                         >
                             <FlipCard style={styles.flipCard}>
                                 <View style={styles.flipFront}>
                                     <Text
                                         style={{
-                                            fontFamily: "outfit-bold",
+                                            fontFamily: 'outfit-bold',
                                             fontSize: 20,
-                                            textAlign: "center",
+                                            textAlign: 'center',
                                             color: Colors.PRIMARY,
                                         }}
                                     >
@@ -121,9 +94,9 @@ export default function Flashcards() {
                                 <View style={styles.flipBack}>
                                     <Text
                                         style={{
-                                            fontFamily: "outfit",
+                                            fontFamily: 'outfit',
                                             fontSize: 20,
-                                            textAlign: "center",
+                                            textAlign: 'center',
                                             color: Colors.BLACK,
                                             padding: 20,
                                         }}
@@ -142,31 +115,31 @@ export default function Flashcards() {
 
 const styles = StyleSheet.create({
     flipCard: {
-        width: Dimensions.get("screen").width * 0.78,
+        width: Dimensions.get('screen').width * 0.78,
         height: 400,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: Colors.BG_GRAY,
         borderRadius: 20,
-        marginHorizontal: Dimensions.get("screen").width * 0.04,
+        marginHorizontal: Dimensions.get('screen').width * 0.04,
         elevation: 1,
         marginTop: 35,
     },
     flipBack: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         borderRadius: 20,
-        height: "100%",
+        height: '100%',
         backgroundColor: Colors.LIGHT_GREEN,
     },
     flipFront: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        height: "100%",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
         backgroundColor: Colors.BG_GRAY,
         borderRadius: 20,
     },

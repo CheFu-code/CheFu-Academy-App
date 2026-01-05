@@ -1,6 +1,6 @@
+import HeaderText from '@/component/common/Header';
 import useDarkMode from '@/hooks/useDarkMode';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { AntDesign, Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import {
     Linking,
     ScrollView,
@@ -13,21 +13,12 @@ import { moderateScale, scale } from 'react-native-size-matters';
 import { styles } from '../../styles/BuyMeCoffee.styles';
 
 export default function BuyMeCoffee() {
-    const { safeBack } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView
             style={{ backgroundColor, padding: moderateScale(15), flex: 1 }}
         >
-            <TouchableOpacity
-                onPress={() => safeBack()}
-                style={styles.backButton}
-            >
-                <AntDesign name="left" size={scale(20)} color={textColor} />
-                <Text style={[styles.buyMeCoffee, { color: textColor }]}>
-                    Buy me coffee
-                </Text>
-            </TouchableOpacity>
+            <HeaderText title="Buy me coffee" />
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={styles.heading}>Support CheFu Academy</Text>
 

@@ -1,21 +1,18 @@
-import { Colors } from '@/constant/Colors';
 import { PrefKey } from '@/constant/Preferences';
 import { RenderSwitch } from '@/helpers/renderSwitch';
+import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/EmailAlerts.styles';
-import { AntDesign } from '@expo/vector-icons';
 import {
     ActivityIndicator,
     ScrollView,
     Text,
     TouchableOpacity,
-    useColorScheme,
-    View,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale } from 'react-native-size-matters';
+import HeaderText from '../common/Header';
 
 interface EmailAlertsUIProps {
-    safeBack: () => void;
     preferences: Record<PrefKey, boolean>;
     toggle: (type: PrefKey) => void;
     resetToDefault: () => void;
@@ -23,28 +20,15 @@ interface EmailAlertsUIProps {
 }
 
 const EmailAlertsUI = ({
-    safeBack,
     preferences,
     toggle,
     resetToDefault,
     loading,
 }: EmailAlertsUIProps) => {
-    const scheme = useColorScheme();
-    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
-    const backgroundColor = scheme === 'dark' ? Colors.BG_COLOR : Colors.WHITE;
+    const { backgroundColor } = useDarkMode();
     return (
-        <SafeAreaView
-            style={[styles.container, { backgroundColor: backgroundColor }]}
-        >
-            <TouchableOpacity
-                onPress={() => safeBack()}
-                style={styles.backButton}
-            >
-                <AntDesign name="left" size={scale(24)} color={textColor} />
-                <Text style={[styles.heading, { color: textColor }]}>
-                    Email Notifications
-                </Text>
-            </TouchableOpacity>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
+            <HeaderText title="Email Notifications" />
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.header}>

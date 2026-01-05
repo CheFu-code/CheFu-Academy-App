@@ -1,3 +1,4 @@
+import HeaderText from '@/component/common/Header';
 import ErrorModal from '@/component/Shared/ErrorModal';
 import { db } from '@/config/fireConfig';
 import { REWARDED_AD_UNIT_ID, support } from '@/constant/random';
@@ -5,7 +6,7 @@ import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { checkDailyLimit } from '@/utils/firestoreUtils';
 import { showToast } from '@/utils/toast';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { doc, setDoc } from '@react-native-firebase/firestore';
 import * as Sentry from '@sentry/react-native';
 import LottieView from 'lottie-react-native';
@@ -18,7 +19,6 @@ import {
     Text,
     TextInput,
     ToastAndroid,
-    TouchableOpacity,
     View,
 } from 'react-native';
 import {
@@ -27,7 +27,7 @@ import {
     RewardedAdEventType,
 } from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import AppModal from '../../component/Shared/AppModal';
 import Button from '../../component/Shared/Button';
 import { generateCourse, generateTopics } from '../../config/AiModel';
@@ -40,7 +40,7 @@ import { handleAiError } from '../../utils/errorUtils';
 export default function AddCourse() {
     const [loading, setLoading] = useState(false);
     const { userDetail } = useContext(UserDetailContext);
-    const { safeReplace, safeBack } = useSafeNavigation();
+    const { safeReplace } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
     const [userInput, setUserInput] = useState('');
     const [topics, setTopics] = useState<string[]>([]);
@@ -301,17 +301,22 @@ export default function AddCourse() {
                 visible={generatingTopic}
             >
                 <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
+                    <View style={[styles.modalContent, { backgroundColor }]}>
                         <LottieView
                             source={require('./../../assets/animations/Brainstorm.json')}
                             autoPlay
                             loop
-                            style={{ width: 150, height: 150 }}
+                            style={{
+                                width: scale(150),
+                                height: verticalScale(150),
+                            }}
                         />
                         <Text style={styles.modalTitle}>
                             Generating Topics.
                         </Text>
-                        <Text style={styles.modalSubtext}>
+                        <Text
+                            style={[styles.modalSubtext, { color: textColor }]}
+                        >
                             Our AI is working to deliver personalized learning
                             topics.
                         </Text>
@@ -349,23 +354,7 @@ export default function AddCourse() {
     return (
         <>
             <SafeAreaView style={{ flex: 1, backgroundColor }}>
-                <TouchableOpacity
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: scale(8),
-                    }}
-                    onPress={() => {
-                        if (!loading) safeBack();
-                    }}
-                >
-                    <AntDesign
-                        name="left"
-                        size={scale(22)}
-                        color={Colors.PRIMARY}
-                    />
-                    <Text style={styles.header}>Create new course</Text>
-                </TouchableOpacity>
+                <HeaderText title="Create new course" />
 
                 <ScrollView
                     showsVerticalScrollIndicator={false}

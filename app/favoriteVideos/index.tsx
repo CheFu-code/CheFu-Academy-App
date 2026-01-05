@@ -1,3 +1,4 @@
+import HeaderText from '@/component/common/Header';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
@@ -128,14 +129,7 @@ export default function FavoriteVideos() {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Header */}
-            <TouchableOpacity style={styles.backButton} onPress={safeBack}>
-                <AntDesign
-                    name="left"
-                    size={scale(24)}
-                    color={Colors.PRIMARY}
-                />
-                <Text style={styles.headerText}>Favorite Videos</Text>
-            </TouchableOpacity>
+            <HeaderText title="Favorite Videos" />
 
             {favoriteCourses.length === 0 ? (
                 <View style={styles.emptyState}>

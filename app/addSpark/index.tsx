@@ -1,3 +1,4 @@
+import HeaderText from '@/component/common/Header';
 import Button from '@/component/Shared/Button';
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
@@ -7,7 +8,7 @@ import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/AddSpark';
 import { showToast } from '@/utils/toast';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import {
     addDoc,
     collection,
@@ -26,7 +27,7 @@ import { moderateScale, scale } from 'react-native-size-matters';
 
 const AddSpark = () => {
     const { userDetail } = useContext(UserDetailContext);
-    const { safeBack, safeReplace } = useSafeNavigation();
+    const { safeReplace } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -89,18 +90,7 @@ const AddSpark = () => {
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={{ paddingHorizontal: scale(10) }}>
-                    <TouchableOpacity
-                        onPress={safeBack}
-                        style={styles.backButton}
-                        disabled={loading}
-                    >
-                        <AntDesign
-                            name="left"
-                            size={scale(20)}
-                            color={Colors.PRIMARY}
-                        />
-                        <Text style={styles.heading}>Create a Spark</Text>
-                    </TouchableOpacity>
+                    <HeaderText title="Create a Spark" />
 
                     <Text style={[styles.label, { color: textColor }]}>
                         Title

@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
-import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
         padding: moderateScale(20),
     },
     header: {
@@ -27,12 +27,11 @@ export const styles = StyleSheet.create({
         elevation: 2,
     },
     courseTitle: {
-        fontSize: scale(18),
-        color: Colors.BLACK,
+        fontSize: RFValue(16),
         fontFamily: "outfit-bold",
     },
     courseDate: {
-        fontSize: scale(14),
+        fontSize: scale(12),
         color: Colors.GREEN,
         marginTop: verticalScale(2),
         fontFamily: "outfit-bold",
@@ -44,7 +43,7 @@ export const styles = StyleSheet.create({
     },
     emptyText: {
         marginTop: verticalScale(12),
-        fontSize: scale(18),
+        fontSize: RFValue(18),
         color: Colors.GRAY,
         fontFamily: "outfit-bold",
     },
@@ -59,7 +58,6 @@ export const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: Colors.BG_COLOR,
         padding: moderateScale(20),
     },
 });

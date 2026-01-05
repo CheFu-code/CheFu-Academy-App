@@ -1,18 +1,14 @@
-import { AntDesign } from '@expo/vector-icons';
-import { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity } from 'react-native';
+import { ScrollView, Text } from 'react-native';
 // import { styles } from '../../styles/About.styles';
+import HeaderText from '@/component/common/Header';
+import { COPYRIGHT } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/About.styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale } from 'react-native-size-matters';
 
 export default function About() {
-    const { safeBack } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
-    const [backDisabled, setBackDisabled] = useState(false);
-    const COPYRIGHT = `© ${new Date().getFullYear()} CheFu Inc. All rights reserved.`;
+    const { backgroundColor } = useDarkMode();
 
     let content;
     try {
@@ -20,29 +16,7 @@ export default function About() {
             <SafeAreaView style={[styles.container, { backgroundColor }]}>
                 <ScrollView accessible accessibilityRole="scrollbar">
                     {/* Back Button */}
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => {
-                            if (backDisabled) return;
-                            setBackDisabled(true);
-                            if (safeBack && typeof safeBack === 'function')
-                                safeBack();
-                            setTimeout(() => setBackDisabled(false), 1000);
-                        }}
-                        accessible={true}
-                        accessibilityRole="button"
-                        accessibilityLabel="Go back to previous screen"
-                        disabled={backDisabled}
-                    >
-                        <AntDesign
-                            name="left"
-                            size={scale(20)}
-                            color={textColor}
-                        />
-                        <Text style={[styles.backText, { color: textColor }]}>
-                            Back
-                        </Text>
-                    </TouchableOpacity>
+                    <HeaderText title="Back" />
 
                     <Text style={styles.title} accessibilityRole="header">
                         About the App

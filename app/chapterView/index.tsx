@@ -1,5 +1,8 @@
+import { db } from '@/config/fireConfig';
+import { INTERSTITIAL_AD_UNIT_ID } from '@/constant/random';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import {
     arrayUnion,
     doc,
@@ -22,10 +25,11 @@ import {
 } from 'react-native';
 import { AdEventType, InterstitialAd } from 'react-native-google-mobile-ads';
 import * as Progress from 'react-native-progress';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Button from '../../component/Shared/Button';
 import { Colors } from '../../constant/Colors';
 import { styles } from '../../styles/ChapterView.styles';
-import { db } from '@/config/fireConfig';
 
 interface Chapter {
     topic: string;
@@ -38,8 +42,6 @@ interface Chapters {
     content: Chapter[];
 }
 
-const INTERSTITIAL_AD_UNIT_ID = 'ca-app-pub-8952058057579255/6615319669';
-
 export default function ChapterView() {
     const { chapterParams, docId, chapterIndex } = useLocalSearchParams();
     const [showFull, setShowFull] = useState(false);
@@ -48,6 +50,7 @@ export default function ChapterView() {
     const [copied, setCopied] = useState(false);
     const [copying, setCopying] = useState(false);
     const { safeBack, safeReplace } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     const maxLines = showFull ? undefined : 5;
     let chapters: Chapters = { content: [] };
 
@@ -139,25 +142,14 @@ export default function ChapterView() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <View style={styles.backButtonContainer}>
                 <Pressable disabled={loader} onPress={safeBack}>
-                    <Ionicons
-                        style={{
-                            padding: 3,
-                            marginTop: 25,
-                            borderRadius: 10,
-                            backgroundColor: Colors.BG_GRAY,
-                            opacity: loader ? 0.4 : 1,
-                        }}
-                        name="arrow-back"
-                        size={24}
-                        color={Colors.PRIMARY}
-                    />
+                    <AntDesign name="left" size={scale(22)} color={textColor} />
                 </Pressable>
                 <Progress.Bar
                     style={{
-                        marginTop: 25,
+                        marginTop: moderateScale(20),
                     }}
                     progress={getProgress(currentPage)}
                     width={Dimensions.get('screen').width * 0.7}
@@ -165,8 +157,8 @@ export default function ChapterView() {
             </View>
 
             <ScrollView
-                style={{ marginTop: 20 }}
-                contentContainerStyle={{ paddingBottom: 40 }}
+                style={{ marginTop: moderateScale(20) }}
+                contentContainerStyle={{ paddingBottom: moderateScale(40) }}
                 showsVerticalScrollIndicator={false}
             >
                 <Text style={styles.topic}>
@@ -204,8 +196,8 @@ export default function ChapterView() {
                                                         fontFamily: isQuoted
                                                             ? 'outfit-bold'
                                                             : 'outfit',
-                                                        fontSize: 16,
-                                                        color: '#fff',
+                                                        fontSize: RFValue(16),
+                                                        color: textColor,
                                                     }}
                                                 >
                                                     {text}
@@ -238,7 +230,7 @@ export default function ChapterView() {
                                         color: showFull
                                             ? Colors.YELLOW
                                             : Colors.GREEN,
-                                        marginTop: 5,
+                                        marginTop: moderateScale(5),
                                     }}
                                 >
                                     {showFull ? 'Read less ▲' : 'Read more ▼'}
@@ -309,7 +301,9 @@ export default function ChapterView() {
                 )}
 
                 {chapters?.content[currentPage]?.example && (
-                    <Text style={styles.exampleText}>Example:</Text>
+                    <Text style={[styles.exampleText, { color: textColor }]}>
+                        Example:
+                    </Text>
                 )}
 
                 {chapters?.content[currentPage]?.example && (
@@ -337,15 +331,21 @@ export default function ChapterView() {
                                             fontFamily: isCode
                                                 ? 'monospace'
                                                 : 'outfit',
-                                            fontSize: 14,
+                                            fontSize: RFValue(14),
                                             color: Colors.WHITE,
                                             backgroundColor: isCode
                                                 ? '#333'
                                                 : 'transparent',
-                                            paddingHorizontal: isCode ? 4 : 0,
-                                            paddingVertical: isCode ? 2 : 0,
-                                            borderRadius: isCode ? 5 : 0,
-                                            marginTop: isCode ? 1.5 : 0,
+                                            paddingHorizontal: isCode
+                                                ? moderateScale(4)
+                                                : 0,
+                                            paddingVertical: isCode
+                                                ? verticalScale(2)
+                                                : 0,
+                                            borderRadius: isCode ? scale(5) : 0,
+                                            marginTop: isCode
+                                                ? moderateScale(1.5)
+                                                : 0,
                                         }}
                                     >
                                         {content}
@@ -356,25 +356,23 @@ export default function ChapterView() {
                 )}
             </ScrollView>
 
-            <View style={{ marginBottom: 39 }}>
+            <View style={{ marginBottom: moderateScale(35) }}>
                 {chapters?.content?.length - 1 !== currentPage ? (
                     <Button
                         loading={loader}
                         onPress={() => setCurrentPage(currentPage + 1)}
                         text={'Next'}
                         disabled={null}
-                        opacity={loader ? 0.4 : 1}
                         icon={
                             <Ionicons
                                 name="chevron-forward"
-                                size={20}
+                                size={scale(20)}
                                 color={Colors.WHITE}
                             />
                         }
                     />
                 ) : (
                     <Button
-                        opacity={loader ? 0.4 : 1}
                         onPress={() => onChapterComplete()}
                         loading={loader}
                         text={'Finish'}
@@ -382,7 +380,7 @@ export default function ChapterView() {
                         icon={
                             <MaterialIcons
                                 name="check"
-                                size={20}
+                                size={scale(20)}
                                 color={Colors.WHITE}
                             />
                         }

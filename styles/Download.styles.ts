@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
 
@@ -6,14 +7,11 @@ export const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: moderateScale(20),
-        backgroundColor: Colors.BG_COLOR,
-        marginBottom: verticalScale(30),
     },
     title: {
-        fontSize: moderateScale(24),
+        fontSize: RFValue(22),
         fontWeight: "bold",
         marginBottom: verticalScale(15),
-        color: Colors.WHITE,
     },
     empty: {
         textAlign: "center",
@@ -41,7 +39,7 @@ export const styles = StyleSheet.create({
         borderRadius: moderateScale(10),
     },
     itemText: {
-        fontSize: moderateScale(16),
+        fontSize: RFValue(16),
         fontFamily: "outfit-bold",
         maxWidth: "80%",
     },
@@ -49,7 +47,7 @@ export const styles = StyleSheet.create({
         color: "red",
         fontFamily: "outfit-bold",
         textAlign: "center",
-        backgroundColor: "gray",
+        backgroundColor: Colors.BG_GRAY,
         marginTop: verticalScale(8),
         marginBottom: verticalScale(8),
         padding: moderateScale(8),

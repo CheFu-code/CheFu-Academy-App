@@ -1,27 +1,26 @@
+import HeaderText from '@/component/common/Header';
 import {
     isAndroidExternalMedia,
     pathFromUri,
     toFileUri,
-} from "@/helpers/fileHelpers";
-import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
-import { useRouter } from "expo-router";
-import * as Sharing from "expo-sharing";
-import { useEffect, useState } from "react";
+} from '@/helpers/fileHelpers';
+import useDarkMode from '@/hooks/useDarkMode';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
-    Pressable,
     Text,
     TouchableOpacity,
-    View
-} from "react-native";
-import RNFS from "react-native-fs";
-import AppModal from "../../component/Shared/AppModal";
-import { Colors } from "../../constant/Colors";
-import { styles } from "../../styles/Download.styles";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
+    View,
+} from 'react-native';
+import RNFS from 'react-native-fs';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AppModal from '../../component/Shared/AppModal';
+import { Colors } from '../../constant/Colors';
+import { styles } from '../../styles/Download.styles';
 
 type DownloadItem = {
     id: string;
@@ -31,19 +30,19 @@ type DownloadItem = {
 };
 
 export default function DownloadScreen() {
-    const { safeBack, safePush } = useSafeNavigation()
+    const { backgroundColor } = useDarkMode();
     const [downloads, setDownloads] = useState<DownloadItem[]>([]);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [itemToDelete, setItemToDelete] = useState<DownloadItem | null>(null);
     const [shareModal, setShareModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
     const [deleteModal, setDeleteModal] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
 
     useEffect(() => {
@@ -51,7 +50,7 @@ export default function DownloadScreen() {
     }, []);
 
     const loadDownloads = async () => {
-        const saved = await AsyncStorage.getItem("offlineDownloads");
+        const saved = await AsyncStorage.getItem('offlineDownloads');
         if (saved) setDownloads(JSON.parse(saved));
     };
 
@@ -59,7 +58,7 @@ export default function DownloadScreen() {
         if (loadingId) return;
         setLoadingId(item.id);
         try {
-            const uri = item.uri || "";
+            const uri = item.uri || '';
             const fileUri = toFileUri(uri);
 
             if (isAndroidExternalMedia(uri)) {
@@ -71,8 +70,8 @@ export default function DownloadScreen() {
                     const updated = downloads.filter((d) => d.id !== item.id);
                     setDownloads(updated);
                     await AsyncStorage.setItem(
-                        "offlineDownloads",
-                        JSON.stringify(updated)
+                        'offlineDownloads',
+                        JSON.stringify(updated),
                     );
                     return;
                 }
@@ -88,16 +87,16 @@ export default function DownloadScreen() {
             const updated = downloads.filter((d) => d.id !== item.id);
             setDownloads(updated);
             await AsyncStorage.setItem(
-                "offlineDownloads",
-                JSON.stringify(updated)
+                'offlineDownloads',
+                JSON.stringify(updated),
             );
         } catch (error) {
             setDeleteModal({
                 visible: true,
-                title: "Error",
-                message: "Unable to delete the course file.",
+                title: 'Error',
+                message: 'Unable to delete the course file.',
             });
-            console.error("Delete error:", error);
+            console.error('Delete error:', error);
         } finally {
             setLoadingId(null);
         }
@@ -107,7 +106,7 @@ export default function DownloadScreen() {
         if (loadingId) return;
         setLoadingId(item.id);
         try {
-            const uri = item.uri || "";
+            const uri = item.uri || '';
             const fileUri = toFileUri(uri);
 
             // Verify existence depending on storage location
@@ -122,8 +121,8 @@ export default function DownloadScreen() {
             if (!exists) {
                 setShareModal({
                     visible: true,
-                    title: "File Not Found",
-                    message: "The file has been moved or deleted.",
+                    title: 'File Not Found',
+                    message: 'The file has been moved or deleted.',
                 });
                 return;
             }
@@ -132,54 +131,31 @@ export default function DownloadScreen() {
             if (!available) {
                 setShareModal({
                     visible: true,
-                    title: "Sharing Not Available",
-                    message: "This feature is not supported on your device.",
+                    title: 'Sharing Not Available',
+                    message: 'This feature is not supported on your device.',
                 });
                 return;
             }
 
             await Sharing.shareAsync(fileUri, {
-                mimeType: "application/pdf",
+                mimeType: 'application/pdf',
                 dialogTitle: `Share ${item.title}`,
             });
         } catch (error) {
             setShareModal({
                 visible: true,
-                title: "Error",
-                message: "Unable to share the course file.",
+                title: 'Error',
+                message: 'Unable to share the course file.',
             });
-            console.error("Share error:", error);
+            console.error('Share error:', error);
         } finally {
             setLoadingId(null);
         }
     };
 
     return (
-        <View style={styles.container}>
-            <Pressable
-                onPress={() => {
-                    if (safeBack && typeof safeBack === "function")
-                        safeBack();
-                }}
-                accessible={true}
-                accessibilityLabel="Go back"
-                style={styles.backButton}
-            >
-                <Ionicons size={24} color={Colors.BLACK} name="arrow-back" />
-            </Pressable>
-
-            <Text
-                style={[
-                    styles.title,
-                    {
-                        textAlign: "center",
-                        marginTop: 30,
-                        fontFamily: "outfit-bold",
-                    },
-                ]}
-            >
-                Downloaded Courses
-            </Text>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
+            <HeaderText title="Downloaded Courses" />
 
             {downloads.length === 0 ? (
                 <Text style={styles.empty}>No courses downloaded.</Text>
@@ -194,13 +170,13 @@ export default function DownloadScreen() {
                                 style={[
                                     styles.itemBox,
                                     {
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
                                         borderBottomWidth: 2,
                                         borderBottomColor: Colors.PRIMARY,
                                         borderTopWidth: 2,
                                         borderTopColor: Colors.RED,
-                                        backgroundColor: "#ccc",
+                                        backgroundColor: '#ccc',
                                         borderLeftWidth: 2,
                                         borderRightWidth: 2,
                                         borderRightColor: Colors.BLACK,
@@ -211,14 +187,14 @@ export default function DownloadScreen() {
                                 <Text numberOfLines={4} style={styles.itemText}>
                                     {item.title}
                                 </Text>
-                                <View style={{ flexDirection: "column" }}>
+                                <View style={{ flexDirection: 'column' }}>
                                     <TouchableOpacity
                                         onPress={() => share(item)}
                                         disabled={!!loadingId}
                                     >
                                         {loadingId === item.id ? (
                                             <ActivityIndicator
-                                                size={"small"}
+                                                size={'small'}
                                                 color={Colors.GREEN}
                                             />
                                         ) : (
@@ -245,9 +221,9 @@ export default function DownloadScreen() {
                                             setItemToDelete(item);
                                             setDeleteModal({
                                                 visible: true,
-                                                title: "Delete?",
+                                                title: 'Delete?',
                                                 message:
-                                                    "Are you sure you want to delete this course file?",
+                                                    'Are you sure you want to delete this course file?',
                                             });
                                         }}
                                     >
@@ -296,6 +272,6 @@ export default function DownloadScreen() {
                     }
                 }}
             />
-        </View>
+        </SafeAreaView>
     );
 }
