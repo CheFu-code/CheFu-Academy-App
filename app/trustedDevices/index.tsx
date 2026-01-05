@@ -1,18 +1,16 @@
-import { db } from '@/config/fireConfig';
+import HeaderText from '@/component/common/Header';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import { useFetchUser } from '@/hooks/fetchUserDetail';
 import useDarkMode from '@/hooks/useDarkMode';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
-import { useCallback, useContext, useState } from 'react';
+import { TrustedDevice } from '@/types/trustedDevice';
+import { Ionicons } from '@expo/vector-icons';
+import { useContext, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     RefreshControl,
     ScrollView,
     Text,
-    ToastAndroid,
     TouchableOpacity,
     View,
 } from 'react-native';
@@ -20,38 +18,12 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
 
-type TrustedDevice = {
-    brand?: string;
-    deviceType?: number;
-    modelName?: string;
-    osName?: string;
-    osVersion?: string;
-};
-
 export default function TrustedDevices() {
-    const { safeBack } = useSafeNavigation();
+    const { userDetail } = useContext(UserDetailContext);
     const { textColor, backgroundColor } = useDarkMode();
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const [loading, setLoading] = useState(false);
-    const [loadingDevice, setLoadingDevice] = useState<string | null>(null);
+    const { fetchUserDetail, deleteFromTrustedDevices } = useFetchUser();
     const [refreshing, setRefreshing] = useState(false);
-
-    const fetchUserDetail = useCallback(async () => {
-        if (!userDetail?.email) return;
-
-        try {
-            const snapshot = await getDoc(doc(db, 'users', userDetail?.email)); // 👈 wrap with doc()
-            if (snapshot.exists()) {
-                const data = snapshot.data();
-                setUserDetail({ ...userDetail, ...data });
-            }
-        } catch (err) {
-            console.error('Failed to fetch user detail:', err);
-            ToastAndroid.show('Failed to refresh data', ToastAndroid.SHORT);
-        } finally {
-            setLoading(false);
-        }
-    }, [setUserDetail, userDetail]);
+    const [loadingDevice] = useState<string | null>(null);
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -59,91 +31,10 @@ export default function TrustedDevices() {
         setRefreshing(false);
     };
 
-    const deleteFromTrustedDevices = (device: TrustedDevice) => {
-        Alert.alert(
-            'Confirm Removal',
-            'Are you sure you want to remove this device from your trusted devices?',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Remove',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            if (
-                                !userDetail?.email ||
-                                !userDetail?.trustedDevices
-                            ) {
-                                ToastAndroid.show(
-                                    'Your data not found',
-                                    ToastAndroid.SHORT,
-                                );
-                                return;
-                            }
-                            setLoadingDevice(device.modelName || 'unknown');
-                            const filteredDevices =
-                                userDetail.trustedDevices.filter(
-                                    (d: TrustedDevice) =>
-                                        !(
-                                            d.brand === device.brand &&
-                                            d.modelName === device.modelName &&
-                                            d.osName === device.osName &&
-                                            d.osVersion === device.osVersion &&
-                                            d.deviceType === device.deviceType
-                                        ),
-                                );
-                            await updateDoc(
-                                doc(db, 'users', userDetail?.email),
-                                {
-                                    trustedDevices: filteredDevices,
-                                },
-                            );
-                            setUserDetail({
-                                ...userDetail,
-                                trustedDevices: filteredDevices,
-                            });
-                            Alert.alert(
-                                'Success',
-                                'Device removed from trusted list',
-                            );
-                        } catch (error) {
-                            console.error(
-                                'Error removing trusted device:',
-                                error,
-                            );
-                            Alert.alert('Error', 'Failed to remove device');
-                        } finally {
-                            setLoadingDevice(null);
-                        }
-                    },
-                },
-            ],
-            { cancelable: false },
-        );
-    };
-
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor }}>
             {/* Header */}
-            <TouchableOpacity
-                onPress={() => safeBack()}
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingHorizontal: verticalScale(15),
-                }}
-            >
-                <AntDesign name="left" size={scale(20)} color={textColor} />
-                <Text
-                    style={{
-                        fontFamily: 'outfit-bold',
-                        fontSize: RFValue(20),
-                        color: textColor,
-                    }}
-                >
-                    Trusted Devices
-                </Text>
-            </TouchableOpacity>
+            <HeaderText title="Trusted Devices" />
 
             <ScrollView
                 refreshControl={

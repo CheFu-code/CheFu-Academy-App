@@ -1,32 +1,34 @@
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
+import HeaderText from '@/component/common/Header';
+import useDarkMode from '@/hooks/useDarkMode';
+import { useTransaction } from '@/hooks/useTransaction';
 import { useUserPayments } from '@/hooks/useUserPayments';
 import { styles } from '@/styles/SubscriptionAndBilling.styles';
-import * as Print from 'expo-print';
-import { router } from 'expo-router';
-import * as Sharing from 'expo-sharing';
+import { capitalize } from '@/utils/string';
 import { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
-    PermissionsAndroid,
-    Platform,
-    Pressable,
     ScrollView,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
-import RNFS from 'react-native-fs';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 
 export default function SubscriptionAndBilling() {
     const { userDetail } = useContext(UserDetailContext);
     const { getUserPayments } = useUserPayments();
-    const [paymentHistory, setPaymentHistory] = useState([]);
+    const { textColor, backgroundColor } = useDarkMode();
+    const { downloadTransaction, shareTransaction } = useTransaction();
+    const [loading2] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [loading2, setLoading2] = useState(false);
+    const [paymentHistory, setPaymentHistory] = useState([]);
 
     useEffect(() => {
         const fetchPayments = async () => {
@@ -38,362 +40,19 @@ export default function SubscriptionAndBilling() {
         fetchPayments();
     }, [userDetail?.email, getUserPayments]);
 
-    const capitalize = (str?: string) =>
-        str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
-
-    async function requestStoragePermission() {
-        if (Platform.OS === 'android' && Platform.Version < 33) {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: 'Storage Permission Required',
-                    message:
-                        'This app needs access to your storage to save receipts',
-                    buttonPositive: 'OK',
-                },
-            );
-            return granted === PermissionsAndroid.RESULTS.GRANTED;
-        }
-        return true;
-    }
-
-    const downloadTransaction = async (payment, userDetail) => {
-        setLoading2(true);
-        try {
-            const hasPermission = await requestStoragePermission();
-            if (!hasPermission) {
-                Alert.alert(
-                    'Permission Denied',
-                    'Cannot save receipt without storage permission.',
-                );
-                setLoading2(false);
-                return;
-            }
-
-            const html = `
-      <html>
-        <head>
-          <style>
-            body {
-              font-family: 'Segoe UI', sans-serif;
-              padding: 24px;
-              background: #ffffff;
-              color: #333;
-            }
-            header {
-              text-align: center;
-              margin-bottom: 30px;
-            }
-            header h1 {
-              color: #1a73e8;
-              margin-bottom: 4px;
-            }
-            header p {
-              font-size: 13px;
-              color: #666;
-            }
-            h2 {
-              color: #2c3e50;
-              border-bottom: 2px solid #eee;
-              padding-bottom: 10px;
-              margin-top: 40px;
-            }
-            .section {
-              margin-bottom: 25px;
-            }
-            .label {
-              font-weight: 600;
-              width: 180px;
-              display: inline-block;
-            }
-            .value {
-              color: #444;
-            }
-            .amount {
-              font-weight: bold;
-              font-size: 16px;
-              color: #28a745;
-            }
-            .status-paid {
-              color: white;
-              background-color: #28a745;
-              padding: 2px 8px;
-              border-radius: 4px;
-              font-size: 12px;
-              display: inline-block;
-            }
-            .status-failed {
-              color: white;
-              background-color: #dc3545;
-              padding: 2px 8px;
-              border-radius: 4px;
-              font-size: 12px;
-              display: inline-block;
-            }
-            footer {
-              border-top: 1px solid #ddd;
-              margin-top: 50px;
-              padding-top: 20px;
-              font-size: 12px;
-              color: #888;
-              text-align: center;
-            }
-          </style>
-        </head>
-        <body>
-          <header>
-            <h1>CheFu Academy</h1>
-            <p>Empowering Learners Through Tech Education</p>
-            <p><a href="https://chefu.academy">www.chefu.academy</a></p>
-          </header>
-
-          <h2>Transaction Receipt</h2>
-
-          <div class="section">
-            <p><span class="label">Order ID:</span> <span class="value">${
-                payment.orderID
-            }</span></p>
-            <p><span class="label">Payer Name:</span> <span class="value">${
-                payment.payerName?.given_name || ''
-            } ${payment.payerName?.surname || ''}</span></p>
-            <p><span class="label">Payer Email:</span> <span class="value">${
-                payment.email
-            }</span></p>
-          </div>
-
-          <div class="section">
-            <p><span class="label">Plan:</span> <span class="value">${
-                payment.planType
-            }</span></p>
-            <p><span class="label">Amount:</span> <span class="amount">${
-                payment.amount?.value
-            } ${payment.amount?.currency_code}</span></p>
-            <p><span class="label">Status:</span> 
-              <span class="${
-                  payment.status?.toLowerCase() === 'paid' ||
-                  payment.status?.toLowerCase() === 'completed'
-                      ? 'status-paid'
-                      : 'status-failed'
-              }">${payment.status}</span>
-            </p>
-            <p><span class="label">Transaction Date:</span> <span class="value">${new Date(
-                payment.timestamp,
-            ).toLocaleString()}</span></p>
-          </div>
-
-          <div class="section">
-            <p><span class="label">Membership Start:</span> <span class="value">${new Date(
-                userDetail?.subscribedAt,
-            ).toLocaleDateString()}</span></p>
-            <p><span class="label">Membership Ends:</span> <span class="value">${new Date(
-                userDetail?.memberUntil,
-            ).toLocaleDateString()}</span></p>
-          </div>
-
-          <footer>
-            Thank you for learning with CheFu Academy.<br/>
-            Need help? Email us at <strong>support@chefu.academy</strong><br/>
-            &copy; ${new Date().getFullYear()} CheFu Inc. All rights reserved.
-          </footer>
-        </body>
-      </html>
-    `;
-
-            const { uri } = await Print.printToFileAsync({ html });
-
-            if (Platform.OS === 'android') {
-                const fileName = `CheFu_Academy_subscription_receipt_${
-                    payment.orderID || Date.now()
-                }.pdf`;
-                const downloadPath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
-                await RNFS.copyFile(uri.replace('file://', ''), downloadPath);
-
-                Alert.alert(
-                    'Success',
-                    `Receipt saved to Downloads folder:\n${downloadPath}`,
-                );
-            } else {
-                // iOS fallback: share instead of saving to Downloads
-                if (!(await Sharing.isAvailableAsync())) {
-                    Alert.alert(
-                        'Error',
-                        'Sharing is not available on this device',
-                    );
-                    setLoading2(false);
-                    return;
-                }
-                await Sharing.shareAsync(uri);
-            }
-        } catch (error) {
-            console.error('Download failed', error);
-            Alert.alert('Error', 'Failed to save receipt.');
-        } finally {
-            setLoading2(false);
-        }
-    };
-
-    const shareTransaction = async (payment) => {
-        setLoading(true);
-        try {
-            const html = `
-<html>
-  <head>
-    <style>
-      body {
-        font-family: 'Segoe UI', sans-serif;
-        padding: 24px;
-        background: #ffffff;
-        color: #333;
-      }
-      header {
-        text-align: center;
-        margin-bottom: 30px;
-      }
-      header h1 {
-        color: #1a73e8;
-        margin-bottom: 4px;
-      }
-      header p {
-        font-size: 13px;
-        color: #666;
-      }
-      h2 {
-        color: #2c3e50;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 10px;
-        margin-top: 40px;
-      }
-      .section {
-        margin-bottom: 25px;
-      }
-      .label {
-        font-weight: 600;
-        width: 180px;
-        display: inline-block;
-      }
-      .value {
-        color: #444;
-      }
-      .amount {
-        font-weight: bold;
-        font-size: 16px;
-        color: #28a745;
-      }
-      .status-paid {
-        color: white;
-        background-color: #28a745;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        display: inline-block;
-      }
-      .status-failed {
-        color: white;
-        background-color: #dc3545;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        display: inline-block;
-      }
-      footer {
-        border-top: 1px solid #ddd;
-        margin-top: 50px;
-        padding-top: 20px;
-        font-size: 12px;
-        color: #888;
-        text-align: center;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <h1>CheFu Academy</h1>
-      <p>Empowering Learners Through Tech Education</p>
-      <p><a href="https://chefu.academy">www.chefu.academy</a></p>
-    </header>
-
-    <h2>Transaction Receipt</h2>
-
-    <div class="section">
-      <p><span class="label">Order ID:</span> <span class="value">${
-          payment.orderID
-      }</span></p>
-      <p><span class="label">Payer Name:</span> <span class="value">${
-          payment.payerName?.given_name || ''
-      } ${payment.payerName?.surname || ''}</span></p>
-      <p><span class="label">Payer Email:</span> <span class="value">${
-          payment.email
-      }</span></p>
-    </div>
-
-    <div class="section">
-      <p><span class="label">Plan:</span> <span class="value">${
-          payment.planType
-      }</span></p>
-      <p><span class="label">Amount:</span> <span class="amount">${
-          payment.amount?.value
-      } ${payment.amount?.currency_code}</span></p>
-      <p><span class="label">Status:</span> 
-        <span class="${
-            payment.status?.toLowerCase() === 'paid' ||
-            payment.status?.toLowerCase() === 'completed'
-                ? 'status-paid'
-                : 'status-failed'
-        }">${payment.status}</span>
-      </p>
-      <p><span class="label">Transaction Date:</span> <span class="value">${new Date(
-          payment.timestamp,
-      ).toLocaleString()}</span></p>
-    </div>
-
-    <div class="section">
-      <p><span class="label">Membership Start:</span> <span class="value">${new Date(
-          userDetail?.subscribedAt,
-      ).toLocaleDateString()}</span></p>
-      <p><span class="label">Membership Ends:</span> <span class="value">${new Date(
-          userDetail?.memberUntil,
-      ).toLocaleDateString()}</span></p>
-    </div>
-
-    <footer>
-      Thank you for learning with CheFu Academy.<br/>
-      Need help? Email us at <strong>support@chefu.academy</strong><br/>
-      &copy; ${new Date().getFullYear()} CheFu Inc. All rights reserved.
-    </footer>
-  </body>
-</html>
-`;
-
-            const { uri } = await Print.printToFileAsync({ html });
-
-            if (!(await Sharing.isAvailableAsync())) {
-                Alert.alert('Error', 'Sharing is not available on this device');
-                setLoading(false);
-                return;
-            }
-
-            await Sharing.shareAsync(uri);
-        } catch (err) {
-            console.error('Download failed', err);
-            Alert.alert('Error', 'Failed to download transaction');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
-        <View style={[styles.container, { padding: 20 }]}>
+        <SafeAreaView
+            style={[
+                styles.container,
+                { padding: moderateScale(20), backgroundColor },
+            ]}
+        >
             {/* Header */}
-            <View style={styles.headerRow}>
-                <Pressable onPress={() => router.back()}>
-                    <Ionicons style={styles.icon} size={24} name="arrow-back" />
-                </Pressable>
-                <Text style={styles.heading}>Subscription & Billing</Text>
-            </View>
+            <HeaderText title="Subscription & Billing" />
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 40 }}
+                contentContainerStyle={{ paddingBottom: moderateScale(40) }}
             >
                 {/* Current Plan Section */}
                 <View style={styles.section}>
@@ -404,7 +63,11 @@ export default function SubscriptionAndBilling() {
                             alignItems: 'center',
                         }}
                     >
-                        <Text style={styles.sectionTitle}>Current Plan</Text>
+                        <Text
+                            style={[styles.sectionTitle, { color: textColor }]}
+                        >
+                            Current Plan
+                        </Text>
 
                         <View style={{ flexDirection: 'row', gap: 10 }}>
                             <TouchableOpacity
@@ -461,11 +124,14 @@ export default function SubscriptionAndBilling() {
                     </View>
 
                     <Text style={styles.planName}>
-                        {`${capitalize(userDetail.planType)} Plan`}
+                        {`${capitalize(userDetail.planType)} Plan` ||
+                            'Unknown Plan'}
                     </Text>
                     <Text style={styles.renewalDate}>
                         Your plan will expire on:{' '}
-                        {new Date(userDetail.memberUntil).toLocaleDateString()}
+                        {new Date(
+                            userDetail.memberUntil,
+                        ).toLocaleDateString() || 'N/A'}
                     </Text>
 
                     <TouchableOpacity
@@ -473,7 +139,9 @@ export default function SubscriptionAndBilling() {
                         style={[styles.button, { opacity: loading ? 0.5 : 1 }]}
                         onPress={() => {
                             // Replace with real cancellation logic
-                            Alert.alert('Cancel Subscription pressed');
+                            Alert.alert(
+                                'Your subscription plan has been canceled',
+                            );
                         }}
                     >
                         <Text style={styles.buttonText}>
@@ -493,13 +161,13 @@ export default function SubscriptionAndBilling() {
                         style={{
                             color: Colors.BG_GRAY,
                             fontFamily: 'michroma',
-                            fontSize: 12,
+                            fontSize: RFValue(12),
                         }}
                     >
                         Email: {userDetail?.email}
                     </Text>
                     <Text style={styles.sectionTitle}>
-                        Total Payments: {paymentHistory.length}
+                        Total Payments: {paymentHistory.length || ''}
                     </Text>
                 </View>
 
@@ -511,11 +179,11 @@ export default function SubscriptionAndBilling() {
                             <Text style={styles.paymentText}>
                                 {new Date(
                                     payment.timestamp,
-                                ).toLocaleDateString()}
+                                ).toLocaleDateString() || ''}
                             </Text>
                             <Text style={styles.paymentText}>
                                 {payment.amount?.value}{' '}
-                                {payment.amount?.currency_code}
+                                {payment.amount?.currency_code || ''}
                             </Text>
                             <Text
                                 style={{
@@ -524,15 +192,15 @@ export default function SubscriptionAndBilling() {
                                         payment.status === 'COMPLETED'
                                             ? 'green'
                                             : 'red',
-                                    fontWeight: 'bold',
+                                    fontFamily: 'outfit-bold',
                                 }}
                             >
-                                {payment.status}
+                                {payment.status || ''}
                             </Text>
                         </View>
                     ))}
                 </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }

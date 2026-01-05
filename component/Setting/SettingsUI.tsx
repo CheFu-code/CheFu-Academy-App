@@ -4,7 +4,7 @@ import { options } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/Settings.styles';
 import { SettingsUIProps } from '@/types/settingUI';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import {
     ActivityIndicator,
@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
+import HeaderText from '../common/Header';
 import SettingItem from './settingItem';
 
 const SettingsUI = ({
@@ -49,19 +50,7 @@ const SettingsUI = ({
         >
             {/* Header + Dropdown Button */}
             <View style={styles.header}>
-                <TouchableOpacity
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: scale(5),
-                    }}
-                    onPress={safeBack}
-                >
-                    <AntDesign name="left" size={scale(22)} color={textColor} />
-                    <Text style={[styles.title, { color: textColor }]}>
-                        Settings
-                    </Text>
-                </TouchableOpacity>
+                <HeaderText title="Settings" />
 
                 <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
                     <MaterialIcons

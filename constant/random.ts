@@ -6,7 +6,9 @@ export const COPYRIGHT = `© ${new Date().getFullYear()} CheFu Inc. All rights r
 export const REWARDED_AD_UNIT_ID = 'ca-app-pub-8952058057579255/8646813913';
 export const INTERSTITIAL_AD_UNIT_ID = 'ca-app-pub-8952058057579255/6615319669';
 export const support = 'chefu.inc@gmail.com';
+export const LAST_UPDATED = new Date(2025, 6, 10); // July is month 6 (0-indexed)
 export const MAX_WORDS = 60;
+export const ACTION_WIDTH = 70;
 export const categories = [
     'Tip',
     'Question',
@@ -15,3 +17,10 @@ export const categories = [
     'Achievement',
     'Discussion',
 ];
+
+export const permissionDisplayNames = {
+    camera: 'Camera',
+    mediaLibrary: 'Media Library',
+    location: 'Location',
+    notifications: 'Notifications',
+};

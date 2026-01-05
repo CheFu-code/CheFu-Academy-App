@@ -1,10 +1,9 @@
 import { Colors } from "@/constant/Colors";
 import { StyleSheet } from "react-native";
-import { scale, verticalScale, moderateScale } from "react-native-size-matters";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
-        backgroundColor: Colors.BG_COLOR,
         flex: 1,
     },
     icon: {
@@ -32,7 +31,6 @@ export const styles = StyleSheet.create({
         fontSize: scale(18),
         fontWeight: "600",
         marginBottom: verticalScale(12),
-        color: "white",
     },
     planName: {
         fontSize: scale(16),

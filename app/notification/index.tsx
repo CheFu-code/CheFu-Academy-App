@@ -1,10 +1,12 @@
+import HeaderText from '@/component/common/Header';
 import { db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
+import { ACTION_WIDTH } from '@/constant/random';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/NotificationScreen.styles';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {
     collection,
     deleteDoc,
@@ -46,12 +48,10 @@ interface Notification {
     read?: boolean;
 }
 
-const ACTION_WIDTH = 70;
-
 const NotificationScreen = () => {
-    const { safeBack, safePush } = useSafeNavigation();
+    const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext); // ✅ get logged in user
-    const { textColor, backgroundColor } = useDarkMode();
+    const { backgroundColor } = useDarkMode();
     const [notifications, setNotifications] = useState<Notification[]>([]);
 
     // ✅ fetch real-time notifications
@@ -221,12 +221,7 @@ const NotificationScreen = () => {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={[styles.container, { backgroundColor }]}>
-                <TouchableOpacity onPress={safeBack} style={styles.backButton}>
-                    <AntDesign name="left" size={scale(20)} color={textColor} />
-                    <Text style={[styles.header, { color: textColor }]}>
-                        Notifications
-                    </Text>
-                </TouchableOpacity>
+                <HeaderText title="Notifications" />
 
                 {notifications.length === 0 ? (
                     <View style={styles.emptyState}>

@@ -1,5 +1,5 @@
+import HeaderText from '@/component/common/Header';
 import useDarkMode from '@/hooks/useDarkMode';
-import { AntDesign } from '@expo/vector-icons';
 import {
     Linking,
     Pressable,
@@ -9,28 +9,16 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
-import { useSafeNavigation } from '../../hooks/useSafeNavigation';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Privacy() {
-    const { safeBack } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Back Button */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => safeBack()}
-                accessible={true}
-                accessibilityLabel="Go back"
-            >
-                <AntDesign name="left" size={scale(22)} color={textColor} />
-                <Text style={[styles.backText, { color: textColor }]}>
-                    Back
-                </Text>
-            </TouchableOpacity>
+            <HeaderText title="Back" />
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 style={styles.container2}
@@ -92,7 +80,9 @@ export default function Privacy() {
 
                 <TouchableOpacity
                     onPress={() =>
-                        Linking.openURL('https://chefu-academy.vercel.app/privacy-policy')
+                        Linking.openURL(
+                            'https://chefu-academy.vercel.app/privacy-policy',
+                        )
                     }
                 >
                     <Text

@@ -1,4 +1,5 @@
 import { db } from '@/config/fireConfig';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { AntDesign } from '@expo/vector-icons';
@@ -8,13 +9,14 @@ import {
     getDocs,
     orderBy,
     query,
-    where
+    where,
 } from '@react-native-firebase/firestore';
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale } from 'react-native-size-matters';
 import CourseListGrid, {
     AllowedPaths,
 } from '../../../component/PracticeScreen/CourseListGrid';
@@ -25,6 +27,7 @@ import { UserDetailContext } from '../../../context/UserDetailContext';
 export default function PracticeTypeHomeScreen() {
     const { type } = useLocalSearchParams();
     const { safeBack } = useSafeNavigation();
+    const { textColor, backgroundColor } = useDarkMode();
     const option = PracticeOption.find((item) => item.name === type);
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
@@ -67,7 +70,7 @@ export default function PracticeTypeHomeScreen() {
         <>
             <SafeAreaView
                 style={{
-                    backgroundColor: Colors.BG_COLOR,
+                    backgroundColor,
                     paddingBottom: -25,
                 }}
             >
@@ -91,12 +94,16 @@ export default function PracticeTypeHomeScreen() {
                         marginTop: 15,
                     }}
                 >
-                    <AntDesign name="left" size={24} color={Colors.PRIMARY} />
+                    <AntDesign
+                        name="left"
+                        size={scale(22)}
+                        color={Colors.PRIMARY}
+                    />
                     <Text
                         style={{
                             fontFamily: 'outfit-bold',
-                            fontSize: RFValue(20),
-                            color: Colors.PRIMARY,
+                            fontSize: RFValue(22),
+                            color: textColor,
                         }}
                     >
                         {type}
@@ -109,7 +116,7 @@ export default function PracticeTypeHomeScreen() {
                 onRefresh={() => GetCourseList()}
                 refreshing={loading}
                 style={{
-                    backgroundColor: Colors.BG_COLOR,
+                    backgroundColor,
                     flex: 1,
                 }}
                 data={[]}

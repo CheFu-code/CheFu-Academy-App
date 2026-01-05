@@ -29,6 +29,7 @@ import { Video as VideoView } from 'react-native-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import AppModal from '../Shared/AppModal';
 import Button from '../Shared/Button';
+import HeaderText from '../common/Header';
 
 const VideoDetailUI = ({
     backgroundColor,
@@ -60,7 +61,7 @@ const VideoDetailUI = ({
     showOptions,
     showReportModal,
     setReportReason,
-}:VideoDetailUIProps) => {
+}: VideoDetailUIProps) => {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <View
@@ -70,13 +71,7 @@ const VideoDetailUI = ({
                     paddingHorizontal: verticalScale(10),
                 }}
             >
-                <TouchableOpacity style={styles.backButton} onPress={safeBack}>
-                    <AntDesign name="left" size={scale(20)} color={textColor} />
-                    <Text style={[styles.backText, { color: textColor }]}>
-                        Back
-                    </Text>
-                </TouchableOpacity>
-
+                <HeaderText title="Back" />
                 <View style={styles.backButton}>
                     {video.uploadedBy !== 'YouTube' && (
                         <>

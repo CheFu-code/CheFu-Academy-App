@@ -1,13 +1,13 @@
+import HeaderText from '@/component/common/Header';
 import CourseCard from '@/component/Shared/CourseCard';
 import Loading from '@/component/Shared/Loading';
 import VideoCard from '@/component/VideoCard';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { useVideo } from '@/hooks/useVideo';
 import { styles } from '@/styles/SearchResult.styles';
-import { AntDesign } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import LottieView from 'lottie-react-native';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import {
     SafeAreaView,
@@ -17,7 +17,7 @@ import {
 export default function SearchScreen() {
     const insets = useSafeAreaInsets();
     const { query } = useLocalSearchParams();
-    const { safePush, safeBack } = useSafeNavigation();
+    const { safePush } = useSafeNavigation();
     const { videoResults, fetchVideos, results, fetchCourses, loading } =
         useVideo();
     const totalResults = results.length + videoResults.length;
@@ -38,17 +38,7 @@ export default function SearchScreen() {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <View style={{ marginTop: 5, flex: 1 }}>
-                <TouchableOpacity onPress={safeBack} style={styles.backButton}>
-                    <AntDesign
-                        style={{ left: 5 }}
-                        color={'white'}
-                        size={20}
-                        name="left"
-                    />
-                    <Text numberOfLines={1} style={styles.title}>
-                        Results for :
-                    </Text>
-                </TouchableOpacity>
+                <HeaderText title="Results for :" />
                 <View style={styles.queryContainer}>
                     <Text numberOfLines={1} style={styles.queryText}>
                         {' '}

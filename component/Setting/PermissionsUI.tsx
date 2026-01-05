@@ -1,19 +1,11 @@
 import useDarkMode from '@/hooks/useDarkMode';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/Permissions.styles';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { PermissionKeys, PermissionsUIProps } from '@/types/permissions';
+import { Ionicons } from '@expo/vector-icons';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
-
-type PermissionKeys = 'camera' | 'mediaLibrary' | 'location' | 'notifications';
-
-interface PermissionsUIProps {
-    permissions: Record<PermissionKeys, boolean>;
-    requestPermission: (type: PermissionKeys) => Promise<void>;
-    openSettings: () => void;
-    permissionDisplayNames: Record<PermissionKeys, string>;
-}
+import HeaderText from '../common/Header';
 
 const PermissionsUI = ({
     permissions,
@@ -21,24 +13,10 @@ const PermissionsUI = ({
     openSettings,
     permissionDisplayNames,
 }: PermissionsUIProps) => {
-    const { safeBack } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
-            <TouchableOpacity
-                onPress={safeBack}
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: scale(10),
-                }}
-            >
-                <AntDesign size={scale(20)} name="left" color={textColor} />
-                <Text style={[styles.title, { color: textColor }]}>
-                    App Permissions
-                </Text>
-            </TouchableOpacity>
-
+            <HeaderText title="App Permissions" />
             {Object.entries(permissions).map(([key, granted]) => (
                 <View key={key} style={styles.item}>
                     <Text style={[styles.label, { color: textColor }]}>

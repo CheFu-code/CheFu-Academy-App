@@ -35,7 +35,6 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalContent: {
-        backgroundColor: '#121212',
         padding: scale(25),
         borderRadius: scale(14),
         alignItems: 'center',

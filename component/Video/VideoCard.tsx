@@ -1,6 +1,5 @@
 // VideoCard.tsx
-import { AntDesign } from "@expo/vector-icons";
-import React from "react";
+import { AntDesign } from '@expo/vector-icons';
 import {
     Dimensions,
     Image,
@@ -8,10 +7,11 @@ import {
     Text,
     TouchableOpacity,
     View,
-} from "react-native";
-import Video from "react-native-video";
+} from 'react-native';
+import { scale } from 'react-native-size-matters';
+import Video from 'react-native-video';
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 type VideoCardProps = {
     video?: string | null;
@@ -44,7 +44,11 @@ export default function VideoCard({
                     />
                 ) : (
                     <View style={[styles.video, styles.placeholder]}>
-                        <AntDesign name="playcircleo" size={50} color="#888" />
+                        <AntDesign
+                            name="playcircleo"
+                            size={scale(50)}
+                            color="#888"
+                        />
                         <Text style={styles.placeholderText}>Preview</Text>
                     </View>
                 )}
@@ -61,15 +65,15 @@ export default function VideoCard({
 
 const styles = StyleSheet.create({
     cardWrapper: {
-        position: "relative",
+        position: 'relative',
         marginVertical: 10,
-        alignItems: "center",
+        alignItems: 'center',
     },
     card: {
         borderRadius: 10,
-        overflow: "hidden",
-        backgroundColor: "#222",
-        alignItems: "center",
+        overflow: 'hidden',
+        backgroundColor: '#222',
+        alignItems: 'center',
     },
     video: {
         width: width - 40,
@@ -77,22 +81,22 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     text: {
-        color: "#fff",
+        color: '#fff',
         marginTop: 5,
         fontSize: 14,
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
     },
     placeholder: {
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#444",
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#444',
     },
     placeholderText: {
-        color: "#888",
+        color: '#888',
         marginTop: 5,
     },
     crossIcon: {
-        position: "absolute",
+        position: 'absolute',
         top: 10,
         right: 15,
         zIndex: 10,

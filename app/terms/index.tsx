@@ -1,23 +1,16 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
-import {
-    AccessibilityInfo,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import { Colors } from "../../constant/Colors";
-import {useSafeNavigation} from "../../hooks/useSafeNavigation"
-
-const CONTACT_EMAIL = "chefu.inc@gmail.com";
-const LAST_UPDATED = new Date(2025, 6, 10); // July is month 6 (0-indexed)
+import HeaderText from '@/component/common/Header';
+import { LAST_UPDATED, support } from '@/constant/random';
+import useDarkMode from '@/hooks/useDarkMode';
+import { useEffect, useRef } from 'react';
+import { AccessibilityInfo, ScrollView, StyleSheet, Text } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale } from 'react-native-size-matters';
+import { Colors } from '../../constant/Colors';
 
 export default function TermsOfService() {
-    const {safeBack} = useSafeNavigation()
     const scrollRef = useRef(null);
+    const { backgroundColor } = useDarkMode();
 
     useEffect(() => {
         // Scroll to top on mount for better UX
@@ -26,28 +19,17 @@ export default function TermsOfService() {
         }
         // Announce screen for accessibility
         AccessibilityInfo.announceForAccessibility(
-            "Terms of Service screen loaded"
+            'Terms of Service screen loaded',
         );
     }, []);
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Back Button */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => {
-                    if (router && typeof router.back === "function")
-                        safeBack();
-                }}
-                accessible={true}
-                accessibilityLabel="Go back"
-            >
-                <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
-                <Text style={styles.backText}>Back</Text>
-            </TouchableOpacity>
+            <HeaderText title="Back" />
             <ScrollView
                 ref={scrollRef}
-                style={styles.container2}
+                style={[styles.container2, { backgroundColor }]}
                 showsVerticalScrollIndicator={false}
                 accessibilityRole="scrollbar"
                 accessibilityLabel="Terms of Service content"
@@ -98,71 +80,68 @@ export default function TermsOfService() {
                     5. Contact Us
                 </Text>
                 <Text style={styles.paragraph}>
-                    For questions or concerns about these terms, contact us at:{" "}
+                    For questions or concerns about these terms, contact us at:{' '}
                     <Text
                         style={{
                             color: Colors.PRIMARY,
-                            textDecorationLine: "underline",
+                            textDecorationLine: 'underline',
                         }}
                         accessibilityRole="link"
-                        accessibilityLabel={`Email ${CONTACT_EMAIL}`}
+                        accessibilityLabel={`Email ${support}`}
                     >
-                        {CONTACT_EMAIL}
+                        {support}
                     </Text>
                 </Text>
 
                 <Text style={styles.footer}>
-                    Last updated:{" "}
+                    Last updated:{' '}
                     {LAST_UPDATED.toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
                     })}
                 </Text>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
-        backgroundColor: Colors.BG_COLOR,
+        padding: moderateScale(20),
         flex: 1,
-        marginBottom: 50,
     },
     container2: {
-        backgroundColor: Colors.BG_COLOR,
         flex: 1,
     },
     backButton: {
-        flexDirection: "row",
-        alignItems: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
         marginBottom: 15,
         marginTop: 20,
     },
     backText: {
         fontSize: 16,
         color: Colors.PRIMARY,
-        fontFamily: "outfit",
+        fontFamily: 'outfit',
         marginLeft: 5,
     },
     title: {
-        fontSize: 24,
-        fontFamily: "outfit-bold",
+        fontSize: RFValue(22),
+        fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
         marginBottom: 15,
     },
     subtitle: {
         fontSize: 18,
-        fontFamily: "outfit-bold",
+        fontFamily: 'outfit-bold',
         color: Colors.PRIMARY,
         marginTop: 20,
         marginBottom: 5,
     },
     paragraph: {
-        fontSize: 16,
-        fontFamily: "outfit",
+        fontSize: RFValue(16),
+        fontFamily: 'outfit',
         color: Colors.GRAY,
         lineHeight: 24,
         marginBottom: 10,
@@ -171,7 +150,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
         fontSize: 14,
         color: Colors.GRAY,
-        fontFamily: "outfit",
-        textAlign: "center",
+        fontFamily: 'outfit',
+        textAlign: 'center',
     },
 });

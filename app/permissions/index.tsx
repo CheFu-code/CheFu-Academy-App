@@ -1,5 +1,7 @@
 import PermissionsUI from '@/component/Setting/PermissionsUI';
 import { auth, db } from '@/config/fireConfig';
+import { permissionDisplayNames } from '@/constant/random';
+import { PermissionKeys } from '@/types/permissions';
 import { doc, setDoc } from '@react-native-firebase/firestore';
 import * as Camera from 'expo-camera';
 import * as Location from 'expo-location';
@@ -7,8 +9,6 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useState } from 'react';
 import { Linking } from 'react-native';
-
-type PermissionKeys = 'camera' | 'mediaLibrary' | 'location' | 'notifications';
 
 export default function Permissions() {
     const [cameraPermission, requestCameraPermission] =
@@ -21,14 +21,7 @@ export default function Permissions() {
         notifications: false,
     });
 
-    const permissionDisplayNames = {
-        camera: 'Camera',
-        mediaLibrary: 'Media Library',
-        location: 'Location',
-        notifications: 'Notifications',
-    };
-
-    const checkPermissions = useCallback( async () => {
+    const checkPermissions = useCallback(async () => {
         const cameraStatus = cameraPermission?.status ?? 'undetermined';
         const { status: mediaLibraryStatus } =
             await MediaLibrary.getPermissionsAsync();

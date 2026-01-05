@@ -1,6 +1,6 @@
+import HeaderText from '@/component/common/Header';
 import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/Subscription.styles';
-import { AntDesign } from '@expo/vector-icons';
 import * as Sentry from '@sentry/react-native';
 import { useState } from 'react';
 import {
@@ -13,10 +13,8 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 import { PLANS } from '../../constant/plans';
-import { useSafeNavigation } from '../../hooks/useSafeNavigation';
 
 interface PayPalLink {
     href: string;
@@ -29,7 +27,6 @@ interface PayPalCreateOrderResponse {
 }
 
 export default function SubscriptionWall() {
-    const { safeBack } = useSafeNavigation();
     const { backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState('pro');
@@ -105,20 +102,7 @@ export default function SubscriptionWall() {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
-            <TouchableOpacity
-                disabled={loading}
-                onPress={() => safeBack()}
-                accessible={true}
-                accessibilityLabel="Go back"
-                style={styles.backButton}
-            >
-                <AntDesign
-                    name="left"
-                    size={scale(22)}
-                    color={Colors.PRIMARY}
-                />
-                <Text style={styles.header}>Choose Your Plan</Text>
-            </TouchableOpacity>
+            <HeaderText title="Choose Your Plan" />
 
             <FlatList
                 data={PLANS}

@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { Colors } from "../constant/Colors";
-import { scale, verticalScale, moderateScale } from "react-native-size-matters";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
         padding: moderateScale(16),
     },
     backButton: {
@@ -26,11 +26,10 @@ export const styles = StyleSheet.create({
     },
     emptyText: {
         color: Colors.GRAY,
-        fontSize: scale(16),
+        fontSize: RFValue(16),
         fontFamily: "outfit",
     },
     courseCard: {
-        backgroundColor: Colors.BG_GRAY,
         borderRadius: moderateScale(12),
         padding: moderateScale(12),
         marginTop: verticalScale(10),
@@ -38,7 +37,7 @@ export const styles = StyleSheet.create({
         marginRight: "1%",
     },
     courseTitle: {
-        fontSize: scale(16),
+        fontSize: scale(15),
         color: Colors.PRIMARY,
         fontFamily: "outfit-bold",
     },
@@ -58,7 +57,7 @@ export const styles = StyleSheet.create({
         gap: moderateScale(18),
     },
     chapter: {
-        fontSize: scale(14),
+        fontSize: RFValue(12),
         color: Colors.BLACK,
         fontFamily: "outfit-bold",
     },

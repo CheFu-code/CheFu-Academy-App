@@ -2,8 +2,9 @@ import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import { Colors } from '../../constant/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { scale } from 'react-native-size-matters';
+import { Colors } from '../../constant/Colors';
 
 export type AllowedPaths =
     | '/courses/details'
@@ -71,7 +72,7 @@ export default function CourseListGrid({
                     >
                         <Ionicons
                             name="checkmark-circle"
-                            size={20}
+                            size={scale(20)}
                             color={Colors.PRIMARY}
                             style={{
                                 position: 'absolute',

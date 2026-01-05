@@ -1,4 +1,5 @@
 import HeaderText from '@/component/common/Header';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -7,13 +8,17 @@ import {
     Image,
     StyleSheet,
     Text,
-    View
+    View,
 } from 'react-native';
 import FlipCard from 'react-native-flip-card';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale, scale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 
 export default function Flashcards() {
     const { courseParams } = useLocalSearchParams();
+    const { textColor, backgroundColor } = useDarkMode();
     const course = JSON.parse(courseParams);
     const flashcard = course?.flashcards;
     const [currentPage, setCurrentPage] = useState(0);
@@ -26,20 +31,19 @@ export default function Flashcards() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.BG_COLOR }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <Image
                 style={{
                     position: 'absolute',
                     width: '100%',
-                    height: 500,
+                    height: scale(500),
                 }}
                 source={require('../../assets/images/graph.png')}
             />
             <View
                 style={{
                     position: 'absolute',
-                    padding: 25,
-                    marginTop: 25,
+                    padding: moderateScale(20),
                     width: '100%',
                 }}
             >
@@ -55,8 +59,8 @@ export default function Flashcards() {
                     <Text
                         style={{
                             fontFamily: 'outfit-bold',
-                            fontSize: 17,
-                            color: Colors.WHITE,
+                            fontSize: RFValue(22),
+                            color: textColor,
                         }}
                     >
                         {currentPage + 1} of {flashcard?.length}
@@ -73,8 +77,8 @@ export default function Flashcards() {
                         <View
                             key={index}
                             style={{
-                                height: 500,
-                                marginTop: 20,
+                                height: moderateScale(500),
+                                marginTop: moderateScale(20),
                                 display: 'flex',
                             }}
                         >
@@ -83,7 +87,7 @@ export default function Flashcards() {
                                     <Text
                                         style={{
                                             fontFamily: 'outfit-bold',
-                                            fontSize: 20,
+                                            fontSize: RFValue(20),
                                             textAlign: 'center',
                                             color: Colors.PRIMARY,
                                         }}
@@ -95,10 +99,10 @@ export default function Flashcards() {
                                     <Text
                                         style={{
                                             fontFamily: 'outfit',
-                                            fontSize: 20,
+                                            fontSize: RFValue(20),
                                             textAlign: 'center',
                                             color: Colors.BLACK,
-                                            padding: 20,
+                                            padding: moderateScale(20),
                                         }}
                                     >
                                         {item?.back}
@@ -109,19 +113,19 @@ export default function Flashcards() {
                     )}
                 />
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     flipCard: {
         width: Dimensions.get('screen').width * 0.78,
-        height: 400,
+        height: moderateScale(400),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colors.BG_GRAY,
-        borderRadius: 20,
+        borderRadius: scale(20),
         marginHorizontal: Dimensions.get('screen').width * 0.04,
         elevation: 1,
         marginTop: 35,

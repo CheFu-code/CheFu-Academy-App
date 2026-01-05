@@ -1,13 +1,15 @@
+import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/SignIn.styles';
 import LottieView from 'lottie-react-native';
 import { Modal, Text, View } from 'react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
 
 const Loading = ({ loading }: { loading: boolean }) => {
+    const { backgroundColor } = useDarkMode();
     return (
         <Modal animationType="fade" transparent={true} visible={loading}>
             <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
+                <View style={[styles.modalContent, { backgroundColor }]}>
                     <LottieView
                         source={require('../../assets/animations/GO TO SCHOOL ANIMATION.json')}
                         autoPlay

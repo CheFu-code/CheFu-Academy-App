@@ -1,15 +1,17 @@
+import HeaderText from '@/component/common/Header';
 import { auth, db } from '@/config/fireConfig';
 import { Colors } from '@/constant/Colors';
 import { imageAssets } from '@/constant/Option';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {
     collection,
     FirebaseFirestoreTypes,
     getDocs,
     query,
-    where
+    where,
 } from '@react-native-firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
@@ -21,10 +23,12 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { scale } from 'react-native-size-matters';
 import { styles } from '../../styles/MyCourses.styles';
 
 export default function MyCourses() {
-    const { safeBack, safePush } = useSafeNavigation();
+    const { safePush } = useSafeNavigation();
+    const { backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(true);
     const [myCourses, setMyCourses] = useState<Course[]>([]);
 
@@ -65,15 +69,9 @@ export default function MyCourses() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Header */}
-            <TouchableOpacity
-                onPress={() => safeBack()}
-                style={styles.backButton}
-            >
-                <AntDesign name="left" size={24} color={Colors.WHITE} />
-                <Text style={styles.backButtonText}>My Courses</Text>
-            </TouchableOpacity>
+            <HeaderText title="My Courses" />
 
             {/* Body */}
             {loading ? (
@@ -96,7 +94,14 @@ export default function MyCourses() {
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item }) => (
                             <TouchableOpacity
-                                style={styles.courseCard}
+                                style={[
+                                    styles.courseCard,
+                                    {
+                                        backgroundColor: isCourseComplete(item)
+                                            ? Colors.LIGHT_GREEN
+                                            : Colors.BG_GRAY,
+                                    },
+                                ]}
                                 onPress={() =>
                                     safePush({
                                         pathname: '/courseView',
@@ -119,7 +124,7 @@ export default function MyCourses() {
 
                                         {isCourseComplete(item) && (
                                             <Ionicons
-                                                size={24}
+                                                size={scale(20)}
                                                 color={Colors.GREEN}
                                                 name="checkmark-circle"
                                                 style={styles.checkmark}
@@ -160,11 +165,6 @@ export default function MyCourses() {
                                                 : ''}
                                         </Text>
                                     </View>
-                                    {isCourseComplete(item) && (
-                                        <Text style={styles.completedBadge}>
-                                            Completed
-                                        </Text>
-                                    )}
                                 </View>
                             </TouchableOpacity>
                         )}
