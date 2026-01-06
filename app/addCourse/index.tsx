@@ -16,7 +16,7 @@ import { styles } from '../../styles/AddCourse.styles';
 
 export default function AddCourse() {
     const [loading] = useState(false);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const {
         generateTopic,
         onTopicSelect,
@@ -58,7 +58,7 @@ export default function AddCourse() {
                     keyboardShouldPersistTaps="handled"
                 >
                     <View style={{ flex: 1 }}>
-                        <Text style={[styles.title, { color: textColor }]}>
+                        <Text style={[styles.title, { color }]}>
                             What do you want to learn today?
                         </Text>
                         <Text style={styles.subtitle}>
@@ -96,7 +96,7 @@ export default function AddCourse() {
                                 <Text
                                     style={[
                                         styles.selectTopic,
-                                        { color: textColor },
+                                        { color },
                                     ]}
                                 >
                                     Select all topics which you want to add in

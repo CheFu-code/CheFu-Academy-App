@@ -27,7 +27,7 @@ import { UserDetailContext } from '../../../context/UserDetailContext';
 export default function PracticeTypeHomeScreen() {
     const { type } = useLocalSearchParams();
     const { safeBack } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const option = PracticeOption.find((item) => item.name === type);
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
@@ -103,7 +103,7 @@ export default function PracticeTypeHomeScreen() {
                         style={{
                             fontFamily: 'outfit-bold',
                             fontSize: RFValue(22),
-                            color: textColor,
+                            color,
                         }}
                     >
                         {type}

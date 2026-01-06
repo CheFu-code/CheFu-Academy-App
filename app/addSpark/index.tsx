@@ -28,7 +28,7 @@ import { moderateScale, scale } from 'react-native-size-matters';
 const AddSpark = () => {
     const { userDetail } = useContext(UserDetailContext);
     const { safeReplace } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
@@ -92,7 +92,7 @@ const AddSpark = () => {
                 <View style={{ paddingHorizontal: scale(10) }}>
                     <HeaderText title="Create a Spark" />
 
-                    <Text style={[styles.label, { color: textColor }]}>
+                    <Text style={[styles.label, { color }]}>
                         Title
                     </Text>
                     <TextInput
@@ -103,7 +103,7 @@ const AddSpark = () => {
                         placeholderTextColor={Colors.GRAY}
                     />
 
-                    <Text style={[styles.label, { color: textColor }]}>
+                    <Text style={[styles.label, { color }]}>
                         Content
                     </Text>
                     <TextInput
@@ -136,7 +136,7 @@ const AddSpark = () => {
                         styles.label,
                         {
                             paddingHorizontal: moderateScale(10),
-                            color: textColor,
+                            color,
                         },
                     ]}
                 >

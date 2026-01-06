@@ -1,6 +1,6 @@
 export interface EditProfileProps {
     backgroundColor: string;
-    textColor: string;
+    color: string;
     safeBack: () => void;
     profilePicture: string;
     fullname: string;

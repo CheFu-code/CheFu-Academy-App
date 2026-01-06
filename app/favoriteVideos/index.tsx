@@ -29,7 +29,7 @@ import { scale } from 'react-native-size-matters';
 export default function FavoriteVideos() {
     const { safeBack, safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(true);
     const [favoriteCourses, setFavoriteCourses] = useState<FavoriteCourse[]>(
         [],
@@ -112,14 +112,14 @@ export default function FavoriteVideos() {
                         alignItems: 'center',
                     }}
                 >
-                    <AntDesign name="left" color={textColor} size={scale(20)} />
-                    <Text style={{ color: textColor, fontSize: RFValue(18) }}>
+                    <AntDesign name="left" color={color} size={scale(20)} />
+                    <Text style={{ color, fontSize: RFValue(18) }}>
                         Back
                     </Text>
                 </TouchableOpacity>
                 <ActivityIndicator
                     size="large"
-                    color={textColor}
+                    color={color}
                     style={{ alignItems: 'center', justifyContent: 'center' }}
                 />
             </SafeAreaView>

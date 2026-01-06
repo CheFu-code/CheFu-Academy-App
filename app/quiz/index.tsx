@@ -27,7 +27,7 @@ import { Colors } from '../../constant/Colors';
 export default function Quiz() {
     const { courseParams } = useLocalSearchParams();
     const { safeBack, safeReplace } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const course = JSON.parse(courseParams);
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedOption, setSelectedOption] = useState();
@@ -118,14 +118,14 @@ export default function Quiz() {
                         <AntDesign
                             name="left"
                             size={scale(22)}
-                            color={textColor}
+                            color={color}
                         />
                     </Pressable>
                     <Text
                         style={{
                             fontFamily: 'outfit-bold',
                             fontSize: RFValue(20),
-                            color: textColor,
+                            color,
                         }}
                     >
                         {currentPage + 1} of {quiz?.length}

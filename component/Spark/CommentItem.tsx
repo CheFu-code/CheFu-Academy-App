@@ -31,7 +31,7 @@ export default function CommentItem({
     sparkId,
 }: Props) {
     const slideAnim = useRef(new Animated.Value(300)).current;
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     const [editText, setEditText] = useState(comment.text);
     const [modalVisible, setModalVisible] = useState(false);
     const [repliesVisible, setRepliesVisible] = useState(false);
@@ -88,7 +88,7 @@ export default function CommentItem({
                     </Text>
                 </View>
 
-                <Text style={[styles.commentText, { color: textColor }]}>
+                <Text style={[styles.commentText, { color }]}>
                     {comment.text}
                 </Text>
 

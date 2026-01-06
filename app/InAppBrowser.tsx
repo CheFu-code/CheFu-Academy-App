@@ -12,14 +12,14 @@ export default function InAppBrowser() {
     const webviewRef = useRef<WebView>(null);
     const { url } = useLocalSearchParams<{ url: string }>();
     const { safeBack } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
 
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={[styles.header, { backgroundColor }]}>
                 <TouchableOpacity onPress={safeBack}>
-                    <AntDesign name="left" size={scale(24)} color={textColor} />
+                    <AntDesign name="left" size={scale(24)} color={color} />
                 </TouchableOpacity>
                 <View
                     style={{
@@ -31,7 +31,7 @@ export default function InAppBrowser() {
                     }}
                 >
                     <TouchableOpacity onPress={safeBack}>
-                        <Ionicons name="close" size={24} color={textColor} />
+                        <Ionicons name="close" size={24} color={color} />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -40,7 +40,7 @@ export default function InAppBrowser() {
                         <Ionicons
                             name="refresh"
                             size={scale(24)}
-                            color={textColor}
+                            color={color}
                         />
                     </TouchableOpacity>
                 </View>

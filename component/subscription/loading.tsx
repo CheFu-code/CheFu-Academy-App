@@ -5,7 +5,7 @@ import { ActivityIndicator, Text, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function Loading() {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <View style={[styles.center, { backgroundColor }]}>
             <ActivityIndicator size="large" color={Colors.GREEN} />
@@ -13,7 +13,7 @@ export default function Loading() {
                 style={{
                     fontFamily: 'outfit-bold',
                     fontSize: RFValue(20),
-                    color: textColor,
+                    color,
                 }}
             >
                 Verifying payment...

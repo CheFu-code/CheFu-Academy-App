@@ -20,7 +20,7 @@ import { scale, verticalScale } from 'react-native-size-matters';
 
 export default function TrustedDevices() {
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const { fetchUserDetail, deleteFromTrustedDevices } = useFetchUser();
     const [refreshing, setRefreshing] = useState(false);
     const [loadingDevice] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export default function TrustedDevices() {
                             style={{
                                 fontFamily: 'outfit',
                                 fontSize: RFValue(14),
-                                color: textColor,
+                                color,
                                 marginTop: verticalScale(15),
                             }}
                         >
@@ -189,7 +189,7 @@ export default function TrustedDevices() {
                                     >
                                         {loadingDevice === device.modelName ? (
                                             <ActivityIndicator
-                                                color={textColor}
+                                                color={color}
                                                 size="small"
                                             />
                                         ) : (

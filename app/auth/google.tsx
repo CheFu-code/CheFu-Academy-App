@@ -19,7 +19,7 @@ export default function GoogleAuthScreen() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { safeReplace } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
 
     function isFirebaseError(
         error: unknown,
@@ -100,7 +100,7 @@ export default function GoogleAuthScreen() {
                     loop
                     style={{ width: scale(130), height: verticalScale(130) }}
                 />
-                <Text style={[styles.message, { color: textColor }]}>
+                <Text style={[styles.message, { color }]}>
                     Signing in with Google...
                 </Text>
             </View>
@@ -111,10 +111,10 @@ export default function GoogleAuthScreen() {
         return (
             <View style={[styles.container, { backgroundColor }]}>
                 <Text style={styles.errorText}>Error:</Text>
-                <Text style={[styles.message, { color: textColor }]}>
+                <Text style={[styles.message, { color }]}>
                     {error}
                 </Text>
-                <Text style={[styles.message, { color: textColor }]}>
+                <Text style={[styles.message, { color }]}>
                     Please try again.
                 </Text>
 
@@ -127,7 +127,7 @@ export default function GoogleAuthScreen() {
                         <Ionicons
                             name="refresh"
                             size={scale(20)}
-                            color={textColor}
+                            color={color}
                         />
                     }
                 />

@@ -13,7 +13,7 @@ import { moderateScale, scale } from 'react-native-size-matters';
 import { styles } from '../../styles/BuyMeCoffee.styles';
 
 export default function BuyMeCoffee() {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView
             style={{ backgroundColor, padding: moderateScale(15), flex: 1 }}
@@ -22,7 +22,7 @@ export default function BuyMeCoffee() {
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={styles.heading}>Support CheFu Academy</Text>
 
-                <Text style={[styles.paragraph, { color: textColor }]}>
+                <Text style={[styles.paragraph, { color }]}>
                     CheFu Academy is built with love, purpose, and long nights
                     of coding. Every feature you use — from lessons to quizzes,
                     chat, progress tracking and more — has been
@@ -30,7 +30,7 @@ export default function BuyMeCoffee() {
                     crafted to empower your learning journey.
                 </Text>
 
-                <Text style={[styles.paragraph, { color: textColor }]}>
+                <Text style={[styles.paragraph, { color }]}>
                     But building and maintaining an app like this takes time,
                     resources, and dedication. Your support helps keep this
                     platform alive and improving. Whether it’s for hosting
@@ -38,7 +38,7 @@ export default function BuyMeCoffee() {
                     bugs — every little contribution goes a long way.
                 </Text>
 
-                <Text style={[styles.paragraph, { color: textColor }]}>
+                <Text style={[styles.paragraph, { color }]}>
                     If CheFu Academy has helped you, inspired you, or made
                     learning easier, please consider buying me a coffee. It’s a
                     small gesture with a big impact.
@@ -49,10 +49,10 @@ export default function BuyMeCoffee() {
                     transform the world.&quot; – Howard Zinn
                 </Text>
 
-                <Text style={[styles.paragraph, { color: textColor }]}>
+                <Text style={[styles.paragraph, { color }]}>
                     I’m not backed by a big company. Just an indie creator on a
                     mission to make learning accessible and powerful for{' '}
-                    <Text style={{ fontWeight: 600, color: textColor }}>
+                    <Text style={{ fontWeight: 600, color }}>
                         everyone
                     </Text>
                     .

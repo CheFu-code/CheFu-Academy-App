@@ -18,7 +18,7 @@ export default function EditModal({
     onClose,
     onSave,
 }: Props) {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <Modal
             transparent
@@ -32,7 +32,7 @@ export default function EditModal({
                 onPressOut={onClose}
             >
                 <View style={styles.editHeader}>
-                    <Text style={[styles.editText, { color: textColor }]}>
+                    <Text style={[styles.editText, { color }]}>
                         Edit Comment
                     </Text>
                     <TextInput

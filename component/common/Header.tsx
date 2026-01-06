@@ -7,7 +7,7 @@ import { scale } from 'react-native-size-matters';
 
 const HeaderText = ({ title }: { title: string }) => {
     const { safeBack } = useSafeNavigation();
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     return (
         <TouchableOpacity
             style={{
@@ -17,10 +17,10 @@ const HeaderText = ({ title }: { title: string }) => {
             }}
             onPress={safeBack}
         >
-            <AntDesign name="left" size={scale(22)} color={textColor} />
+            <AntDesign name="left" size={scale(22)} color={color} />
             <Text
                 style={{
-                    color: textColor,
+                    color,
                     fontFamily: 'outfit-bold',
                     fontSize: RFValue(22),
                 }}

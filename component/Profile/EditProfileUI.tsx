@@ -15,7 +15,7 @@ import { scale } from 'react-native-size-matters';
 
 const EditProfile = ({
     backgroundColor,
-    textColor,
+    color,
     safeBack,
     profilePicture,
     fullname,
@@ -34,8 +34,8 @@ const EditProfile = ({
                 onPress={() => safeBack()}
                 style={styles.backButton}
             >
-                <AntDesign name="left" color={textColor} size={scale(20)} />
-                <Text style={[styles.title, { color: textColor }]}>
+                <AntDesign name="left" color={color} size={scale(20)} />
+                <Text style={[styles.title, { color }]}>
                     Edit Profile
                 </Text>
             </TouchableOpacity>
@@ -63,32 +63,32 @@ const EditProfile = ({
                     <EvilIcons
                         name="camera"
                         size={scale(20)}
-                        color={textColor}
+                        color={color}
                     />
                 </TouchableOpacity>
             </View>
 
             <TextInput
-                style={[styles.input, { color: textColor }]}
+                style={[styles.input, { color }]}
                 placeholder="Full Name"
                 value={fullname}
                 onChangeText={setFullname}
-                placeholderTextColor={textColor}
+                placeholderTextColor={color}
             />
             <TextInput
-                style={[styles.input, { color: textColor }]}
+                style={[styles.input, { color }]}
                 placeholder="Bio"
                 value={bio}
                 onChangeText={setBio}
                 multiline
-                placeholderTextColor={textColor}
+                placeholderTextColor={color}
             />
             <TextInput
-                style={[styles.input, { color: textColor }]}
+                style={[styles.input, { color }]}
                 placeholder="Country"
                 value={country}
                 onChangeText={setCountry}
-                placeholderTextColor={textColor}
+                placeholderTextColor={color}
             />
 
             {loading ? (

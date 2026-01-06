@@ -34,7 +34,7 @@ import HeaderText from '../common/Header';
 const VideoDetailUI = ({
     backgroundColor,
     safeBack,
-    textColor,
+    color,
     video,
     adding,
     handleFavorite,
@@ -89,7 +89,7 @@ const VideoDetailUI = ({
                                         name={favorite ? 'heart' : 'hearto'}
                                         size={scale(22)}
                                         color={
-                                            favorite ? Colors.RED : textColor
+                                            favorite ? Colors.RED : color
                                         }
                                     />
                                 )}
@@ -107,7 +107,7 @@ const VideoDetailUI = ({
                                     <Feather
                                         name="download-cloud"
                                         size={scale(22)}
-                                        color={textColor}
+                                        color={color}
                                     />
                                 )}
                             </TouchableOpacity>
@@ -120,7 +120,7 @@ const VideoDetailUI = ({
                         <MaterialIcons
                             name="more-vert"
                             size={scale(22)}
-                            color={textColor}
+                            color={color}
                         />
                     </TouchableOpacity>
                 </View>
@@ -163,7 +163,7 @@ const VideoDetailUI = ({
             })()}
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                <Text style={[styles.title, { color: textColor }]}>
+                <Text style={[styles.title, { color }]}>
                     {video.title}
                 </Text>
                 <View
@@ -173,7 +173,7 @@ const VideoDetailUI = ({
                         gap: scale(3),
                     }}
                 >
-                    <Text style={[styles.uploadedBy, { color: textColor }]}>
+                    <Text style={[styles.uploadedBy, { color }]}>
                         by{' '}
                         <Text style={{ fontFamily: 'outfit-bold' }}>
                             {uploaderName || video.uploadedBy}
@@ -201,12 +201,12 @@ const VideoDetailUI = ({
                                 <FontAwesome
                                     name="calendar"
                                     size={scale(12)}
-                                    color={textColor}
+                                    color={color}
                                 />
                                 <Text
                                     style={[
                                         styles.uploadedAt,
-                                        { color: textColor },
+                                        { color },
                                     ]}
                                 >
                                     {uploadedAtText}
@@ -218,9 +218,9 @@ const VideoDetailUI = ({
                         <AntDesign
                             name="clockcircleo"
                             size={scale(12)}
-                            color={textColor}
+                            color={color}
                         />
-                        <Text style={[styles.duration, { color: textColor }]}>
+                        <Text style={[styles.duration, { color }]}>
                             {typeof video.duration === 'string'
                                 ? formatYouTubeDuration(video.duration)
                                 : formatDuration(video.duration)}{' '}
@@ -232,11 +232,11 @@ const VideoDetailUI = ({
                         <FontAwesome5
                             name="users"
                             size={scale(12)}
-                            color={textColor}
+                            color={color}
                         />
                         <Text
                             numberOfLines={1}
-                            style={[styles.duration, { color: textColor }]}
+                            style={[styles.duration, { color }]}
                         >
                             {formatViews(video.views)}
                         </Text>
@@ -382,7 +382,7 @@ const VideoDetailUI = ({
                     <View
                         style={{
                             width: '80%',
-                            backgroundColor: textColor,
+                            backgroundColor: color,
                             borderRadius: scale(8),
                             padding: scale(15),
                         }}

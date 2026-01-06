@@ -15,7 +15,7 @@ import {
 export default function EditProfileScreen() {
     const { userDetail } = useContext(UserDetailContext);
     const { safeBack } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [fullname, setFullname] = useState(userDetail?.fullname || '');
     const [bio, setBio] = useState(userDetail?.bio || '');
     const [country, setCountry] = useState(userDetail?.country || '');
@@ -84,7 +84,7 @@ export default function EditProfileScreen() {
     return (
         <EditProfile
             backgroundColor={backgroundColor}
-            textColor={textColor}
+            color={color}
             safeBack={safeBack}
             profilePicture={profilePicture}
             fullname={fullname}

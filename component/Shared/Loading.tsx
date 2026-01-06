@@ -19,7 +19,7 @@ export default function Loading({
     size,
 }: LoadingProps) {
     const animationSize = size ?? Math.min(width * 0.3, 200);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     // Animated opacity for text
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -70,7 +70,7 @@ export default function Loading({
                     marginTop: verticalScale(10),
                     fontFamily: 'outfit',
                     fontSize: RFValue(15),
-                    color: textColor,
+                    color,
                     textAlign: 'center',
                     opacity: fadeAnim, // animated
                 }}

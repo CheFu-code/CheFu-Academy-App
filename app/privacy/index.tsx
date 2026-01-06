@@ -14,7 +14,7 @@ import { scale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 
 export default function Privacy() {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             {/* Back Button */}
@@ -90,7 +90,7 @@ export default function Privacy() {
                             fontFamily: 'outfit',
                             fontSize: RFValue(15),
                             marginTop: verticalScale(10),
-                            color: textColor,
+                            color,
                         }}
                     >
                         ...more

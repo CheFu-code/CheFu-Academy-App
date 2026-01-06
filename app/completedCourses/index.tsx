@@ -23,7 +23,7 @@ import { scale } from 'react-native-size-matters';
 const CompletedChapters = () => {
     const { safeReplace } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -85,7 +85,7 @@ const CompletedChapters = () => {
             <View style={{ marginLeft: scale(12), width: '80%' }}>
                 <Text
                     numberOfLines={2}
-                    style={[styles.courseTitle, { color: textColor }]}
+                    style={[styles.courseTitle, { color }]}
                 >
                     {item.courseTitle}
                 </Text>

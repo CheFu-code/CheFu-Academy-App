@@ -1,3 +1,4 @@
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,11 +10,10 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { moderateScale, scale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/CourseView.styles';
-import { moderateScale, scale } from 'react-native-size-matters';
-import useDarkMode from '@/hooks/useDarkMode';
 
 interface ChaptersProps {
     course: Course;
@@ -22,7 +22,7 @@ interface ChaptersProps {
 export default function Chapters({ course }: ChaptersProps) {
     const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     const isChapterCompleted = (index: number) => {
         if (!Array.isArray(course?.completedChapter)) return false;
         const isCompleted = course.completedChapter.find(
@@ -37,7 +37,7 @@ export default function Chapters({ course }: ChaptersProps) {
                 padding: moderateScale(15),
             }}
         >
-            <Text style={[styles.chapterTextContent, { color: textColor }]}>
+            <Text style={[styles.chapterTextContent, { color }]}>
                 Chapters
             </Text>
 

@@ -44,7 +44,7 @@ const ChangePasswordUI = ({
     renderInput,
 }: ChangePasswordUIProps) => {
     const scheme = useColorScheme();
-    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
+    const color = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
     return (
         <SafeAreaView
             style={{
@@ -62,11 +62,11 @@ const ChangePasswordUI = ({
                     marginLeft: verticalScale(10),
                 }}
             >
-                <AntDesign name="left" size={scale(20)} color={textColor} />
+                <AntDesign name="left" size={scale(20)} color={color} />
                 <Text
                     style={{
                         fontFamily: 'outfit-bold',
-                        color: textColor,
+                        color,
                         fontSize: RFValue(18),
                         marginLeft: scale(6),
                     }}
@@ -117,7 +117,7 @@ const ChangePasswordUI = ({
                     }
                 >
                     {loading ? (
-                        <ActivityIndicator size={'small'} color={textColor} />
+                        <ActivityIndicator size={'small'} color={color} />
                     ) : (
                         <Text style={styles.buttonText}>Update Password</Text>
                     )}

@@ -43,7 +43,7 @@ import { styles } from '../../styles/CourseView';
 export default function CourseView() {
     const { courseParams, enroll } = useLocalSearchParams();
     const { safeReplace, safePush } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [course, setCourse] = useState<Course>({
         id: '',
         courseTitle: '',
@@ -288,8 +288,8 @@ export default function CourseView() {
                 onPress={() => safeReplace('/(tabs)/home')}
                 style={styles.backButton}
             >
-                <AntDesign size={scale(20)} color={textColor} name="left" />
-                <Text style={[styles.backText, { color: textColor }]}>
+                <AntDesign size={scale(20)} color={color} name="left" />
+                <Text style={[styles.backText, { color }]}>
                     Back
                 </Text>
             </TouchableOpacity>

@@ -1,15 +1,14 @@
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    Switch,
-    Pressable,
-    useColorScheme,
-} from 'react-native';
-import React from 'react';
+import { Colors } from '@/constant/Colors';
 import { styles } from '@/styles/Settings.styles';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { Colors } from '@/constant/Colors';
+import {
+    Pressable,
+    Switch,
+    Text,
+    TouchableOpacity,
+    useColorScheme,
+    View,
+} from 'react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
 
 interface SettingItemProps {
@@ -32,7 +31,7 @@ const SettingItem = ({
     disabled,
 }: SettingItemProps) => {
     const scheme = useColorScheme();
-    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
+    const color = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
 
     return (
         <View
@@ -56,7 +55,7 @@ const SettingItem = ({
                     <Text
                         style={[
                             styles.label,
-                            { color: textColor },
+                            { color },
                             label === 'Log Out'
                                 ? { color: 'red', fontFamily: 'outfit-bold' }
                                 : null,

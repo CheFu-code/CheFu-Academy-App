@@ -18,7 +18,7 @@ import { Colors } from '../../constant/Colors';
 
 export default function Flashcards() {
     const { courseParams } = useLocalSearchParams();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const course = JSON.parse(courseParams);
     const flashcard = course?.flashcards;
     const [currentPage, setCurrentPage] = useState(0);
@@ -60,7 +60,7 @@ export default function Flashcards() {
                         style={{
                             fontFamily: 'outfit-bold',
                             fontSize: RFValue(22),
-                            color: textColor,
+                            color,
                         }}
                     >
                         {currentPage + 1} of {flashcard?.length}

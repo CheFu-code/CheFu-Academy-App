@@ -15,7 +15,7 @@ const ScrollViewComp = ({
     chapters,
     currentPage,
     maxLines,
-    textColor,
+    color,
     setShowFull,
     showFull,
     copying,
@@ -63,7 +63,7 @@ const ScrollViewComp = ({
                                                     ? 'outfit-bold'
                                                     : 'outfit',
                                                 fontSize: RFValue(16),
-                                                color: textColor,
+                                                color,
                                             }}
                                         >
                                             {text}
@@ -153,7 +153,7 @@ const ScrollViewComp = ({
             )}
 
             {chapters?.content[currentPage]?.example && (
-                <Text style={[styles.exampleText, { color: textColor }]}>
+                <Text style={[styles.exampleText, { color }]}>
                     Example:
                 </Text>
             )}

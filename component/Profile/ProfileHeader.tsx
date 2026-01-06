@@ -57,7 +57,7 @@ export const ProfileHeader = ({
 }: ProfileHeaderProps) => {
     const { safePush } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [nameInput, setNameInput] = useState(fullname);
     const [modalVisible, setModalVisible] = useState(false);
     const { loading, verifyEmail } = useProfileActions(
@@ -200,7 +200,7 @@ export const ProfileHeader = ({
                             }}
                             name="settings-outline"
                             size={scale(18)}
-                            color={textColor}
+                            color={color}
                         />
                     </TouchableOpacity>
                 </View>
@@ -273,7 +273,7 @@ export const ProfileHeader = ({
                                     numberOfLines={1}
                                     style={[
                                         styles.profileEmail,
-                                        { color: textColor },
+                                        { color },
                                     ]}
                                 >
                                     Joined {formatDate(createdAt)}
@@ -283,7 +283,7 @@ export const ProfileHeader = ({
 
                         <Text
                             numberOfLines={1}
-                            style={[styles.profileEmail, { color: textColor }]}
+                            style={[styles.profileEmail, { color }]}
                         >
                             {email}
                         </Text>
@@ -307,14 +307,14 @@ export const ProfileHeader = ({
                 <View style={styles2.modalBackground}>
                     <View style={[styles2.modalContainer, { backgroundColor }]}>
                         <Text
-                            style={[styles2.modalTitle, { color: textColor }]}
+                            style={[styles2.modalTitle, { color }]}
                         >
                             Change Name
                         </Text>
                         <TextInput
                             value={nameInput}
                             onChangeText={setNameInput}
-                            style={[styles.input, { color: textColor }]}
+                            style={[styles.input, { color }]}
                             placeholder="Enter new name"
                             placeholderTextColor={Colors.GRAY}
                         />
@@ -330,7 +330,7 @@ export const ProfileHeader = ({
                                 <Text
                                     style={[
                                         styles2.buttonText,
-                                        { color: textColor },
+                                        { color },
                                     ]}
                                 >
                                     Cancel

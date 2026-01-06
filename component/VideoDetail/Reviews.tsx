@@ -44,7 +44,7 @@ dayjs.extend(relativeTime);
 export default function Reviews({ video, enrolled }: Props) {
     const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [rating, setRating] = useState(0);
     const [reviews, setReviews] = useState<UserReviews[]>([]);
     const [loading, setLoading] = useState(false);
@@ -251,7 +251,7 @@ export default function Reviews({ video, enrolled }: Props) {
         <>
             <View>
                 <View style={styles.container}>
-                    <Text style={[styles.header, { color: textColor }]}>
+                    <Text style={[styles.header, { color }]}>
                         Student Reviews
                     </Text>
                     <View style={styles.ratingContainer}>
@@ -261,7 +261,7 @@ export default function Reviews({ video, enrolled }: Props) {
                                 size={scale(18)}
                                 color="yellow"
                             />
-                            <Text style={{ color: textColor }}>
+                            <Text style={{ color }}>
                                 {getAverageRating().toFixed(1)} (
                                 {reviews.length})
                             </Text>
@@ -301,7 +301,7 @@ export default function Reviews({ video, enrolled }: Props) {
                             <Text
                                 style={[
                                     styles.noReviewsText,
-                                    { color: textColor },
+                                    { color },
                                 ]}
                             >
                                 No reviews yet...
@@ -426,7 +426,7 @@ export default function Reviews({ video, enrolled }: Props) {
             >
                 <View style={styles.modalOverlay}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
-                        <Text style={[styles.modalTitle, { color: textColor }]}>
+                        <Text style={[styles.modalTitle, { color }]}>
                             Add your review
                         </Text>
 
@@ -451,9 +451,9 @@ export default function Reviews({ video, enrolled }: Props) {
                             numberOfLines={4}
                             value={reviewText}
                             onChangeText={setReviewText}
-                            style={[styles.textInput, { color: textColor }]}
+                            style={[styles.textInput, { color }]}
                             placeholder="Write your review here..."
-                            placeholderTextColor={textColor}
+                            placeholderTextColor={color}
                         />
 
                         <View style={styles.modalButtons}>

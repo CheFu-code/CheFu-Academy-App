@@ -36,7 +36,7 @@ export default function ConfirmPasswordModal({
     loading,
 }: ConfirmPasswordModalProps) {
     const { safePush } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <Modal transparent visible={visible} animationType="slide">
             <View style={styles.modalOverlay}>
@@ -48,7 +48,7 @@ export default function ConfirmPasswordModal({
                             secureTextEntry={!showPassword}
                             value={password}
                             onChangeText={setPassword}
-                            style={[styles.inputWithIcon, { color: textColor }]}
+                            style={[styles.inputWithIcon, { color }]}
                             placeholderTextColor="#ccc"
                             autoCapitalize="none"
                             autoCorrect={false}

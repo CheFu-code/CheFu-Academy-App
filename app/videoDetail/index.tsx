@@ -21,7 +21,7 @@ export default function VideoDetail() {
     const { safeBack } = useSafeNavigation();
     const { id, ytVideo } = useLocalSearchParams();
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const {
         fetchUploaderName,
         handleEnroll,
@@ -130,7 +130,7 @@ export default function VideoDetail() {
         <VideoDetailUI
             backgroundColor={backgroundColor}
             safeBack={safeBack}
-            textColor={textColor}
+            color={color}
             video={video}
             adding={adding}
             handleFavorite={handleFavorite}

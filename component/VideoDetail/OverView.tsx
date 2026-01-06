@@ -1,11 +1,10 @@
-import { Video } from '@/types/video';
-import React from 'react';
-import { Image, Text, View } from 'react-native';
-import { styles } from '../../styles/OverView.styles';
 import { useRenderTextWithLinks } from '@/helpers/detectLinks';
-import { verticalScale } from 'react-native-size-matters';
-import { RFValue } from 'react-native-responsive-fontsize';
 import useDarkMode from '@/hooks/useDarkMode';
+import { Video } from '@/types/video';
+import { Image, Text, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { verticalScale } from 'react-native-size-matters';
+import { styles } from '../../styles/OverView.styles';
 
 type Props = {
     video: Video | null;
@@ -13,12 +12,12 @@ type Props = {
 
 export default function OverView({ video }: Props) {
     const { renderTextWithLinks } = useRenderTextWithLinks();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
 
     return (
         <View>
             {video?.uploadedBy !== 'YouTube' && (
-                <Text style={[styles.header, { color: textColor }]}>
+                <Text style={[styles.header, { color }]}>
                     What you will learn
                 </Text>
             )}
@@ -28,7 +27,7 @@ export default function OverView({ video }: Props) {
                     {video?.topics?.map((topic, index) => (
                         <Text
                             key={index}
-                            style={[styles.topic, { color: textColor }]}
+                            style={[styles.topic, { color }]}
                         >
                             • {topic}
                         </Text>
@@ -39,12 +38,12 @@ export default function OverView({ video }: Props) {
             <Text
                 style={[
                     styles.header,
-                    { marginTop: verticalScale(16), color: textColor },
+                    { marginTop: verticalScale(16), color },
                 ]}
             >
                 Course Description
             </Text>
-            <Text style={[styles.description, { color: textColor }]}>
+            <Text style={[styles.description, { color }]}>
                 {video?.description
                     ? renderTextWithLinks(video.description)
                     : 'No description available.'}
@@ -52,7 +51,7 @@ export default function OverView({ video }: Props) {
             <Text
                 style={[
                     styles.header,
-                    { marginTop: verticalScale(16), color: textColor },
+                    { marginTop: verticalScale(16), color },
                 ]}
             >
                 Instructor
@@ -79,14 +78,14 @@ export default function OverView({ video }: Props) {
                     </View>
                 )}
                 <View>
-                    <Text style={[styles.instructorName, { color: textColor }]}>
+                    <Text style={[styles.instructorName, { color }]}>
                         {video?.instructorCompany || 'Unknown'}
                     </Text>
                     <Text
                         style={{
                             fontFamily: 'outfit',
                             fontSize: RFValue(14),
-                            color: textColor,
+                            color,
                         }}
                     >
                         {video?.instructorName || 'Unknown'}

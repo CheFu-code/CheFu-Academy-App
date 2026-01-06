@@ -3,10 +3,10 @@ import { styles } from '@/styles/SparkDetail';
 import { Text, View } from 'react-native';
 
 const ReplyHeader = () => {
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     return (
         <View style={{ alignItems: 'center' }}>
-            <Text style={[styles.replyText, { color: textColor }]}>
+            <Text style={[styles.replyText, { color }]}>
                 Replies
             </Text>
         </View>

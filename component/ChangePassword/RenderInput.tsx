@@ -20,11 +20,11 @@ const RenderInput = ({
     setter,
 }: RenderInputProps) => {
     const scheme = useColorScheme();
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     return (
         <View style={styles.inputContainer}>
             <TextInput
-                style={[styles.input, { color: textColor }]}
+                style={[styles.input, { color }]}
                 placeholder={label}
                 placeholderTextColor={
                     scheme === 'dark' ? Colors.GRAY : Colors.BLACK
@@ -42,7 +42,7 @@ const RenderInput = ({
                 <Ionicons
                     name={show[field] ? 'eye-off' : 'eye'}
                     size={scale(20)}
-                    color={textColor}
+                    color={color}
                 />
             </TouchableOpacity>
         </View>

@@ -24,7 +24,7 @@ import { UserDetailContext } from '../../context/UserDetailContext';
 export default function SubscriptionAndBilling() {
     const { userDetail } = useContext(UserDetailContext);
     const { getUserPayments } = useUserPayments();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const { downloadTransaction, shareTransaction } = useTransaction();
     const [loading2] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -64,7 +64,7 @@ export default function SubscriptionAndBilling() {
                         }}
                     >
                         <Text
-                            style={[styles.sectionTitle, { color: textColor }]}
+                            style={[styles.sectionTitle, { color }]}
                         >
                             Current Plan
                         </Text>

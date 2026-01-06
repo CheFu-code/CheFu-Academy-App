@@ -17,7 +17,7 @@ import { Colors } from '../../constant/Colors';
 
 export default function QuestionAnswer() {
     const { courseParams } = useLocalSearchParams();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const course = JSON.parse(courseParams);
     const qaList = course?.qa || [];
     const [selectedQuestion, setSelectedQuestion] = useState();
@@ -57,7 +57,7 @@ export default function QuestionAnswer() {
                     style={{
                         fontFamily: 'outfit-bold',
                         fontSize: RFValue(16),
-                        color: textColor,
+                        color,
                         marginTop: 10,
                         textAlign: 'center',
                         marginBottom: moderateScale(10),

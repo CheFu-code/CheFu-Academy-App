@@ -36,7 +36,7 @@ const SignInUI = ({
     password,
 }: SignInUIProps) => {
     const { safeReplace } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <KeyboardAvoidingView
@@ -60,7 +60,7 @@ const SignInUI = ({
 
                         <TextInput
                             placeholder="Email"
-                            style={[styles.textInput, { color: textColor }]}
+                            style={[styles.textInput, { color }]}
                             placeholderTextColor={Colors.GRAY}
                             onChangeText={(value) => {
                                 setEmail(value.trim());
@@ -85,7 +85,7 @@ const SignInUI = ({
                                 autoCapitalize="none"
                                 style={[
                                     styles.passwordInput,
-                                    { color: textColor },
+                                    { color },
                                 ]}
                                 onSubmitEditing={() => {
                                     if (!loading) handleSignIn();
@@ -121,10 +121,10 @@ const SignInUI = ({
                                 style={styles.icons}
                                 name="google"
                                 size={scale(20)}
-                                color={textColor}
+                                color={color}
                             />
 
-                            <Text style={[styles.google, { color: textColor }]}>
+                            <Text style={[styles.google, { color }]}>
                                 Google
                             </Text>
                         </TouchableOpacity>
@@ -150,7 +150,7 @@ const SignInUI = ({
                         </TouchableOpacity>
 
                         <View style={styles.ABC}>
-                            <Text style={{ color: textColor }}>
+                            <Text style={{ color }}>
                                 Don&apos;t have an account?{' '}
                             </Text>
                             <Pressable

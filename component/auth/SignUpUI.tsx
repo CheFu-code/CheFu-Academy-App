@@ -35,7 +35,7 @@ const SignUpUI = ({
     errorMsg,
 }: SignUpUIProps) => {
     const { safeReplace } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <KeyboardAvoidingView
@@ -70,7 +70,7 @@ const SignUpUI = ({
                             style={[
                                 styles.textInput,
                                 fullNameError && { borderColor: 'red' },
-                                { color: textColor },
+                                { color },
                             ]}
                             placeholderTextColor={Colors.GRAY}
                             onChangeText={(v) => {
@@ -102,7 +102,7 @@ const SignUpUI = ({
 
                         <TextInput
                             placeholder="Email"
-                            style={[styles.textInput, { color: textColor }]}
+                            style={[styles.textInput, { color }]}
                             placeholderTextColor={Colors.GRAY}
                             onChangeText={(v) => setEmail(v.trim())}
                             keyboardType="email-address"
@@ -115,7 +115,7 @@ const SignUpUI = ({
                         <View style={{ width: '100%', position: 'relative' }}>
                             <TextInput
                                 placeholder="Password"
-                                style={[styles.textInput, { color: textColor }]}
+                                style={[styles.textInput, { color }]}
                                 placeholderTextColor={Colors.GRAY}
                                 secureTextEntry={!showPassword}
                                 onChangeText={(v) => setPassword(v)}
@@ -206,7 +206,7 @@ const SignUpUI = ({
                                 marginTop: verticalScale(20),
                             }}
                         >
-                            <Text style={{ color: textColor }}>
+                            <Text style={{ color }}>
                                 Already have an account?{' '}
                             </Text>
 

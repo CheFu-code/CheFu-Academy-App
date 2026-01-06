@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function CommentMenu({ setModalVisible, onDelete }: Props) {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <Menu>
             <MenuTrigger style={styles.menuTrigger}>
@@ -40,11 +40,11 @@ export default function CommentMenu({ setModalVisible, onDelete }: Props) {
                         <Ionicons
                             name="pencil"
                             size={scale(15)}
-                            color={textColor}
+                            color={color}
                         />
                         <Text
                             style={{
-                                color: textColor,
+                                color,
                                 fontSize: RFValue(14),
                                 fontFamily: 'outfit-bold',
                             }}

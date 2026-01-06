@@ -10,7 +10,7 @@ import { moderateScale, scale } from 'react-native-size-matters';
 
 const Spark = () => {
     const { safePush } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <View style={styles.header}>
@@ -18,7 +18,7 @@ const Spark = () => {
                 <TouchableOpacity onPress={() => safePush('/addSpark')}>
                     <MaterialIcons
                         name="post-add"
-                        color={textColor}
+                        color={color}
                         size={scale(20)}
                     />
                 </TouchableOpacity>

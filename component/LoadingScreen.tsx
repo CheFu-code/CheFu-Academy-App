@@ -19,7 +19,7 @@ type LoadingScreenProps = {
 
 const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
     const scheme = useColorScheme();
-    const textColor = scheme === 'dark' ? Colors.GREEN : Colors.BLACK;
+    const color = scheme === 'dark' ? Colors.GREEN : Colors.BLACK;
     const [triggering, setTriggering] = useState<boolean>(false);
 
     // re-trigger the auth-system-button when user accidentally close the biometric auth UI
@@ -65,7 +65,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 <Text
                     style={{
                         fontSize: RFValue(14),
-                        color: textColor,
+                        color,
                         fontFamily: 'outfit-bold',
                         textAlign: 'center',
                     }}

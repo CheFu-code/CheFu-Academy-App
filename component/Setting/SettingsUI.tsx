@@ -38,7 +38,7 @@ const SettingsUI = ({
     verify,
     handleLogout,
 }: SettingsUIProps) => {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView
             style={[
@@ -86,7 +86,7 @@ const SettingsUI = ({
                 style={styles.container}
             >
                 <Text
-                    style={[styles.heading, { color: textColor, marginTop: 0 }]}
+                    style={[styles.heading, { color, marginTop: 0 }]}
                 >
                     General
                 </Text>
@@ -119,7 +119,7 @@ const SettingsUI = ({
                     />
                 )}
 
-                <Text style={[styles.heading, { color: textColor }]}>
+                <Text style={[styles.heading, { color }]}>
                     Notifications
                 </Text>
                 <SettingItem
@@ -141,7 +141,7 @@ const SettingsUI = ({
                     onPress={() => safePush('/emailAlerts')}
                 />
 
-                <Text style={[styles.heading, { color: textColor }]}>
+                <Text style={[styles.heading, { color }]}>
                     Privacy & Security
                 </Text>
                 <SettingItem
@@ -175,7 +175,7 @@ const SettingsUI = ({
                     disabled={loading}
                 />
 
-                <Text style={[styles.heading, { color: textColor }]}>
+                <Text style={[styles.heading, { color }]}>
                     About
                 </Text>
                 <SettingItem
@@ -217,7 +217,7 @@ const SettingsUI = ({
                     onPress={() => handleShare()}
                 />
 
-                <Text style={[styles.heading, { color: textColor }]}>
+                <Text style={[styles.heading, { color }]}>
                     Account
                 </Text>
 

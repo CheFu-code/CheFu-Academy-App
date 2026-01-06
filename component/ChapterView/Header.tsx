@@ -8,14 +8,14 @@ import { styles } from '../../styles/ChapterView.styles';
 const Header = ({
     loader,
     safeBack,
-    textColor,
+    color,
     getProgress,
     currentPage,
 }: HeaderProps) => {
     return (
         <View style={styles.backButtonContainer}>
             <Pressable disabled={loader} onPress={safeBack}>
-                <AntDesign name="left" size={scale(22)} color={textColor} />
+                <AntDesign name="left" size={scale(22)} color={color} />
             </Pressable>
             <Progress.Bar
                 style={{

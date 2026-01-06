@@ -12,7 +12,7 @@ import { styles } from '../../styles/ChapterView.styles';
 
 export default function ChapterView() {
     const { safeBack } = useSafeNavigation();
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const { chapterParams } = useLocalSearchParams();
     const { getProgress, onChapterComplete, handleCopy } = useChapterViewHook();
     const [showFull, setShowFull] = useState(false);
@@ -45,7 +45,7 @@ export default function ChapterView() {
             <Header
                 loader={loader}
                 safeBack={safeBack}
-                textColor={textColor}
+                color={color}
                 getProgress={getProgress}
                 currentPage={currentPage}
             />
@@ -54,7 +54,7 @@ export default function ChapterView() {
                 chapters={chapters}
                 currentPage={currentPage}
                 maxLines={maxLines}
-                textColor={textColor}
+                color={color}
                 setShowFull={setShowFull}
                 showFull={showFull}
                 copying={copying}

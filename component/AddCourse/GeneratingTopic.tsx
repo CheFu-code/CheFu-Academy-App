@@ -5,7 +5,7 @@ import { scale, verticalScale } from 'react-native-size-matters';
 import { styles } from '../../styles/AddCourse.styles';
 
 const GeneratingTopic = ({ generatingTopic }: { generatingTopic: boolean }) => {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <Modal
             animationType="fade"
@@ -24,7 +24,7 @@ const GeneratingTopic = ({ generatingTopic }: { generatingTopic: boolean }) => {
                         }}
                     />
                     <Text style={styles.modalTitle}>Generating Topics.</Text>
-                    <Text style={[styles.modalSubtext, { color: textColor }]}>
+                    <Text style={[styles.modalSubtext, { color }]}>
                         Our AI is working to deliver personalized learning
                         topics.
                     </Text>

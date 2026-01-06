@@ -19,12 +19,12 @@ export function RenderSwitch({
     toggle,
 }: RenderSwitchProps) {
     const scheme = useColorScheme();
-    const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
+    const color = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
 
     return (
         <View style={styles.switchContainer} key={type}>
             <View style={{ flex: 1 }}>
-                <Text style={[styles.label, { color: textColor }]}>
+                <Text style={[styles.label, { color }]}>
                     {label}
                 </Text>
                 <Text style={[styles.subtext, { color: Colors.GRAY }]}>

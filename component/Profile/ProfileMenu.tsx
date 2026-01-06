@@ -43,7 +43,7 @@ export const ProfileMenu = ({
 }: ProfileMenuProps) => {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { email, member, planType } = userDetail || {};
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
     const renderedMenuItems = useMemo(
         () => menuItems(router, Linking, ToastAndroid, Colors),
@@ -64,7 +64,7 @@ export const ProfileMenu = ({
             <View style={styles.menuSection}>
                 <Text
                     style={{
-                        color: textColor,
+                        color,
                         fontFamily: 'outfit-bold',
                         fontSize: RFValue(17),
                     }}
@@ -128,7 +128,7 @@ export const ProfileMenu = ({
 
                 <Text
                     style={{
-                        color: textColor,
+                        color,
                         fontFamily: 'outfit-bold',
                         fontSize: RFValue(17),
                     }}

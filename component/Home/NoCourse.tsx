@@ -8,7 +8,7 @@ import Button from '../Shared/Button';
 
 export default function NoCourse() {
     const { safePush } = useSafeNavigation();
-    const {textColor} = useDarkMode();
+    const {color} = useDarkMode();
     const [loading, setLoading] = useState(false);
 
     return (
@@ -33,7 +33,7 @@ export default function NoCourse() {
                     fontFamily: 'outfit-bold',
                     fontSize: RFValue(24),
                     textAlign: 'center',
-                    color: textColor,
+                    color,
                     marginBottom: moderateScale(10),
                 }}
             >

@@ -4,7 +4,7 @@ import { Video } from "./video";
 
 export interface VideoDetailUIProps {
     backgroundColor: string;
-    textColor: string;
+    color: string;
 
     safeBack: () => void;
 

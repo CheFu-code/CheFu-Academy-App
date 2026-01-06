@@ -26,7 +26,7 @@ interface IntroProps {
 export default function Intro({ course, enroll }: IntroProps) {
     const { userDetail } = useContext(UserDetailContext);
     const { safeReplace } = useSafeNavigation();
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     const [loading, setLoading] = useState(false);
     const [showFull, setShowFull] = useState(false);
     const maxLines = showFull ? undefined : 4;
@@ -102,13 +102,13 @@ export default function Intro({ course, enroll }: IntroProps) {
                     <Ionicons
                         name="book-outline"
                         size={moderateScale(18)}
-                        color={textColor}
+                        color={color}
                     />
                     <Text
                         style={{
                             fontFamily: 'outfit',
                             fontSize: RFValue(16),
-                            color: textColor,
+                            color,
                         }}
                     >
                         {course?.chapters?.length} Chapters
@@ -120,7 +120,7 @@ export default function Intro({ course, enroll }: IntroProps) {
                         fontFamily: 'outfit-bold',
                         fontSize: RFValue(18),
                         marginTop: verticalScale(10),
-                        color: textColor,
+                        color,
                     }}
                 >
                     Description:
@@ -167,7 +167,7 @@ export default function Intro({ course, enroll }: IntroProps) {
                             <Ionicons
                                 name="download-outline"
                                 size={moderateScale(18)}
-                                color={textColor}
+                                color={color}
                             />
                         }
                     />

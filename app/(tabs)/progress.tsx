@@ -35,7 +35,7 @@ import { styles } from '../../styles/Progress.styles';
 export default function Progress({ enroll = false }) {
     const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(false);
     const [lastDoc, setLastDoc] = useState(null);
     const [fetching, setFetching] = useState(false);
@@ -207,7 +207,7 @@ export default function Progress({ enroll = false }) {
                                 >
                                     <Text
                                         style={{
-                                            color: textColor,
+                                            color,
                                             textAlign: 'center',
                                             padding: scale(10),
                                             margin: scale(5),
@@ -217,7 +217,7 @@ export default function Progress({ enroll = false }) {
                                     </Text>
                                     <ActivityIndicator
                                         size={'small'}
-                                        color={textColor}
+                                        color={color}
                                     />
                                 </View>
                             ) : null

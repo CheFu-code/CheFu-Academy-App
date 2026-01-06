@@ -23,14 +23,14 @@ export default function CommentsList({
     onLike,
     onReply,
 }: Props) {
-    const { textColor } = useDarkMode();
+    const { color } = useDarkMode();
     if (!comments.length) {
         return <Text style={styles.noComments}>No comments yet</Text>;
     }
 
     return (
         <View>
-            <Text style={[styles.commentsHeader, { color: textColor }]}>
+            <Text style={[styles.commentsHeader, { color }]}>
                 Comments
             </Text>
             {comments.map((c, i) => (

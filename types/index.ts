@@ -36,7 +36,7 @@ export type RenderInputProps = {
 export type HeaderProps = {
     loader: boolean;
     safeBack: () => void;
-    textColor: string;
+    color: string;
     getProgress: (currentPage: number) => number;
     currentPage: number;
 };
@@ -45,7 +45,7 @@ export type ScrollViewProp = {
     chapters: Chapters;
     currentPage: number;
     maxLines: number | undefined;
-    textColor: string;
+    color: string;
     setShowFull: React.Dispatch<React.SetStateAction<boolean>>;
     showFull: boolean;
     copying: boolean;

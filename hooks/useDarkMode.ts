@@ -3,10 +3,10 @@ import { Colors } from '../constant/Colors';
 
 const useDarkMode = () => {
   const scheme = useColorScheme();
-  const textColor = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
+  const color = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
   const backgroundColor = scheme === 'dark' ? Colors.BG_COLOR : Colors.WHITE;
 
-  return { textColor, backgroundColor };
+  return { color, backgroundColor };
 };
 
 export default useDarkMode;

@@ -13,13 +13,13 @@ const PermissionsUI = ({
     openSettings,
     permissionDisplayNames,
 }: PermissionsUIProps) => {
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
             <HeaderText title="App Permissions" />
             {Object.entries(permissions).map(([key, granted]) => (
                 <View key={key} style={styles.item}>
-                    <Text style={[styles.label, { color: textColor }]}>
+                    <Text style={[styles.label, { color }]}>
                         {permissionDisplayNames[key as PermissionKeys]}
                     </Text>
 
@@ -36,7 +36,7 @@ const PermissionsUI = ({
                             color={granted ? 'green' : 'red'}
                             style={{ marginRight: verticalScale(6) }}
                         />
-                        <Text style={[styles.buttonText, { color: textColor }]}>
+                        <Text style={[styles.buttonText, { color }]}>
                             {granted ? 'Granted' : 'Request'}
                         </Text>
                     </TouchableOpacity>

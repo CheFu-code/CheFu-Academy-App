@@ -29,7 +29,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const SparkDetail = () => {
     const { sparkId } = useLocalSearchParams<{ sparkId: string }>();
     const { userDetail } = useContext(UserDetailContext);
-    const { textColor, backgroundColor } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const [comment, setComment] = useState('');
     const [commenting, setCommenting] = useState(false);
     const [spark, setSpark] = useState<Spark | null>(null);
@@ -304,10 +304,10 @@ const SparkDetail = () => {
             <SparkHeader spark={spark} />
 
             {/* Title & Content */}
-            <Text style={[styles.title, { color: textColor }]}>
+            <Text style={[styles.title, { color }]}>
                 {spark.title}
             </Text>
-            <Text style={[styles.content, { color: textColor }]}>
+            <Text style={[styles.content, { color }]}>
                 {spark.content}
             </Text>
 
