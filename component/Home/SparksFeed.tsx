@@ -1,4 +1,4 @@
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { fetchInitialSparks, fetchMoreSparks } from '@/services/sparksService';

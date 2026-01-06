@@ -1,5 +1,5 @@
 import Button from "@/component/Shared/Button";
-import { auth } from "@/config/fireConfig";
+import { auth } from "@/config/firebaseConfig";
 import { useSafeNavigation } from "@/hooks/useSafeNavigation";
 import { Ionicons } from "@expo/vector-icons";
 import {

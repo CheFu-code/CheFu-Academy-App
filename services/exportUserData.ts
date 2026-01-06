@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { doc, getDoc } from '@react-native-firebase/firestore';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';

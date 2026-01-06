@@ -1,3 +1,5 @@
+import { FirebaseAuthTypes } from '@react-native-firebase/auth';
+
 export type SignUpUIProps = {
     fullName: string;
     fullNameError?: boolean;
@@ -12,4 +14,18 @@ export type SignUpUIProps = {
     loading: boolean;
     handleSignUp: () => void;
     errorMsg?: string;
+};
+
+interface SignUpResponse {
+    user: FirebaseAuthTypes.User;
+    userData: {
+        fullname?: string;
+        lastLogin?: Date;
+        updatedAt?: Date;
+        profilePicture?: string | null;
+        provider?: string;
+        [key: string]: unknown;
+    };
 }
+
+export type SignUpResponseOrUndefined = SignUpResponse | undefined;

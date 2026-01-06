@@ -1,5 +1,5 @@
 // hooks/useRefreshProfile.ts
-import { db } from "@/config/fireConfig";
+import { db } from "@/config/firebaseConfig";
 import { showToast } from "@/utils/toast";
 import { doc, getDoc } from "@react-native-firebase/firestore";
 import * as Sentry from "@sentry/react-native";

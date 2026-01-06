@@ -1,4 +1,4 @@
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import {
@@ -15,11 +15,11 @@ import {
     View,
     ViewStyle,
 } from 'react-native';
+import { scale } from 'react-native-size-matters';
 import { imageAssets } from '../../constant/Option';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/CourseCard.styles';
 import AppModal from './AppModal';
-import { scale } from 'react-native-size-matters';
 
 export default function CourseCard({
     course,

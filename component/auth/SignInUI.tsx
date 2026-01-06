@@ -1,5 +1,6 @@
 import { Colors } from '@/constant/Colors';
 import AnimatedText from '@/helpers/animateText';
+import { Google } from '@/helpers/navigation';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SignIn.styles';
@@ -18,7 +19,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { RFValue } from 'react-native-responsive-fontsize';
 import { scale, verticalScale } from 'react-native-size-matters';
 
 const SignInUI = ({
@@ -35,11 +35,8 @@ const SignInUI = ({
     email,
     password,
 }: SignInUIProps) => {
-    const { safePush, safeReplace } = useSafeNavigation();
+    const { safeReplace } = useSafeNavigation();
     const { textColor, backgroundColor } = useDarkMode();
-    const google = () => {
-        safeReplace('/auth/google');
-    };
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <KeyboardAvoidingView
@@ -48,21 +45,11 @@ const SignInUI = ({
                 keyboardVerticalOffset={verticalScale(30)}
             >
                 <ScrollView
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        justifyContent: 'center',
-                        paddingBottom: verticalScale(40),
-                    }}
+                    contentContainerStyle={styles.SV}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
-                    <View
-                        style={{
-                            alignItems: 'center',
-                            paddingTop: verticalScale(30),
-                            padding: scale(20),
-                        }}
-                    >
+                    <View style={styles.X}>
                         <LottieView
                             autoPlay
                             loop={true}
@@ -83,14 +70,7 @@ const SignInUI = ({
                             autoCapitalize="none"
                         />
                         {emailError ? (
-                            <Text
-                                style={{
-                                    color: 'red',
-                                    alignSelf: 'flex-start',
-                                }}
-                            >
-                                {emailError}
-                            </Text>
+                            <Text style={styles.A}>{emailError}</Text>
                         ) : null}
 
                         <View style={styles.passwordContainer}>
@@ -123,36 +103,19 @@ const SignInUI = ({
                             </Pressable>
                         </View>
                         {passwordError ? (
-                            <Text
-                                style={{
-                                    color: 'red',
-                                    alignSelf: 'flex-start',
-                                }}
-                            >
-                                {passwordError}
-                            </Text>
+                            <Text style={styles.A}>{passwordError}</Text>
                         ) : null}
 
                         <Pressable
-                            onPress={() => safePush('/auth/forgotPassword')}
-                            style={{
-                                alignSelf: 'flex-end',
-                                marginTop: verticalScale(8),
-                            }}
+                            onPress={() => safeReplace('/auth/forgotPassword')}
+                            style={styles.FPC}
                         >
-                            <Text
-                                style={{
-                                    color: Colors.PRIMARY,
-                                    fontWeight: 'bold',
-                                }}
-                            >
-                                Forgot Password?
-                            </Text>
+                            <Text style={styles.FP}>Forgot Password?</Text>
                         </Pressable>
 
                         <TouchableOpacity
                             style={styles.iconsContainer}
-                            onPress={() => google()}
+                            onPress={() => Google()}
                         >
                             <AntDesign
                                 style={styles.icons}
@@ -160,13 +123,8 @@ const SignInUI = ({
                                 size={scale(20)}
                                 color={textColor}
                             />
-                            <Text
-                                style={{
-                                    fontSize: RFValue(15),
-                                    fontFamily: 'outfit',
-                                    color: textColor,
-                                }}
-                            >
+
+                            <Text style={[styles.google, { color: textColor }]}>
                                 Google
                             </Text>
                         </TouchableOpacity>
@@ -191,26 +149,14 @@ const SignInUI = ({
                             )}
                         </TouchableOpacity>
 
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                marginTop: verticalScale(16),
-                            }}
-                        >
+                        <View style={styles.ABC}>
                             <Text style={{ color: textColor }}>
                                 Don&apos;t have an account?{' '}
                             </Text>
                             <Pressable
                                 onPress={() => safeReplace('/auth/signUp')}
                             >
-                                <Text
-                                    style={{
-                                        color: Colors.PRIMARY,
-                                        fontWeight: 'bold',
-                                    }}
-                                >
-                                    Sign Up
-                                </Text>
+                                <Text style={styles.FP}>Sign Up</Text>
                             </Pressable>
                         </View>
                     </View>

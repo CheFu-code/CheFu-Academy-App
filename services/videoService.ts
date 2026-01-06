@@ -1,4 +1,4 @@
-import { auth, db } from "@/config/fireConfig";
+import { auth, db } from "@/config/firebaseConfig";
 import { Video, YouTubeVideo } from "@/types/video";
 import {
     collection,

@@ -1,5 +1,6 @@
 import Button from '@/component/Shared/Button';
-import { auth } from '@/config/fireConfig';
+import { auth } from '@/config/firebaseConfig';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -10,10 +11,9 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import LottieView from 'lottie-react-native';
 import { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
+import { scale, verticalScale } from 'react-native-size-matters';
 import { styles } from '../../styles/GitHub.styles';
 import { saveUser } from '../../utils/authService';
-import { scale, verticalScale } from 'react-native-size-matters';
-import useDarkMode from '@/hooks/useDarkMode';
 
 export default function GoogleAuthScreen() {
     const [loading, setLoading] = useState(false);

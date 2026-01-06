@@ -1,354 +1,46 @@
+import GeneratingTopic from '@/component/AddCourse/GeneratingTopic';
+import Loading from '@/component/AddCourse/Loading';
 import HeaderText from '@/component/common/Header';
 import ErrorModal from '@/component/Shared/ErrorModal';
-import { db } from '@/config/fireConfig';
-import { REWARDED_AD_UNIT_ID, support } from '@/constant/random';
+import { useAddCourseHook } from '@/handlers/AddCourse/addCourseFunction';
 import useDarkMode from '@/hooks/useDarkMode';
-import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { checkDailyLimit } from '@/utils/firestoreUtils';
-import { showToast } from '@/utils/toast';
 import { Ionicons } from '@expo/vector-icons';
-import { doc, setDoc } from '@react-native-firebase/firestore';
-import * as Sentry from '@sentry/react-native';
-import LottieView from 'lottie-react-native';
-import { useContext, useState } from 'react';
-import {
-    Alert,
-    Modal,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    ToastAndroid,
-    View,
-} from 'react-native';
-import {
-    AdEventType,
-    RewardedAd,
-    RewardedAdEventType,
-} from 'react-native-google-mobile-ads';
+import { useState } from 'react';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { moderateScale, scale } from 'react-native-size-matters';
 import AppModal from '../../component/Shared/AppModal';
 import Button from '../../component/Shared/Button';
-import { generateCourse, generateTopics } from '../../config/AiModel';
 import { Colors } from '../../constant/Colors';
-import Prompt from '../../constant/Prompt';
-import { UserDetailContext } from '../../context/UserDetailContext';
-import { styles } from '../../styles/AddCourse';
-import { handleAiError } from '../../utils/errorUtils';
+import { styles } from '../../styles/AddCourse.styles';
 
 export default function AddCourse() {
-    const [loading, setLoading] = useState(false);
-    const { userDetail } = useContext(UserDetailContext);
-    const { safeReplace } = useSafeNavigation();
+    const [loading] = useState(false);
     const { textColor, backgroundColor } = useDarkMode();
+    const {
+        generateTopic,
+        onTopicSelect,
+        isTopicSelected,
+        onGenerateCourse,
+        watchRewardedAd,
+    } = useAddCourseHook();
     const [userInput, setUserInput] = useState('');
-    const [topics, setTopics] = useState<string[]>([]);
-    const [selectedTopic, setSelectedTopic] = useState<string[]>([]);
-    const [generatingTopic, setGeneratingTopic] = useState(false);
+    const [topics] = useState<string[]>([]);
+    const [selectedTopic] = useState<string[]>([]);
+    const [generatingTopic] = useState(false);
     const [limitModalVisible, setLimitModalVisible] = useState(false);
-    const [extraCourseUnlocked, setExtraCourseUnlocked] = useState(false);
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: '',
         message: '',
     });
-    const rewardedAd = RewardedAd.createForAdRequest(REWARDED_AD_UNIT_ID, {
-        requestNonPersonalizedAdsOnly: true,
-    });
-    const generateTopic = async () => {
-        if (generatingTopic) return; // Prevent double submission
-        if (!userInput.trim()) {
-            setErrorModal({
-                visible: true,
-                title: 'Input Required',
-                message: 'Please enter a course idea first.',
-            });
-            return;
-        }
-
-        setGeneratingTopic(true);
-
-        try {
-            const courseCountToday = await checkDailyLimit(userDetail?.email);
-            if (
-                userDetail?.member === false &&
-                courseCountToday >= 3 &&
-                !extraCourseUnlocked
-            ) {
-                setLimitModalVisible(true);
-                setGeneratingTopic(false);
-                setUserInput('');
-                setTopics([]);
-                setSelectedTopic([]);
-                setLoading(false);
-                return;
-            }
-        } catch (error) {
-            console.error('Error checking course count:', error);
-            Alert.alert('Error', 'Failed to verify daily course limit.');
-            setGeneratingTopic(false);
-            return;
-        }
-
-        let topicIdea = [];
-        try {
-            const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-            if (!apiKey) {
-                setErrorModal({
-                    visible: true,
-                    title: 'Missing Key',
-                    message: 'Your AI key is missing.',
-                });
-                setGeneratingTopic(false);
-                return;
-            }
-            setGeneratingTopic(true);
-            const promptText = userInput + Prompt.IDEA;
-            const contents = [
-                {
-                    role: 'user',
-                    parts: [{ text: promptText }],
-                },
-            ];
-            const aiResponse = await generateTopics(contents);
-            const cleanedResponse =
-                aiResponse && typeof aiResponse === 'string'
-                    ? aiResponse.replace(/^```json[\r\n]+|```$/gi, '').trim()
-                    : aiResponse;
-            if (!cleanedResponse || cleanedResponse.trim() === '') {
-                setErrorModal({
-                    visible: true,
-                    title: 'No Response',
-                    message: 'The AI didn’t return any results.',
-                });
-                topicIdea = [];
-                setGeneratingTopic(false);
-                return;
-            } else {
-                function safeJsonParse(json: string) {
-                    try {
-                        return JSON.parse(json);
-                    } catch {
-                        return null;
-                    }
-                }
-
-                try {
-                    topicIdea = safeJsonParse(cleanedResponse) || [];
-                } catch (e) {
-                    topicIdea = [];
-                    handleAiError(e, support);
-                }
-            }
-            setUserInput('');
-        } catch (error) {
-            console.error('Error generating topic:', error);
-            setErrorModal({
-                visible: true,
-                title: 'Error',
-                message: `Failed to generate topic. \n ${error}`,
-            });
-            topicIdea = [];
-        } finally {
-            setTopics(Array.isArray(topicIdea) ? topicIdea : []);
-            setGeneratingTopic(false);
-        }
-    };
-
-    const onTopicSelect = (topic: string) => {
-        const isAlreadyExist = selectedTopic.find((item) => item === topic);
-        if (!isAlreadyExist) {
-            setSelectedTopic((prev) => [...prev, topic]);
-        } else {
-            const topics = selectedTopic.filter((item) => item !== topic);
-            setSelectedTopic(topics);
-        }
-    };
-
-    const isTopicSelected = (topic: string) => {
-        const selection = selectedTopic.find((item) => item === topic);
-        return selection ? true : false;
-    };
-
-    const onGenerateCourse = async () => {
-        if (loading) return; // Prevent double submission
-        if (!selectedTopic.length) {
-            setErrorModal({
-                visible: true,
-                title: 'No Topics Selected',
-                message: 'Please select at least one topic.',
-            });
-
-            return;
-        }
-        setLoading(true);
-        const promptText = selectedTopic + Prompt.COURSE;
-        const contents = [
-            {
-                role: 'user',
-                parts: [{ text: promptText }],
-            },
-        ];
-        try {
-            const aiResp = await generateCourse(contents);
-            if (!aiResp || aiResp.trim() === '') {
-                setErrorModal({
-                    visible: true,
-                    title: 'No Response',
-                    message: 'The AI didn’t return any results.',
-                });
-                setLoading(false);
-                return;
-            }
-            let coursesObj;
-            try {
-                coursesObj = JSON.parse(aiResp);
-            } catch (e) {
-                handleAiError(e, support);
-                if (typeof Sentry !== 'undefined') {
-                    Sentry.captureException(e, {
-                        extra: { aiResponse: aiResp },
-                    });
-                }
-                return;
-            }
-            // Handle both array and object with courses property
-            const coursesArray = Array.isArray(coursesObj)
-                ? coursesObj
-                : coursesObj.courses;
-
-            if (!Array.isArray(coursesArray) || coursesArray.length === 0) {
-                setErrorModal({
-                    visible: true,
-                    title: 'No Response',
-                    message: 'The AI didn’t return any results.',
-                });
-                setLoading(false);
-                return;
-            }
-
-            // Await all course writes before continuing
-            await Promise.all(
-                coursesArray.map(async (course) => {
-                    const emailSafe = userDetail?.email.replace(/[@.]/g, '_');
-                    const docId = emailSafe + '_' + Date.now().toString();
-
-                    await setDoc(doc(db, 'course', docId), {
-                        ...course,
-                        createdOn: new Date(),
-                        createdBy: userDetail?.email,
-                        docId: docId,
-                    });
-                }),
-            );
-
-            safeReplace('/(tabs)/home');
-            ToastAndroid.show(
-                'Course created successfully!',
-                ToastAndroid.SHORT,
-            );
-        } catch (e: unknown) {
-            console.log('failed course', (e as Error).message);
-            setErrorModal({
-                visible: true,
-                title: 'Error',
-                message: 'Failed to generate course.',
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const watchRewardedAd = () => {
-        showToast('Your ad is loading. It will be ready shortly.');
-        rewardedAd.load();
-
-        const unsubscribe = rewardedAd.addAdEventListener(
-            RewardedAdEventType.LOADED,
-            () => {
-                rewardedAd.show();
-            },
-        );
-
-        rewardedAd.addAdEventListener(
-            RewardedAdEventType.EARNED_REWARD,
-            (reward) => {
-                setExtraCourseUnlocked(true);
-                showToast('You earned 1 extra course!');
-            },
-        );
-
-        rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
-            console.error('Ad failed to load:', error);
-            Alert.alert(
-                'Ad Error',
-                'Failed to load rewarded ad. Try again later.',
-            );
-        });
-
-        // Remove listeners when done
-        return () => {
-            unsubscribe();
-        };
-    };
 
     if (generatingTopic) {
-        return (
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={generatingTopic}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={[styles.modalContent, { backgroundColor }]}>
-                        <LottieView
-                            source={require('./../../assets/animations/Brainstorm.json')}
-                            autoPlay
-                            loop
-                            style={{
-                                width: scale(150),
-                                height: verticalScale(150),
-                            }}
-                        />
-                        <Text style={styles.modalTitle}>
-                            Generating Topics.
-                        </Text>
-                        <Text
-                            style={[styles.modalSubtext, { color: textColor }]}
-                        >
-                            Our AI is working to deliver personalized learning
-                            topics.
-                        </Text>
-                    </View>
-                </View>
-            </Modal>
-        );
+        return <GeneratingTopic generatingTopic={generatingTopic} />;
     }
 
     if (loading) {
-        return (
-            <Modal animationType="fade" transparent={true} visible={loading}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <LottieView
-                            source={require('./../../assets/animations/generatingTopic.json')}
-                            autoPlay
-                            loop
-                            style={{ width: 190, height: 190 }}
-                        />
-                        <Text style={styles.modalTitle}>
-                            Let the Genius Work
-                        </Text>
-                        <Text style={styles.modalSubtext}>
-                            Powered by CheFu Inc., our advanced AI is crafting
-                            your course with precision, efficiency, and a
-                            personalized touch—designed exclusively for you.
-                        </Text>
-                    </View>
-                </View>
-            </Modal>
-        );
+        return <Loading loading={loading} />;
     }
 
     return (
@@ -391,16 +83,15 @@ export default function AddCourse() {
                             loading={loading}
                             disabled={generatingTopic || !userInput.trim()}
                             icon={
-                                <Ionicons name="add" size={16} color="#fff" />
+                                <Ionicons
+                                    name="add"
+                                    size={scale(15)}
+                                    color="#fff"
+                                />
                             }
                         />
 
-                        <View
-                            style={{
-                                marginTop: 15,
-                                marginBottom: 15,
-                            }}
-                        >
+                        <View style={styles.AB}>
                             {topics.length > 0 && (
                                 <Text
                                     style={[
@@ -440,7 +131,7 @@ export default function AddCourse() {
                         </View>
 
                         {selectedTopic.length > 0 && (
-                            <View style={{ marginBottom: 50 }}>
+                            <View style={{ marginBottom: moderateScale(30) }}>
                                 <Button
                                     loading={loading}
                                     onPress={() => onGenerateCourse()}

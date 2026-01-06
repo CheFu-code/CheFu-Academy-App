@@ -1,7 +1,7 @@
+import { auth, db } from "@/config/firebaseConfig";
+import { doc, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
 import { useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
-import { auth, db } from "@/config/fireConfig";
-import { doc, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
 
 const HEARTBEAT_INTERVAL_MS = 30_000;      // send heartbeat every 30 seconds
 const HEARTBEAT_MIN_DELAY_MS = 25_000;     // minimum spacing between writes

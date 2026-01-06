@@ -1,4 +1,4 @@
-import { auth } from '@/config/fireConfig';
+import { auth } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { options } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';

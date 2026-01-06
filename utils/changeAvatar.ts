@@ -1,4 +1,4 @@
-import { auth, db } from "@/config/fireConfig";
+import { auth, db } from "@/config/firebaseConfig";
 import { doc, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import ImagePicker from "react-native-image-crop-picker";

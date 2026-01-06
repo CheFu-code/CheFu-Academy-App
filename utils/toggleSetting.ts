@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { BIOMETRICS } from '@/constant/caches';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, updateDoc } from '@react-native-firebase/firestore';

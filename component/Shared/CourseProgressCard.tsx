@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { styles } from '@/styles/CourseProgressCard.styles';
 import { Course } from '@/types/course';
 import { CourseProgressCardProps } from '@/types/courseProgressCard';

@@ -1,5 +1,5 @@
 // hooks/useLoadUser.ts
-import { auth, db } from "@/config/fireConfig";
+import { auth, db } from "@/config/firebaseConfig";
 import { USER_DETAIL } from "@/constant/caches";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged } from "@react-native-firebase/auth";

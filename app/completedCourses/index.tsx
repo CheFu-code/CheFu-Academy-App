@@ -1,5 +1,6 @@
 import HeaderText from '@/component/common/Header';
-import { db } from '@/config/fireConfig';
+import Loading from '@/component/Shared/Loading';
+import { db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
@@ -15,9 +16,9 @@ import {
     where,
 } from '@react-native-firebase/firestore';
 import { useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { moderateScale, scale } from 'react-native-size-matters';
+import { scale } from 'react-native-size-matters';
 
 const CompletedChapters = () => {
     const { safeReplace } = useSafeNavigation();
@@ -96,19 +97,7 @@ const CompletedChapters = () => {
     );
 
     if (loading) {
-        return (
-            <View style={[styles.indicatorContainer, { backgroundColor }]}>
-                <ActivityIndicator size="large" color={Colors.GREEN} />
-                <Text
-                    style={[
-                        styles.courseTitle,
-                        { color: textColor, marginTop: moderateScale(16) },
-                    ]}
-                >
-                    Loading...
-                </Text>
-            </View>
-        );
+        return <Loading />;
     }
 
     return (

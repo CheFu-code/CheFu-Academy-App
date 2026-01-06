@@ -4,7 +4,7 @@ import AddComment from '@/component/Spark/AddComment';
 import CommentsList from '@/component/Spark/CommentsList';
 import SparkActions from '@/component/Spark/SparkActions';
 import SparkHeader from '@/component/Spark/SparkHeaser';
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
 import { styles } from '@/styles/SparkDetail';

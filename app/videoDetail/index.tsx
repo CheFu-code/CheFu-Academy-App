@@ -2,7 +2,7 @@ import NotFound from '@/component/VideoDetail/NotFound';
 import OverView from '@/component/VideoDetail/OverView';
 import Reviews from '@/component/VideoDetail/Reviews';
 import VideoDetailUI from '@/component/VideoDetail/VideoDetailUI';
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useFetchVideoUploader } from '@/hooks/fetchVidUploader';

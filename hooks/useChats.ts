@@ -1,5 +1,5 @@
 // hooks/useChats.ts
-import { db } from "@/config/fireConfig";
+import { db } from "@/config/firebaseConfig";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { showToast } from "@/utils/toast";
 import { addDoc, collection, deleteDoc, doc, FirebaseFirestoreTypes, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, where } from "@react-native-firebase/firestore";

@@ -13,7 +13,7 @@ import NoCourse from '../../component/Home/NoCourse';
 import CourseProgressCard from '../../component/Shared/CourseProgressCard';
 import { UserDetailContext } from '../../context/UserDetailContext';
 
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';

@@ -1,4 +1,4 @@
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { deleteVideo } from '@/services/deleteVideo';
 import { reportVideo } from '@/services/reportVideo';

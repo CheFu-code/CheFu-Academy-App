@@ -1,4 +1,4 @@
-import { db } from "@/config/fireConfig";
+import { db } from "@/config/firebaseConfig";
 import {
     collection,
     getDocs,

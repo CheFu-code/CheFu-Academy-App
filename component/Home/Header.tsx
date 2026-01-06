@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { useHandles } from '@/handlers/Header/handleFunctions';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';

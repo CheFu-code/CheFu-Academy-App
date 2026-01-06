@@ -120,4 +120,8 @@ export const styles = StyleSheet.create({
         fontFamily: 'outfit',
         fontSize: RFValue(16),
     },
+    AB: {
+        marginTop: verticalScale(15),
+        marginBottom: moderateScale(15),
+    },
 });

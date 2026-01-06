@@ -5,7 +5,6 @@ import './firebase-background-handler';
 
 import FontErrorScreen from '@/component/FontErrorScreen';
 import LoadingScreen from '@/component/LoadingScreen';
-import OfflineScreen from '@/component/Offline/OfflineScreen';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
 import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
@@ -13,6 +12,7 @@ import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
 import useLastSeenTracker from '@/hooks/useLastSeenTracker';
 import { useNotifications } from '@/hooks/useNotifications';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
+import { useColorScheme } from 'react-native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { NetworkProvider, useNetwork } from '../context/NetworkContext';
 import { UserDetailContext } from '../context/UserDetailContext';
@@ -34,6 +34,7 @@ function LayoutContent() {
     const { isConnected } = useNetwork();
     const { authChecked, authSuccess, retryAuth } = useBiometricAuth();
     const { backgroundColor } = useDarkMode();
+    const scheme = useColorScheme();
     const [fontsLoaded, fontError] = useFonts({
         outfit: require('../assets/fonts/Outfit-Regular.ttf'),
         'outfit-bold': require('../assets/fonts/Outfit-Bold.ttf'),
@@ -53,7 +54,7 @@ function LayoutContent() {
     useDeepLinking();
     useHandleDynamicLinks();
 
-    if (!isConnected) return <OfflineScreen />;
+    // if (!isConnected) return <OfflineScreen />;
     if (fontError) return <FontErrorScreen />;
 
     const isUiReady = fontsLoaded;
@@ -69,7 +70,7 @@ function LayoutContent() {
                 <Stack
                     screenOptions={{
                         headerShown: false,
-                        statusBarStyle: 'light',
+                        statusBarStyle: scheme === 'dark' ? 'light' : 'dark',
                         statusBarAnimation: 'slide',
                         gestureEnabled: true,
                         animation: 'slide_from_bottom',

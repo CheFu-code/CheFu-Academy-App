@@ -1,4 +1,4 @@
-import { auth } from '@/config/fireConfig';
+import { auth } from '@/config/firebaseConfig';
 import { OFFLINE_DOWNLOADS } from '@/constant/caches';
 import {
     ensureLegacyWritePermission,

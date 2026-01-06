@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { CACHE_KEY } from '@/constant/caches';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { Course } from '@/types/course';

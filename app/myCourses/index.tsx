@@ -1,5 +1,5 @@
 import HeaderText from '@/component/common/Header';
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { imageAssets } from '@/constant/Option';
 import useDarkMode from '@/hooks/useDarkMode';

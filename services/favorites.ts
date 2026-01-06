@@ -1,4 +1,4 @@
-import { db } from "@/config/fireConfig";
+import { db } from "@/config/firebaseConfig";
 import { FavoriteCourse } from "@/types/video";
 import { collection, deleteDoc, doc, FirebaseFirestoreTypes, getDoc, getDocs } from "@react-native-firebase/firestore";
 

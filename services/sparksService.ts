@@ -1,4 +1,4 @@
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { Spark } from '@/types/sparks';
 import {
     collection,

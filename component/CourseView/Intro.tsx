@@ -1,4 +1,5 @@
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,12 +12,11 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import Button from '../Shared/Button';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
-import { RFValue } from 'react-native-responsive-fontsize';
-import useDarkMode from '@/hooks/useDarkMode';
 
 interface IntroProps {
     course: Course;

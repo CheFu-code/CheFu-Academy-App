@@ -1,5 +1,5 @@
 import Loading from '@/component/Explore/Loading';
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { CACHED_COURSES } from '@/constant/caches';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';

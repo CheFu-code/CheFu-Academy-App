@@ -1,4 +1,4 @@
-import { auth, db } from "@/config/fireConfig";
+import { auth, db } from "@/config/firebaseConfig";
 import {
     createUserWithEmailAndPassword
 } from "@react-native-firebase/auth";

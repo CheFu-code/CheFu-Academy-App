@@ -1,5 +1,5 @@
 import PermissionsUI from '@/component/Setting/PermissionsUI';
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { permissionDisplayNames } from '@/constant/random';
 import { PermissionKeys } from '@/types/permissions';
 import { doc, setDoc } from '@react-native-firebase/firestore';

@@ -1,31 +1,16 @@
 import SignUpUI from '@/component/auth/SignUpUI';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { SignUpResponseOrUndefined } from '@/types/signUp';
+import { validateEmail } from '@/utils/validateEmail';
+import { validatePasswordStrength } from '@/utils/validatePassword';
 import LottieView from 'lottie-react-native';
 import { useContext, useState } from 'react';
-import {
-    Modal,
-    Text,
-    View
-} from 'react-native';
+import { Modal, Text, View } from 'react-native';
 import AppModal from '../../component/Shared/AppModal';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/SignUp.styles';
 import { signUpUser } from '../../utils/authService';
 
-interface SignUpResponse {
-    user: FirebaseAuthTypes.User;
-    userData: {
-        fullname?: string;
-        lastLogin?: Date;
-        updatedAt?: Date;
-        profilePicture?: string | null;
-        provider?: string;
-        [key: string]: unknown;
-    };
-}
-
-type SignUpResponseOrUndefined = SignUpResponse | undefined;
 
 const SignUp = () => {
     const [fullName, setFullName] = useState('');
@@ -37,9 +22,7 @@ const SignUp = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const validateEmail = (email: string) =>
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const validatePassword = (pw: string) => pw.length >= 6;
+
     const [successModal, setSuccessModal] = useState({
         visible: false,
         title: '',
@@ -58,7 +41,7 @@ const SignUp = () => {
             setErrorMsg('Please enter a valid email address.');
             return;
         }
-        if (!validatePassword(password)) {
+        if (!validatePasswordStrength(password)) {
             setErrorMsg('Password should be at least 6 characters.');
             return;
         }

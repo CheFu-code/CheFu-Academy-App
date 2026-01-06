@@ -1,6 +1,6 @@
 import EmailVerificationBanner from '@/component/Home/EmailVerificationBanner';
 import VideoCardHomeScreen from '@/component/Video/VideoCardHomeScreen';
-import { auth } from '@/config/fireConfig';
+import { auth } from '@/config/firebaseConfig';
 import { useCourses } from '@/hooks/useCourses';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useFocusEffect } from '@react-navigation/native';

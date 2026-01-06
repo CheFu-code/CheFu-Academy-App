@@ -1,4 +1,4 @@
-import { db } from "@/config/fireConfig";
+import { db } from "@/config/firebaseConfig";
 import { Video } from "@/types/video";
 import { showToast } from "@/utils/toast";
 import {

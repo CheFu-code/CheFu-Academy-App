@@ -1,5 +1,5 @@
 // services/userService.ts
-import { auth, db } from "@/config/fireConfig";
+import { auth, db } from "@/config/firebaseConfig";
 import {
     deleteUser,
     EmailAuthProvider,

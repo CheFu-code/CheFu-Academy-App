@@ -3,7 +3,9 @@ import LoggedOutMessage from '@/component/Profile/LoggedOutMessage ';
 import { ProfileHeader } from '@/component/Profile/ProfileHeader';
 import { ProfileMenu } from '@/component/Profile/ProfileMenu';
 import ErrorModal from '@/component/Shared/ErrorModal';
+import { auth, db } from '@/config/firebaseConfig';
 import { menuItems } from '@/data/menuItems';
+import useDarkMode from '@/hooks/useDarkMode';
 import { usePickImage } from '@/hooks/usePickImage';
 import { useProfileActions } from '@/hooks/useProfileActions';
 import { useRefreshProfile } from '@/hooks/useRefreshProfile';
@@ -15,13 +17,11 @@ import { doc, updateDoc } from '@react-native-firebase/firestore';
 import { router } from 'expo-router';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Image, Linking, SafeAreaView, ToastAndroid } from 'react-native';
+import { verticalScale } from 'react-native-size-matters';
 import AppModal from '../../component/Shared/AppModal';
 import { Colors } from '../../constant/Colors';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Profile.styles';
-import { auth, db } from '@/config/fireConfig';
-import useDarkMode from '@/hooks/useDarkMode';
-import { verticalScale } from 'react-native-size-matters';
 
 export default function Profile() {
     const { safePush, safeReplace } = useSafeNavigation();

@@ -1,5 +1,5 @@
 import EmailAlertsUI from '@/component/Setting/EmailAlertsUI';
-import { auth, db } from '@/config/fireConfig';
+import { auth, db } from '@/config/firebaseConfig';
 import { PREF_KEY } from '@/constant/caches';
 import { DEFAULT_PREFS, PrefKey } from '@/constant/Preferences';
 import AsyncStorage from '@react-native-async-storage/async-storage';

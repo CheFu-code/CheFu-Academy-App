@@ -1,8 +1,8 @@
 import { AntDesign } from '@expo/vector-icons';
 import { doc, updateDoc } from '@react-native-firebase/firestore';
 
-import { db } from '@/config/fireConfig';
-import { INTERSTITIAL_AD_UNIT_ID } from '@/constant/random';
+import { interstitial } from '@/config/AdConfig';
+import { db } from '@/config/firebaseConfig';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { useLocalSearchParams } from 'expo-router';
@@ -16,7 +16,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { AdEventType, InterstitialAd } from 'react-native-google-mobile-ads';
+import { AdEventType } from 'react-native-google-mobile-ads';
 import * as Progress from 'react-native-progress';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -60,11 +60,6 @@ export default function Quiz() {
             await updateDoc(courseRef, {
                 quizResult: result,
             });
-
-            const interstitial = InterstitialAd.createForAdRequest(
-                INTERSTITIAL_AD_UNIT_ID,
-                { requestNonPersonalizedAdsOnly: true },
-            );
 
             const unsubscribe = interstitial.addAdEventsListener(({ type }) => {
                 if (type === AdEventType.LOADED) {
@@ -148,7 +143,7 @@ export default function Quiz() {
                         width={Dimensions.get('screen').width * 0.85}
                     />
                 </View>
-                
+
                 <ScrollView
                     showsHorizontalScrollIndicator={false}
                     style={{

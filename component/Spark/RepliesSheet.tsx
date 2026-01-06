@@ -1,4 +1,4 @@
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { useRenderTextWithLinks } from '@/helpers/detectLinks';
 import useDarkMode from '@/hooks/useDarkMode';

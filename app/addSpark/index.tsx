@@ -1,6 +1,6 @@
 import HeaderText from '@/component/common/Header';
 import Button from '@/component/Shared/Button';
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { categories, MAX_WORDS } from '@/constant/random';
 import { UserDetailContext } from '@/context/UserDetailContext';

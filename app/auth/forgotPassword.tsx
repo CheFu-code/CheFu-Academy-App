@@ -1,9 +1,10 @@
-import AppModal from "@/component/Shared/AppModal";
-import { auth } from "@/config/fireConfig";
-import { useSafeNavigation } from "@/hooks/useSafeNavigation";
-import * as Sentry from "@sentry/react-native";
-import LottieView from "lottie-react-native";
-import { useState } from "react";
+import AppModal from '@/component/Shared/AppModal';
+import { useForgotHook } from '@/handlers/auth/forgotPassword/handlerFunction';
+import AnimatedText from '@/helpers/animateText';
+import useDarkMode from '@/hooks/useDarkMode';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import LottieView from 'lottie-react-native';
+import { useState } from 'react';
 import {
     ActivityIndicator,
     StyleSheet,
@@ -11,119 +12,50 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import ErrorModal from "../../component/Shared/ErrorModal";
-import { Colors } from "../../constant/Colors";
+} from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
+import ErrorModal from '../../component/Shared/ErrorModal';
+import { Colors } from '../../constant/Colors';
 
 const ForgotPassword = () => {
-    const [email, setEmail] = useState("");
-    const [loading, setLoading] = useState(false);
-    const { safeBack } = useSafeNavigation()
+    const [email, setEmail] = useState('');
+    const [loading] = useState(false);
+    const { safeBack, safeReplace } = useSafeNavigation();
+    const { handleReset } = useForgotHook();
+    const { backgroundColor } = useDarkMode();
     const [successModalVisible, setSuccessModalVisible] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
     const [errorModalVisible, setErrorModalVisible] = useState({
         visible: false,
-        title: "",
-        message: "",
+        title: '',
+        message: '',
     });
-
-    const handleReset = () => {
-        if (loading) return;
-        const cleanEmail = email.trim().toLowerCase();
-
-        if (!cleanEmail) {
-            setErrorModalVisible({
-                visible: true,
-                title: "Enter Email",
-                message: "Please enter your email address.",
-            });
-            return;
-        }
-
-        setLoading(true);
-
-        auth.sendPasswordResetEmail(cleanEmail)
-            .then(() => {
-                setLoading(false);
-                setSuccessModalVisible({
-                    visible: true,
-                    title: "Check Your Email",
-                    message: `Password reset link sent to ${cleanEmail}.`,
-                });
-            })
-            .catch((error) => {
-                setLoading(false);
-                Sentry.captureException(error);
-
-                if (!error || !error.code) {
-                    setErrorModalVisible({
-                        visible: true,
-                        title: "Error",
-                        message: "An unknown error occurred. Please try again.",
-                    });
-                    return;
-                }
-                switch (error.code) {
-                    case "auth/user-not-found":
-                        setErrorModalVisible({
-                            visible: true,
-                            title: "User Not Found",
-                            message: "No user found with this email.",
-                        });
-                        break;
-                    case "auth/invalid-email":
-                        setErrorModalVisible({
-                            visible: true,
-                            title: "Invalid Email",
-                            message: "The email address is not valid.",
-                        });
-                        break;
-                    case "auth/missing-email":
-                        setErrorModalVisible({
-                            visible: true,
-                            title: "Missing Email",
-                            message: "Please enter your email address.",
-                        });
-                        break;
-                    case "auth/network-request-failed":
-                        setErrorModalVisible({
-                            visible: true,
-                            title: "Network Error",
-                            message: "Please check your internet connection.",
-                        });
-                        break;
-                    default:
-                        setErrorModalVisible({
-                            visible: true,
-                            title: "Error",
-                            message: error.message,
-                        });
-                }
-            });
-    };
 
     return (
         <>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor }]}>
                 <View
                     style={{
-                        marginBottom: 30,
-                        alignItems: "center",
-                        justifyContent: "center",
+                        alignItems: 'center',
+                        justifyContent: 'center',
                     }}
                 >
                     <LottieView
-                        source={require("../../assets/animations/Forget password animation.json")}
+                        source={require('../../assets/animations/Forget password animation.json')}
                         autoPlay
                         loop
-                        style={{ width: 150, height: 150 }}
+                        style={{
+                            width: moderateScale(150),
+                            height: verticalScale(150),
+                        }}
                     />
                 </View>
-                <Text style={styles.title}>Reset Password</Text>
+                <AnimatedText text="Reset Password" />
                 <TextInput
                     style={styles.input}
                     placeholder="Enter your email"
@@ -142,7 +74,7 @@ const ForgotPassword = () => {
                     ]}
                 >
                     {loading ? (
-                        <ActivityIndicator color={"white"} />
+                        <ActivityIndicator color={'white'} />
                     ) : (
                         <Text style={styles.buttonText}>Send Reset Link</Text>
                     )}
@@ -150,7 +82,7 @@ const ForgotPassword = () => {
 
                 <TouchableOpacity
                     onPress={() => {
-                        safeBack();
+                        safeReplace('/auth/signIn');
                     }}
                     style={styles.cancel}
                 >
@@ -193,41 +125,35 @@ export default ForgotPassword;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.BG_COLOR,
-        padding: 25,
-        justifyContent: "center",
+        padding: moderateScale(20),
+        justifyContent: 'center',
     },
-    title: {
-        fontSize: 26,
-        fontWeight: "bold",
-        color: Colors.PRIMARY,
-        marginBottom: 20,
-        textAlign: "center",
-    },
+
     input: {
         borderWidth: 1,
         borderColor: Colors.PRIMARY,
-        borderRadius: 8,
-        padding: 15,
-        fontSize: 16,
+        borderRadius: moderateScale(8),
+        padding: moderateScale(15),
+        fontSize: RFValue(16),
         color: Colors.WHITE,
-        marginBottom: 20,
+        marginBottom: moderateScale(20),
     },
     button: {
         backgroundColor: Colors.PRIMARY,
-        padding: 15,
-        borderRadius: 8,
+        padding: moderateScale(15),
+        borderRadius: moderateScale(8),
     },
     buttonText: {
         color: Colors.WHITE,
-        fontSize: 18,
-        textAlign: "center",
+        fontSize: RFValue(17),
+        textAlign: 'center',
     },
     cancel: {
-        marginTop: 15,
+        marginTop: verticalScale(15),
     },
     cancelText: {
         color: Colors.PRIMARY,
-        textAlign: "center",
+        textAlign: 'center',
+        fontSize: RFValue(13),
     },
 });

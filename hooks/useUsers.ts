@@ -1,5 +1,5 @@
 // hooks/useUsers.ts
-import { db } from "@/config/fireConfig";
+import { db } from "@/config/firebaseConfig";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { User } from "@/types/user";
 import { collection, FirebaseFirestoreTypes, getDocs } from "@react-native-firebase/firestore";

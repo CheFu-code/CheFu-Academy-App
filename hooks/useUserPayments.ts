@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { db } from '@/config/firebaseConfig';
 import {
     collection,
     FirebaseFirestoreTypes,
@@ -7,7 +6,8 @@ import {
     query,
     where,
 } from '@react-native-firebase/firestore';
-import { db } from '@/config/fireConfig';
+import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 interface Payment {
     id: string;

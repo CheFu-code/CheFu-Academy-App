@@ -1,4 +1,4 @@
-import { auth } from '@/config/fireConfig';
+import { auth } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { sendEmailVerification } from '@react-native-firebase/auth';
 import { useState } from 'react';

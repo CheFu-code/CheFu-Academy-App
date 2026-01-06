@@ -6,7 +6,7 @@ import { Colors } from '../constant/Colors';
 export const styles = StyleSheet.create({
     textInput: {
         width: '100%',
-        borderWidth: 0.5,
+        borderWidth: 0.9,
         padding: verticalScale(12),
         fontSize: RFValue(14),
         marginTop: verticalScale(15),
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 0.5,
+        borderWidth: 0.9,
         paddingHorizontal: scale(12),
         borderRadius: scale(8),
         borderColor: '#858585',
@@ -86,5 +86,35 @@ export const styles = StyleSheet.create({
         height: verticalScale(160),
         marginBottom: verticalScale(12),
         resizeMode: 'contain',
+    },
+    X: {
+        alignItems: 'center',
+        paddingTop: verticalScale(30),
+        padding: scale(20),
+    },
+    A: {
+        color: 'red',
+        alignSelf: 'flex-start',
+    },
+    FP: {
+        color: Colors.PRIMARY,
+        fontWeight: 'bold',
+    },
+    FPC: {
+        alignSelf: 'flex-end',
+        marginTop: verticalScale(8),
+    },
+    SV: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingBottom: verticalScale(40),
+    },
+    google: {
+        fontSize: RFValue(15),
+        fontFamily: 'outfit',
+    },
+    ABC: {
+        flexDirection: 'row',
+        marginTop: verticalScale(16),
     },
 });

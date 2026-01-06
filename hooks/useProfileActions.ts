@@ -1,4 +1,4 @@
-import { auth, db, user } from '@/config/fireConfig';
+import { auth, db, user } from '@/config/firebaseConfig';
 import { LOGOUT_KEYS } from '@/constant/random';
 import { UserDetail } from '@/types/UserDetail';
 import { showToast } from '@/utils/toast';

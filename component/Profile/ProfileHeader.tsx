@@ -1,7 +1,9 @@
 // components/Profile/ProfileHeader.tsx
+import { auth } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { formatDate } from '@/helpers/formatDate';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useProfileActions } from '@/hooks/useProfileActions';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles, styles2 } from '@/styles/Profile.styles';
@@ -19,11 +21,9 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import ErrorModal from '../Shared/ErrorModal';
-import { auth } from '@/config/fireConfig';
-import { scale, verticalScale } from 'react-native-size-matters';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import useDarkMode from '@/hooks/useDarkMode';
+import { scale, verticalScale } from 'react-native-size-matters';
+import ErrorModal from '../Shared/ErrorModal';
 
 interface ProfileHeaderProps {
     profilePicture: string;

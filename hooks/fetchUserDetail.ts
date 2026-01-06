@@ -1,8 +1,9 @@
-import { db } from '@/config/fireConfig';
+import { db } from '@/config/firebaseConfig';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { TrustedDevice } from '@/types/trustedDevice';
 import { showToast } from '@/utils/toast';
 import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
+import * as Sentry from '@sentry/react-native';
 import { useCallback, useContext, useState } from 'react';
 import { Alert } from 'react-native';
 
@@ -89,5 +90,22 @@ export const useFetchUser = () => {
         );
     };
 
-    return { fetchUserDetail, deleteFromTrustedDevices };
+    const getUserDetail = async (email: string) => {
+        try {
+            const userDocRef = doc(db, 'users', email);
+            // Update lastLogin to now
+            await userDocRef.update({ lastLogin: new Date() });
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                setUserDetail(userDoc.data());
+            } else {
+                console.warn('User data not found in Firestore.');
+            }
+        } catch (error) {
+            console.error('Error fetching user data from sign in:', error);
+            Sentry.captureException(error);
+        }
+    };
+
+    return { fetchUserDetail, deleteFromTrustedDevices, getUserDetail };
 };
