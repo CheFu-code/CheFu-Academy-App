@@ -2,11 +2,12 @@ import Error from '@/component/Setting/Error';
 import FatalError from '@/component/Setting/FatalError';
 import SettingsUI from '@/component/Setting/SettingsUI';
 import { useShareApp } from '@/handlers/handleShareApp';
+import { useProfileActions } from '@/hooks/useProfileActions';
 import { useExportUserData } from '@/services/exportUserData';
-import { useLogOut } from '@/services/logOut';
 import { useVerifyEmail } from '@/services/verifyUserEmail';
 import { useFetchSetting } from '@/utils/fetchSettings';
 import { useToggle } from '@/utils/toggleSetting';
+import { router } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
 import AppModal from '../component/Shared/AppModal';
 import { UserDetailContext } from '../context/UserDetailContext';
@@ -19,14 +20,18 @@ export default function SettingsScreen() {
     const [showVersion, setShowVersion] = useState(false);
     const [useBiometrics, setUseBiometrics] = useState(true);
     const [notifications, setNotifications] = useState(true);
-    const { logOut } = useLogOut();
     const { verify } = useVerifyEmail();
     const { handleShare } = useShareApp();
     const { fetchSettings } = useFetchSetting();
     const { toggleSetting } = useToggle();
     const { exportUserData } = useExportUserData();
     const { safePush, safeBack } = useSafeNavigation();
-    const { userDetail } = useContext(UserDetailContext);
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const { handleLogout } = useProfileActions(
+        userDetail,
+        setUserDetail,
+        router,
+    );
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: '',
@@ -92,7 +97,7 @@ export default function SettingsScreen() {
                     handleShare={handleShare}
                     userDetail={userDetail}
                     verify={verify}
-                    logOut={logOut}
+                    handleLogout={handleLogout}
                 />
             );
         }

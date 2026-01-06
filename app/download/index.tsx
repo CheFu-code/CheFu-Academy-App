@@ -1,4 +1,5 @@
 import HeaderText from '@/component/common/Header';
+import { OFFLINE_DOWNLOADS } from '@/constant/caches';
 import {
     isAndroidExternalMedia,
     pathFromUri,
@@ -50,7 +51,7 @@ export default function DownloadScreen() {
     }, []);
 
     const loadDownloads = async () => {
-        const saved = await AsyncStorage.getItem('offlineDownloads');
+        const saved = await AsyncStorage.getItem(OFFLINE_DOWNLOADS);
         if (saved) setDownloads(JSON.parse(saved));
     };
 
@@ -70,7 +71,7 @@ export default function DownloadScreen() {
                     const updated = downloads.filter((d) => d.id !== item.id);
                     setDownloads(updated);
                     await AsyncStorage.setItem(
-                        'offlineDownloads',
+                        OFFLINE_DOWNLOADS,
                         JSON.stringify(updated),
                     );
                     return;
@@ -87,7 +88,7 @@ export default function DownloadScreen() {
             const updated = downloads.filter((d) => d.id !== item.id);
             setDownloads(updated);
             await AsyncStorage.setItem(
-                'offlineDownloads',
+                OFFLINE_DOWNLOADS,
                 JSON.stringify(updated),
             );
         } catch (error) {

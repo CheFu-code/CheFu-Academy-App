@@ -1,5 +1,6 @@
 // hooks/useLoadUser.ts
 import { auth, db } from "@/config/fireConfig";
+import { USER_DETAIL } from "@/constant/caches";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged } from "@react-native-firebase/auth";
 import { doc, getDoc, updateDoc } from "@react-native-firebase/firestore";
@@ -24,7 +25,7 @@ export const useLoadUser = () => {
 
         async function loadUser() {
             try {
-                const storedUser = await AsyncStorage.getItem("userDetail");
+                const storedUser = await AsyncStorage.getItem(USER_DETAIL);
                 if (storedUser) {
                     const userData = JSON.parse(storedUser);
                     setUserDetail(userData);
@@ -57,7 +58,7 @@ export const useLoadUser = () => {
                             }
 
                             setUserDetail(userData);
-                            await AsyncStorage.setItem("userDetail", JSON.stringify(userData));
+                            await AsyncStorage.setItem(USER_DETAIL, JSON.stringify(userData));
                             safeReplace("/(tabs)/home");
                         }
                         console.log('user loaded, redirecting')

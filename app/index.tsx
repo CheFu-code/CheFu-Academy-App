@@ -1,4 +1,5 @@
 import { TermsText } from '@/component/TermsText';
+import { SEEN_WELCOME } from '@/constant/caches';
 import { useLoadUser } from '@/hooks/useLoadUser';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Entypo, FontAwesome } from '@expo/vector-icons';
@@ -19,7 +20,7 @@ export default function Index() {
 
     useEffect(() => {
         const checkWelcome = async () => {
-            const hasSeen = await AsyncStorage.getItem('hasSeenWelcome');
+            const hasSeen = await AsyncStorage.getItem(SEEN_WELCOME);
             if (!hasSeen) {
                 setShowWelcome(true);
             }
@@ -28,7 +29,7 @@ export default function Index() {
     }, []);
 
     const handleGetStarted = async () => {
-        await AsyncStorage.setItem('hasSeenWelcome', 'true');
+        await AsyncStorage.setItem(SEEN_WELCOME, 'true');
         safeReplace('/auth/signUp');
     };
 

@@ -1,17 +1,18 @@
 import { auth } from '@/config/fireConfig';
+import { OFFLINE_DOWNLOADS } from '@/constant/caches';
 import {
     ensureLegacyWritePermission,
     savePDFToAppMediaFolder,
     scanFile,
 } from '@/helpers/courseDownloadHelpers';
 import { generateCourseHTML } from '@/helpers/generateCourseHTML';
+import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import {
     AntDesign,
-    Ionicons,
     MaterialCommunityIcons,
-    MaterialIcons,
+    MaterialIcons
 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
@@ -32,13 +33,12 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { scale, verticalScale } from 'react-native-size-matters';
 import Chapters from '../../component/CourseView/Chapters';
 import Intro from '../../component/CourseView/Intro';
 import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
 import { styles } from '../../styles/CourseView';
-import useDarkMode from '@/hooks/useDarkMode';
-import { scale, verticalScale } from 'react-native-size-matters';
 
 export default function CourseView() {
     const { courseParams, enroll } = useLocalSearchParams();
@@ -135,7 +135,7 @@ export default function CourseView() {
             }
 
             // Load existing downloads
-            let existing = await AsyncStorage.getItem('offlineDownloads');
+            let existing = await AsyncStorage.getItem(OFFLINE_DOWNLOADS);
             let parsed: Course[] = [];
             try {
                 parsed = existing ? JSON.parse(existing) : [];
@@ -197,7 +197,7 @@ export default function CourseView() {
                     },
                 ];
                 await AsyncStorage.setItem(
-                    'offlineDownloads',
+                    OFFLINE_DOWNLOADS,
                     JSON.stringify(updated),
                 );
 
@@ -216,7 +216,7 @@ export default function CourseView() {
                     },
                 ];
                 await AsyncStorage.setItem(
-                    'offlineDownloads',
+                    OFFLINE_DOWNLOADS,
                     JSON.stringify(updated),
                 );
                 ToastAndroid.show(

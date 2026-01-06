@@ -1,4 +1,5 @@
 import { auth, db } from '@/config/fireConfig';
+import { BIOMETRICS } from '@/constant/caches';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, updateDoc } from '@react-native-firebase/firestore';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -58,7 +59,7 @@ export const useToggle = () => {
                 // 👇 Add this immediately after
                 if (name === 'Biometric Lock') {
                     await AsyncStorage.setItem(
-                        'useBiometrics',
+                        BIOMETRICS,
                         newValue.toString(),
                     );
                 }

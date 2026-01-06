@@ -1,11 +1,10 @@
 // hooks/useVideos.ts
-import { useEffect, useState, useCallback } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchVideos, fetchYouTubeVideos } from "@/services/videoService";
-import { Video } from "@/types/video";
-import { parseYouTubeDuration } from "@/helpers/formatDate";
-
-const STORAGE_KEY = "videos_cache";
+import { STORAGE_KEY } from '@/constant/caches';
+import { parseYouTubeDuration } from '@/helpers/formatDate';
+import { fetchVideos, fetchYouTubeVideos } from '@/services/videoService';
+import { Video } from '@/types/video';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useState } from 'react';
 
 // Fisher–Yates shuffle
 const shuffleArray = <T>(array: T[]): T[] => {
@@ -25,17 +24,14 @@ export function useVideos() {
         setVideosState(shuffleArray(arr));
     }, []);
 
-
-
     const loadCachedVideos = useCallback(async () => {
         try {
             const cached = await AsyncStorage.getItem(STORAGE_KEY);
             if (cached) setVideos(JSON.parse(cached));
         } catch (err) {
-            console.warn("Failed to load cache:", err);
+            console.warn('Failed to load cache:', err);
         }
     }, [setVideos]);
-
 
     const fetchAndUpdateVideos = useCallback(async () => {
         try {
@@ -50,15 +46,15 @@ export function useVideos() {
                 duration: parseYouTubeDuration(v.duration),
                 views: v.views,
                 publishedAt: v.publishedAt,
-                category: v.category || "YouTube",
+                category: v.category || 'YouTube',
                 uploadedAt: v.createdAt,
-                instructorName: v.channelTitle || "Unknown Channel",
-                instructorCompany: v.channelTitle ? `${v.channelTitle}` : "",
-                videoURL: "",
-                uploadedBy: "YouTube",
-                level: "beginner",
+                instructorName: v.channelTitle || 'Unknown Channel',
+                instructorCompany: v.channelTitle ? `${v.channelTitle}` : '',
+                videoURL: '',
+                uploadedBy: 'YouTube',
+                level: 'beginner',
                 topics: [],
-                visibility: "public",
+                visibility: 'public',
             }));
 
             const allVideos = [...backendVideos, ...ytVideos];
@@ -66,7 +62,7 @@ export function useVideos() {
             setVideos(allVideos);
             await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allVideos));
         } catch (err) {
-            console.warn("Failed to fetch videos:", err);
+            console.warn('Failed to fetch videos:', err);
         }
     }, [setVideos]);
 

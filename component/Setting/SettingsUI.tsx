@@ -36,7 +36,7 @@ const SettingsUI = ({
     handleShare,
     userDetail,
     verify,
-    logOut,
+    handleLogout,
 }: SettingsUIProps) => {
     const { textColor, backgroundColor } = useDarkMode();
     return (
@@ -258,7 +258,7 @@ const SettingsUI = ({
                 <SettingItem
                     label="Log Out"
                     icon="exit-outline"
-                    onPress={() => logOut()}
+                    onPress={() => handleLogout()}
                 />
             </ScrollView>
         </SafeAreaView>

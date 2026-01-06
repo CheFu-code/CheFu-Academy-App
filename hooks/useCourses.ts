@@ -1,4 +1,5 @@
 import { auth, db } from '@/config/fireConfig';
+import { CACHE_KEY } from '@/constant/caches';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { Course } from '@/types/course';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,7 +15,6 @@ export const useCourses = () => {
     const [fetching, setFetching] = useState(false);
     const { safeReplace } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const CACHE_KEY = '@cached_courses';
 
     const loadCachedCourses = async () => {
         try {

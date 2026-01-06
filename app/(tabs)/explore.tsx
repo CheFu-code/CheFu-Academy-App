@@ -1,5 +1,6 @@
 import Loading from '@/component/Explore/Loading';
 import { db } from '@/config/fireConfig';
+import { CACHED_COURSES } from '@/constant/caches';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
@@ -64,12 +65,12 @@ export default function ExploreScreen() {
             setCourseData(limitedData);
             setFilteredCourses(limitedData);
             await AsyncStorage.setItem(
-                'cachedCourses',
+                CACHED_COURSES,
                 JSON.stringify(limitedData),
             );
         } catch (error) {
             console.error('Failed to fetch courses:', error);
-            const cached = await AsyncStorage.getItem('cachedCourses');
+            const cached = await AsyncStorage.getItem(CACHED_COURSES);
             if (cached) {
                 const parsed = JSON.parse(cached);
                 setCourseData(parsed);
@@ -99,9 +100,7 @@ export default function ExploreScreen() {
     };
 
     if (loading) {
-        return (
-            <Loading/>
-        );
+        return <Loading />;
     }
 
     return (

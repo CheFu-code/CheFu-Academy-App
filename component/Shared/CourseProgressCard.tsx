@@ -78,7 +78,6 @@ export default function CourseProgressCard({
     useEffect(() => {
         async function checkAndSendNotification() {
             if (!item) {
-                console.log('No course item provided.');
                 return;
             }
 

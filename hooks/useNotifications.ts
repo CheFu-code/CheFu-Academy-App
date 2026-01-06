@@ -1,3 +1,4 @@
+import { DAILY_NOTIFICATION } from "@/constant/caches";
 import notifee from "@notifee/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getApp } from "@react-native-firebase/app";
@@ -20,11 +21,11 @@ export function useNotifications() {
                 importance: 4, // AndroidImportance.HIGH
             });
 
-            const alreadyScheduled = await AsyncStorage.getItem("dailyNotificationScheduled");
+            const alreadyScheduled = await AsyncStorage.getItem(DAILY_NOTIFICATION);
 
             if (!alreadyScheduled) {
                 await scheduleDailyNotification();
-                await AsyncStorage.setItem("dailyNotificationScheduled", "true");
+                await AsyncStorage.setItem(DAILY_NOTIFICATION, "true");
             }
         }
 

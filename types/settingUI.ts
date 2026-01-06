@@ -18,5 +18,5 @@ export interface SettingsUIProps {
     handleShare: () => void;
     userDetail: UserDetail;
     verify: () => void;
-    logOut: () => void;
+    handleLogout: () => void;
 }

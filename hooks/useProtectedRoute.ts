@@ -1,8 +1,9 @@
+import { SEEN_WELCOME } from "@/constant/caches";
 import { UserDetail } from "@/types/UserDetail";
-import { useSegments } from "expo-router";
-import { useSafeNavigation } from "./useSafeNavigation";
-import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSegments } from "expo-router";
+import { useEffect, useState } from "react";
+import { useSafeNavigation } from "./useSafeNavigation";
 
 const useProtectedRoute = (
     userDetail: UserDetail | null | undefined,
@@ -13,7 +14,7 @@ const useProtectedRoute = (
     const [hasSeenWelcome, setHasSeenWelcome] = useState<boolean | null>(null);
 
     useEffect(() => {
-        AsyncStorage.getItem("hasSeenWelcome").then(value => {
+        AsyncStorage.getItem(SEEN_WELCOME).then(value => {
             setHasSeenWelcome(value === "true");
         });
     }, []);

@@ -1,4 +1,5 @@
 import { auth, db } from '@/config/fireConfig';
+import { BIOMETRICS } from '@/constant/caches';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, getDoc } from '@react-native-firebase/firestore';
 import { useState } from 'react';
@@ -32,7 +33,7 @@ export const useFetchSetting = () => {
                 if (typeof data.useBiometrics === 'boolean') {
                     setUseBiometrics(data.useBiometrics);
                     await AsyncStorage.setItem(
-                        'useBiometrics',
+                        BIOMETRICS,
                         data.useBiometrics.toString(),
                     );
                 }

@@ -5,7 +5,4 @@ export const DEFAULT_PREFS = {
     security: true,
 };
 
-
-export const PREF_KEY = 'email_preferences';
-
 export type PrefKey = keyof typeof DEFAULT_PREFS;

@@ -1,3 +1,17 @@
+import { IoniconsName } from '@/types';
+import { Colors } from './Colors';
+import {
+    BIOMETRICS,
+    CACHE_KEY,
+    CACHED_COURSES,
+    DAILY_NOTIFICATION,
+    OFFLINE_DOWNLOADS,
+    PREF_KEY,
+    SEEN_WELCOME,
+    STORAGE_KEY,
+    USER_DETAIL,
+} from './caches';
+
 export const SHARE_MESSAGE = 'Check out CheFu Academy App!';
 export const SHARE_URL =
     'https://play.google.com/store/apps/details?id=com.chefu.academy';
@@ -18,9 +32,33 @@ export const categories = [
     'Discussion',
 ];
 
+export const modalOptions: {
+    label: string;
+    icon: IoniconsName;
+    color?: string;
+}[] = [
+    { label: 'Add Course', icon: 'add-circle-outline' },
+    { label: 'Post Spark', icon: 'add' },
+    { label: 'Favorite Videos', icon: 'heart' },
+    { label: 'Contact Support', icon: 'mail-outline' },
+    { label: 'Rate our app', icon: 'star-outline', color: Colors.YELLOW },
+];
+
 export const permissionDisplayNames = {
     camera: 'Camera',
     mediaLibrary: 'Media Library',
     location: 'Location',
     notifications: 'Notifications',
 };
+
+export const LOGOUT_KEYS = [
+    USER_DETAIL,
+    CACHE_KEY,
+    BIOMETRICS,
+    PREF_KEY,
+    STORAGE_KEY,
+    SEEN_WELCOME,
+    CACHED_COURSES,
+    OFFLINE_DOWNLOADS,
+    DAILY_NOTIFICATION,
+];

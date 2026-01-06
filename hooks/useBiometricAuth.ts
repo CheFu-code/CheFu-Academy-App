@@ -1,3 +1,4 @@
+import { BIOMETRICS } from "@/constant/caches";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Sentry from "@sentry/react-native";
 import * as LocalAuthentication from "expo-local-authentication";
@@ -10,7 +11,7 @@ export function useBiometricAuth() {
 
     const runBiometrics = async () => {
         try {
-            const biometricEnabled = await AsyncStorage.getItem("useBiometrics");
+            const biometricEnabled = await AsyncStorage.getItem(BIOMETRICS);
             if (biometricEnabled !== "true") {
                 setAuthSuccess(true);
             } else {

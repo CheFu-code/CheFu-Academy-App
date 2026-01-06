@@ -1,1 +1,9 @@
+export const PREF_KEY = 'email_preferences';
 export const CACHE_KEY = '@cached_courses';
+export const BIOMETRICS = 'useBiometrics';
+export const USER_DETAIL = 'userDetail';
+export const STORAGE_KEY = 'videos_cache';
+export const SEEN_WELCOME = 'hasSeenWelcome';
+export const CACHED_COURSES = 'cachedCourses';
+export const OFFLINE_DOWNLOADS = 'offlineDownloads';
+export const DAILY_NOTIFICATION = 'dailyNotificationScheduled';

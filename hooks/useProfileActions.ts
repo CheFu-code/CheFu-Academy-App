@@ -1,4 +1,5 @@
-import { auth, db } from '@/config/fireConfig';
+import { auth, db, user } from '@/config/fireConfig';
+import { LOGOUT_KEYS } from '@/constant/random';
 import { UserDetail } from '@/types/UserDetail';
 import { showToast } from '@/utils/toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,27 +18,23 @@ import {
 } from '@react-native-firebase/firestore';
 import * as Sentry from '@sentry/react-native';
 import { useCallback, useState } from 'react';
-import { ToastAndroid } from 'react-native';
+import { Alert } from 'react-native';
 
 export function useProfileActions(
     userDetail: UserDetail | null,
     setUserDetail: React.Dispatch<React.SetStateAction<UserDetail | null>>,
     router: any,
 ) {
-    const CACHE_KEY = '@cached_courses';
     const [loading, setLoading] = useState(false);
 
     const handleLogout = useCallback(async () => {
         try {
             setLoading(true);
             await signOut(auth);
-            await AsyncStorage.removeItem('userDetail');
-            await AsyncStorage.removeItem(CACHE_KEY);
-            await AsyncStorage.removeItem('useBiometrics');
-            await AsyncStorage.removeItem('email_preferences');
+            await AsyncStorage.multiRemove(LOGOUT_KEYS);
             setUserDetail(null);
         } catch (err) {
-            ToastAndroid.show('Failed to logout', ToastAndroid.SHORT);
+            showToast('Failed to logout');
             Sentry.captureException(err);
         } finally {
             setLoading(false);
@@ -49,12 +46,7 @@ export function useProfileActions(
             if (!password) return;
             try {
                 setLoading(true);
-                const user = auth.currentUser;
-                if (!user?.email)
-                    return ToastAndroid.show(
-                        'No user logged in',
-                        ToastAndroid.SHORT,
-                    );
+                if (!user?.email) return showToast('No user logged in');
 
                 const cred = EmailAuthProvider.credential(user.email, password);
                 await reauthenticateWithCredential(user, cred);
@@ -77,12 +69,9 @@ export function useProfileActions(
                 }
 
                 await deleteUser(user);
-                await AsyncStorage.removeItem('userDetail');
+                await AsyncStorage.multiRemove(LOGOUT_KEYS);
                 setUserDetail(null);
-                ToastAndroid.show(
-                    'Account deleted successfully',
-                    ToastAndroid.SHORT,
-                );
+                showToast('Account deleted successfully');
                 router.replace('/');
             } catch (err: unknown) {
                 Sentry.captureException(err);
@@ -107,20 +96,12 @@ export function useProfileActions(
     const verifyEmail = useCallback(async () => {
         try {
             setLoading(true);
-            const user = auth.currentUser;
-            if (!user)
-                return ToastAndroid.show(
-                    'No user signed in',
-                    ToastAndroid.SHORT,
-                );
+            if (!user) return showToast('No user signed in');
             await sendEmailVerification(user);
-            ToastAndroid.show(
-                `Verification email sent to ${user?.email}`,
-                ToastAndroid.LONG,
-            );
+            Alert.alert(`Verification email sent to ${user?.email}`);
             setLoading(false);
         } catch (err) {
-            ToastAndroid.show('Error. Please try again', ToastAndroid.LONG)
+            showToast('Error. Please try again');
             Sentry.captureException(err);
         } finally {
             setLoading(false);
