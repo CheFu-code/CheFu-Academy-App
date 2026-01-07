@@ -1,13 +1,15 @@
-const express = require("express");
-const admin = require("firebase-admin");
-const router = express.Router();
+import express from 'express';
+import admin from 'firebase-admin';
+import serviceAccount from './firebase/serviceAccountKey.json';
 
-const serviceAccount = require("./firebase/serviceAccountKey.json");
+const router = express.Router();
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+        credential: admin.credential.cert(
+            serviceAccount as admin.ServiceAccount,
+        ),
     });
 } else {
 }
@@ -43,53 +45,60 @@ const firestore = admin.firestore();
 //         console.error("❌ Error sending notification:", error);
 //     });
 
-router.post("/save-fcm-token", async (req, res) => {
-    console.log("🔔 Save FCM token request received with body:", req.body);
-
+router.post('/save-fcm-token', async (req, res) => {
     const { email, fcmToken } = req.body;
 
-    if (!email || !fcmToken) {
-        console.warn("⚠️ Missing email or FCM token in request");
-        return res.status(400).send("Missing email or FCM token");
+    if (!fcmToken) {
+        console.warn('⚠️ Missing FCM token in request');
+        return res.status(400).send('Missing FCM token');
+    } else if (!email) {
+        console.warn('⚠️ Missing email in request');
+        return res.status(400).send('Missing email');
     }
 
     try {
         await firestore
-            .collection("users")
+            .collection('users')
             .doc(email)
             .set({ fcmToken }, { merge: true });
 
-        res.status(200).json({ success: true, message: "FCM token saved" });
+        res.status(200).json({ success: true, message: 'FCM token saved' });
     } catch (error) {
-        console.error("❌ Error saving FCM token:", error);
-        res.status(500).send("Failed to save FCM token");
+        console.error('❌ Error saving FCM token:', error);
+        res.status(500).send('Failed to save FCM token');
     }
 });
 
-router.post("/sendToUser", async (req, res) => {
+router.post('/sendToUser', async (req, res) => {
     const { userEmail, title, body } = req.body;
 
-    if (!userEmail || !title || !body) {
-        console.warn("⚠️ Missing required fields in request");
-        return res.status(400).send("Missing fields");
+    if (!userEmail) {
+        console.warn('⚠️ Missing userEmail in request');
+        return res.status(400).send('Missing userEmail in request');
+    } else if (!title) {
+        console.warn('Missing title in request');
+        return res.status(400).send('Missing title in request');
+    } else if (!body) {
+        console.warn('Missing body in request');
+        return res.status(400).send('Missing body in request');
     }
 
     try {
         const userDoc = await firestore
-            .collection("users")
+            .collection('users')
             .doc(userEmail)
             .get();
 
         if (!userDoc.exists) {
-            console.warn("❌ User not found in Firestore:", userEmail);
-            return res.status(404).send("User not found");
+            console.warn('❌ User not found in Firestore:', userEmail);
+            return res.status(404).send('User not found');
         }
 
         const token = userDoc.data().fcmToken;
 
         if (!token) {
-            console.warn("❌ User has no FCM token saved:", userEmail);
-            return res.status(400).send("User has no FCM token saved");
+            console.warn('❌ User has no FCM token saved:', userEmail);
+            return res.status(400).send('User has no FCM token saved');
         }
 
         const message = {
@@ -97,7 +106,7 @@ router.post("/sendToUser", async (req, res) => {
             notification: { title, body },
             android: {
                 notification: {
-                    channelId: "default", // Ensure this matches the one in your app
+                    channelId: 'default', // Ensure this matches the one in your app
                 },
             },
         };
@@ -105,17 +114,17 @@ router.post("/sendToUser", async (req, res) => {
         const response = await admin.messaging().send(message);
 
         res.json({ success: true, response });
-    } catch (error) {
-        console.error("❌ Error sending notification:", error);
+    } catch (error: any) {
+        console.error('❌ Error sending notification:', error);
         if (
-            error.code === "messaging/registration-token-not-registered" &&
+            error.code === 'messaging/registration-token-not-registered' &&
             userEmail
         ) {
             console.warn(
-                `Removing invalid FCM token for user ${userEmail} from Firestore.`
+                `Removing invalid FCM token for user ${userEmail} from Firestore.`,
             );
             await firestore
-                .collection("users")
+                .collection('users')
                 .doc(userEmail)
                 .update({ fcmToken: admin.firestore.FieldValue.delete() });
         }

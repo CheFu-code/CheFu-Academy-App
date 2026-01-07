@@ -1,43 +1,26 @@
-const express = require("express");
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+import dotenv from 'dotenv';
+import express, { Request, Response } from 'express';
+import { getReadableLocation } from '../helper/getReadableLocation';
+import { transporter } from '../helper/transporter';
+
+dotenv.config();
 
 const router = express.Router();
-const axios = require("axios");
-
-async function getReadableLocation(lat, lon) {
-    const apiKey = process.env.OPENCAGE_API_KEY;
-    const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${apiKey}`;
-
-    const res = await axios.get(url);
-    const components = res.data.results[0]?.components;
-
-    return `${components.city || components.town || components.village}, ${
-        components.country
-    }`;
-}
-
-// Setup transporter
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
 
 // Send welcome email
-router.post("/send-welcome", async (req, res) => {
+router.post('/send-welcome', async (req: Request, res: Response) => {
     const { email, name } = req.body;
 
-    if (!email || !name) {
-        return res.status(400).json({ error: "Missing email or name" });
+    if (!email) {
+        return res.status(400).json({ error: 'Missing email' });
+    } else if (!name) {
+        return res.status(400).json({ error: 'Missing name' });
     }
 
     const mailOptions = {
-        from: `"CheFu Academy" <${process.env.SMTP_USER}>`,
+        from: `"CheFu Academy" ― <${process.env.SMTP_USER}>`,
         to: email,
-        subject: "🎉 Welcome to CheFu Academy!",
+        subject: '🎉 Welcome to CheFu Academy!',
         html: `
     <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background: #f4f8fb; padding: 0; margin: 0; min-height: 100vh;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background: #f4f8fb; padding: 0; margin: 0;">
@@ -62,7 +45,7 @@ router.post("/send-welcome", async (req, res) => {
                  
                   <p style="font-size: 1.05rem; line-height: 1.7; margin: 0 0 18px 0;">
                     Need help? Our support team is here for you. Reply to this email or visit our
-                    <a href="https://chefu-academy.com/support" style="color: #1a73e8; text-decoration: underline;">Support Center</a>.
+                    <a href="https://chefu-academy.vercel.app/support" style="color: #1a73e8; text-decoration: underline;">Support Center</a>.
                   </p>
                 </td>
               </tr>
@@ -83,32 +66,30 @@ router.post("/send-welcome", async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        res.json({ message: "Welcome email sent!" });
+        res.json({ message: 'Welcome email sent!' });
     } catch (e) {
-        console.error("❌ Failed to send welcome email:", e);
-        res.status(500).json({ error: "Email send failed" });
+        console.error('❌ Failed to send welcome email:', e);
+        res.status(500).json({ error: 'Email send failed' });
     }
 });
 
 // send alerts for logins
-router.post("/send-alert", async (req, res) => {
-    console.log("📩 /send-alert route triggered");
-
+router.post('/send-alert', async (req: Request, res: Response) => {
     const { email, name, location, device } = req.body;
 
     if (!email || !name || !location || !device) {
-        console.warn("⚠️ Missing email or name in request");
-        return res.status(400).json({ error: "Missing email or name" });
+        console.warn('⚠️ Missing email or name in request');
+        return res.status(400).json({ error: 'Missing email or name' });
     }
     const locationString = await getReadableLocation(
         location.latitude,
-        location.longitude
+        location.longitude,
     );
 
     const mailOptions = {
         from: `"CheFu Academy" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: "🔐 New Login Alert - CheFu Academy",
+        subject: '🔐 New Login Alert - CheFu Academy',
         html: `
     <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background: #f4f8fb; padding: 0; margin: 0; min-height: 100vh;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background: #f4f8fb; padding: 0; margin: 0;">
@@ -128,11 +109,11 @@ router.post("/send-alert", async (req, res) => {
                   <ul style="font-size: 1rem; line-height: 1.7; margin: 0 0 18px 16px;">
                     <li><strong>Time:</strong> ${new Date().toLocaleString()}</li>
                     <li><strong>Location:</strong> ${
-                        locationString || "Unknown"
+                        locationString || 'Unknown'
                     }</li>
                     <li><strong>Device:</strong> ${device?.brand} ${
-                        device?.modelName
-                    } (${device?.osName} ${device?.osVersion})</li>
+            device?.modelName
+        } (${device?.osName} ${device?.osVersion})</li>
                   </ul>
                   <p style="font-size: 1rem; line-height: 1.7; margin: 0 0 18px 0;">If this was you, no further action is required. If not, please <a style="color: #1a73e8;">secure your account</a> immediately.</p>
                 </td>
@@ -152,28 +133,27 @@ router.post("/send-alert", async (req, res) => {
     };
 
     try {
-        console.log("🚀 Sending login alert email to:", email);
         await transporter.sendMail(mailOptions);
-        console.log("✅ Email sent successfully to:", email);
-        res.json({ message: "Login alert email sent!" });
+        console.log('✅ Email sent successfully to:', email);
+        res.json({ message: 'Login alert email sent!' });
     } catch (e) {
-        console.error("❌ Failed to send alert login email:", e);
-        res.status(500).json({ error: "Email send failed" });
+        console.error('❌ Failed to send alert login email:', e);
+        res.status(500).json({ error: 'Email send failed' });
     }
 });
 
 // send email when user changes password
-router.post("/send-password-change", async (req, res) => {
+router.post('/send-password-change', async (req: Request, res: Response) => {
     const { email, name } = req.body;
     if (!email || !name) {
-        console.warn("⚠️ Missing email or name in request");
-        return res.status(400).json({ error: "Missing email or name" });
+        console.warn('⚠️ Missing email or name in request');
+        return res.status(400).json({ error: 'Missing email or name' });
     }
 
     const mailOptions = {
         from: `"CheFu Academy" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: "🔒 Password Changed - CheFu Academy",
+        subject: '🔒 Password Changed - CheFu Academy',
         html: `
     <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background: #f4f8fb; padding: 0; margin: 0; min-height: 100vh;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background: #f4f8fb;">
@@ -216,13 +196,13 @@ router.post("/send-password-change", async (req, res) => {
     };
 
     try {
-        console.log("🚀 Sending password change alert email to:", email);
+        console.log('🚀 Sending password change alert email to:', email);
         await transporter.sendMail(mailOptions);
-        console.log("✅ Email sent successfully to:", email);
-        res.json({ message: "Password change alert email sent!" });
+        console.log('✅ Email sent successfully to:', email);
+        res.json({ message: 'Password change alert email sent!' });
     } catch (e) {
-        console.error("❌ Failed to send alert password change email:", e);
-        res.status(500).json({ error: "Email send failed" });
+        console.error('❌ Failed to send alert password change email:', e);
+        res.status(500).json({ error: 'Email send failed' });
     }
 });
 module.exports = router;
