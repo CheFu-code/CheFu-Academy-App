@@ -1,7 +1,9 @@
+import useDarkMode from '@/hooks/useDarkMode';
+import { ButtonProps } from '@/types/Button';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import { Colors } from '../../constant/Colors';
-import { scale, moderateScale } from 'react-native-size-matters';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { moderateScale, scale } from 'react-native-size-matters';
+import { Colors } from '../../constant/Colors';
 
 export default function Button({
     text,
@@ -10,8 +12,9 @@ export default function Button({
     loading,
     disabled,
     icon,
-}) {
+}: ButtonProps) {
     const isDisabled = loading || disabled;
+    const { backgroundColor } = useDarkMode();
 
     return (
         <TouchableOpacity
@@ -19,7 +22,7 @@ export default function Button({
             disabled={isDisabled}
             style={{
                 backgroundColor:
-                    type === 'fill' ? Colors.PRIMARY : Colors.BG_COLOR,
+                    type === 'fill' ? Colors.PRIMARY : backgroundColor,
                 paddingVertical: moderateScale(10),
                 paddingHorizontal: moderateScale(12),
                 width: '100%',

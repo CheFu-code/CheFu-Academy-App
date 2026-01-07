@@ -1,4 +1,5 @@
 import AppModal from '@/component/Shared/AppModal';
+import Button from '@/component/Shared/Button';
 import { useForgotHook } from '@/handlers/auth/forgotPassword/handlerFunction';
 import AnimatedText from '@/helpers/animateText';
 import useDarkMode from '@/hooks/useDarkMode';
@@ -6,7 +7,6 @@ import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import LottieView from 'lottie-react-native';
 import { useState } from 'react';
 import {
-    ActivityIndicator,
     StyleSheet,
     Text,
     TextInput,
@@ -20,11 +20,11 @@ import ErrorModal from '../../component/Shared/ErrorModal';
 import { Colors } from '../../constant/Colors';
 
 const ForgotPassword = () => {
+    const { handleReset } = useForgotHook();
+    const { safeBack, safeReplace } = useSafeNavigation();
+    const { color, backgroundColor } = useDarkMode();
     const [email, setEmail] = useState('');
     const [loading] = useState(false);
-    const { safeBack, safeReplace } = useSafeNavigation();
-    const { handleReset } = useForgotHook();
-    const { backgroundColor } = useDarkMode();
     const [successModalVisible, setSuccessModalVisible] = useState({
         visible: false,
         title: '',
@@ -39,25 +39,17 @@ const ForgotPassword = () => {
     return (
         <>
             <SafeAreaView style={[styles.container, { backgroundColor }]}>
-                <View
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
+                <View style={styles.center}>
                     <LottieView
                         source={require('../../assets/animations/Forget password animation.json')}
                         autoPlay
                         loop
-                        style={{
-                            width: moderateScale(150),
-                            height: verticalScale(150),
-                        }}
+                        style={styles.ABC}
                     />
                 </View>
                 <AnimatedText text="Reset Password" />
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color }]}
                     placeholder="Enter your email"
                     placeholderTextColor={Colors.GRAY}
                     onChangeText={(text) => {
@@ -65,20 +57,14 @@ const ForgotPassword = () => {
                     }}
                     autoCapitalize="none"
                 />
-                <TouchableOpacity
-                    disabled={loading || !email.trim()}
+                <Button
+                    text={'Send Reset Link'}
+                    type="fill"
                     onPress={handleReset}
-                    style={[
-                        styles.button,
-                        { opacity: loading || !email.trim() ? 0.5 : 1 },
-                    ]}
-                >
-                    {loading ? (
-                        <ActivityIndicator color={'white'} />
-                    ) : (
-                        <Text style={styles.buttonText}>Send Reset Link</Text>
-                    )}
-                </TouchableOpacity>
+                    loading={loading}
+                    disabled={loading || !email.trim()}
+                    icon={null}
+                />
 
                 <TouchableOpacity
                     onPress={() => {
@@ -135,7 +121,6 @@ const styles = StyleSheet.create({
         borderRadius: moderateScale(8),
         padding: moderateScale(15),
         fontSize: RFValue(16),
-        color: Colors.WHITE,
         marginBottom: moderateScale(20),
     },
     button: {
@@ -155,5 +140,13 @@ const styles = StyleSheet.create({
         color: Colors.PRIMARY,
         textAlign: 'center',
         fontSize: RFValue(13),
+    },
+    center: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    ABC: {
+        width: moderateScale(150),
+        height: verticalScale(150),
     },
 });
