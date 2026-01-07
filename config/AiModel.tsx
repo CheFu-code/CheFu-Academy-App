@@ -2,7 +2,7 @@ import { Content } from "@/types/ai";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY,
+    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY_SECOND,
 });
 const config = {
     responseMimeType: "application/json",

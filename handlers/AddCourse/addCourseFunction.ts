@@ -69,7 +69,7 @@ export const useAddCourseHook = () => {
 
         let topicIdea = [];
         try {
-            const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+            const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY_SECOND;
             if (!apiKey) {
                 setErrorModal({
                     visible: true,
