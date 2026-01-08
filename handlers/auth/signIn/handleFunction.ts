@@ -103,7 +103,6 @@ export const useSignInHook = () => {
             await getUserDetail(signedInEmail);
 
             safeReplace('/(tabs)/home');
-            ToastAndroid.show('Signed in successfully', ToastAndroid.SHORT);
 
             const userDocRef = doc(db, 'users', signedInEmail);
             const userDoc = await getDoc(userDocRef);
