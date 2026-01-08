@@ -29,7 +29,6 @@ export const useSignInHook = () => {
     const [googleLoading, setGoogleLoading] = useState(false); // google
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const deviceInfo = buildDeviceInfo();
 
     const handleSignIn = async (): Promise<void> => {
         if (loading || googleLoading) return;
@@ -130,6 +129,7 @@ export const useSignInHook = () => {
 
             const userData = userSnap.data();
             const trustedDevices: DeviceInfo[] = userData?.trustedDevices ?? [];
+            const deviceInfo = buildDeviceInfo();
 
             // -----------------------------
             // 7. New Device Detection

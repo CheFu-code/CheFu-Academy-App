@@ -5,6 +5,7 @@ import './firebase-background-handler';
 
 import FontErrorScreen from '@/component/FontErrorScreen';
 import LoadingScreen from '@/component/LoadingScreen';
+import OfflineScreen from '@/component/Offline/OfflineScreen';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
 import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
@@ -54,7 +55,7 @@ function LayoutContent() {
     useDeepLinking();
     useHandleDynamicLinks();
 
-    // if (!isConnected) return <OfflineScreen />;
+    if (!isConnected) return <OfflineScreen />;
     if (fontError) return <FontErrorScreen />;
 
     const isUiReady = fontsLoaded;
@@ -70,7 +71,7 @@ function LayoutContent() {
                 <Stack
                     screenOptions={{
                         headerShown: false,
-                        statusBarStyle: scheme === 'dark' ? 'dark' : 'dark',
+                        statusBarStyle: scheme === 'dark' ? 'dark' : 'light',
                         statusBarAnimation: 'slide',
                         gestureEnabled: true,
                         animation: 'slide_from_bottom',
