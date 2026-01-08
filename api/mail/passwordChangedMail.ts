@@ -35,7 +35,7 @@ export const passwordChangedMail = ({
                   </p>
                   <p style="font-size: 1rem; line-height: 1.7; margin: 0 0 18px 0;">
                     Need help? Contact us at our
-                    <a href="mailto:"chefu.inc@gmail.com" style="color: #1a73e8; text-decoration: underline;">Support Center</a>.
+                    <a href="mailto:chefu.inc@gmail.com" style="color: #1a73e8; text-decoration: underline;">Support Center</a>.
                   </p>
                 </td>
               </tr>
