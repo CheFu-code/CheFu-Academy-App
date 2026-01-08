@@ -10,5 +10,7 @@ export type SignInUIProps = {
     showPassword: boolean;
     setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
     loading: boolean;
+    googleLoading: boolean;
     handleSignIn: () => void;
+    handleGoogleSignIn: () => Promise<void>
 };

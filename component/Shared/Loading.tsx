@@ -3,7 +3,9 @@ import LottieView from 'lottie-react-native';
 import { useEffect, useRef } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
+import HeaderText from '../common/Header';
 
 interface LoadingProps {
     message?: string;
@@ -44,39 +46,41 @@ export default function Loading({
     }, [fadeAnim]);
 
     return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingHorizontal: moderateScale(10),
-                backgroundColor,
-            }}
-        >
-            <LottieView
-                autoPlay
-                loop
-                source={
-                    animationSource ??
-                    require('../../assets/animations/Loading.json')
-                }
+        <SafeAreaView style={{ flex: 1, backgroundColor }}>
+            <HeaderText title="Back" />
+            <View
                 style={{
-                    width: animationSize,
-                    height: animationSize,
-                }}
-            />
-            <Animated.Text
-                style={{
-                    marginTop: verticalScale(10),
-                    fontFamily: 'outfit',
-                    fontSize: RFValue(15),
-                    color,
-                    textAlign: 'center',
-                    opacity: fadeAnim, // animated
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: moderateScale(10),
                 }}
             >
-                {message}
-            </Animated.Text>
-        </View>
+                <LottieView
+                    autoPlay
+                    loop
+                    source={
+                        animationSource ??
+                        require('../../assets/animations/Loading.json')
+                    }
+                    style={{
+                        width: animationSize,
+                        height: animationSize,
+                    }}
+                />
+                <Animated.Text
+                    style={{
+                        marginTop: verticalScale(10),
+                        fontFamily: 'outfit',
+                        fontSize: RFValue(15),
+                        color,
+                        textAlign: 'center',
+                        opacity: fadeAnim, // animated
+                    }}
+                >
+                    {message}
+                </Animated.Text>
+            </View>
+        </SafeAreaView>
     );
 }

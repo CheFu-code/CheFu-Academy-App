@@ -115,7 +115,7 @@ router.post('/send-alert', async (req: Request, res: Response) => {
             device?.modelName
         } (${device?.osName} ${device?.osVersion})</li>
                   </ul>
-                  <p style="font-size: 1rem; line-height: 1.7; margin: 0 0 18px 0;">If this was you, no further action is required. If not, please <a style="color: #1a73e8;">secure your account</a> immediately.</p>
+                  <p style="font-size: 1rem; line-height: 1.7; margin: 0 0 18px 0;">If this was you, no further action is required. If not, please <a href="https://chefu-academy.vercel.app/settings/account" style="color: #1a73e8;">secure your account</a> immediately.</p>
                 </td>
               </tr>
               <tr>
@@ -177,7 +177,7 @@ router.post('/send-password-change', async (req: Request, res: Response) => {
                   </p>
                   <p style="font-size: 1rem; line-height: 1.7; margin: 0 0 18px 0;">
                     Need help? Contact us at our
-                    <a href="mailto:"kurisanimaluleke77@gmail.com" style="color: #1a73e8; text-decoration: underline;">Support Center</a>.
+                    <a href="mailto:"chefu.inc@gmail.com" style="color: #1a73e8; text-decoration: underline;">Support Center</a>.
                   </p>
                 </td>
               </tr>

@@ -17,14 +17,15 @@ export const useSignInHook = () => {
     const { safeReplace } = useSafeNavigation();
     const { getUserDetail } = useFetchUser();
 
-    const [email] = useState('');
-    const [password] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false); // google
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
     const handleSignIn = async () => {
-        if (loading) return;
+        if (loading || googleLoading) return;
 
         const cleanEmail = email.trim().toLowerCase();
         setEmailError('');
@@ -216,5 +217,29 @@ export const useSignInHook = () => {
         }
     };
 
-    return { handleSignIn };
+    const handleGoogleSignIn = async () => {
+        if (loading || googleLoading) return;
+
+        setGoogleLoading(true);
+        try {
+            safeReplace('/auth/google'); // ✅ hooks are valid here
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
+
+    return {
+        email,
+        setEmail,
+        password,
+        setPassword,
+        loading,
+        googleLoading,
+        emailError,
+        setEmailError,
+        passwordError,
+        setPasswordError,
+        handleSignIn,
+        handleGoogleSignIn,
+    };
 };

@@ -70,7 +70,7 @@ function LayoutContent() {
                 <Stack
                     screenOptions={{
                         headerShown: false,
-                        statusBarStyle: scheme === 'dark' ? 'light' : 'dark',
+                        statusBarStyle: scheme === 'dark' ? 'dark' : 'dark',
                         statusBarAnimation: 'slide',
                         gestureEnabled: true,
                         animation: 'slide_from_bottom',
