@@ -168,6 +168,7 @@ export default function MyCourses() {
                                 </View>
                             </TouchableOpacity>
                         )}
+                        style={styles.AB}
                     />
                 </>
             )}

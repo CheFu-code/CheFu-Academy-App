@@ -52,7 +52,10 @@ const AppModal = ({
                             onPress={onConfirm}
                             style={[
                                 styles.button,
-                                { backgroundColor: confirmColor },
+                                {
+                                    backgroundColor: confirmColor,
+                                    borderWidth: 0,
+                                },
                             ]}
                         >
                             <Text style={styles.confirmText}>
@@ -104,7 +107,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 10,
         padding: 12,
-        borderWidth: 1,
+        borderWidth: 0.7,
         alignItems: 'center',
     },
     confirmText: {

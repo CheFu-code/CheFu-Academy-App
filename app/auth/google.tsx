@@ -111,9 +111,7 @@ export default function GoogleAuthScreen() {
         return (
             <View style={[styles.container, { backgroundColor }]}>
                 <Text style={styles.errorText}>Error:</Text>
-                <Text style={[styles.message, { color }]}>
-                    {error}
-                </Text>
+                <Text style={[styles.message, { color }]}>{error}</Text>
                 <Text style={[styles.message, { color }]}>
                     Please try again.
                 </Text>
@@ -130,6 +128,7 @@ export default function GoogleAuthScreen() {
                             color={color}
                         />
                     }
+                    type="fill"
                 />
             </View>
         );

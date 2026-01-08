@@ -298,12 +298,7 @@ export default function Reviews({ video, enrolled }: Props) {
                 <>
                     {reviews.length === 0 ? (
                         <View style={styles.noReviewsContainer}>
-                            <Text
-                                style={[
-                                    styles.noReviewsText,
-                                    { color },
-                                ]}
-                            >
+                            <Text style={[styles.noReviewsText, { color }]}>
                                 No reviews yet...
                             </Text>
                         </View>

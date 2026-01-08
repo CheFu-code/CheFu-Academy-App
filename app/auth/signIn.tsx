@@ -5,15 +5,22 @@ import { useSignInHook } from '@/handlers/auth/signIn/handleFunction';
 import { useState } from 'react';
 
 const SignIn = () => {
-    const { handleSignIn } = useSignInHook();
-    
-    const [loading] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [emailError, setEmailError] = useState('');
+    const {
+        email,
+        setEmail,
+        password,
+        setPassword,
+        loading,
+        googleLoading,
+        emailError,
+        setEmailError,
+        passwordError,
+        setPasswordError,
+        handleSignIn,
+        handleGoogleSignIn
+    } = useSignInHook();
     const [fatalError, setFatalError] = useState<Error | null>(null);
     const [showPassword, setShowPassword] = useState(false);
-    const [passwordError, setPasswordError] = useState('');
 
     if (loading) {
         return <Loading loading={loading} />;
@@ -39,6 +46,8 @@ const SignIn = () => {
             email={email}
             password={password}
             handleSignIn={handleSignIn}
+            handleGoogleSignIn={handleGoogleSignIn}
+            googleLoading={googleLoading}
         />
     );
 };

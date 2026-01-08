@@ -1,6 +1,5 @@
 import { Colors } from '@/constant/Colors';
 import AnimatedText from '@/helpers/animateText';
-import { Google } from '@/helpers/navigation';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { styles } from '@/styles/SignIn.styles';
@@ -31,9 +30,11 @@ const SignInUI = ({
     passwordError,
     setShowPassword,
     loading,
+    googleLoading,
     handleSignIn,
     email,
     password,
+    handleGoogleSignIn,
 }: SignInUIProps) => {
     const { safeReplace } = useSafeNavigation();
     const { color, backgroundColor } = useDarkMode();
@@ -83,10 +84,7 @@ const SignInUI = ({
                                     if (passwordError) setPasswordError('');
                                 }}
                                 autoCapitalize="none"
-                                style={[
-                                    styles.passwordInput,
-                                    { color },
-                                ]}
+                                style={[styles.passwordInput, { color }]}
                                 onSubmitEditing={() => {
                                     if (!loading) handleSignIn();
                                 }}
@@ -114,19 +112,28 @@ const SignInUI = ({
                         </Pressable>
 
                         <TouchableOpacity
-                            style={styles.iconsContainer}
-                            onPress={() => Google()}
+                            disabled={googleLoading}
+                            style={[
+                                styles.iconsContainer,
+                                { opacity: googleLoading ? 0.4 : 1 },
+                            ]}
+                            onPress={handleGoogleSignIn}
                         >
-                            <AntDesign
-                                style={styles.icons}
-                                name="google"
-                                size={scale(20)}
-                                color={color}
-                            />
-
-                            <Text style={[styles.google, { color }]}>
-                                Google
-                            </Text>
+                            {googleLoading ? (
+                                <ActivityIndicator color={color} />
+                            ) : (
+                                <>
+                                    <AntDesign
+                                        style={styles.icons}
+                                        name="google"
+                                        size={scale(20)}
+                                        color={color}
+                                    />
+                                    <Text style={[styles.google, { color }]}>
+                                        Google
+                                    </Text>
+                                </>
+                            )}
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -139,7 +146,7 @@ const SignInUI = ({
                                             : 1,
                                 },
                             ]}
-                            onPress={handleSignIn}
+                            onPress={() => handleSignIn()}
                             disabled={loading || !email || !password}
                         >
                             {!loading ? (
