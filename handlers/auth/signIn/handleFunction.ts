@@ -1,14 +1,20 @@
 import { auth, db } from '@/config/firebaseConfig';
-import { support } from '@/constant/random';
+import { API_BASE, support } from '@/constant/random';
 import { useFetchUser } from '@/hooks/fetchUserDetail';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { FirebaseAuthError } from '@/types';
 import { DeviceInfo } from '@/types/DeviceInfo';
+import { buildDeviceInfo } from '@/utils/buildDeviceInfo';
 import { validateEmail } from '@/utils/validateEmail';
-import { doc, getDoc } from '@react-native-firebase/firestore';
-import messaging from '@react-native-firebase/messaging';
+import { signInWithEmailAndPassword } from '@react-native-firebase/auth';
+import {
+    arrayUnion,
+    doc,
+    getDoc,
+    updateDoc,
+} from '@react-native-firebase/firestore';
+import { getMessaging, getToken } from '@react-native-firebase/messaging';
 import * as Sentry from '@sentry/react-native';
-import * as Device from 'expo-device';
 import * as Location from 'expo-location';
 import { useState } from 'react';
 import { Alert, Linking, ToastAndroid } from 'react-native';
@@ -23,41 +29,64 @@ export const useSignInHook = () => {
     const [googleLoading, setGoogleLoading] = useState(false); // google
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const deviceInfo = buildDeviceInfo();
 
-    const handleSignIn = async () => {
+    const handleSignIn = async (): Promise<void> => {
         if (loading || googleLoading) return;
 
-        const cleanEmail = email.trim().toLowerCase();
+        const normalizedEmail = email.trim().toLowerCase();
+
         setEmailError('');
         setPasswordError('');
 
-        if (!cleanEmail) {
+        // -----------------------------
+        // 1. Input Validation (Fail Fast)
+        // -----------------------------
+        if (!normalizedEmail) {
             setEmailError('Please enter your email');
             return;
         }
-        if (!validateEmail(cleanEmail)) {
+
+        if (!validateEmail(normalizedEmail)) {
             setEmailError('Please enter a valid email address');
             return;
         }
+
         if (!password) {
             setPasswordError('Please enter your password');
             return;
         }
 
         setLoading(true);
+
         try {
-            const resp = await auth.signInWithEmailAndPassword(
-                cleanEmail,
+            // -----------------------------
+            // 2. Authenticate User
+            // -----------------------------
+            const credential = await signInWithEmailAndPassword(
+                auth,
+                normalizedEmail,
                 password,
             );
-            const signedInEmail = resp.user.email;
 
-            // 🔔 1. Get FCM token
-            const fcmToken = await messaging().getToken();
+            const signedInEmail = credential?.user?.email;
+            if (!signedInEmail) {
+                throw new Error('Authenticated user email missing');
+            }
 
+            // -----------------------------
+            // 3. Parallel Non-Blocking Tasks
+            // -----------------------------
+            const [fcmToken, locationPermission] = await Promise.all([
+                getToken(getMessaging()).catch(() => null),
+                Location.requestForegroundPermissionsAsync(),
+            ]);
+
+            // -----------------------------
+            // 4. Save FCM Token (Best Effort)
+            // -----------------------------
             if (fcmToken) {
-                // 🔥 2. Save to Firestore backend (use your own endpoint)
-                await fetch(
+                fetch(
                     'https://chefu-academy-tmzx.onrender.com/api/save-fcm-token',
                     {
                         method: 'POST',
@@ -67,149 +96,158 @@ export const useSignInHook = () => {
                             fcmToken,
                         }),
                     },
-                );
-            } else {
-                console.warn('⚠️ No FCM token received.');
+                ).catch(() => {
+                    // Silent failure — do not block login
+                    console.warn('Failed to save FCM token');
+                });
             }
 
-            const deviceInfo = {
-                brand: Device.brand,
-                modelName: Device.modelName,
-                osName: Device.osName,
-                osVersion: Device.osVersion,
-                deviceType: Device.deviceType,
-            };
+            // -----------------------------
+            // 5. Device & Location Context
+            // -----------------------------
 
-            // 2. Get location info
-            const { status } =
-                await Location.requestForegroundPermissionsAsync();
-            let locationInfo = {};
-            if (status === 'granted') {
+            let locationInfo: { latitude?: number; longitude?: number } = {};
+
+            if (locationPermission.status === 'granted') {
                 const location = await Location.getCurrentPositionAsync({});
                 locationInfo = {
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
                 };
-            } else {
-                Alert.alert(
-                    'Please grant location permission to protect your account.',
-                );
             }
 
-            if (!signedInEmail) {
-                throw new Error('User email is missing');
-            }
-
+            // -----------------------------
+            // 6. Fetch User Profile
+            // -----------------------------
             await getUserDetail(signedInEmail);
 
-            safeReplace('/(tabs)/home');
-
             const userDocRef = doc(db, 'users', signedInEmail);
-            const userDoc = await getDoc(userDocRef);
-            const userData = userDoc.data();
-            const previousDevices = userDoc.data()?.trustedDevices || [];
-            const currentDevice = deviceInfo; // e.g. brand + model + os
+            const userSnap = await getDoc(userDocRef);
 
-            // Check if device is new
-            const isNewDevice = !previousDevices.some(
-                (d: DeviceInfo) =>
-                    d.brand === currentDevice.brand &&
-                    d.modelName === currentDevice.modelName &&
-                    d.osName === currentDevice.osName &&
-                    d.osVersion === currentDevice.osVersion,
+            if (!userSnap.exists()) {
+                throw new Error('User record not found');
+            }
+
+            const userData = userSnap.data();
+            const trustedDevices: DeviceInfo[] = userData?.trustedDevices ?? [];
+
+            // -----------------------------
+            // 7. New Device Detection
+            // -----------------------------
+            const isNewDevice = !trustedDevices.some(
+                (d) =>
+                    d.brand === deviceInfo.brand &&
+                    d.modelName === deviceInfo.modelName &&
+                    d.osName === deviceInfo.osName &&
+                    d.osVersion === deviceInfo.osVersion,
             );
 
+            // -----------------------------
+            // 8. Security Alert (If Enabled)
+            // -----------------------------
             if (isNewDevice && userData?.emailPreferences?.security === true) {
-                // Send alert email
-                await fetch(
-                    'https://chefu-academy-tmzx.onrender.com/api/email/send-alert',
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: signedInEmail,
-                            name:
-                                userData?.fullname ||
-                                signedInEmail.split('@')[0],
-                            device: deviceInfo,
-                            location: locationInfo,
-                        }),
-                    },
-                );
-                // Update trusted devices and locations
-                await userDocRef.update({
-                    trustedDevices: [...previousDevices, currentDevice],
-                });
+                try {
+                    const response = await fetch(
+                        `${API_BASE}/api/email/send-alert`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: signedInEmail,
+                                name:
+                                    userData?.fullname ??
+                                    signedInEmail.split('@')[0],
+                                device: deviceInfo,
+                                location: locationInfo,
+                            }),
+                        },
+                    );
 
-                console.log('alert email sent');
-            } else {
-                console.log('no need to send alert email');
+                    if (!response.ok) {
+                        Sentry.captureMessage('Security alert email failed', {
+                            extra: {
+                                status: response.status,
+                                email: signedInEmail,
+                            },
+                        });
+                    }
+                } catch (err) {
+                    Sentry.captureException(err);
+                }
+
+                // 🔐 Always update trusted devices
+                await updateDoc(userDocRef, {
+                    trustedDevices: arrayUnion(deviceInfo),
+                });
             }
-        } catch (e: unknown) {
-            Sentry.captureException(e);
+
+            // -----------------------------
+            // 9. Navigate Only After Security Checks
+            // -----------------------------
+            safeReplace('/(tabs)/home');
+        } catch (error: unknown) {
+            // -----------------------------
+            // 10. Observability
+            // -----------------------------
+            Sentry.captureException(error);
+
             const contactSupport = () => Linking.openURL(`mailto:${support}`);
 
-            if (typeof e === 'object' && e !== null && 'code' in e) {
-                const error = e as FirebaseAuthError;
+            if (
+                typeof error === 'object' &&
+                error !== null &&
+                'code' in error
+            ) {
+                const firebaseError = error as FirebaseAuthError;
 
-                switch (e.code) {
+                switch (firebaseError.code) {
                     case 'auth/operation-not-allowed':
                         Alert.alert(
-                            'Login Not Enabled',
-                            'Email/password accounts are not enabled. Please contact support.',
+                            'Login Disabled',
+                            'Email/password login is disabled.',
                             [
                                 { text: 'Cancel', style: 'cancel' },
                                 {
-                                    text: 'Contact Now',
+                                    text: 'Contact Support',
                                     onPress: contactSupport,
                                 },
                             ],
                         );
                         break;
+
                     case 'auth/invalid-credential':
                         ToastAndroid.show(
-                            'Invalid credentials. Please try again.',
+                            'Invalid email or password.',
                             ToastAndroid.SHORT,
                         );
                         break;
-                    case 'auth/unknown':
-                        Alert.alert(
-                            'Unknown Error',
-                            'We encountered an unknown error. Please try again later',
-                        );
-                        break;
+
                     case 'auth/network-request-failed':
                         Alert.alert(
                             'Network Error',
-                            'Please check your internet connection and try again.',
+                            'Please check your internet connection.',
                         );
                         break;
+
                     case 'auth/too-many-requests':
                         Alert.alert(
-                            'Error',
-                            'Too many requests have been made from this device.',
+                            'Too Many Attempts',
+                            'Please wait before trying again.',
                         );
                         break;
-                    case 'auth/internal-error':
-                        Alert.alert(
-                            'Error',
-                            error.message ||
-                                'Please try again or contact support.',
-                            [
-                                { text: 'Cancel', style: 'cancel' },
-                                { text: 'Contact', onPress: contactSupport },
-                            ],
-                        );
-                        break;
+
                     default:
                         Alert.alert(
-                            'Error',
-                            error.message || 'An unexpected error occurred.',
+                            'Login Failed',
+                            firebaseError.message ??
+                                'An unexpected error occurred.',
                         );
-                        break;
                 }
             } else {
-                Alert.alert('Error', 'An unexpected error occurred.');
+                Alert.alert(
+                    'Unexpected Error',
+                    'Something went wrong. Please try again.',
+                );
             }
         } finally {
             setLoading(false);

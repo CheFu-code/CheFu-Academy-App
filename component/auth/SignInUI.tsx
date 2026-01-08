@@ -146,10 +146,7 @@ const SignInUI = ({
                                             : 1,
                                 },
                             ]}
-                            onPress={() => {
-                                console.log('handleSignIn called');
-                                handleSignIn();
-                            }}
+                            onPress={() => handleSignIn()}
                             disabled={loading || !email || !password}
                         >
                             {!loading ? (
