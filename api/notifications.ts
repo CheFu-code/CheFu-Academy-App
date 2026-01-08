@@ -94,7 +94,7 @@ router.post('/sendToUser', async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        const token = userDoc.data().fcmToken;
+        const token = userDoc.data()?.fcmToken;
 
         if (!token) {
             console.warn('❌ User has no FCM token saved:', userEmail);
