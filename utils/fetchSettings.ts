@@ -49,5 +49,11 @@ export const useFetchSetting = () => {
         }
     }
 
-    return { fetchSettings };
+    return {
+        notifications,
+        setNotifications,
+        fetchSettings,
+        useBiometrics,
+        setUseBiometrics,
+    };
 };

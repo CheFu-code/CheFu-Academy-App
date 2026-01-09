@@ -1,9 +1,8 @@
-import { auth } from '@/config/firebaseConfig';
+import { user } from '@/config/firebaseConfig';
 import { sendEmailVerification } from '@react-native-firebase/auth';
 import { useState } from 'react';
 
 export const useVerifyEmail = () => {
-    const user = auth.currentUser;
     const [loading, setLoading] = useState(false);
     const [fatalError, setFatalError] = useState(null);
     const [errorModal, setErrorModal] = useState({
@@ -38,5 +37,13 @@ export const useVerifyEmail = () => {
         }
     };
 
-    return { verify };
+    return {
+        loading,
+        setLoading,
+        setFatalError,
+        fatalError,
+        errorModal,
+        setErrorModal,
+        verify,
+    };
 };

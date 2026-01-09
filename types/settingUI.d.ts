@@ -7,6 +7,7 @@ export interface SettingsUIProps {
     isOpen: boolean;
     safePush: (path: Href) => void;
     loading: boolean;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     notifications: boolean;
     setNotifications: (v: boolean) => void;
     showVersion: boolean;

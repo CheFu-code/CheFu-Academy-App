@@ -67,5 +67,13 @@ export const useExportUserData = () => {
         }
     };
 
-    return { exportUserData };
+    return {
+        loading,
+        setLoading,
+        fatalError,
+        setFatalError,
+        errorModal,
+        setErrorModal,
+        exportUserData,
+    };
 };
