@@ -15,16 +15,26 @@ import { useSafeNavigation } from '../hooks/useSafeNavigation';
 
 export default function SettingsScreen() {
     const [isOpen, setIsOpen] = useState(false);
-    const [loading] = useState(false);
-    const [fatalError, setFatalError] = useState(null);
     const [showVersion, setShowVersion] = useState(false);
-    const [useBiometrics, setUseBiometrics] = useState(true);
-    const [notifications, setNotifications] = useState(true);
     const { verify } = useVerifyEmail();
     const { handleShare } = useShareApp();
-    const { fetchSettings } = useFetchSetting();
+    const {
+        notifications,
+        setNotifications,
+        fetchSettings,
+        useBiometrics,
+        setUseBiometrics,
+    } = useFetchSetting();
     const { toggleSetting } = useToggle();
-    const { exportUserData } = useExportUserData();
+    const {
+        loading,
+        setLoading,
+        fatalError,
+        setFatalError,
+        errorModal,
+        setErrorModal,
+        exportUserData,
+    } = useExportUserData();
     const { safePush, safeBack } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { handleLogout } = useProfileActions(
@@ -32,11 +42,7 @@ export default function SettingsScreen() {
         setUserDetail,
         router,
     );
-    const [errorModal, setErrorModal] = useState({
-        visible: false,
-        title: '',
-        message: '',
-    });
+
     const [successModal, setSuccessModal] = useState({
         visible: false,
         title: '',
@@ -49,30 +55,7 @@ export default function SettingsScreen() {
         } catch (err: any) {
             setFatalError(err);
         }
-    }, [fetchSettings]);
-
-    <AppModal
-        visible={errorModal.visible}
-        title={errorModal.title}
-        message={errorModal.message}
-        onCancel={null}
-        onConfirm={() => setErrorModal({ ...errorModal, visible: false })}
-        cancelText="Cancel"
-        confirmText="OK"
-        showCancel={false}
-        confirmColor="green"
-        cancelColor="red"
-    />;
-
-    <AppModal
-        visible={successModal.visible}
-        title={successModal.title}
-        message={successModal.message}
-        confirmText="OK"
-        showCancel={false}
-        onConfirm={() => setSuccessModal({ ...successModal, visible: false })}
-        onCancel={null}
-    />;
+    }, [fetchSettings, setFatalError]);
 
     let content;
     try {
@@ -80,25 +63,55 @@ export default function SettingsScreen() {
             content = <FatalError />;
         } else {
             content = (
-                <SettingsUI
-                    safeBack={safeBack}
-                    setIsOpen={setIsOpen}
-                    isOpen={isOpen}
-                    safePush={safePush}
-                    loading={loading}
-                    notifications={notifications}
-                    setNotifications={setNotifications}
-                    showVersion={showVersion}
-                    setShowVersion={setShowVersion}
-                    exportUserData={exportUserData}
-                    toggleSetting={toggleSetting}
-                    useBiometrics={useBiometrics}
-                    setUseBiometrics={setUseBiometrics}
-                    handleShare={handleShare}
-                    userDetail={userDetail}
-                    verify={verify}
-                    handleLogout={handleLogout}
-                />
+                <>
+                    <SettingsUI
+                        safeBack={safeBack}
+                        setIsOpen={setIsOpen}
+                        isOpen={isOpen}
+                        safePush={safePush}
+                        loading={loading}
+                        setLoading={setLoading}
+                        notifications={notifications}
+                        setNotifications={setNotifications}
+                        showVersion={showVersion}
+                        setShowVersion={setShowVersion}
+                        exportUserData={exportUserData}
+                        toggleSetting={toggleSetting}
+                        useBiometrics={useBiometrics}
+                        setUseBiometrics={setUseBiometrics}
+                        handleShare={handleShare}
+                        userDetail={userDetail}
+                        verify={verify}
+                        handleLogout={handleLogout}
+                    />
+
+                    <AppModal
+                        visible={errorModal.visible}
+                        title={errorModal.title}
+                        message={errorModal.message}
+                        onCancel={null}
+                        onConfirm={() =>
+                            setErrorModal({ ...errorModal, visible: false })
+                        }
+                        cancelText="Cancel"
+                        confirmText="OK"
+                        showCancel={false}
+                        confirmColor="green"
+                        cancelColor="red"
+                    />
+
+                    <AppModal
+                        visible={successModal.visible}
+                        title={successModal.title}
+                        message={successModal.message}
+                        confirmText="OK"
+                        showCancel={false}
+                        onConfirm={() =>
+                            setSuccessModal({ ...successModal, visible: false })
+                        }
+                        onCancel={null}
+                    />
+                </>
             );
         }
     } catch (err) {

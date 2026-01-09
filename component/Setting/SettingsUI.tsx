@@ -25,6 +25,7 @@ const SettingsUI = ({
     isOpen,
     safePush,
     loading,
+    setLoading,
     notifications,
     setNotifications,
     showVersion,

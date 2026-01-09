@@ -10,7 +10,6 @@ import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { fetchVideoById } from '@/services/videoService';
 import { styles } from '@/styles/VideoDetail.styles';
-import { Video } from '@/types/video';
 import { doc, getDoc } from '@react-native-firebase/firestore';
 
 import { useLocalSearchParams } from 'expo-router';
@@ -23,6 +22,19 @@ export default function VideoDetail() {
     const { userDetail } = useContext(UserDetailContext);
     const { color, backgroundColor } = useDarkMode();
     const {
+        video,
+        setVideo,
+        adding,
+        favorite,
+        setFavorite,
+        reporting,
+        enrolling,
+        downloading,
+        uploaderName,
+        reportReason,
+        setReportReason,
+        showReportModal,
+        setShowReportModal,
         fetchUploaderName,
         handleEnroll,
         handleFavorite,
@@ -30,18 +42,9 @@ export default function VideoDetail() {
         handleDeleteVideo,
         handleReport,
     } = useFetchVideoUploader();
-    const [video, setVideo] = useState<Video | null>(null);
-    const [adding] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [favorite, setFavorite] = useState(false);
     const [enrolled, setEnrolled] = useState(false);
-    const [enrolling] = useState(false);
-    const [reporting] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
-    const [downloading] = useState(false);
-    const [reportReason, setReportReason] = useState('');
-    const [uploaderName] = useState<string | null>(null);
-    const [showReportModal, setShowReportModal] = useState(false);
     const uploadedAtText = video?.uploadedAt?.toDate().toLocaleDateString();
 
     const [activeTab, setActiveTab] = useState<
@@ -78,7 +81,7 @@ export default function VideoDetail() {
                 .then((data) => setVideo(data))
                 .finally(() => setLoading(false));
         }
-    }, [id, ytVideo]);
+    }, [id, ytVideo, setVideo]);
 
     useEffect(() => {
         fetchUploaderName();
@@ -110,7 +113,7 @@ export default function VideoDetail() {
         getDoc(favRef).then((docSnap) => {
             if (docSnap.exists()) setFavorite(true);
         });
-    }, [video, userDetail]);
+    }, [video, userDetail, setFavorite]);
 
     if (loading) {
         return (
