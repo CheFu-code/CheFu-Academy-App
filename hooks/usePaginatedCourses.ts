@@ -1,4 +1,3 @@
-// hooks/usePaginatedCourses.ts
 import { CACHED_COURSES } from '@/constant/caches';
 import { courseRef } from '@/constant/random';
 import { UserDetailContext } from '@/context/UserDetailContext';
@@ -52,16 +51,16 @@ export const usePaginatedCourses = (pageSize = 6) => {
             );
 
             setCourses(data);
-            setHasMore(snapshot.docs.length === pageSize);
+            setHasMore(data.length === pageSize);
             setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
 
+            // Save cache
             await AsyncStorage.setItem(CACHED_COURSES, JSON.stringify(data));
         } catch (error) {
             console.error('Failed to fetch courses:', error);
             const cached = await AsyncStorage.getItem(CACHED_COURSES);
             if (cached) {
-                const parsed = JSON.parse(cached);
-                setCourses(parsed);
+                setCourses(JSON.parse(cached));
             }
         } finally {
             setRefreshing(false);
@@ -79,7 +78,7 @@ export const usePaginatedCourses = (pageSize = 6) => {
                 courseRef,
                 orderBy('createdOn', 'desc'),
                 startAfter(lastDoc),
-                limit(pageSize + 1),
+                limit(pageSize),
             );
             const snapshot = await getDocs(q);
 
@@ -89,25 +88,35 @@ export const usePaginatedCourses = (pageSize = 6) => {
                 return;
             }
 
-            const data: Course[] = snapshot.docs.map(
+            let data: Course[] = snapshot.docs.map(
                 (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
                     id: doc.id,
                     ...doc.data(),
                 }),
             );
 
+            // Filter out courses created by current user
+            data = data.filter(
+                (course) => course.createdBy !== userDetail?.email,
+            );
+
             setCourses((prev) => [...prev, ...data]);
             setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+            setHasMore(data.length === pageSize);
 
-            if (snapshot.docs.length < pageSize + 1) {
-                setHasMore(false);
-            }
+            // Update cache
+            const cached = await AsyncStorage.getItem(CACHED_COURSES);
+            const cachedData: Course[] = cached ? JSON.parse(cached) : [];
+            await AsyncStorage.setItem(
+                CACHED_COURSES,
+                JSON.stringify([...cachedData, ...data]),
+            );
         } catch (error) {
             console.error('Failed to load more courses:', error);
         } finally {
             setLoadingMore(false);
         }
-    }, [lastDoc, loadingMore, hasMore, pageSize]);
+    }, [lastDoc, loadingMore, hasMore, pageSize, userDetail?.email]);
 
     useEffect(() => {
         fetchCourses();
