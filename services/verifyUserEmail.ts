@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 export const useVerifyEmail = () => {
     const [loading, setLoading] = useState(false);
-    const [fatalError, setFatalError] = useState(null);
+    const [fatalError, setFatalError] = useState<Error | null>(null);
     const [errorModal, setErrorModal] = useState({
         visible: false,
         title: '',

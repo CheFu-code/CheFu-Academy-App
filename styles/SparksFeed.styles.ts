@@ -15,7 +15,6 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.BG_COLOR,
     },
     card: {
-        backgroundColor: Colors.WHITE,
         padding: scale(10),
         marginBottom: moderateScale(12),
         borderRadius: scale(12),
@@ -25,6 +24,7 @@ export const styles = StyleSheet.create({
         shadowOffset: { width: moderateScale(2), height: verticalScale(2) },
         borderWidth: scale(0.6),
         borderColor: Colors.BG_GRAY,
+        backgroundColor: Colors.BG_GRAY,
     },
     header: {
         flexDirection: 'row',

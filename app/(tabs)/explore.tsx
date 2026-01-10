@@ -1,17 +1,20 @@
-import Loading from '@/component/Explore/Loading';
-import { db } from '@/config/firebaseConfig';
+import ListFooter from '@/component/ListFooter';
+import Loading from '@/component/Shared/Loading';
 import { CACHED_COURSES } from '@/constant/caches';
+import { courseRef } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { useSearchHandler } from '@/hooks/useSearch';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-    collection,
     FirebaseFirestoreTypes,
     getDocs,
+    limit,
     orderBy,
     query,
+    startAfter,
 } from '@react-native-firebase/firestore';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import {
@@ -19,7 +22,6 @@ import {
     Image,
     Text,
     TextInput,
-    ToastAndroid,
     TouchableOpacity,
     View,
 } from 'react-native';
@@ -31,21 +33,33 @@ import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Explore.styles';
 
 export default function ExploreScreen() {
+    const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const [courseData, setCourseData] = useState<Course[]>([]);
-    const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
-    const [refreshing, setRefreshing] = useState(false);
     const { backgroundColor } = useDarkMode();
     const [searchTerm, setSearchTerm] = useState('');
+    const { handleSearch } = useSearchHandler({
+        searchTerm,
+        setSearchTerm,
+        safePush,
+    });
+
+    const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(true);
-    const { safePush } = useSafeNavigation();
+    const [lastDoc, setLastDoc] = useState(null);
+    const [courseData, setCourseData] = useState<Course[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+    const isSearching = searchTerm.trim().length > 0;
+
     const fetchCourses = useCallback(async () => {
         setRefreshing(true);
+        setLoading(true);
+        setLastDoc(null);
+        setHasMore(true);
+
         try {
-            const q = query(
-                collection(db, 'course'),
-                orderBy('createdOn', 'desc'),
-            );
+            const q = query(courseRef, orderBy('createdOn', 'desc'), limit(6));
             const snapshot = await getDocs(q);
 
             let data: Course[] = snapshot.docs.map(
@@ -55,19 +69,17 @@ export default function ExploreScreen() {
                 }),
             );
 
-            // ✅ Exclude courses owned by current user
             data = data.filter(
                 (course) => course.createdBy !== userDetail?.email,
             );
 
-            const limitedData = data.slice(0, Math.ceil(data.length * 0.4)); // 40%
+            setCourseData(data);
+            setFilteredCourses(data);
 
-            setCourseData(limitedData);
-            setFilteredCourses(limitedData);
-            await AsyncStorage.setItem(
-                CACHED_COURSES,
-                JSON.stringify(limitedData),
-            );
+            setHasMore(snapshot.docs.length === 6);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+
+            await AsyncStorage.setItem(CACHED_COURSES, JSON.stringify(data));
         } catch (error) {
             console.error('Failed to fetch courses:', error);
             const cached = await AsyncStorage.getItem(CACHED_COURSES);
@@ -86,20 +98,49 @@ export default function ExploreScreen() {
         fetchCourses();
     }, [fetchCourses]);
 
-    const handleSearch = () => {
-        if (!searchTerm.trim()) {
-            ToastAndroid.show('Please enter a search term', ToastAndroid.SHORT);
-            return;
-        }
+    const loadMore = async () => {
+        if (loadingMore || !lastDoc || !hasMore) return;
 
-        safePush({
-            pathname: '/searchResults',
-            params: { query: searchTerm.trim() },
-        });
-        setSearchTerm('');
+        setLoadingMore(true);
+
+        try {
+            const q = query(
+                courseRef,
+                orderBy('createdOn', 'desc'),
+                startAfter(lastDoc),
+                limit(7),
+            );
+
+            const snapshot = await getDocs(q);
+
+            if (snapshot.empty) {
+                setHasMore(false);
+                setLastDoc(null);
+                return;
+            }
+
+            const data: Course[] = snapshot.docs.map(
+                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }),
+            );
+
+            setCourseData((prev) => [...prev, ...data]);
+            setFilteredCourses((prev) => [...prev, ...data]);
+            setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+
+            if (snapshot.docs.length < 7) {
+                setHasMore(false);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoadingMore(false);
+        }
     };
 
-    if (loading) {
+    if (loading && courseData.length === 0) {
         return <Loading />;
     }
 
@@ -140,11 +181,13 @@ export default function ExploreScreen() {
 
                 <FlatList
                     showsVerticalScrollIndicator={false}
+                    onRefresh={fetchCourses}
+                    refreshing={refreshing}
                     data={filteredCourses}
                     keyExtractor={(item) => item.id}
                     numColumns={2}
                     contentContainerStyle={{
-                        paddingBottom: moderateScale(50),
+                        paddingBottom: moderateScale(30),
                     }}
                     columnWrapperStyle={{ justifyContent: 'space-between' }}
                     renderItem={({ item }) => (
@@ -168,8 +211,9 @@ export default function ExploreScreen() {
                             No courses found.
                         </Text>
                     }
-                    refreshing={loading}
-                    onRefresh={fetchCourses}
+                    onEndReached={isSearching ? undefined : loadMore}
+                    onEndReachedThreshold={0.3}
+                    ListFooterComponent={loadingMore ? <ListFooter /> : null}
                 />
             </View>
         </SafeAreaView>

@@ -16,8 +16,8 @@ import PracticeSection from '../../component/Home/PracticeSection';
 
 export default function Home() {
     const flatListRef = useRef<FlatList>(null);
-    const { courseList, fetchCourses, loading } = useCourses();
     const { backgroundColor } = useDarkMode();
+    const { courseList, fetchCourses, loading } = useCourses();
 
     useFocusEffect(
         useCallback(() => {
@@ -27,15 +27,8 @@ export default function Home() {
         }, []),
     );
 
-    function shuffleArray<T>(array: T[]): T[] {
-        return array
-            .map((item) => ({ item, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ item }) => item);
-    }
-
     const randomizedBlocks = useMemo(
-        () => shuffleArray([<VideoCardHomeScreen key="videos" />]),
+        () => [<VideoCardHomeScreen key="videos" />],
         [],
     );
 

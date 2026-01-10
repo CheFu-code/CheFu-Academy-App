@@ -8,7 +8,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale } from 'react-native-size-matters';
@@ -27,6 +27,7 @@ const EditProfile = ({
     loading,
     handleSave,
     pickImage,
+    safePush,
 }: EditProfileProps) => {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -35,9 +36,7 @@ const EditProfile = ({
                 style={styles.backButton}
             >
                 <AntDesign name="left" color={color} size={scale(20)} />
-                <Text style={[styles.title, { color }]}>
-                    Edit Profile
-                </Text>
+                <Text style={[styles.title, { color }]}>Edit Profile</Text>
             </TouchableOpacity>
 
             <View style={styles.avatarCont}>
@@ -60,11 +59,7 @@ const EditProfile = ({
                     }}
                     activeOpacity={0.8}
                 >
-                    <EvilIcons
-                        name="camera"
-                        size={scale(20)}
-                        color={color}
-                    />
+                    <EvilIcons name="camera" size={scale(20)} color={color} />
                 </TouchableOpacity>
             </View>
 

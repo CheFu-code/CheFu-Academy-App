@@ -38,9 +38,6 @@ export const useSignInHook = () => {
         setEmailError('');
         setPasswordError('');
 
-        // -----------------------------
-        // 1. Input Validation (Fail Fast)
-        // -----------------------------
         if (!normalizedEmail) {
             setEmailError('Please enter your email');
             return;
@@ -59,9 +56,6 @@ export const useSignInHook = () => {
         setLoading(true);
 
         try {
-            // -----------------------------
-            // 2. Authenticate User
-            // -----------------------------
             const credential = await signInWithEmailAndPassword(
                 auth,
                 normalizedEmail,
@@ -73,37 +67,23 @@ export const useSignInHook = () => {
                 throw new Error('Authenticated user email missing');
             }
 
-            // -----------------------------
-            // 3. Parallel Non-Blocking Tasks
-            // -----------------------------
             const [fcmToken, locationPermission] = await Promise.all([
                 getToken(getMessaging()).catch(() => null),
                 Location.requestForegroundPermissionsAsync(),
             ]);
 
-            // -----------------------------
-            // 4. Save FCM Token (Best Effort)
-            // -----------------------------
             if (fcmToken) {
-                fetch(
-                    'https://chefu-academy-tmzx.onrender.com/api/save-fcm-token',
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: signedInEmail,
-                            fcmToken,
-                        }),
-                    },
-                ).catch(() => {
-                    // Silent failure — do not block login
+                fetch(`${API_BASE}/api/save-fcm-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: signedInEmail,
+                        fcmToken,
+                    }),
+                }).catch(() => {
                     console.warn('Failed to save FCM token');
                 });
             }
-
-            // -----------------------------
-            // 5. Device & Location Context
-            // -----------------------------
 
             let locationInfo: { latitude?: number; longitude?: number } = {};
 
@@ -115,9 +95,6 @@ export const useSignInHook = () => {
                 };
             }
 
-            // -----------------------------
-            // 6. Fetch User Profile
-            // -----------------------------
             await getUserDetail(signedInEmail);
 
             const userDocRef = doc(db, 'users', signedInEmail);
@@ -131,9 +108,6 @@ export const useSignInHook = () => {
             const trustedDevices: DeviceInfo[] = userData?.trustedDevices ?? [];
             const deviceInfo = buildDeviceInfo();
 
-            // -----------------------------
-            // 7. New Device Detection
-            // -----------------------------
             const isNewDevice = !trustedDevices.some(
                 (d) =>
                     d.brand === deviceInfo.brand &&
@@ -142,9 +116,6 @@ export const useSignInHook = () => {
                     d.osVersion === deviceInfo.osVersion,
             );
 
-            // -----------------------------
-            // 8. Security Alert (If Enabled)
-            // -----------------------------
             if (isNewDevice && userData?.emailPreferences?.security === true) {
                 try {
                     const response = await fetch(
@@ -175,20 +146,13 @@ export const useSignInHook = () => {
                     Sentry.captureException(err);
                 }
 
-                // 🔐 Always update trusted devices
                 await updateDoc(userDocRef, {
                     trustedDevices: arrayUnion(deviceInfo),
                 });
             }
 
-            // -----------------------------
-            // 9. Navigate Only After Security Checks
-            // -----------------------------
             safeReplace('/(tabs)/home');
         } catch (error: unknown) {
-            // -----------------------------
-            // 10. Observability
-            // -----------------------------
             Sentry.captureException(error);
 
             const contactSupport = () => Linking.openURL(`mailto:${support}`);

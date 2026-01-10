@@ -1,89 +1,22 @@
+import { useTabIcons } from '@/component/Shared/TabIcons';
 import useDarkMode from '@/hooks/useDarkMode';
-import {
-    Ionicons,
-    MaterialCommunityIcons,
-    MaterialIcons,
-} from '@expo/vector-icons';
-import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { Tabs } from 'expo-router';
-import { useCallback } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+    useSafeAreaInsets
+} from 'react-native-safe-area-context';
 import { Colors } from '../../constant/Colors';
-
-type TabBarIconProps = NonNullable<
-    BottomTabNavigationOptions['tabBarIcon']
-> extends (props: infer P) => any
-    ? P
-    : never;
 
 const TabLayout = () => {
     const insets = useSafeAreaInsets();
     const { backgroundColor } = useDarkMode();
-    const renderHomeIcon = useCallback(
-        ({ color, size }: TabBarIconProps) => (
-            <Ionicons
-                style={{ marginTop: 25, height: '100%' }}
-                name="home-outline"
-                size={size}
-                color={color}
-            />
-        ),
-        [],
-    );
 
-    const renderExploreIcon = useCallback(
-        ({ color, size }: TabBarIconProps) => (
-            <MaterialCommunityIcons
-                style={{ marginTop: 25, height: '100%' }}
-                name="book-search"
-                size={size}
-                color={color}
-            />
-        ),
-        [],
-    );
-
-    const renderSparkIcon = useCallback(
-        ({ size, color }: TabBarIconProps) => (
-            <MaterialIcons
-                style={{
-                    marginTop: 25,
-                    height: '100%',
-                }}
-                name="compost"
-                size={size}
-                color={color}
-            />
-        ),
-        [],
-    );
-
-    const renderProgressIcon = useCallback(
-        ({ size, color }: TabBarIconProps) => (
-            <Ionicons
-                style={{
-                    marginTop: 25,
-                    height: '100%',
-                }}
-                name="bar-chart-outline"
-                size={size}
-                color={color}
-            />
-        ),
-        [],
-    );
-
-    const renderProfileIcon = useCallback(
-        ({ color, size }: TabBarIconProps) => (
-            <Ionicons
-                style={{ marginTop: 25, height: '100%' }}
-                name="person-outline"
-                size={size}
-                color={color}
-            />
-        ),
-        [],
-    );
+    const {
+        renderHomeIcon,
+        renderExploreIcon,
+        renderSparkIcon,
+        renderProgressIcon,
+        renderProfileIcon,
+    } = useTabIcons();
 
     return (
         <Tabs
@@ -101,7 +34,7 @@ const TabLayout = () => {
                     shadowOpacity: 0.1,
                     shadowRadius: 4,
                     borderTopWidth: 0.3,
-                    borderTopColor: Colors.YELLOW
+                    borderTopColor: Colors.YELLOW,
                 },
             }}
         >

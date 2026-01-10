@@ -1,5 +1,6 @@
 import { db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
+import { SPARKS_LIMIT } from '@/constant/random';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { fetchInitialSparks, fetchMoreSparks } from '@/services/sparksService';
 import { styles } from '@/styles/SparksFeed.styles';
@@ -44,7 +45,6 @@ const SparksFeed = () => {
     const [deleting, setDeleting] = useState<boolean>(false);
     const [isVerified, setIsVerified] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
-    const SPARKS_LIMIT = 6;
     const [lastVisible, setLastVisible] =
         useState<FirebaseFirestoreTypes.QueryDocumentSnapshot | null>(null);
 
