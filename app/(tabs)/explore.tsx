@@ -1,22 +1,12 @@
-import ListFooter from '@/component/ListFooter';
+import ListEmpty from '@/component/Shared/ListEmpty';
+import ListFooter from '@/component/Shared/ListFooter';
 import Loading from '@/component/Shared/Loading';
-import { CACHED_COURSES } from '@/constant/caches';
-import { courseRef } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
+import { usePaginatedCourses } from '@/hooks/usePaginatedCourses';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { useSearchHandler } from '@/hooks/useSearch';
-import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-    FirebaseFirestoreTypes,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    startAfter,
-} from '@react-native-firebase/firestore';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     FlatList,
     Image,
@@ -29,12 +19,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import CourseCard from '../../component/Shared/CourseCard';
 import { Colors } from '../../constant/Colors';
-import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Explore.styles';
 
 export default function ExploreScreen() {
     const { safePush } = useSafeNavigation();
-    const { userDetail } = useContext(UserDetailContext);
     const { backgroundColor } = useDarkMode();
     const [searchTerm, setSearchTerm] = useState('');
     const { handleSearch } = useSearchHandler({
@@ -42,105 +30,20 @@ export default function ExploreScreen() {
         setSearchTerm,
         safePush,
     });
-
-    const [hasMore, setHasMore] = useState(true);
-    const [loading, setLoading] = useState(true);
-    const [lastDoc, setLastDoc] = useState(null);
-    const [courseData, setCourseData] = useState<Course[]>([]);
-    const [refreshing, setRefreshing] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
-    const isSearching = searchTerm.trim().length > 0;
-
-    const fetchCourses = useCallback(async () => {
-        setRefreshing(true);
-        setLoading(true);
-        setLastDoc(null);
-        setHasMore(true);
-
-        try {
-            const q = query(courseRef, orderBy('createdOn', 'desc'), limit(6));
-            const snapshot = await getDocs(q);
-
-            let data: Course[] = snapshot.docs.map(
-                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }),
-            );
-
-            data = data.filter(
-                (course) => course.createdBy !== userDetail?.email,
-            );
-
-            setCourseData(data);
-            setFilteredCourses(data);
-
-            setHasMore(snapshot.docs.length === 6);
-            setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-
-            await AsyncStorage.setItem(CACHED_COURSES, JSON.stringify(data));
-        } catch (error) {
-            console.error('Failed to fetch courses:', error);
-            const cached = await AsyncStorage.getItem(CACHED_COURSES);
-            if (cached) {
-                const parsed = JSON.parse(cached);
-                setCourseData(parsed);
-                setFilteredCourses(parsed);
-            }
-        } finally {
-            setRefreshing(false);
-            setLoading(false);
-        }
-    }, [userDetail?.email]);
+    const {
+        courses,
+        loading,
+        refreshing,
+        loadingMore,
+        fetchCourses,
+        loadMore,
+    } = usePaginatedCourses(6);
 
     useEffect(() => {
         fetchCourses();
     }, [fetchCourses]);
 
-    const loadMore = async () => {
-        if (loadingMore || !lastDoc || !hasMore) return;
-
-        setLoadingMore(true);
-
-        try {
-            const q = query(
-                courseRef,
-                orderBy('createdOn', 'desc'),
-                startAfter(lastDoc),
-                limit(7),
-            );
-
-            const snapshot = await getDocs(q);
-
-            if (snapshot.empty) {
-                setHasMore(false);
-                setLastDoc(null);
-                return;
-            }
-
-            const data: Course[] = snapshot.docs.map(
-                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }),
-            );
-
-            setCourseData((prev) => [...prev, ...data]);
-            setFilteredCourses((prev) => [...prev, ...data]);
-            setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-
-            if (snapshot.docs.length < 7) {
-                setHasMore(false);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoadingMore(false);
-        }
-    };
-
-    if (loading && courseData.length === 0) {
+    if (loading && courses.length === 0) {
         return <Loading />;
     }
 
@@ -180,10 +83,13 @@ export default function ExploreScreen() {
                 </View>
 
                 <FlatList
-                    showsVerticalScrollIndicator={false}
-                    onRefresh={fetchCourses}
+                    data={courses}
                     refreshing={refreshing}
-                    data={filteredCourses}
+                    onRefresh={fetchCourses}
+                    onEndReached={loadMore}
+                    ListFooterComponent={loadingMore ? <ListFooter /> : null}
+                    showsVerticalScrollIndicator={false}
+                    onEndReachedThreshold={0.3}
                     keyExtractor={(item) => item.id}
                     numColumns={2}
                     contentContainerStyle={{
@@ -200,20 +106,7 @@ export default function ExploreScreen() {
                             }}
                         />
                     )}
-                    ListEmptyComponent={
-                        <Text
-                            style={{
-                                textAlign: 'center',
-                                marginTop: verticalScale(20),
-                                color: '#999',
-                            }}
-                        >
-                            No courses found.
-                        </Text>
-                    }
-                    onEndReached={isSearching ? undefined : loadMore}
-                    onEndReachedThreshold={0.3}
-                    ListFooterComponent={loadingMore ? <ListFooter /> : null}
+                    ListEmptyComponent={<ListEmpty />}
                 />
             </View>
         </SafeAreaView>

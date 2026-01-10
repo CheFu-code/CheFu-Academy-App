@@ -6,7 +6,7 @@ import NoCourse from '../../component/Home/NoCourse';
 import CourseProgressCard from '../../component/Shared/CourseProgressCard';
 import { UserDetailContext } from '../../context/UserDetailContext';
 
-import ListFooter from '@/component/ListFooter';
+import ListFooter from '@/component/Shared/ListFooter';
 import Loading from '@/component/Shared/Loading';
 import { courseRef } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
