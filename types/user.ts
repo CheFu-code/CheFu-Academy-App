@@ -1,4 +1,4 @@
-import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 export interface User {
     id: string;
@@ -40,4 +40,11 @@ export interface User {
         screenWidth: number;
         totalMemory: number;
     };
+    phoneNumber?: {
+        number: string;
+        verified: boolean;
+    };
+    planType?: string;
+    subscribedAt?: string;
+    memberUntil?: string;
 }

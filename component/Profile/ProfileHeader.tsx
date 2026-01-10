@@ -1,4 +1,3 @@
-// components/Profile/ProfileHeader.tsx
 import { auth } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';

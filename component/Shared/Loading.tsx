@@ -5,7 +5,6 @@ import { Animated, Dimensions, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
-import HeaderText from '../common/Header';
 
 interface LoadingProps {
     message?: string;
@@ -47,7 +46,6 @@ export default function Loading({
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor }}>
-            <HeaderText title="Back" />
             <View
                 style={{
                     flex: 1,

@@ -1,24 +1,19 @@
 import { useFocusEffect } from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    Text,
-    ToastAndroid,
-    View,
-} from 'react-native';
+import { FlatList, Image, Text, View } from 'react-native';
 import NoCourse from '../../component/Home/NoCourse';
 import CourseProgressCard from '../../component/Shared/CourseProgressCard';
 import { UserDetailContext } from '../../context/UserDetailContext';
 
-import { db } from '@/config/firebaseConfig';
+import ListFooter from '@/component/Shared/ListFooter';
+import Loading from '@/component/Shared/Loading';
+import { courseRef } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
+import { showToast } from '@/utils/toast';
 import {
-    collection,
     FirebaseFirestoreTypes,
     getDocs,
     limit,
@@ -27,7 +22,6 @@ import {
     startAfter,
     where,
 } from '@react-native-firebase/firestore';
-import LottieView from 'lottie-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { styles } from '../../styles/Progress.styles';
@@ -35,7 +29,7 @@ import { styles } from '../../styles/Progress.styles';
 export default function Progress({ enroll = false }) {
     const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const { color, backgroundColor } = useDarkMode();
+    const { backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(false);
     const [lastDoc, setLastDoc] = useState(null);
     const [fetching, setFetching] = useState(false);
@@ -62,7 +56,6 @@ export default function Progress({ enroll = false }) {
         }
 
         try {
-            const courseRef = collection(db, 'course');
             const q = query(
                 courseRef,
                 where('createdBy', '==', userDetail?.email),
@@ -84,7 +77,7 @@ export default function Progress({ enroll = false }) {
         } catch (error) {
             console.error(error);
             Sentry.captureException(error);
-            ToastAndroid.show('Failed to load progress', ToastAndroid.SHORT);
+            showToast('Failed to load your progress');
         } finally {
             setLoading(false);
             setFetching(false);
@@ -97,7 +90,6 @@ export default function Progress({ enroll = false }) {
         setLoadingMore(true);
 
         try {
-            const courseRef = collection(db, 'course');
             const q = query(
                 courseRef,
                 where('createdBy', '==', userDetail?.email),
@@ -143,20 +135,7 @@ export default function Progress({ enroll = false }) {
     };
 
     if (loading && courseList.length === 0) {
-        return (
-            <View style={[styles.loadingContainer, { backgroundColor }]}>
-                <LottieView
-                    autoPlay
-                    loop
-                    source={require('../../assets/animations/Loading.json')}
-                    style={{
-                        width: scale(150),
-                        height: verticalScale(150),
-                    }}
-                />
-                <Text style={styles.loadingText}>Loading your progress...</Text>
-            </View>
-        );
+        return <Loading message="Loading your progress..." />;
     }
 
     return (
@@ -195,37 +174,13 @@ export default function Progress({ enroll = false }) {
                         }}
                         onEndReached={loadMore}
                         onEndReachedThreshold={0.3}
-                        ListFooterComponent={
-                            loadingMore ? (
-                                <View
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: scale(3),
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            color,
-                                            textAlign: 'center',
-                                            padding: scale(10),
-                                            margin: scale(5),
-                                        }}
-                                    >
-                                        Loading more...
-                                    </Text>
-                                    <ActivityIndicator
-                                        size={'small'}
-                                        color={color}
-                                    />
-                                </View>
-                            ) : null
-                        }
                         contentContainerStyle={{
                             padding: scale(10),
                             marginBottom: moderateScale(10),
                         }}
+                        ListFooterComponent={
+                            loadingMore ? <ListFooter /> : null
+                        }
                     />
                 ) : (
                     !loading && <NoCourse />

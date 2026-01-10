@@ -14,7 +14,7 @@ import {
 
 export default function EditProfileScreen() {
     const { userDetail } = useContext(UserDetailContext);
-    const { safeBack } = useSafeNavigation();
+    const { safeBack,safePush } = useSafeNavigation();
     const { color, backgroundColor } = useDarkMode();
     const [fullname, setFullname] = useState(userDetail?.fullname || '');
     const [bio, setBio] = useState(userDetail?.bio || '');
@@ -96,6 +96,7 @@ export default function EditProfileScreen() {
             loading={loading}
             handleSave={handleSave}
             pickImage={pickImage}
+            safePush={safePush}
         />
     );
 }

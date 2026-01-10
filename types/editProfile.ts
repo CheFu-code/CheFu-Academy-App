@@ -1,3 +1,5 @@
+import { Href } from 'expo-router';
+
 export interface EditProfileProps {
     backgroundColor: string;
     color: string;
@@ -12,4 +14,5 @@ export interface EditProfileProps {
     loading: boolean;
     handleSave: () => void;
     pickImage: () => void;
+    safePush: (path: Href) => void;
 }
