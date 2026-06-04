@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/firebaseConfig';
+import { db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
@@ -152,7 +152,8 @@ export default function Reviews({ video, enrolled }: Props) {
 
     const handleEditReview = async () => {
         if (!video || !editingReviewId) return;
-        if (userDetail?.uid !== auth.currentUser?.uid) {
+        const selectedReview = reviews.find(review => review.id === editingReviewId);
+        if (!userDetail?.uid || selectedReview?.userId !== userDetail.uid) {
             showToast('You can only edit your own reviews');
             return;
         }

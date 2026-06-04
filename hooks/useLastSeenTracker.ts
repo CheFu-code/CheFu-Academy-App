@@ -1,5 +1,4 @@
-import { auth, db } from "@/config/firebaseConfig";
-import { doc, serverTimestamp, updateDoc } from "@react-native-firebase/firestore";
+import { chefuApiClient } from "@/services/chefuApiClient";
 import { useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
 
@@ -8,7 +7,7 @@ const HEARTBEAT_MIN_DELAY_MS = 25_000;     // minimum spacing between writes
 const BASE_RETRY_MS = 1000;
 const MAX_RETRIES = 3;
 
-export default function useLastSeenTracker() {
+export default function useLastSeenTracker(email?: string) {
     const mounted = useRef(true);
     const heartbeatTimer = useRef<number | null>(null);
     const lastHeartbeatAt = useRef<number>(0);
@@ -22,17 +21,11 @@ export default function useLastSeenTracker() {
             const email = currentEmail.current;
             if (!email || !mounted.current) return;
 
-            const ref = doc(db, "users", email);
-
             try {
                 retryCount.current = 0;
 
-                await updateDoc(ref, {
+                await chefuApiClient.post("/api/academy/mobile/presence", {
                     online,
-                    ...(online
-                        ? { lastHeartbeat: serverTimestamp() }
-                        : { lastSeen: serverTimestamp() }
-                    ),
                 });
 
                 if (online) lastHeartbeatAt.current = Date.now();
@@ -82,45 +75,26 @@ export default function useLastSeenTracker() {
 
         const appStateListener = AppState.addEventListener("change", handleAppState);
 
-        // Auth state listener (production best practice)
-        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-            if (!user) {
-                // signed out
-                stopHeartbeat();
-                currentEmail.current = null;
-                return;
-            }
-
-            const email = user.email ?? null;
-            if (!email) return;
-
+        if (email) {
             currentEmail.current = email;
-
             updateOnlineStatus(true).then(startHeartbeat);
-        });
-
-        // Initial boot condition
-        if (auth.currentUser?.email) {
-            currentEmail.current = auth.currentUser.email;
-            updateOnlineStatus(true).then(startHeartbeat);
+        } else {
+            stopHeartbeat();
+            currentEmail.current = null;
         }
 
         return () => {
             mounted.current = false;
             stopHeartbeat();
             appStateListener.remove();
-            unsubscribeAuth();
 
             const email = currentEmail.current;
             if (!email) return;
 
-            const ref = doc(db, "users", email);
-
             // Fire-and-forget offline write
-            updateDoc(ref, {
+            void chefuApiClient.post("/api/academy/mobile/presence", {
                 online: false,
-                lastSeen: serverTimestamp(),
             }).catch(() => { });
         };
-    }, []);
+    }, [email]);
 }

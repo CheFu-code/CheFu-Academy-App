@@ -1,4 +1,4 @@
-import { auth, db } from "@/config/firebaseConfig";
+import { db } from "@/config/firebaseConfig";
 import { Video } from "@/types/video";
 import { showToast } from "@/utils/toast";
 import {
@@ -12,17 +12,19 @@ import {
 } from "@react-native-firebase/storage";
 
 interface DeleteVideoParams {
+    currentUserEmail?: string;
     video: Video;
     onSuccess?: () => void;
     onFinally?: () => void;
 }
 
 export const deleteVideo = async ({
+    currentUserEmail,
     video,
     onSuccess,
     onFinally,
 }: DeleteVideoParams) => {
-    if (!auth.currentUser) {
+    if (!currentUserEmail) {
         showToast("You must be logged in to delete video");
         return;
     }

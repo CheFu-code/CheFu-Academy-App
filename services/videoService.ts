@@ -1,4 +1,4 @@
-import { auth, db } from "@/config/firebaseConfig";
+import { db } from "@/config/firebaseConfig";
 import { Video, YouTubeVideo } from "@/types/video";
 import {
     collection,
@@ -25,12 +25,12 @@ export const uploadVideo = async (
     category: string,
     visibility: "public" | "private",
     duration: number,
+    uploadedByEmail: string,
     views: number = 0,
     topics: string[],
 
 ) => {
-    const user = auth.currentUser;
-    if (!user) throw new Error("Not authenticated");
+    if (!uploadedByEmail) throw new Error("Not authenticated");
 
     const videoId = uuid.v4().toString();
 
@@ -47,7 +47,7 @@ export const uploadVideo = async (
         videoURL,
         thumbnailURL,
         category,
-        uploadedBy: user.email,
+        uploadedBy: uploadedByEmail,
         uploadedAt: serverTimestamp(),
         visibility,
         duration,

@@ -1,12 +1,13 @@
-import { auth, db } from '@/config/firebaseConfig';
 import { BIOMETRICS } from '@/constant/caches';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { doc, getDoc } from '@react-native-firebase/firestore';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { ToastAndroid } from 'react-native';
 import { showToast } from './toast';
 
 export const useFetchSetting = () => {
+    const { userDetail } = useContext(UserDetailContext);
     const [fetching, setFetching] = useState(false);
     const [notifications, setNotifications] = useState(true);
     const [useBiometrics, setUseBiometrics] = useState(true);
@@ -16,27 +17,21 @@ export const useFetchSetting = () => {
         if (fetching) return;
         setFetching(true);
         try {
-            const user = auth.currentUser;
-            if (!user?.email) return;
+            if (!userDetail?.email) return;
 
-            const docRef = doc(db, 'users', user?.email);
-            const docSnap = await getDoc(docRef);
+            const response = await chefuApiClient.get('/api/academy/mobile/settings');
+            const data = response.data;
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (!data) return;
+            if (typeof data.notifications === 'boolean') {
+                setNotifications(data.notifications);
+            }
 
-                if (typeof data.notifications === 'boolean') {
-                    setNotifications(data.notifications);
-                }
-
-                if (typeof data.useBiometrics === 'boolean') {
-                    setUseBiometrics(data.useBiometrics);
-                    await AsyncStorage.setItem(
-                        BIOMETRICS,
-                        data.useBiometrics.toString(),
-                    );
-                }
+            if (typeof data.useBiometrics === 'boolean') {
+                setUseBiometrics(data.useBiometrics);
+                await AsyncStorage.setItem(
+                    BIOMETRICS,
+                    data.useBiometrics.toString(),
+                );
             }
         } catch (error: any) {
             setFatalError(error);

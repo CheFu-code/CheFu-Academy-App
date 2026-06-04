@@ -1,8 +1,7 @@
-import { db } from '@/config/firebaseConfig';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import { TrustedDevice } from '@/types/trustedDevice';
 import { showToast } from '@/utils/toast';
-import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 import * as Sentry from '@sentry/react-native';
 import { useCallback, useContext, useState } from 'react';
 import { Alert } from 'react-native';
@@ -17,11 +16,8 @@ export const useFetchUser = () => {
 
         try {
             setLoading(true);
-            const snapshot = await getDoc(doc(db, 'users', userDetail?.email)); // 👈 wrap with doc()
-            if (snapshot.exists()) {
-                const data = snapshot.data();
-                setUserDetail({ ...userDetail, ...data });
-            }
+            const response = await chefuApiClient.get('/api/academy/mobile/me');
+            setUserDetail({ ...userDetail, ...response.data });
         } catch (err) {
             console.error('Failed to fetch user detail:', err);
             showToast('Failed to refresh data');
@@ -60,12 +56,9 @@ export const useFetchUser = () => {
                                             d.deviceType === device.deviceType
                                         ),
                                 );
-                            await updateDoc(
-                                doc(db, 'users', userDetail?.email),
-                                {
-                                    trustedDevices: filteredDevices,
-                                },
-                            );
+                            await chefuApiClient.patch('/api/academy/mobile/me', {
+                                trustedDevices: filteredDevices,
+                            });
                             setUserDetail({
                                 ...userDetail,
                                 trustedDevices: filteredDevices,
@@ -92,15 +85,8 @@ export const useFetchUser = () => {
 
     const getUserDetail = async (email: string) => {
         try {
-            const userDocRef = doc(db, 'users', email);
-            // Update lastLogin to now
-            await userDocRef.update({ lastLogin: new Date() });
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                setUserDetail(userDoc.data());
-            } else {
-                console.warn('User data not found in Firestore.');
-            }
+            const response = await chefuApiClient.get('/api/academy/mobile/me');
+            setUserDetail(response.data);
         } catch (error) {
             console.error('Error fetching user data from sign in:', error);
             Sentry.captureException(error);

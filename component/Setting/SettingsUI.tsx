@@ -1,7 +1,7 @@
-import { auth } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { options } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
+import { chefuAccountManageUrl } from '@/services/ssoAuth';
 import { styles } from '@/styles/Settings.styles';
 import { SettingsUIProps } from '@/types/settingUI';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -36,7 +36,6 @@ const SettingsUI = ({
     setUseBiometrics,
     handleShare,
     userDetail,
-    verify,
     handleLogout,
 }: SettingsUIProps) => {
     const { color, backgroundColor } = useDarkMode();
@@ -98,9 +97,9 @@ const SettingsUI = ({
                     onPress={() => safePush('/editProfile')}
                 />
                 <SettingItem
-                    label="Change Password"
-                    icon="lock-closed"
-                    onPress={() => safePush('/changePassword')}
+                    label="Manage CheFu Account"
+                    icon="person-circle-outline"
+                    onPress={() => Linking.openURL(chefuAccountManageUrl())}
                 />
                 <SettingItem
                     label="Export My Data"
@@ -229,25 +228,6 @@ const SettingsUI = ({
                         onPress={() => safePush('/subscriptionAndBilling')}
                     />
                 )}
-
-                {auth.currentUser &&
-                    !auth.currentUser.emailVerified &&
-                    (loading ? (
-                        <ActivityIndicator
-                            size={'small'}
-                            color={Colors.GREEN}
-                        />
-                    ) : (
-                        <SettingItem
-                            label="Verify Email"
-                            icon="mail"
-                            onPress={() => verify()}
-                            disabled={
-                                !auth.currentUser ||
-                                auth.currentUser.emailVerified
-                            }
-                        />
-                    ))}
 
                 <SettingItem
                     label="Buy me coffee"

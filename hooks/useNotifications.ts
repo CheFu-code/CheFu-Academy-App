@@ -9,9 +9,9 @@ import { scheduleDailyNotification } from "../app/notifications/scheduleLocalNot
 
 const NOTIFICATION_CHANNEL_ID = "default";
 
-export function useNotifications() {
+export function useNotifications(userEmail?: string) {
     useEffect(() => {
-        requestUserPermission();
+        requestUserPermission(userEmail);
 
         async function createNotificationSetup() {
             await notifee.createChannel({
@@ -40,5 +40,5 @@ export function useNotifications() {
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [userEmail]);
 }

@@ -139,15 +139,6 @@ export const styles = StyleSheet.create({
         fontFamily: 'outfit',
         fontSize: RFValue(13),
     },
-    forgotPasswordText: {
-        fontFamily: 'outfit',
-        fontSize: RFValue(13),
-        color: Colors.GRAY,
-        marginBottom: verticalScale(20),
-        textAlign: 'right',
-        textDecorationLine: 'underline',
-        fontStyle: 'italic',
-    },
     common: {
         flexDirection: 'row',
         alignItems: 'center',

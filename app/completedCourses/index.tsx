@@ -1,20 +1,13 @@
 import HeaderText from '@/component/common/Header';
 import Loading from '@/component/Shared/Loading';
-import { db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import { styles } from '@/styles/CompletedCourse.styles';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
-import {
-    collection,
-    FirebaseFirestoreTypes,
-    getDocs,
-    query,
-    where,
-} from '@react-native-firebase/firestore';
 import { useContext, useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,37 +23,17 @@ const CompletedChapters = () => {
     useEffect(() => {
         const fetchCompleted = async () => {
             if (!userDetail?.email) {
-                safeReplace('/auth/signIn');
+                safeReplace('/auth/sso' as any);
                 return;
             }
 
             try {
                 // ✅ Fetch only courses created by the current user
-                const q = query(
-                    collection(db, 'course'),
-                    where('createdBy', '==', userDetail?.email),
+                const response = await chefuApiClient.get(
+                    '/api/academy/mobile/courses/my',
+                    { params: { limit: 100, status: 'completed' } },
                 );
-
-                const snapshot = await getDocs(q);
-                let completed: Course[] = [];
-
-                snapshot.forEach(
-                    (
-                        docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot<Course>,
-                    ) => {
-                        const data = docSnap.data() as Course;
-
-                        if (
-                            data.completedChapter &&
-                            data.completedChapter.length > 0
-                        ) {
-                            completed.push({
-                                ...data,
-                                id: docSnap.id,
-                            });
-                        }
-                    },
-                );
+                const completed = (response.data?.courses || []) as Course[];
 
                 setCourses(completed);
             } catch (error) {

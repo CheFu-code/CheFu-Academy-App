@@ -1,15 +1,12 @@
-import { db, user } from '@/config/firebaseConfig';
-import {
-    doc,
-    serverTimestamp,
-    updateDoc,
-} from '@react-native-firebase/firestore';
-import storage from '@react-native-firebase/storage';
+import { chefuApiClient } from '@/services/chefuApiClient';
+import { UserDetail } from '@/types/UserDetail';
+import * as FileSystem from 'expo-file-system';
 import ImagePicker from 'react-native-image-crop-picker';
 import { showToast } from './toast';
 
 export const changeAvatar = async (
     setUserDetail: (updater: (prev: any) => any) => void,
+    userDetail: UserDetail | null,
 ) => {
     try {
         // 1. Pick a single image
@@ -32,28 +29,22 @@ export const changeAvatar = async (
 
         if (!image || !image.path) return null;
 
-        // 2. Get current user
-        if (!user) throw new Error('No user logged in');
-        showToast('Updating...');
-        const path = `avatars/${user.uid}.jpg`;
-
-        // 3. Upload the file to Firebase Storage
-        await storage().ref(path).putFile(image.path);
-
-        // 4. Get download URL
-        const downloadURL = await storage().ref(path).getDownloadURL();
-
-        // 5. Update Firebase Auth profile
-        await user.updateProfile({ photoURL: downloadURL });
-
-        if (!user.email) {
-            throw new Error('User email not available');
+        if (!userDetail?.uid || !userDetail.email) {
+            throw new Error('No user logged in');
         }
-
-        await updateDoc(doc(db, 'users', user.email), {
-            profilePicture: downloadURL,
-            updatedAt: serverTimestamp(),
+        showToast('Updating...');
+        const imageBase64 = await FileSystem.readAsStringAsync(image.path, {
+            encoding: FileSystem.EncodingType.Base64,
         });
+        const response = await chefuApiClient.post('/api/academy/mobile/avatar', {
+            contentType: image.mime || 'image/jpeg',
+            imageBase64,
+        });
+        const downloadURL = response.data?.profilePicture;
+
+        if (!downloadURL) {
+            throw new Error('Backend did not return an avatar URL');
+        }
 
         setUserDetail((prev) =>
             prev ? { ...prev, profilePicture: downloadURL } : prev,

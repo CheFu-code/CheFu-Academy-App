@@ -1,10 +1,9 @@
-import { auth } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { formatDate } from '@/helpers/formatDate';
 import useDarkMode from '@/hooks/useDarkMode';
-import { useProfileActions } from '@/hooks/useProfileActions';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { chefuAccountManageUrl } from '@/services/ssoAuth';
 import { styles, styles2 } from '@/styles/Profile.styles';
 import { showToast } from '@/utils/toast';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +18,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { scale, verticalScale } from 'react-native-size-matters';
@@ -55,15 +55,10 @@ export const ProfileHeader = ({
     loadingName,
 }: ProfileHeaderProps) => {
     const { safePush } = useSafeNavigation();
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const { userDetail } = useContext(UserDetailContext);
     const { color, backgroundColor } = useDarkMode();
     const [nameInput, setNameInput] = useState(fullname);
     const [modalVisible, setModalVisible] = useState(false);
-    const { loading, verifyEmail } = useProfileActions(
-        userDetail,
-        setUserDetail,
-        safePush,
-    );
     const [error, setError] = useState({
         message: '',
         visible: false,
@@ -159,37 +154,22 @@ export const ProfileHeader = ({
                         width: '90%',
                     }}
                 >
-                    {auth.currentUser?.emailVerified ? (
+                    <TouchableOpacity
+                        onPress={() => Linking.openURL(chefuAccountManageUrl())}
+                    >
                         <Text
                             style={[
                                 styles.profileEmail,
                                 {
                                     color: Colors.GREEN,
                                     marginTop: verticalScale(10),
+                                    textDecorationLine: 'underline',
                                 },
                             ]}
                         >
-                            Email Verified
+                            CheFu Account
                         </Text>
-                    ) : (
-                        <TouchableOpacity
-                            disabled={loading}
-                            onPress={verifyEmail}
-                        >
-                            <Text
-                                style={[
-                                    styles.profileEmail,
-                                    {
-                                        color: Colors.RED,
-                                        textDecorationLine: 'underline',
-                                        marginTop: verticalScale(10),
-                                    },
-                                ]}
-                            >
-                                email not verified
-                            </Text>
-                        </TouchableOpacity>
-                    )}
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => safePush('/settings')}>
                         <Ionicons
                             style={{

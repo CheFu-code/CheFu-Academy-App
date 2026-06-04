@@ -1,4 +1,3 @@
-import { auth } from '@/config/firebaseConfig';
 import { OFFLINE_DOWNLOADS } from '@/constant/caches';
 import {
     ensureLegacyWritePermission,
@@ -11,7 +10,6 @@ import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import {
     AntDesign,
-    MaterialCommunityIcons,
     MaterialIcons
 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,7 +34,6 @@ import {
 import { scale, verticalScale } from 'react-native-size-matters';
 import Chapters from '../../component/CourseView/Chapters';
 import Intro from '../../component/CourseView/Intro';
-import { Colors } from '../../constant/Colors';
 import { imageAssets } from '../../constant/Option';
 import { styles } from '../../styles/CourseView';
 
@@ -125,15 +122,6 @@ export default function CourseView() {
         setLoading(true);
 
         try {
-            if (!auth.currentUser?.emailVerified) {
-                ToastAndroid.show(
-                    'Please verify your email to download courses',
-                    ToastAndroid.SHORT,
-                );
-                setLoading(false);
-                return;
-            }
-
             // Load existing downloads
             let existing = await AsyncStorage.getItem(OFFLINE_DOWNLOADS);
             let parsed: Course[] = [];
@@ -294,65 +282,47 @@ export default function CourseView() {
                 </Text>
             </TouchableOpacity>
 
-            {auth.currentUser?.emailVerified ? (
-                <Pressable
-                    disabled={loading}
-                    onPress={() => downloadCourse(course)}
-                    style={styles.downloadButton}
-                >
-                    {loading ? (
-                        <ActivityIndicator
-                            style={{
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                            size={'small'}
-                            color={'white'}
-                        />
-                    ) : downloaded ? (
-                        <TouchableOpacity
-                            onPress={() => {
-                                ToastAndroid.show(
-                                    'Already downloaded',
-                                    ToastAndroid.SHORT,
-                                );
-                            }}
-                        >
-                            <Animated.View
-                                style={{ transform: [{ scale: scaleAnim }] }}
-                            >
-                                <MaterialIcons
-                                    name="download-done"
-                                    size={scale(22)}
-                                    color="white"
-                                />
-                            </Animated.View>
-                        </TouchableOpacity>
-                    ) : (
-                        <MaterialIcons
-                            name="file-download"
-                            size={scale(22)}
-                            color="white"
-                        />
-                    )}
-                </Pressable>
-            ) : (
-                <Pressable
-                    disabled={loading}
-                    onPress={() => downloadCourse(course)}
-                    style={[
-                        styles.downloadButton,
-                        { backgroundColor: Colors.LIGHT_RED },
-                    ]}
-                >
-                    <MaterialCommunityIcons
-                        style={{ marginTop: verticalScale(-1) }}
-                        size={scale(22)}
-                        color={Colors.RED}
-                        name="download-off-outline"
+            <Pressable
+                disabled={loading}
+                onPress={() => downloadCourse(course)}
+                style={styles.downloadButton}
+            >
+                {loading ? (
+                    <ActivityIndicator
+                        style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                        size={'small'}
+                        color={'white'}
                     />
-                </Pressable>
-            )}
+                ) : downloaded ? (
+                    <TouchableOpacity
+                        onPress={() => {
+                            ToastAndroid.show(
+                                'Already downloaded',
+                                ToastAndroid.SHORT,
+                            );
+                        }}
+                    >
+                        <Animated.View
+                            style={{ transform: [{ scale: scaleAnim }] }}
+                        >
+                            <MaterialIcons
+                                name="download-done"
+                                size={scale(22)}
+                                color="white"
+                            />
+                        </Animated.View>
+                    </TouchableOpacity>
+                ) : (
+                    <MaterialIcons
+                        name="file-download"
+                        size={scale(22)}
+                        color="white"
+                    />
+                )}
+            </Pressable>
 
             {/* Spacer below the image */}
             <View style={{ height: verticalScale(220) }} />

@@ -18,6 +18,5 @@ export interface SettingsUIProps {
     setUseBiometrics: (v: boolean) => void;
     handleShare: () => void;
     userDetail: UserDetail;
-    verify: () => void;
     handleLogout: () => void;
 }

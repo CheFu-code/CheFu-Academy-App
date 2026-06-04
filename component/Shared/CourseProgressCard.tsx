@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/firebaseConfig';
+import { db } from '@/config/firebaseConfig';
 import { styles } from '@/styles/CourseProgressCard.styles';
 import { Course } from '@/types/course';
 import { CourseProgressCardProps } from '@/types/courseProgressCard';
@@ -37,14 +37,12 @@ export default function CourseProgressCard({
         useState<FirebaseFirestoreTypes.DocumentData | null>(null);
 
     async function fetchUserFromFirestore() {
-        const currentUser = auth.currentUser;
-
-        if (!currentUser) {
+        if (!userDetail?.email) {
             console.log('No authenticated user.');
             return;
         }
 
-        const userDocRef = doc(db, 'users', userDetail?.email); // using email as doc ID
+        const userDocRef = doc(db, 'users', userDetail.email);
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
@@ -62,7 +60,7 @@ export default function CourseProgressCard({
 
     useEffect(() => {
         fetchUserFromFirestore();
-    }, []);
+    }, [userDetail?.email]);
 
     const GetCompletedChapters = (course: Course) => {
         const total = course?.chapters?.length ?? 0;

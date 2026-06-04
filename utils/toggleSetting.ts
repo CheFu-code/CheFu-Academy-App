@@ -1,11 +1,12 @@
-import { auth, db } from '@/config/firebaseConfig';
 import { BIOMETRICS } from '@/constant/caches';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { doc, updateDoc } from '@react-native-firebase/firestore';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 export const useToggle = () => {
+    const { userDetail } = useContext(UserDetailContext);
     const [fatalError, setFatalError] = useState(null);
     const [errorModal, setErrorModal] = useState({
         visible: false,
@@ -45,12 +46,9 @@ export const useToggle = () => {
             });
 
             try {
-                const user = auth.currentUser;
-                if (!user?.email) return;
+                if (!userDetail?.email) return;
 
-                const userRef = doc(db, 'users', user.email);
-
-                await updateDoc(userRef, {
+                await chefuApiClient.patch('/api/academy/mobile/settings', {
                     [name === 'Biometric Lock'
                         ? 'useBiometrics'
                         : 'notifications']: newValue,

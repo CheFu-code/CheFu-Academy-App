@@ -195,6 +195,7 @@ export const useFetchVideoUploader = () => {
         setDeleting(true);
 
         await deleteVideo({
+            currentUserEmail: userDetail?.email,
             video,
             onSuccess: () => safeReplace('/(tabs)/home'),
             onFinally: () => setDeleting(false),

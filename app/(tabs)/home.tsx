@@ -1,10 +1,9 @@
-import EmailVerificationBanner from '@/component/Home/EmailVerificationBanner';
 import VideoCardHomeScreen from '@/component/Video/VideoCardHomeScreen';
-import { auth } from '@/config/firebaseConfig';
+import { UserDetailContext } from '@/context/UserDetailContext';
 import { useCourses } from '@/hooks/useCourses';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useContext, useMemo, useRef } from 'react';
 import { FlatList, Image, View } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import CourseList from '../../component/Home/CourseList';
@@ -18,13 +17,14 @@ export default function Home() {
     const flatListRef = useRef<FlatList>(null);
     const { backgroundColor } = useDarkMode();
     const { courseList, fetchCourses, loading } = useCourses();
+    const { userDetail } = useContext(UserDetailContext);
 
     useFocusEffect(
         useCallback(() => {
-            if (auth.currentUser) {
+            if (userDetail?.email) {
                 fetchCourses();
             }
-        }, []),
+        }, [fetchCourses, userDetail?.email]),
     );
 
     const randomizedBlocks = useMemo(
@@ -34,7 +34,6 @@ export default function Home() {
 
     return (
         <>
-            <EmailVerificationBanner />
             <Header
                 onPress={() => {
                     flatListRef.current?.scrollToOffset({
@@ -52,7 +51,7 @@ export default function Home() {
                 keyExtractor={(item) => item.id}
                 style={{ backgroundColor }}
                 onRefresh={() => {
-                    if (auth.currentUser) {
+                    if (userDetail?.email) {
                         fetchCourses(true);
                     }
                 }}

@@ -4,10 +4,8 @@ import SettingsUI from '@/component/Setting/SettingsUI';
 import { useShareApp } from '@/handlers/handleShareApp';
 import { useProfileActions } from '@/hooks/useProfileActions';
 import { useExportUserData } from '@/services/exportUserData';
-import { useVerifyEmail } from '@/services/verifyUserEmail';
 import { useFetchSetting } from '@/utils/fetchSettings';
 import { useToggle } from '@/utils/toggleSetting';
-import { router } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
 import AppModal from '../component/Shared/AppModal';
 import { UserDetailContext } from '../context/UserDetailContext';
@@ -16,7 +14,6 @@ import { useSafeNavigation } from '../hooks/useSafeNavigation';
 export default function SettingsScreen() {
     const [isOpen, setIsOpen] = useState(false);
     const [showVersion, setShowVersion] = useState(false);
-    const { verify } = useVerifyEmail();
     const { handleShare } = useShareApp();
     const {
         notifications,
@@ -36,12 +33,8 @@ export default function SettingsScreen() {
         exportUserData,
     } = useExportUserData();
     const { safePush, safeBack } = useSafeNavigation();
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
-    const { handleLogout } = useProfileActions(
-        userDetail,
-        setUserDetail,
-        router,
-    );
+    const { userDetail } = useContext(UserDetailContext);
+    const { handleLogout } = useProfileActions();
 
     const [successModal, setSuccessModal] = useState({
         visible: false,
@@ -81,7 +74,6 @@ export default function SettingsScreen() {
                         setUseBiometrics={setUseBiometrics}
                         handleShare={handleShare}
                         userDetail={userDetail}
-                        verify={verify}
                         handleLogout={handleLogout}
                     />
 

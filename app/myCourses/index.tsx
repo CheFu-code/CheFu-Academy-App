@@ -1,19 +1,13 @@
 import HeaderText from '@/component/common/Header';
-import { auth, db } from '@/config/firebaseConfig';
 import { Colors } from '@/constant/Colors';
 import { imageAssets } from '@/constant/Option';
+import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
-import {
-    collection,
-    FirebaseFirestoreTypes,
-    getDocs,
-    query,
-    where,
-} from '@react-native-firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -27,6 +21,7 @@ import { scale } from 'react-native-size-matters';
 import { styles } from '../../styles/MyCourses.styles';
 
 export default function MyCourses() {
+    const { userDetail } = useContext(UserDetailContext);
     const { safePush } = useSafeNavigation();
     const { backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(true);
@@ -35,21 +30,13 @@ export default function MyCourses() {
     useEffect(() => {
         const fetchMyCourses = async () => {
             try {
-                const user = auth.currentUser;
-                if (!user) return;
+                if (!userDetail?.email) return;
 
-                const q = query(
-                    collection(db, 'course'),
-                    where('createdBy', '==', user.email),
+                const response = await chefuApiClient.get(
+                    '/api/academy/mobile/courses/my',
+                    { params: { limit: 100 } },
                 );
-                const snap = await getDocs(q);
-
-                const courses = snap.docs.map(
-                    (doc: FirebaseFirestoreTypes.DocumentSnapshot) => ({
-                        id: doc.id,
-                        ...doc.data(),
-                    }),
-                );
+                const courses = response.data?.courses || [];
                 setMyCourses(courses);
             } catch (err) {
                 console.error('Error fetching courses:', err);
@@ -59,7 +46,7 @@ export default function MyCourses() {
         };
 
         fetchMyCourses();
-    }, []);
+    }, [userDetail?.email]);
 
     const isCourseComplete = (course: Course) => {
         const totalChapters = course.chapters?.length || 0;
@@ -151,18 +138,7 @@ export default function MyCourses() {
                                             numberOfLines={1}
                                             style={styles.time}
                                         >
-                                            {item?.createdOn?.toDate
-                                                ? item.createdOn
-                                                      .toDate()
-                                                      .toLocaleDateString(
-                                                          'en-GB',
-                                                          {
-                                                              day: '2-digit',
-                                                              month: '2-digit',
-                                                              year: 'numeric',
-                                                          },
-                                                      )
-                                                : ''}
+                                            {formatCourseDate(item.createdOn)}
                                         </Text>
                                     </View>
                                 </View>
@@ -174,4 +150,21 @@ export default function MyCourses() {
             )}
         </SafeAreaView>
     );
+}
+
+function formatCourseDate(value: any) {
+    const date =
+        value && typeof value.toDate === 'function'
+            ? value.toDate()
+            : value
+              ? new Date(value)
+              : null;
+
+    if (!date || Number.isNaN(date.getTime())) return '';
+
+    return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    });
 }

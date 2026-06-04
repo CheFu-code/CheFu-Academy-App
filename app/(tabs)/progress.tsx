@@ -8,20 +8,11 @@ import { UserDetailContext } from '../../context/UserDetailContext';
 
 import ListFooter from '@/component/Shared/ListFooter';
 import Loading from '@/component/Shared/Loading';
-import { courseRef } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import { Course } from '@/types/course';
 import { showToast } from '@/utils/toast';
-import {
-    FirebaseFirestoreTypes,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    startAfter,
-    where,
-} from '@react-native-firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { styles } from '../../styles/Progress.styles';
@@ -31,7 +22,7 @@ export default function Progress({ enroll = false }) {
     const { userDetail } = useContext(UserDetailContext);
     const { backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(false);
-    const [lastDoc, setLastDoc] = useState(null);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [fetching, setFetching] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [courseList, setCourseList] = useState<Course[]>([]);
@@ -47,7 +38,7 @@ export default function Progress({ enroll = false }) {
         if (fetching) return;
         setLoading(true);
         setFetching(true);
-        setLastDoc(null);
+        setNextCursor(null);
 
         if (!userDetail?.email) {
             setLoading(false);
@@ -56,24 +47,14 @@ export default function Progress({ enroll = false }) {
         }
 
         try {
-            const q = query(
-                courseRef,
-                where('createdBy', '==', userDetail?.email),
-                orderBy('createdOn', 'desc'),
-                limit(7),
+            const response = await chefuApiClient.get(
+                '/api/academy/mobile/courses/my',
+                { params: { limit: 7 } },
             );
-
-            const snapshot = await getDocs(q);
-
-            const data = snapshot.docs.map(
-                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                    ...doc.data(),
-                    id: doc.id,
-                }),
-            );
+            const data = response.data?.courses || [];
 
             setCourseList(data);
-            setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+            setNextCursor(response.data?.nextCursor || null);
         } catch (error) {
             console.error(error);
             Sentry.captureException(error);
@@ -85,30 +66,19 @@ export default function Progress({ enroll = false }) {
     }, [userDetail?.email]);
 
     const loadMore = async () => {
-        if (loadingMore || !lastDoc) return;
+        if (loadingMore || !nextCursor) return;
 
         setLoadingMore(true);
 
         try {
-            const q = query(
-                courseRef,
-                where('createdBy', '==', userDetail?.email),
-                orderBy('createdOn', 'desc'),
-                startAfter(lastDoc),
-                limit(7),
+            const response = await chefuApiClient.get(
+                '/api/academy/mobile/courses/my',
+                { params: { cursor: nextCursor, limit: 7 } },
             );
-
-            const snapshot = await getDocs(q);
-
-            const data = snapshot.docs.map(
-                (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                    ...doc.data(),
-                    id: doc.id,
-                }),
-            );
+            const data = response.data?.courses || [];
 
             setCourseList((prev) => [...prev, ...data]);
-            setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
+            setNextCursor(response.data?.nextCursor || null);
         } catch (error) {
             console.error(error);
             Sentry.captureException(error);

@@ -1,6 +1,5 @@
 import { TermsText } from '@/component/TermsText';
 import { SEEN_WELCOME } from '@/constant/caches';
-import { useLoadUser } from '@/hooks/useLoadUser';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Entypo, FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +12,6 @@ import { styles } from '../styles/WelcomeScreen.styles';
 
 export default function Index() {
     const { safeReplace } = useSafeNavigation();
-    const { loading } = useLoadUser();
     // useImmersiveMode();
 
     const [showWelcome, setShowWelcome] = useState(false);
@@ -30,7 +28,7 @@ export default function Index() {
 
     const handleGetStarted = async () => {
         await AsyncStorage.setItem(SEEN_WELCOME, 'true');
-        safeReplace('/auth/signUp');
+        safeReplace('/auth/sso' as any);
     };
 
     if (!showWelcome) return null; // don't render until check is done
@@ -67,7 +65,6 @@ export default function Index() {
 
                 {/* Get Started Button */}
                 <TouchableOpacity
-                    disabled={loading}
                     style={styles.button}
                     onPress={handleGetStarted}
                     activeOpacity={0.8}
@@ -105,7 +102,7 @@ export default function Index() {
                     </Text>
                 </View>
 
-                <TermsText disabled={loading} />
+                <TermsText disabled={false} />
             </ScrollView>
         </SafeAreaView>
     );

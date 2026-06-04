@@ -1,4 +1,4 @@
-import { auth, db } from '@/config/firebaseConfig';
+import { db } from '@/config/firebaseConfig';
 import { useHandles } from '@/handlers/Header/handleFunctions';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -56,11 +56,7 @@ export default function Header({ onPress }: { onPress?: () => void }) {
                     style={[
                         styles.subHeaderContainer,
                         {
-                            marginTop:
-                                auth.currentUser &&
-                                !auth.currentUser.emailVerified
-                                    ? scale(0)
-                                    : scale(18),
+                            marginTop: scale(18),
                         },
                     ]}
                 >

@@ -1,10 +1,11 @@
-import { auth, db } from '@/config/firebaseConfig';
-import { doc, getDoc } from '@react-native-firebase/firestore';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 export const useExportUserData = () => {
+    const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [fatalError, setFatalError] = useState(null);
     const [errorModal, setErrorModal] = useState({
@@ -16,8 +17,7 @@ export const useExportUserData = () => {
     const exportUserData = async () => {
         try {
             setLoading(true);
-            const user = auth.currentUser;
-            if (!user?.email) {
+            if (!userDetail?.email) {
                 setErrorModal({
                     visible: true,
                     title: 'Error',
@@ -27,10 +27,10 @@ export const useExportUserData = () => {
                 return;
             }
 
-            const docRef = doc(db, 'users', user.email);
-            const docSnap = await getDoc(docRef);
+            const response = await chefuApiClient.get('/api/academy/mobile/me/export');
+            const userData = response.data;
 
-            if (!docSnap.exists()) {
+            if (!userData) {
                 setErrorModal({
                     visible: true,
                     title: 'Error',
@@ -40,9 +40,8 @@ export const useExportUserData = () => {
                 return;
             }
 
-            const userData = docSnap.data();
             const json = JSON.stringify(userData, null, 2);
-            const safeEmail = user.email.replace(/[^a-zA-Z0-9]/g, '_');
+            const safeEmail = userDetail.email.replace(/[^a-zA-Z0-9]/g, '_');
             const filename = `${FileSystem.documentDirectory}my_chefu_academy_data_${safeEmail}.json`;
 
             await FileSystem.writeAsStringAsync(filename, json, {

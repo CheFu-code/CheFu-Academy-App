@@ -4,6 +4,7 @@ import { UserDetailContext } from '@/context/UserDetailContext';
 import { menuItems, url } from '@/data/menuItems';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useRefreshProfile } from '@/hooks/useRefreshProfile';
+import { chefuAccountManageUrl } from '@/services/ssoAuth';
 import { styles } from '@/styles/Profile.styles';
 import { showToast } from '@/utils/toast';
 import { Entypo, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
@@ -23,14 +24,10 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { scale, verticalScale } from 'react-native-size-matters';
 
 interface ProfileMenuProps {
-    menuItems: any[];
     subscribe: () => void;
     isFreeUser: boolean;
     loading: boolean;
     handleLogout: () => void;
-    confirmDeleteAccount: () => void;
-    refreshing: boolean;
-    avatarURL: string | null;
 }
 
 export const ProfileMenu = ({
@@ -38,8 +35,6 @@ export const ProfileMenu = ({
     isFreeUser,
     loading,
     handleLogout,
-    confirmDeleteAccount,
-    avatarURL,
 }: ProfileMenuProps) => {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { email, member, planType } = userDetail || {};
@@ -202,17 +197,17 @@ export const ProfileMenu = ({
 
                 <TouchableOpacity
                     style={[styles.menuItem, { marginTop: verticalScale(5) }]}
-                    onPress={confirmDeleteAccount}
+                    onPress={() => Linking.openURL(chefuAccountManageUrl())}
                     disabled={loading}
                 >
                     <Ionicons
-                        name="trash-outline"
+                        name="person-circle-outline"
                         size={scale(24)}
-                        color={Colors.RED}
+                        color={Colors.PRIMARY}
                         style={styles.icon}
                     />
-                    <Text style={[styles.menuLabel, { color: Colors.RED }]}>
-                        Delete Account
+                    <Text style={styles.menuLabel}>
+                        Manage CheFu Account
                     </Text>
                 </TouchableOpacity>
 

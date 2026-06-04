@@ -1,13 +1,14 @@
 import EmailAlertsUI from '@/component/Setting/EmailAlertsUI';
-import { auth, db } from '@/config/firebaseConfig';
 import { PREF_KEY } from '@/constant/caches';
 import { DEFAULT_PREFS, PrefKey } from '@/constant/Preferences';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { doc, getDoc, setDoc } from '@react-native-firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
 export default function EmailAlerts() {
+    const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
     const [preferences, setPreferences] = useState(DEFAULT_PREFS);
 
@@ -19,14 +20,10 @@ export default function EmailAlerts() {
                     setPreferences(JSON.parse(local));
                 }
 
-                const user = auth.currentUser;
-                if (user?.email) {
-                    const ref = doc(db, 'users', user.email);
-                    const snap = await getDoc(ref);
+                if (userDetail?.email) {
+                    const response = await chefuApiClient.get('/api/academy/mobile/settings');
 
-                    if (!snap.exists()) return;
-
-                    const data = snap.data(); // ✔️ now TypeScript understands it's stable
+                    const data = response.data;
                     if (data?.emailPreferences) {
                         setPreferences(data.emailPreferences);
 
@@ -42,7 +39,7 @@ export default function EmailAlerts() {
         };
 
         loadPreferences();
-    }, []);
+    }, [userDetail?.email]);
 
     const toggle = async (type: PrefKey) => {
         const updated = { ...preferences, [type]: !preferences[type] };
@@ -50,15 +47,11 @@ export default function EmailAlerts() {
 
         try {
             await AsyncStorage.setItem(PREF_KEY, JSON.stringify(updated));
-            const user = auth.currentUser;
-            if (user && user.email) {
-                const ref = doc(db, 'users', user.email);
-                await setDoc(
-                    ref,
-                    { emailPreferences: updated },
-                    { merge: true },
-                );
-                console.log('Firestore updated successful...');
+            if (userDetail?.email) {
+                await chefuApiClient.patch('/api/academy/mobile/settings', {
+                    emailPreferences: updated,
+                });
+                console.log('Email preferences updated successfully');
             }
         } catch (err) {
             console.error('Save failed', err);
@@ -71,14 +64,10 @@ export default function EmailAlerts() {
         try {
             setLoading(true);
             await AsyncStorage.setItem(PREF_KEY, JSON.stringify(DEFAULT_PREFS));
-            const user = auth.currentUser;
-            if (user && user.email) {
-                const ref = doc(db, 'users', user.email);
-                await setDoc(
-                    ref,
-                    { emailPreferences: DEFAULT_PREFS },
-                    { merge: true },
-                );
+            if (userDetail?.email) {
+                await chefuApiClient.patch('/api/academy/mobile/settings', {
+                    emailPreferences: DEFAULT_PREFS,
+                });
                 Alert.alert(
                     'Success',
                     'Preferences have been reset to default.',

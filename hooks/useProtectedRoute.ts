@@ -39,7 +39,7 @@ const useProtectedRoute = (
         }
 
         if (!userDetail && hasSeenWelcome && !inAuthGroup) {
-            safeReplace('/auth/signIn');
+            safeReplace('/auth/sso' as any);
         }
     }, [authChecked, userDetail, segments, safeReplace, hasSeenWelcome]);
 };

@@ -6,9 +6,9 @@ import './firebase-background-handler';
 import FontErrorScreen from '@/component/FontErrorScreen';
 import LoadingScreen from '@/component/LoadingScreen';
 import OfflineScreen from '@/component/Offline/OfflineScreen';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
-import { useFirebaseAuthObserver } from '@/hooks/useFirebaseAuthObserver';
 import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
 import useLastSeenTracker from '@/hooks/useLastSeenTracker';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -16,7 +16,6 @@ import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { useColorScheme } from 'react-native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { NetworkProvider, useNetwork } from '../context/NetworkContext';
-import { UserDetailContext } from '../context/UserDetailContext';
 import { useBiometricAuth } from '../hooks/useBiometricAuth';
 
 // ✅ Sentry Init
@@ -43,45 +42,63 @@ function LayoutContent() {
         'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
     });
 
-    const { userDetail, setUserDetail } = useFirebaseAuthObserver(
-        authChecked,
-        authSuccess,
-    );
-
-    useProtectedRoute(userDetail, authChecked);
-    useLastSeenTracker();
-    useNotifications();
-    // useImmersiveMode();
-    useDeepLinking();
-    useHandleDynamicLinks();
-
     if (!isConnected) return <OfflineScreen />;
     if (fontError) return <FontErrorScreen />;
 
     const isUiReady = fontsLoaded;
-    const isAuthReady = authChecked && authSuccess && userDetail !== undefined;
 
-    if (!isUiReady || !isAuthReady) {
+    if (!isUiReady || !authChecked || !authSuccess) {
         return <LoadingScreen retryAuth={retryAuth} />;
     }
 
     return (
-        <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-            <MenuProvider>
-                <Stack
-                    screenOptions={{
-                        headerShown: false,
-                        statusBarStyle: scheme === 'dark' ? 'dark' : 'light',
-                        statusBarAnimation: 'slide',
-                        gestureEnabled: true,
-                        animation: 'slide_from_bottom',
-                        contentStyle: {
-                            backgroundColor,
-                        },
-                    }}
-                />
-            </MenuProvider>
-        </UserDetailContext.Provider>
+        <AuthProvider authGateReady={authChecked && authSuccess}>
+            <AppStack
+                backgroundColor={backgroundColor}
+                retryAuth={retryAuth}
+                scheme={scheme}
+            />
+        </AuthProvider>
+    );
+}
+
+function AppStack({
+    backgroundColor,
+    retryAuth,
+    scheme,
+}: {
+    backgroundColor: string;
+    retryAuth: () => Promise<void>;
+    scheme: 'dark' | 'light' | null | undefined;
+}) {
+    const { isLoading, userDetail } = useAuth();
+
+    useProtectedRoute(userDetail, true);
+    useLastSeenTracker(userDetail?.email);
+    useNotifications(userDetail?.email);
+    // useImmersiveMode();
+    useDeepLinking();
+    useHandleDynamicLinks();
+
+    if (isLoading || userDetail === undefined) {
+        return <LoadingScreen retryAuth={retryAuth} />;
+    }
+
+    return (
+        <MenuProvider>
+            <Stack
+                screenOptions={{
+                    headerShown: false,
+                    statusBarStyle: scheme === 'dark' ? 'dark' : 'light',
+                    statusBarAnimation: 'slide',
+                    gestureEnabled: true,
+                    animation: 'slide_from_bottom',
+                    contentStyle: {
+                        backgroundColor,
+                    },
+                }}
+            />
+        </MenuProvider>
     );
 }
 

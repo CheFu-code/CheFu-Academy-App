@@ -1,16 +1,17 @@
 import PermissionsUI from '@/component/Setting/PermissionsUI';
-import { auth, db } from '@/config/firebaseConfig';
 import { permissionDisplayNames } from '@/constant/random';
+import { UserDetailContext } from '@/context/UserDetailContext';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import { PermissionKeys } from '@/types/permissions';
-import { doc, setDoc } from '@react-native-firebase/firestore';
 import * as Camera from 'expo-camera';
 import * as Location from 'expo-location';
 import * as MediaLibrary from 'expo-media-library';
 import * as Notifications from 'expo-notifications';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Linking } from 'react-native';
 
 export default function Permissions() {
+    const { userDetail } = useContext(UserDetailContext);
     const [cameraPermission, requestCameraPermission] =
         Camera.useCameraPermissions();
 
@@ -39,21 +40,17 @@ export default function Permissions() {
 
         setPermissions(updatedPermissions);
 
-        // Save to Firestore under user's document
-        const user = auth.currentUser;
-        if (user?.email) {
+        if (userDetail?.email) {
             try {
-                await setDoc(
-                    doc(db, 'users', user?.email),
-                    { permissions: updatedPermissions },
-                    { merge: true },
-                );
+                await chefuApiClient.put('/api/academy/mobile/permissions', {
+                    permissions: updatedPermissions,
+                });
                 console.log('Permissions saved successfully');
             } catch (error) {
                 console.error('Error saving permissions:', error);
             }
         }
-    }, [cameraPermission]);
+    }, [cameraPermission, userDetail?.email]);
 
     const requestPermission = async (type: PermissionKeys) => {
         let result;
