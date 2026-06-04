@@ -75,7 +75,7 @@ export default function EditProfileScreen() {
                 country,
                 profilePicture: photoURL,
             });
-            setUserDetail((prev) =>
+            setUserDetail((prev: any) =>
                 prev
                     ? {
                           ...prev,

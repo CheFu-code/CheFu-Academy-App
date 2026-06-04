@@ -2,11 +2,12 @@ import GeneratingTopic from '@/component/AddCourse/GeneratingTopic';
 import Loading from '@/component/AddCourse/Loading';
 import HeaderText from '@/component/common/Header';
 import ErrorModal from '@/component/Shared/ErrorModal';
+import { ACADEMY_WEB_BILLING_URL } from '@/constant/links';
 import { useAddCourseHook } from '@/handlers/AddCourse/addCourseFunction';
 import useDarkMode from '@/hooks/useDarkMode';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Linking, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, scale } from 'react-native-size-matters';
 import AppModal from '../../component/Shared/AppModal';
@@ -22,7 +23,6 @@ export default function AddCourse() {
         onTopicSelect,
         isTopicSelected,
         onGenerateCourse,
-        watchRewardedAd,
     } = useAddCourseHook();
     const [userInput, setUserInput] = useState('');
     const [topics] = useState<string[]>([]);
@@ -158,14 +158,14 @@ export default function AddCourse() {
             <AppModal
                 visible={limitModalVisible}
                 title="Daily Limit Reached"
-                message="Free users can create up to 3 courses per day. Upgrade for unlimited access, or watch a rewarded ad to create one additional course."
-                confirmText="Watch Ad"
-                cancelText="Cancel"
+                message="Free users can create up to 3 courses per day. Use Academy billing on the web for unlimited access."
+                confirmText="Open Billing"
+                cancelText="Not Now"
                 confirmColor={Colors.GREEN}
                 onCancel={() => setLimitModalVisible(false)}
                 onConfirm={() => {
                     setLimitModalVisible(false);
-                    watchRewardedAd();
+                    Linking.openURL(ACADEMY_WEB_BILLING_URL);
                 }}
             />
         </>

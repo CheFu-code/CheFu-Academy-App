@@ -1,4 +1,5 @@
 import { db } from '@/config/firebaseConfig';
+import { ACADEMY_WEB_BILLING_URL } from '@/constant/links';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { deleteVideo } from '@/services/deleteVideo';
 import { reportVideo } from '@/services/reportVideo';
@@ -16,7 +17,7 @@ import {
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { useContext, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import { useSafeNavigation } from './useSafeNavigation';
 
 export const useFetchVideoUploader = () => {
@@ -142,13 +143,13 @@ export const useFetchVideoUploader = () => {
         if (!video) return;
         if (userDetail.member === false) {
             Alert.alert(
-                'Upgrade Required',
-                'Only members can download videos. Upgrade now to enjoy offline access and premium features.',
+                'Billing Required',
+                'Offline video downloads are managed through Academy billing on the web.',
                 [
                     { text: 'Cancel', style: 'cancel' },
                     {
-                        text: 'Upgrade',
-                        onPress: () => safeReplace('/subscription'),
+                        text: 'Open Billing',
+                        onPress: () => Linking.openURL(ACADEMY_WEB_BILLING_URL),
                     },
                 ],
             );

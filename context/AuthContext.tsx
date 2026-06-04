@@ -33,7 +33,7 @@ type AuthContextValue = {
     logout: () => Promise<void>;
     refresh: () => Promise<CheFuSsoTokenSet | null>;
     reloadProfile: () => Promise<UserDetail | null>;
-    setUserDetail: Dispatch<SetStateAction<UserDetail | null>>;
+    setUserDetail: Dispatch<SetStateAction<UserDetail | null | undefined>>;
     tokens: CheFuSsoTokenSet | null;
     userDetail: UserDetail | null | undefined;
 };

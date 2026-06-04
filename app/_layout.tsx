@@ -8,7 +8,6 @@ import LoadingScreen from '@/component/LoadingScreen';
 import OfflineScreen from '@/component/Offline/OfflineScreen';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import useDarkMode from '@/hooks/useDarkMode';
-import { useDeepLinking } from '@/hooks/useDeepLinking';
 import useHandleDynamicLinks from '@/hooks/useHandleDynamicLinks';
 import useLastSeenTracker from '@/hooks/useLastSeenTracker';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -77,7 +76,6 @@ function AppStack({
     useLastSeenTracker(userDetail?.email);
     useNotifications(userDetail?.email);
     // useImmersiveMode();
-    useDeepLinking();
     useHandleDynamicLinks();
 
     if (isLoading || userDetail === undefined) {

@@ -11,7 +11,7 @@ import { chefuApiClient } from '@/services/chefuApiClient';
 import { User } from '@/types/user';
 import { changeAvatar } from '@/utils/changeAvatar';
 import { showToast } from '@/utils/toast';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Image, SafeAreaView } from 'react-native';
 import { verticalScale } from 'react-native-size-matters';
 import AppModal from '../../component/Shared/AppModal';
@@ -19,12 +19,11 @@ import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Profile.styles';
 
 export default function Profile() {
-    const { safePush, safeReplace } = useSafeNavigation();
+    const { safeReplace } = useSafeNavigation();
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const {
         email,
         fullname,
-        member,
         memberUntil,
         planType,
         provider,
@@ -36,7 +35,6 @@ export default function Profile() {
     const { loading, handleLogout } = useProfileActions();
 
     const { backgroundColor } = useDarkMode();
-    const isFreeUser = !member;
     const { refreshData } = useRefreshProfile(email, setUserDetail);
     const { error, setError } = usePickImage();
     const [avatarURL, setAvatarURL] = useState(userDetail?.profilePicture);
@@ -62,14 +60,6 @@ export default function Profile() {
     useEffect(() => {
         setAvatarURL(userDetail?.profilePicture);
     }, [userDetail?.profilePicture]);
-
-    const subscribe = useCallback(() => {
-        if (member === true) {
-            showToast('You are already a member.');
-        } else {
-            safePush('/subscription');
-        }
-    }, [member, safePush]);
 
     const handleChangeAvatar = async () => {
         setLoader(true);
@@ -118,7 +108,7 @@ export default function Profile() {
                             profilePicture={avatarURL}
                             fullname={fullname}
                             email={email}
-                            member={member}
+                            member={Boolean(userDetail?.member)}
                             memberUntil={memberUntil}
                             planType={planType}
                             createdAt={createdAt}
@@ -130,8 +120,6 @@ export default function Profile() {
 
                     {userDetail && (
                         <ProfileMenu
-                            subscribe={subscribe}
-                            isFreeUser={isFreeUser}
                             loading={loading}
                             handleLogout={handleLogout}
                         />

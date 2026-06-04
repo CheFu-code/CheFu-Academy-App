@@ -1,4 +1,5 @@
 // utils/notifications.ts
+import { chefuFetch } from '@/services/chefuApiClient';
 
 export async function sendNotification(
     userEmail: string,
@@ -6,15 +7,15 @@ export async function sendNotification(
     body: string
 ): Promise<void> {
     try {
-        const response = await fetch(
-            "https://chefu-academy-tmzx.onrender.com/api/sendToUser",
+        const response = await chefuFetch(
+            "/api/academy/mobile/notifications/send",
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ userEmail, title, body }),
-            }
+            },
         );
 
         if (!response.ok) {

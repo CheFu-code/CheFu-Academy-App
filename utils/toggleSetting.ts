@@ -19,7 +19,11 @@ export const useToggle = () => {
         message: '',
     });
 
-    const toggleSetting = async (name: string, stateSetter, current) => {
+    const toggleSetting = async (
+        name: string,
+        stateSetter: (value: boolean) => void,
+        current: boolean,
+    ) => {
         try {
             const newValue = !current;
 

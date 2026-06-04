@@ -1,10 +1,13 @@
+import { ACADEMY_WEB_BILLING_URL } from '@/constant/links';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
 import { useContext } from 'react';
 import {
+    Alert,
     FlatList,
+    Linking,
     Text,
     ToastAndroid,
     TouchableOpacity,
@@ -64,9 +67,19 @@ export default function Chapters({ course }: ChaptersProps) {
                                 }
 
                                 if (completed && userDetail.member === false) {
-                                    ToastAndroid.show(
-                                        'You completed this chapter. Subscribe to revisit it.',
-                                        ToastAndroid.SHORT,
+                                    Alert.alert(
+                                        'Billing Required',
+                                        'Revisiting completed chapters is managed through Academy billing on the web.',
+                                        [
+                                            { text: 'Cancel', style: 'cancel' },
+                                            {
+                                                text: 'Open Billing',
+                                                onPress: () =>
+                                                    Linking.openURL(
+                                                        ACADEMY_WEB_BILLING_URL,
+                                                    ),
+                                            },
+                                        ],
                                     );
                                     return;
                                 }

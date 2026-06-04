@@ -12,9 +12,9 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { showToast } from '@/utils/toast';
-import axios from 'axios';
 import { VideoCategory } from '@/data/categories';
 import { Colors } from '@/constant/Colors';
+import { chefuApiClient } from '@/services/chefuApiClient';
 
 export default function AddVideoModal({
     visible,
@@ -45,20 +45,13 @@ export default function AddVideoModal({
         try {
             const match = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/);
             if (match) {
-                const videoId = match[1];
-                const API_KEY = 'AIzaSyDslnFAex5WgQcEmnFw1SysNBdJbkuehzY';
-                const res = await axios.get(
-                    `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${API_KEY}`,
+                const response = await chefuApiClient.get(
+                    '/api/academy/mobile/videos/youtube/lookup',
+                    { params: { url } },
                 );
+                const data = response.data;
 
-                if (res.data.items && res.data.items.length > 0) {
-                    const snippet = res.data.items[0].snippet;
-                    const data = {
-                        videoId,
-                        title: snippet.title,
-                        thumbnailURL: snippet.thumbnails.high.url,
-                        // removed category here
-                    };
+                if (data?.videoId) {
                     setVideoData(data);
                     setUrl('');
                 } else {

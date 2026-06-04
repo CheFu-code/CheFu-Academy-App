@@ -63,7 +63,7 @@ export default function Progress({ enroll = false }) {
             setLoading(false);
             setFetching(false);
         }
-    }, [userDetail?.email]);
+    }, [fetching, userDetail?.email]);
 
     const loadMore = async () => {
         if (loadingMore || !nextCursor) return;

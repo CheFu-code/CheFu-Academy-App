@@ -1,4 +1,5 @@
 import { db } from '@/config/firebaseConfig';
+import { ACADEMY_WEB_BILLING_URL } from '@/constant/links';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
@@ -6,6 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { doc, setDoc } from '@react-native-firebase/firestore';
 import { useContext, useState } from 'react';
 import {
+    Alert,
+    Linking,
     ScrollView,
     Text,
     ToastAndroid,
@@ -37,9 +40,16 @@ export default function Intro({ course, enroll }: IntroProps) {
 
     const onEnrollCourse = async () => {
         if (isCourseCompleted && userDetail?.member === false) {
-            ToastAndroid.show(
-                'You completed this course. Subscribe to revisit it.',
-                ToastAndroid.SHORT,
+            Alert.alert(
+                'Billing Required',
+                'Revisiting completed courses is managed through Academy billing on the web.',
+                [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                        text: 'Open Billing',
+                        onPress: () => Linking.openURL(ACADEMY_WEB_BILLING_URL),
+                    },
+                ],
             );
             return; // Early return to prevent further execution
         }

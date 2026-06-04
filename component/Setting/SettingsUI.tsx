@@ -1,4 +1,5 @@
 import { Colors } from '@/constant/Colors';
+import { ACADEMY_WEB_BILLING_URL } from '@/constant/links';
 import { options } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
 import { chefuAccountManageUrl } from '@/services/ssoAuth';
@@ -221,13 +222,11 @@ const SettingsUI = ({
                     Account
                 </Text>
 
-                {userDetail?.member === true && (
-                    <SettingItem
-                        label="Subscription & Billing"
-                        icon="card-outline"
-                        onPress={() => safePush('/subscriptionAndBilling')}
-                    />
-                )}
+                <SettingItem
+                    label="Academy Billing"
+                    icon="card-outline"
+                    onPress={() => Linking.openURL(ACADEMY_WEB_BILLING_URL)}
+                />
 
                 <SettingItem
                     label="Buy me coffee"
