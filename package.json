@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "npx expo --dev-client",
+    "start": "expo start --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -32,6 +32,7 @@
     "expo-camera": "~16.1.11",
     "expo-clipboard": "^7.1.5",
     "expo-constants": "~17.1.7",
+    "expo-dev-client": "~5.2.4",
     "expo-device": "~7.1.4",
     "expo-file-system": "~18.1.11",
     "expo-font": "^13.3.2",
