@@ -41,6 +41,43 @@
                     ]
                 }
             }
+        },
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:441077080510:android:9219e59fa5e0b3be7bd9ef",
+                "android_client_info": {
+                    "package_name": "com.chefuinc.chefuacademy"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "441077080510-h23esadokkt2j56qr3tjkgo9qtefsujt.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.chefuinc.chefuacademy",
+                        "certificate_hash": "e06d399b1d46687059403c54fe0eb6201676cf28"
+                    }
+                },
+                {
+                    "client_id": "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyDg-2ZFafv4bDtssjg9gQ_yaNruJVBVdz8"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "441077080510-376i017sckjqhff8mf491f4erskpmp3d.apps.googleusercontent.com",
+                            "client_type": 3
+                        }
+                    ]
+                }
+            }
         }
     ],
     "configuration_version": "1"
