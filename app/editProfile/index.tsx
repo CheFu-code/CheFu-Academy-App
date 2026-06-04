@@ -2,10 +2,8 @@ import EditProfile from '@/component/Profile/EditProfileUI';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import firestore, {
-    FirebaseFirestoreTypes,
-} from '@react-native-firebase/firestore';
-import storage from '@react-native-firebase/storage';
+import { chefuApiClient } from '@/services/chefuApiClient';
+import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { useContext, useEffect, useState } from 'react';
 import {
@@ -13,7 +11,7 @@ import {
 } from 'react-native';
 
 export default function EditProfileScreen() {
-    const { userDetail } = useContext(UserDetailContext);
+    const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { safeBack,safePush } = useSafeNavigation();
     const { color, backgroundColor } = useDarkMode();
     const [fullname, setFullname] = useState(userDetail?.fullname || '');
@@ -57,20 +55,37 @@ export default function EditProfileScreen() {
                 profilePicture &&
                 profilePicture !== userDetail.profilePicture
             ) {
-                const ref = storage().ref(
-                    `profilePictures/${userDetail.uid}.jpg`,
+                const imageBase64 = await FileSystem.readAsStringAsync(
+                    profilePicture,
+                    { encoding: FileSystem.EncodingType.Base64 },
                 );
-                await ref.putFile(profilePicture);
-                photoURL = await ref.getDownloadURL();
+                const response = await chefuApiClient.post(
+                    '/api/academy/mobile/avatar',
+                    {
+                        contentType: 'image/jpeg',
+                        imageBase64,
+                    },
+                );
+                photoURL = response.data?.profilePicture || photoURL;
             }
 
-            await firestore().collection('users').doc(userDetail.uid).update({
+            await chefuApiClient.patch('/api/academy/mobile/me', {
                 fullname,
                 bio,
                 country,
                 profilePicture: photoURL,
-                updatedAt: FirebaseFirestoreTypes.Timestamp.now(),
             });
+            setUserDetail((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          bio,
+                          country,
+                          fullname,
+                          profilePicture: photoURL,
+                      }
+                    : prev,
+            );
 
             Alert.alert('Success', 'Profile updated successfully!');
         } catch (error) {

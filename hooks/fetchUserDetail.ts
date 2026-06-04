@@ -83,7 +83,7 @@ export const useFetchUser = () => {
         );
     };
 
-    const getUserDetail = async (email: string) => {
+    const getUserDetail = async (_email: string) => {
         try {
             const response = await chefuApiClient.get('/api/academy/mobile/me');
             setUserDetail(response.data);
