@@ -1,15 +1,6 @@
-import { db } from "@/config/firebaseConfig";
+import { chefuApiClient } from "@/services/chefuApiClient";
 import { Video } from "@/types/video";
 import { showToast } from "@/utils/toast";
-import {
-    deleteDoc,
-    doc,
-} from "@react-native-firebase/firestore";
-import {
-    deleteObject,
-    getStorage,
-    refFromURL,
-} from "@react-native-firebase/storage";
 
 interface DeleteVideoParams {
     currentUserEmail?: string;
@@ -32,20 +23,9 @@ export const deleteVideo = async ({
     try {
         showToast("Deleting video...");
 
-        if (video.uploadedBy === "YouTube") {
-            const docRef = doc(db, "youTubeVideos", video.id);
-            await deleteDoc(docRef);
-        } else {
-            const storage = getStorage();
-            const videoRef = refFromURL(storage, video.videoURL);
-            const thumbnailRef = refFromURL(storage, video.thumbnailURL);
-
-            await deleteObject(videoRef);
-            await deleteObject(thumbnailRef);
-
-            const docRef = doc(db, "videos", video.id);
-            await deleteDoc(docRef);
-        }
+        await chefuApiClient.delete(
+            `/api/academy/mobile/videos/${encodeURIComponent(video.id)}`,
+        );
 
         showToast("Video deleted successfully!");
         onSuccess?.();

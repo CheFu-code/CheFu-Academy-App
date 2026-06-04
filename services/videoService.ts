@@ -1,19 +1,12 @@
 import { db } from "@/config/firebaseConfig";
+import { chefuApiClient } from "@/services/chefuApiClient";
 import { Video, YouTubeVideo } from "@/types/video";
 import {
-    collection,
     doc,
-    FirebaseFirestoreTypes,
-    getDoc,
-    getDocs,
-    orderBy,
-    query,
     serverTimestamp,
     setDoc,
-    where
 } from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
-import axios from "axios";
 import uuid from "react-native-uuid";
 
 export const uploadVideo = async (
@@ -65,106 +58,33 @@ const uploadFile = async (uri: string, path: string): Promise<string> => {
 };
 
 export const fetchVideos = async (): Promise<Video[]> => {
-    const q = query(
-        collection(db, "videos"),
-        where("visibility", "==", "public"),
-        orderBy("uploadedAt", "desc")
-    );
+    const response = await chefuApiClient.get("/api/academy/mobile/videos", {
+        params: { source: "uploaded" },
+    });
 
-    const snap = await getDocs(q);
-    return snap.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => doc.data() as Video);
+    return (response.data?.videos || []) as Video[];
 };
 
 export const fetchVideoById = async (videoId: string): Promise<Video | null> => {
     try {
-        const docRef = doc(db, "videos", videoId);
-        const docSnap = await getDoc(docRef);
+        const response = await chefuApiClient.get(
+            `/api/academy/mobile/videos/${encodeURIComponent(videoId)}`,
+        );
 
-        if (!docSnap.exists()) {
-            console.log("Video not found");
-            return null;
-        }
-
-        const data = docSnap.data();
-        if (!data) return null;
-
-        return {
-            id: docSnap.id,
-            title: data.title,
-            instructorCompany: data.instructorCompany,
-            instructorName: data.instructorName,
-            description: data.description,
-            videoURL: data.videoURL,
-            thumbnailURL: data.thumbnailURL,
-            uploadedBy: data.uploadedBy,
-            uploadedAt: data.uploadedAt,
-            category: data.category,
-            visibility: data.visibility,
-            level: data.level ?? "beginner",
-            duration: data.duration ?? 0,
-            views: data.views ?? 0,
-            topics: data.topics ?? [],
-        } as Video;
+        return response.data as Video;
     } catch (error) {
         console.error("Error fetching video:", error);
         return null;
     }
 };
 
-const fetchYouTubeVideoDetails = async (videoId: string) => {
-    const YOUTUBE_API_KEY = 'AIzaSyDslnFAex5WgQcEmnFw1SysNBdJbkuehzY'
-    try {
-        const res = await axios.get(
-            `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${YOUTUBE_API_KEY}`
-        );
-
-        if (res.data.items.length === 0) return null;
-
-        const video = res.data.items[0];
-        const channelTitle = video.snippet.channelTitle || "";
-        return {
-            videoId: video.id,
-            title: video.snippet.title,
-            description: video.snippet.description,
-            thumbnailURL: video.snippet.thumbnails.high.url,
-            duration: video.contentDetails.duration,
-            views: parseInt(video.statistics.viewCount, 10) || 0,
-            publishedAt: new Date(video.snippet.publishedAt),
-            instructorName: channelTitle,
-            instructorCompany: `${channelTitle}`,
-            channelTitle: video.snippet.channelTitle,
-        };
-    } catch (err) {
-        console.error(`Error fetching details for videoId ${videoId}:`, err);
-        return null;
-    }
-};
-
 export const fetchYouTubeVideos = async (): Promise<YouTubeVideo[]> => {
     try {
-        const videosCol = collection(db, "youTubeVideos");
-        const q = query(videosCol, orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+        const response = await chefuApiClient.get("/api/academy/mobile/videos", {
+            params: { source: "youtube" },
+        });
 
-        const videos = await Promise.all(
-            snapshot.docs.map(async (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
-                const firestoreData = doc.data() as Partial<YouTubeVideo>; // may include category
-                if (!firestoreData.videoId) return null; // skip invalid docs
-                const ytDetails = await fetchYouTubeVideoDetails(firestoreData.videoId);
-
-                if (!ytDetails) return null;
-
-                return {
-                    ...ytDetails,
-                    category: firestoreData.category ?? "YouTube",
-                } as YouTubeVideo;
-
-
-            })
-        );
-
-        return videos.filter(Boolean) as YouTubeVideo[];
-
+        return (response.data?.videos || []) as YouTubeVideo[];
     } catch (error) {
         console.error("Error fetching YouTube videos:", error);
         return [];
