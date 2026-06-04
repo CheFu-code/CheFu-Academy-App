@@ -21,11 +21,23 @@ def reactNativeAndroidDir = new File(
   "../android"
 )
 
+def notifeeAndroidLibsDir = new File(
+  providers.exec {
+    workingDir(rootDir)
+    commandLine("node", "--print", "require.resolve('@notifee/react-native/package.json')")
+  }.standardOutput.asText.get().trim(),
+  "../android/libs"
+)
+
 allprojects {
   repositories {
     maven {
       // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
       url(reactNativeAndroidDir)
+    }
+    maven {
+      // Notifee publishes its Android core artifact inside the npm package.
+      url(notifeeAndroidLibsDir)
     }
 
     google()
