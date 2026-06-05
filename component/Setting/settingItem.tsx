@@ -34,13 +34,16 @@ const SettingItem = ({
     const isDangerAction = label === 'Log Out' || label === 'Logging Out...';
 
     return (
-        <View
-            accessible={true}
-            accessibilityRole={toggle ? 'switch' : 'button'}
-            accessibilityLabel={label}
-            style={{ opacity: disabled ? 0.5 : 1 }}
-        >
+        <View style={{ opacity: disabled ? 0.5 : 1 }}>
             <TouchableOpacity
+                accessible
+                accessibilityRole={toggle ? 'switch' : 'button'}
+                accessibilityLabel={label}
+                accessibilityState={{
+                    checked: toggle ? Boolean(value) : undefined,
+                    disabled: Boolean(disabled),
+                }}
+                hitSlop={6}
                 onPress={disabled ? undefined : onPress}
                 disabled={disabled}
                 style={styles.itemRow}
@@ -67,6 +70,7 @@ const SettingItem = ({
 
                 {toggle ? (
                     <Switch
+                        accessibilityLabel={label}
                         value={value}
                         onValueChange={disabled ? undefined : onToggle}
                     />

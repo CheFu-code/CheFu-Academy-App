@@ -7,4 +7,5 @@ export type ButtonProps = {
     loading?: boolean;
     disabled?: boolean;
     icon?: ReactNode;
+    accessibilityLabel?: string;
 };

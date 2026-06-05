@@ -20,6 +20,8 @@ const FontErrorScreen = () => {
             }}
         >
             <MaterialIcons
+                accessibilityElementsHidden
+                importantForAccessibility="no"
                 name="error-outline"
                 size={scale(60)}
                 color={color}
@@ -27,10 +29,11 @@ const FontErrorScreen = () => {
             />
 
             <Text
+                accessibilityRole="header"
                 style={{
                     color,
                     fontSize: RFValue(18),
-                    fontWeight:"bold",
+                    fontWeight: 'bold',
                     textAlign: 'center',
                     marginBottom: verticalScale(6),
                 }}

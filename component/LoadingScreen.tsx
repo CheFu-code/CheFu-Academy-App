@@ -22,7 +22,6 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
     const color = scheme === 'dark' ? Colors.GREEN : Colors.BLACK;
     const [triggering, setTriggering] = useState<boolean>(false);
 
-    // re-trigger the auth-system-button when user accidentally close the biometric auth UI
     const trigger = async () => {
         try {
             setTriggering(true);
@@ -53,6 +52,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 style={{ width: scale(130), height: verticalScale(130) }}
             />
             <TouchableOpacity
+                accessible={false}
                 onPress={() => trigger()}
                 style={{
                     backgroundColor:
@@ -63,6 +63,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 }}
             >
                 <Text
+                    accessibilityRole="text"
                     style={{
                         fontSize: RFValue(14),
                         color,

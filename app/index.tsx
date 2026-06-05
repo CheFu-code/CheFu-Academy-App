@@ -53,7 +53,10 @@ export default function Index() {
     if (!isReady || !showWelcome) {
         return (
             <SafeAreaView style={styles.loadingContainer}>
-                <ActivityIndicator color="#ffffff" />
+                <ActivityIndicator
+                    accessibilityLabel="Preparing CheFu Academy"
+                    color="#ffffff"
+                />
             </SafeAreaView>
         );
     }
@@ -64,6 +67,7 @@ export default function Index() {
 
             <View style={styles.hero}>
                 <Image
+                    accessible={false}
                     source={require('./../assets/images/landing.png')}
                     style={styles.heroImage}
                     resizeMode="contain"
@@ -99,6 +103,8 @@ export default function Index() {
                 </View>
 
                 <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Get started with CheFu Academy"
                     style={({ pressed }) => [
                         styles.button,
                         pressed && styles.buttonPressed,
