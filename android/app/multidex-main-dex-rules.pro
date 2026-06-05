@@ -1,0 +1,2 @@
+-keep class com.chefuinc.chefuacademy.MainApplication { *; }
+-keep class com.chefuinc.chefuacademy.MainActivity { *; }
