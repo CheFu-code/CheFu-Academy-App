@@ -53,17 +53,20 @@ export function AuthProvider({
     );
     const [isLoading, setIsLoading] = useState(true);
 
-    const clearLocalSession = useCallback(async () => {
-        await signOutOfCheFuSso();
-        await AsyncStorage.removeItem(USER_DETAIL);
-        setTokens(null);
-        setUserDetail(null);
-    }, []);
+    const clearLocalSession = useCallback(
+        async (options?: { revokeRemote?: boolean }) => {
+            await signOutOfCheFuSso({ revokeRemote: options?.revokeRemote });
+            await AsyncStorage.removeItem(USER_DETAIL);
+            setTokens(null);
+            setUserDetail(null);
+        },
+        [],
+    );
 
     const reloadProfile = useCallback(async () => {
         const accessToken = await getValidAccessToken();
         if (!accessToken) {
-            await clearLocalSession();
+            await clearLocalSession({ revokeRemote: false });
             return null;
         }
 
@@ -90,7 +93,7 @@ export function AuthProvider({
             await reloadProfile();
         } catch (error) {
             Sentry.captureException(error);
-            await clearLocalSession();
+            await clearLocalSession({ revokeRemote: false });
         } finally {
             setIsLoading(false);
         }
@@ -114,7 +117,7 @@ export function AuthProvider({
     const logout = useCallback(async () => {
         setIsLoading(true);
         try {
-            await clearLocalSession();
+            await clearLocalSession({ revokeRemote: true });
         } finally {
             setIsLoading(false);
         }

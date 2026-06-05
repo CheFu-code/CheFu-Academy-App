@@ -1,12 +1,14 @@
-import dynamicLinks from '@react-native-firebase/dynamic-links';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import * as Linking from 'expo-linking';
 import { useCallback, useEffect } from 'react';
 
 const useHandleDynamicLinks = () => {
-    const { safePush } = useSafeNavigation()
+    const { safePush } = useSafeNavigation();
 
-    const handleLink = useCallback((link: any) => {
-        const sparkId = link.url.split('/spark/')[1];
+    const handleUrl = useCallback((url: string | null) => {
+        if (!url) return;
+
+        const sparkId = url.split('/spark/')[1]?.split(/[?#]/)[0];
         if (sparkId) {
             safePush({
                 pathname: '/sparkDetail',
@@ -16,20 +18,18 @@ const useHandleDynamicLinks = () => {
     }, [safePush]);
 
     useEffect(() => {
-        // App opened from background / foreground
-        const unsubscribe = dynamicLinks().onLink(handleLink);
+        const subscription = Linking.addEventListener('url', ({ url }) => {
+            handleUrl(url);
+        });
 
-        // App opened from quit state
-        dynamicLinks()
-            .getInitialLink()
-            .then((link) => {
-                if (link) handleLink(link);
+        Linking.getInitialURL()
+            .then(handleUrl)
+            .catch(() => {
+                // Deep links are best effort and should never block app startup.
             });
 
-        return () => unsubscribe();
-    }, [handleLink]);
-
-
+        return () => subscription.remove();
+    }, [handleUrl]);
 };
 
 export default useHandleDynamicLinks;

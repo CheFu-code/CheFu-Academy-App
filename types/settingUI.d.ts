@@ -1,13 +1,11 @@
 import { Href } from 'expo-router';
-import { UserDetail } from './UserDetail';
 
 export interface SettingsUIProps {
-    safeBack: () => void;
     setIsOpen: (v: boolean) => void;
     isOpen: boolean;
     safePush: (path: Href) => void;
     loading: boolean;
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    logoutLoading: boolean;
     notifications: boolean;
     setNotifications: (v: boolean) => void;
     showVersion: boolean;
@@ -17,6 +15,5 @@ export interface SettingsUIProps {
     useBiometrics: boolean;
     setUseBiometrics: (v: boolean) => void;
     handleShare: () => void;
-    userDetail: UserDetail;
     handleLogout: () => void;
 }

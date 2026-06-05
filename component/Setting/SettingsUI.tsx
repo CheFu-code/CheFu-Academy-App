@@ -1,5 +1,9 @@
 import { Colors } from '@/constant/Colors';
-import { ACADEMY_WEB_BILLING_URL } from '@/constant/links';
+import {
+    ACADEMY_PRIVACY_URL,
+    ACADEMY_TERMS_URL,
+    ACADEMY_WEB_BILLING_URL,
+} from '@/constant/links';
 import { options } from '@/constant/random';
 import useDarkMode from '@/hooks/useDarkMode';
 import { chefuAccountManageUrl } from '@/services/ssoAuth';
@@ -21,12 +25,11 @@ import HeaderText from '../common/Header';
 import SettingItem from './settingItem';
 
 const SettingsUI = ({
-    safeBack,
     setIsOpen,
     isOpen,
     safePush,
     loading,
-    setLoading,
+    logoutLoading,
     notifications,
     setNotifications,
     showVersion,
@@ -36,7 +39,6 @@ const SettingsUI = ({
     useBiometrics,
     setUseBiometrics,
     handleShare,
-    userDetail,
     handleLogout,
 }: SettingsUIProps) => {
     const { color, backgroundColor } = useDarkMode();
@@ -49,7 +51,6 @@ const SettingsUI = ({
                 },
             ]}
         >
-            {/* Header + Dropdown Button */}
             <View style={styles.header}>
                 <HeaderText title="Settings" />
 
@@ -63,7 +64,6 @@ const SettingsUI = ({
                 </TouchableOpacity>
             </View>
 
-            {/* Dropdown Menu */}
             {isOpen && (
                 <View style={styles.dropdown}>
                     {options.map((item, index) => (
@@ -73,7 +73,7 @@ const SettingsUI = ({
                                 Linking.openURL('mailto:chefu.inc@gmail.com');
                                 setIsOpen(false);
                             }}
-                            style={styles.option} //when i add more options i should uncomment out these styles on the styles file
+                            style={styles.option}
                         >
                             <Text style={styles.optionText}>{item}</Text>
                         </TouchableOpacity>
@@ -81,7 +81,6 @@ const SettingsUI = ({
                 </View>
             )}
 
-            {/* Settings List */}
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 style={styles.container}
@@ -148,7 +147,7 @@ const SettingsUI = ({
                 <SettingItem
                     label="Privacy Policy"
                     icon="shield-checkmark"
-                    onPress={() => safePush('/privacy')}
+                    onPress={() => Linking.openURL(ACADEMY_PRIVACY_URL)}
                 />
                 <SettingItem
                     label="Enable Biometric Lock"
@@ -196,7 +195,7 @@ const SettingsUI = ({
                 <SettingItem
                     label="Terms of Service"
                     icon="document-text-outline"
-                    onPress={() => safePush('/about')}
+                    onPress={() => Linking.openURL(ACADEMY_TERMS_URL)}
                 />
                 <SettingItem
                     label="App Version"
@@ -229,16 +228,10 @@ const SettingsUI = ({
                 />
 
                 <SettingItem
-                    label="Buy me coffee"
-                    icon="exit"
-                    onPress={async () => {
-                        safePush('/buyMeCoffee');
-                    }}
-                />
-                <SettingItem
-                    label="Log Out"
+                    label={logoutLoading ? 'Logging Out...' : 'Log Out'}
                     icon="exit-outline"
                     onPress={() => handleLogout()}
+                    disabled={logoutLoading}
                 />
             </ScrollView>
         </SafeAreaView>

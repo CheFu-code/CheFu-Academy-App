@@ -35,6 +35,7 @@ const secureStoreOptions: SecureStore.SecureStoreOptions = {
 
 const discovery = {
     authorizationEndpoint: `${API_URL.replace(/\/$/, '')}/oauth/authorize`,
+    revocationEndpoint: `${API_URL.replace(/\/$/, '')}/oauth/revoke`,
     tokenEndpoint: `${API_URL.replace(/\/$/, '')}/oauth/token`,
     userInfoEndpoint: `${API_URL.replace(/\/$/, '')}/oauth/userinfo`,
 };
@@ -64,6 +65,10 @@ export type CheFuSsoUserInfo = {
     roles?: string[];
     scope?: string;
     sub: string;
+};
+
+type SignOutOptions = {
+    revokeRemote?: boolean;
 };
 
 let inMemoryTokens: CheFuSsoTokenSet | null | undefined;
@@ -109,10 +114,24 @@ export async function signInWithCheFuSso() {
     return tokens;
 }
 
-export async function signOutOfCheFuSso() {
+export async function signOutOfCheFuSso(options: SignOutOptions = {}) {
+    const tokensToRevoke =
+        options.revokeRemote === false
+            ? null
+            : await readStoredTokensForLogout();
+
     inMemoryTokens = null;
     refreshPromise = null;
-    await SecureStore.deleteItemAsync(TOKEN_STORAGE_KEY, secureStoreOptions);
+
+    try {
+        if (tokensToRevoke?.refreshToken) {
+            await revokeCheFuSsoSession(tokensToRevoke.refreshToken).catch(() => {
+                // Logout must never fail locally because the network is unavailable.
+            });
+        }
+    } finally {
+        await SecureStore.deleteItemAsync(TOKEN_STORAGE_KEY, secureStoreOptions);
+    }
 }
 
 export async function loadSsoTokens() {
@@ -131,7 +150,7 @@ export async function loadSsoTokens() {
         inMemoryTokens = JSON.parse(stored) as CheFuSsoTokenSet;
         return inMemoryTokens;
     } catch {
-        await signOutOfCheFuSso();
+        await signOutOfCheFuSso({ revokeRemote: false });
         return null;
     }
 }
@@ -191,7 +210,7 @@ export function chefuAccountManageUrl() {
 async function refreshCheFuSsoSessionUnsafe() {
     const tokens = await loadSsoTokens();
     if (!tokens?.refreshToken) {
-        await signOutOfCheFuSso();
+        await signOutOfCheFuSso({ revokeRemote: false });
         return null;
     }
 
@@ -210,7 +229,7 @@ async function refreshCheFuSsoSessionUnsafe() {
     });
 
     if (!response.ok) {
-        await signOutOfCheFuSso();
+        await signOutOfCheFuSso({ revokeRemote: false });
         return null;
     }
 
@@ -271,6 +290,46 @@ async function saveSsoTokens(tokens: CheFuSsoTokenSet) {
         JSON.stringify(tokens),
         secureStoreOptions,
     );
+}
+
+async function readStoredTokensForLogout() {
+    if (inMemoryTokens) return inMemoryTokens;
+
+    const stored = await SecureStore.getItemAsync(
+        TOKEN_STORAGE_KEY,
+        secureStoreOptions,
+    ).catch(() => null);
+
+    if (!stored) return null;
+
+    try {
+        return JSON.parse(stored) as CheFuSsoTokenSet;
+    } catch {
+        return null;
+    }
+}
+
+async function revokeCheFuSsoSession(refreshToken: string) {
+    const body = new URLSearchParams({
+        client_id: CLIENT_ID,
+        token: refreshToken,
+        token_type_hint: 'refresh_token',
+    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8_000);
+
+    try {
+        await fetch(discovery.revocationEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: body.toString(),
+            signal: controller.signal,
+        });
+    } finally {
+        clearTimeout(timeout);
+    }
 }
 
 function tokenResponseToTokenSet(response: CheFuSsoTokenResponse) {

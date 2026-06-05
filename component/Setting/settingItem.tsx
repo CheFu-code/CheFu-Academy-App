@@ -2,7 +2,6 @@ import { Colors } from '@/constant/Colors';
 import { styles } from '@/styles/Settings.styles';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import {
-    Pressable,
     Switch,
     Text,
     TouchableOpacity,
@@ -32,6 +31,7 @@ const SettingItem = ({
 }: SettingItemProps) => {
     const scheme = useColorScheme();
     const color = scheme === 'dark' ? Colors.WHITE : Colors.BLACK;
+    const isDangerAction = label === 'Log Out' || label === 'Logging Out...';
 
     return (
         <View
@@ -47,16 +47,16 @@ const SettingItem = ({
             >
                 <View style={styles.itemLeft}>
                     <Ionicons
-                        name={label === 'Buy me coffee' ? 'cafe-outline' : icon}
+                        name={icon}
                         size={scale(20)}
-                        color={label === 'Log Out' ? 'red' : Colors.PRIMARY}
+                        color={isDangerAction ? 'red' : Colors.PRIMARY}
                         style={{ marginRight: verticalScale(10) }}
                     />
                     <Text
                         style={[
                             styles.label,
                             { color },
-                            label === 'Log Out'
+                            isDangerAction
                                 ? { color: 'red', fontFamily: 'outfit-bold' }
                                 : null,
                         ]}
@@ -71,16 +71,11 @@ const SettingItem = ({
                         onValueChange={disabled ? undefined : onToggle}
                     />
                 ) : (
-                    <Pressable
-                        onPress={disabled ? undefined : onPress}
-                        disabled={disabled}
-                    >
-                        <MaterialIcons
-                            name="chevron-right"
-                            size={scale(22)}
-                            color={Colors.GRAY}
-                        />
-                    </Pressable>
+                    <MaterialIcons
+                        name="chevron-right"
+                        size={scale(22)}
+                        color={Colors.GRAY}
+                    />
                 )}
             </TouchableOpacity>
         </View>
