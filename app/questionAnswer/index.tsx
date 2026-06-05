@@ -102,7 +102,7 @@ export default function QuestionAnswer() {
                         </Pressable>
                     )}
                     keyExtractor={(item, index) =>
-                        `${item.question}-${index}`
+                        item.id ? String(item.id) : String(index)
                     }
                 />
             </View>

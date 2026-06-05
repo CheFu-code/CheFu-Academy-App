@@ -175,12 +175,11 @@ const errorStyles = StyleSheet.create({
         paddingHorizontal: 24,
     },
     title: {
-        fontFamily: 'outfit-bold',
         fontSize: 24,
+        fontWeight: '700',
         textAlign: 'center',
     },
     message: {
-        fontFamily: 'outfit',
         fontSize: 15,
         lineHeight: 22,
         marginTop: 10,
@@ -201,7 +200,7 @@ const errorStyles = StyleSheet.create({
     },
     buttonText: {
         color: Colors.WHITE,
-        fontFamily: 'outfit-bold',
         fontSize: 15,
+        fontWeight: '700',
     },
 });

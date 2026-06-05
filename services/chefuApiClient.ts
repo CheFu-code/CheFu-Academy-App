@@ -18,18 +18,6 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
     _retry?: boolean;
 };
 
-let refreshPromise: ReturnType<typeof refreshCheFuSsoSession> | null = null;
-
-async function refreshSessionOnce() {
-    if (!refreshPromise) {
-        refreshPromise = refreshCheFuSsoSession().finally(() => {
-            refreshPromise = null;
-        });
-    }
-
-    return refreshPromise;
-}
-
 export const chefuApiClient = axios.create({
     baseURL: API_URL.replace(/\/$/, ''),
     timeout: 30_000,
@@ -55,7 +43,7 @@ chefuApiClient.interceptors.response.use(
         }
 
         config._retry = true;
-        const refreshed = await refreshSessionOnce();
+        const refreshed = await refreshCheFuSsoSession();
 
         if (!refreshed?.accessToken) {
             await signOutOfCheFuSso({ revokeRemote: false });
@@ -91,7 +79,7 @@ export async function chefuFetch(
         return response;
     }
 
-    const refreshed = await refreshSessionOnce();
+    const refreshed = await refreshCheFuSsoSession();
     if (!refreshed?.accessToken) {
         await signOutOfCheFuSso({ revokeRemote: false });
         return response;

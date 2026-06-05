@@ -23,10 +23,7 @@ export function getUserProfileSummary(
         .then((snapshot) => {
             if (!snapshot.exists()) return null;
 
-            return {
-                ...(snapshot.data() as Partial<UserDetail>),
-                id: snapshot.id,
-            } satisfies UserProfileSummary;
+            return sanitizeUserProfileSummary(snapshot.id, snapshot.data());
         })
         .catch((error) => {
             profileCache.delete(key);
@@ -35,6 +32,28 @@ export function getUserProfileSummary(
 
     profileCache.set(key, request);
     return request;
+}
+
+function sanitizeUserProfileSummary(
+    id: string,
+    raw: unknown,
+): UserProfileSummary | null {
+    if (!raw || typeof raw !== 'object') return null;
+
+    const data = raw as Partial<UserDetail>;
+    const profile: UserProfileSummary = { id };
+
+    if (typeof data.email === 'string') profile.email = data.email;
+    if (typeof data.fullname === 'string') profile.fullname = data.fullname;
+    if (typeof data.profilePicture === 'string') {
+        profile.profilePicture = data.profilePicture;
+    }
+    if (typeof data.uid === 'string') profile.uid = data.uid;
+    if (typeof data.isVerified === 'boolean') {
+        profile.isVerified = data.isVerified;
+    }
+
+    return profile;
 }
 
 export function clearUserProfileSummaryCache(userId?: string) {

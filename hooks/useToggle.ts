@@ -6,6 +6,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useCallback, useContext } from 'react';
 
+const FIELD_MAP: Record<string, 'notifications' | 'useBiometrics'> = {
+    'Biometric Lock': 'useBiometrics',
+    Notifications: 'notifications',
+};
+
 export const useToggle = () => {
     const { userDetail } = useContext(UserDetailContext);
 
@@ -16,8 +21,19 @@ export const useToggle = () => {
             current: boolean,
         ) => {
             const newValue = !current;
+            const apiField = FIELD_MAP[name];
 
             try {
+                if (!apiField) {
+                    showToast('Unknown setting');
+                    return;
+                }
+
+                if (!userDetail?.email) {
+                    showToast('Please sign in to update settings');
+                    return;
+                }
+
                 if (name === 'Biometric Lock') {
                     const [compatible, enrolled] = await Promise.all([
                         LocalAuthentication.hasHardwareAsync(),
@@ -34,15 +50,11 @@ export const useToggle = () => {
 
                 stateSetter(newValue);
 
-                if (!userDetail?.email) return;
-
                 await chefuApiClient.patch('/api/academy/mobile/settings', {
-                    [name === 'Biometric Lock'
-                        ? 'useBiometrics'
-                        : 'notifications']: newValue,
+                    [apiField]: newValue,
                 });
 
-                if (name === 'Biometric Lock') {
+                if (apiField === 'useBiometrics') {
                     await AsyncStorage.setItem(
                         BIOMETRICS,
                         newValue.toString(),

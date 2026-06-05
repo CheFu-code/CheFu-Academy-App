@@ -52,13 +52,15 @@ export default function Quiz() {
     };
 
     const onOptionSelect = (selectedChoice: string) => {
+        if (!currentQuiz) return;
+
         setResult((prev) => ({
             ...prev,
             [currentPage]: {
                 userChoice: selectedChoice,
-                isCorrect: currentQuiz?.correctAns === selectedChoice,
-                question: currentQuiz?.question,
-                correctAns: currentQuiz?.correctAns,
+                isCorrect: currentQuiz.correctAns === selectedChoice,
+                question: currentQuiz.question,
+                correctAns: currentQuiz.correctAns,
             },
         }));
     };
@@ -177,7 +179,7 @@ export default function Quiz() {
                         {currentQuiz?.question}
                     </Text>
 
-                    {currentQuiz?.options.map((item: string, index: number) => (
+                    {(currentQuiz?.options ?? []).map((item: string, index: number) => (
                         <TouchableOpacity
                             onPress={() => {
                                 setSelectedOption(index);
@@ -198,7 +200,7 @@ export default function Quiz() {
                                         ? Colors.LIGHT_GREEN
                                         : undefined,
                             }}
-                            key={`${item}-${index}`}
+                            key={`${currentPage}-${index}`}
                         >
                             <Text
                                 style={{

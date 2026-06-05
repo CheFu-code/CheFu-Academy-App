@@ -76,7 +76,7 @@ export default function Flashcards() {
                 <FlatList
                     data={flashcard}
                     keyExtractor={(item: Flashcard, index) =>
-                        `${item.front}-${index}`
+                        item.id ? String(item.id) : String(index)
                     }
                     pagingEnabled
                     horizontal

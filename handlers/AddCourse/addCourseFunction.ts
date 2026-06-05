@@ -100,12 +100,12 @@ export const useAddCourseHook = () => {
                     }
                 }
 
-                try {
-                    topicIdea = safeJsonParse(cleanedResponse) || [];
-                } catch (e) {
-                    topicIdea = [];
+                const parsed = safeJsonParse(cleanedResponse);
+                topicIdea = parsed || [];
+
+                if (parsed === null) {
                     handleAiError({
-                        error: e instanceof Error ? e.message : String(e),
+                        error: 'JSON parse failed',
                         supportEmail: support,
                     });
                 }
@@ -183,6 +183,7 @@ export const useAddCourseHook = () => {
                         extra: { aiResponse: aiResp },
                     });
                 }
+                setLoading(false);
                 return;
             }
             // Handle both array and object with courses property

@@ -24,7 +24,14 @@ const shuffleArray = <T>(array: T[]): T[] => {
 };
 
 const parseVideoCache = (raw: string): VideoCachePayload | null => {
-    const parsed = JSON.parse(raw) as Video[] | VideoCachePayload;
+    let parsed: Video[] | VideoCachePayload;
+
+    try {
+        parsed = JSON.parse(raw) as Video[] | VideoCachePayload;
+    } catch (error) {
+        console.warn('Failed to parse video cache:', error);
+        return null;
+    }
 
     if (Array.isArray(parsed)) {
         return { fetchedAt: 0, videos: parsed };

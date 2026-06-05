@@ -45,23 +45,27 @@ export default function CourseProgressCard({
             const sent = await AsyncStorage.getItem(notificationSentKey);
             if (sent === 'true') return;
 
-            const { status } = await Notifications.getPermissionsAsync();
-            if (status !== 'granted') {
-                const { status: newStatus } =
-                    await Notifications.requestPermissionsAsync();
-                if (newStatus !== 'granted') return;
-            }
+            try {
+                const { status } = await Notifications.getPermissionsAsync();
+                if (status !== 'granted') {
+                    const { status: newStatus } =
+                        await Notifications.requestPermissionsAsync();
+                    if (newStatus !== 'granted') return;
+                }
 
-            const userEmail = userDetail?.email;
-            if (userEmail) {
-                await sendNotification(
-                    userEmail,
-                    'Course Completed!',
-                    `You completed all chapters in "${courseTitle}"`,
-                );
+                const userEmail = userDetail?.email;
+                if (userEmail) {
+                    await sendNotification(
+                        userEmail,
+                        'Course Completed!',
+                        `You completed all chapters in "${courseTitle}"`,
+                    );
+                }
+            } catch (error) {
+                console.error('Failed to send completion notification:', error);
+            } finally {
+                await AsyncStorage.setItem(notificationSentKey, 'true');
             }
-
-            await AsyncStorage.setItem(notificationSentKey, 'true');
         }
 
         void checkAndSendNotification();

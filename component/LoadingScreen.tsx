@@ -5,7 +5,7 @@ import {
     SafeAreaView,
     Text,
     ToastAndroid,
-    TouchableOpacity,
+    View,
     useColorScheme,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -51,9 +51,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 loop
                 style={{ width: scale(130), height: verticalScale(130) }}
             />
-            <TouchableOpacity
-                accessible={false}
-                onPress={() => trigger()}
+            <View
                 style={{
                     backgroundColor:
                         scheme === 'dark' ? Colors.BG_COLOR : Colors.GRAY,
@@ -63,7 +61,6 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 }}
             >
                 <Text
-                    accessibilityRole="text"
                     style={{
                         fontSize: RFValue(14),
                         color,
@@ -84,7 +81,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 >
                     We help you learn with confidence and privacy.
                 </Text>
-            </TouchableOpacity>
+            </View>
 
             <Button
                 type={scheme === 'dark' ? 'outline' : 'fill'}

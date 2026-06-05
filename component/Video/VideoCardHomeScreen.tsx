@@ -50,7 +50,7 @@ export default function VideoCardHomeScreen() {
             contentContainerStyle={{ paddingBottom: 20 }}
             initialNumToRender={10}
             maxToRenderPerBatch={10}
-            windowSize={9}
+            windowSize={3}
             removeClippedSubviews
         />
     );

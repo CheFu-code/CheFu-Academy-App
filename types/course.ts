@@ -3,6 +3,7 @@
 import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 
 export interface Flashcard {
+    id?: string;
     front: string;
     back: string;
 }
@@ -17,6 +18,7 @@ export interface Chapter {
 }
 
 export interface QA {
+    id?: string;
     question: string;
     answer: string;
 }

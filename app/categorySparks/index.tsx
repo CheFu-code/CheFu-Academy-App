@@ -16,7 +16,12 @@ const CategorySpark = () => {
                 <AntDesign name="left" color={'white'} size={20} />
                 <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
-            <Text>{categoryTitle || 'Category'}</Text>
+            <Text
+                accessibilityLabel="category-title"
+                style={styles.categoryTitle}
+            >
+                {categoryTitle || 'Category'}
+            </Text>
         </SafeAreaView>
     );
 };
@@ -34,5 +39,12 @@ const styles = StyleSheet.create({
     backText: {
         color: 'white',
         fontSize: 16,
+    },
+    categoryTitle: {
+        color: 'white',
+        fontSize: 18,
+        fontFamily: 'outfit-bold',
+        marginTop: 20,
+        textAlign: 'center',
     },
 });

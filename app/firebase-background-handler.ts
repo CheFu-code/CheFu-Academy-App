@@ -1,6 +1,8 @@
 import notifee, { AndroidImportance } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 
+const NOTIFICATION_CHANNEL_ID = 'default';
+
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
     try {
         const { data, notification } = remoteMessage;
@@ -11,11 +13,18 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
         const body =
             notification?.body || normalizeNotificationText(data?.body) || '';
 
+        await notifee.createChannel({
+            id: NOTIFICATION_CHANNEL_ID,
+            name: 'Default Channel',
+            sound: 'default',
+            importance: AndroidImportance.HIGH,
+        });
+
         await notifee.displayNotification({
             title,
             body,
             android: {
-                channelId: 'default',
+                channelId: NOTIFICATION_CHANNEL_ID,
                 smallIcon: 'ic_launcher',
                 color: '#1a73e8',
                 pressAction: {
