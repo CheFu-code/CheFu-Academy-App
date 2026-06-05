@@ -61,7 +61,7 @@ const SparksFeed = () => {
                     setIsVerified(!!userData?.isVerified);
                 }
             } catch (err) {
-                console.log('Error checking verified status:', err);
+                console.error('Error checking verified status:', err);
             }
         };
 
@@ -151,7 +151,7 @@ const SparksFeed = () => {
                 );
             }
         } catch (e) {
-            console.log('Like error:', e);
+            console.error('Like error:', e);
         } finally {
             // 🔓 Unlock after Firestore completes
             setLikeLock(null);

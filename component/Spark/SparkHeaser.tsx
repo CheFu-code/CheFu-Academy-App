@@ -32,7 +32,7 @@ export default function SparkHeader({ spark }: Props) {
                     setIsVerified(!!userData?.isVerified);
                 }
             } catch (err) {
-                console.log('Error checking verified status:', err);
+                console.error('Error checking verified status:', err);
             }
         };
 

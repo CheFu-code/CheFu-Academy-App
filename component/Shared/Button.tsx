@@ -9,9 +9,9 @@ export default function Button({
     text,
     type = 'fill',
     onPress,
-    loading,
-    disabled,
-    icon,
+    loading = false,
+    disabled = false,
+    icon = null,
 }: ButtonProps) {
     const isDisabled = loading || disabled;
     const { backgroundColor } = useDarkMode();

@@ -1,17 +1,11 @@
-import { db } from '@/config/firebaseConfig';
 import { styles } from '@/styles/CourseProgressCard.styles';
 import { Course } from '@/types/course';
 import { CourseProgressCardProps } from '@/types/courseProgressCard';
 import { sendNotification } from '@/utils/notifications';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-    doc,
-    FirebaseFirestoreTypes,
-    getDoc,
-} from '@react-native-firebase/firestore';
 import * as Notifications from 'expo-notifications';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -33,34 +27,8 @@ export default function CourseProgressCard({
     onPress,
 }: CourseProgressCardProps) {
     const { userDetail } = useContext(UserDetailContext);
-    const [userData, setUserData] =
-        useState<FirebaseFirestoreTypes.DocumentData | null>(null);
-
-    async function fetchUserFromFirestore() {
-        if (!userDetail?.email) {
-            console.log('No authenticated user.');
-            return;
-        }
-
-        const userDocRef = doc(db, 'users', userDetail.email);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-            const data = userDocSnap.data(); // data: DocumentData | undefined
-            if (data) {
-                setUserData(data);
-            } else {
-                setUserData(null); // fallback, just in case
-            }
-        } else {
-            console.log('No user document found in Firestore.');
-            setUserData(null);
-        }
-    }
-
-    useEffect(() => {
-        fetchUserFromFirestore();
-    }, [userDetail?.email]);
+    const progressWidth =
+        typeof width === 'number' ? width - moderateScale(24) : 206;
 
     const GetCompletedChapters = (course: Course) => {
         const total = course?.chapters?.length ?? 0;
@@ -93,9 +61,6 @@ export default function CourseProgressCard({
                     const { status: newStatus } =
                         await Notifications.requestPermissionsAsync();
                     if (newStatus !== 'granted') {
-                        console.log(
-                            'Notification permission not granted, aborting notification.',
-                        );
                         return;
                     }
                 }
@@ -190,7 +155,7 @@ export default function CourseProgressCard({
                 <Progress.Bar
                     color={Colors.GREEN}
                     progress={GetCompletedChapters(item)}
-                    width={width - moderateScale(24)}
+                    width={progressWidth}
                 />
 
                 <View style={styles.commonStyles}>

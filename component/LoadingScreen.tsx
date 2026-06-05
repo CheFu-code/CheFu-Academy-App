@@ -29,7 +29,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
             await retryAuth();
         } catch (error: unknown) {
             ToastAndroid.show('Error unlocking your app', ToastAndroid.LONG);
-            console.log('Biometrics error', error);
+            console.error('Biometrics error', error);
         } finally {
             setTriggering(false);
         }

@@ -50,8 +50,6 @@ async function sendTokenToBackend(token, userEmail) {
         if (!response.ok) {
             const errorText = await response.text();
             console.warn("Failed to save FCM token on backend:", errorText);
-        } else {
-            console.log("FCM token saved on backend successfully");
         }
     } catch (error) {
         console.error("Error sending FCM token to backend:", error);

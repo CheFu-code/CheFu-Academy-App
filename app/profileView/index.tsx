@@ -93,7 +93,7 @@ export default function ProfileView() {
                         : 0;
                 setProgress(progressPercent);
             } catch (err) {
-                console.log('Error fetching user data:', err);
+                console.error('Error fetching user data:', err);
             } finally {
                 setLoading(false);
             }

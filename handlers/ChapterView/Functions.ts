@@ -62,7 +62,7 @@ export const useChapterViewHook = () => {
             interstitial.load();
         } catch (error) {
             showToast('Error completing chapter!');
-            console.log(error);
+            console.error(error);
             setLoader(false);
         }
     };
@@ -76,7 +76,7 @@ export const useChapterViewHook = () => {
             showToast('Code copied to clipboard!');
             setTimeout(() => setCopied(false), 1200);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             showToast('Error copying code!');
         } finally {
             setCopying(false);

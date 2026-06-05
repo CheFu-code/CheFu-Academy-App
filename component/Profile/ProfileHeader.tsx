@@ -135,7 +135,7 @@ export const ProfileHeader = ({
 
             showToast('Downloaded successfully');
         } catch (error) {
-            console.log('Download Avatar Error:', error);
+            console.error('Download Avatar Error:', error);
             setError({
                 message: 'Failed to download profile picture. Try again later.',
                 visible: true,

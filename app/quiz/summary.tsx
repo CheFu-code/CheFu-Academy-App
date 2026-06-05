@@ -1,40 +1,36 @@
 import { Entypo, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import Button from '../../component/Shared/Button';
 import { Colors } from '../../constant/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
+import { parseJsonRouteParam } from '../../utils/routeParams';
+
+type QuizResultItem = {
+    correctAns?: string;
+    isCorrect: boolean;
+    question?: string;
+    userChoice?: string;
+};
 
 export default function QuizSummary() {
     const { quizResultParam } = useLocalSearchParams();
-    const quizResult = JSON.parse(quizResultParam);
-    const [correctAns, setCorrectAns] = useState(0);
-    const [totalQuestion, setTotalQuestion] = useState(0);
-
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        quizResult && calculateResult();
-    }, [quizResult]);
-
-    const calculateResult = () => {
-        if (quizResult !== undefined) {
-            const correctAns_ = Object.entries(quizResult)?.filter(
-                ([key, value]) => value?.isCorrect === true,
-            );
-            const totalQues_ = Object.keys(quizResult).length;
-            setCorrectAns(correctAns_.length);
-            setTotalQuestion(totalQues_);
-        }
-    };
-
-    const getPercentageMark = () => {
-        return ((correctAns / totalQuestion) * 100).toFixed(0);
-    };
-
+    const quizResult = parseJsonRouteParam<Record<string, QuizResultItem>>(
+        quizResultParam,
+        {},
+    );
+    const entries = useMemo(() => Object.entries(quizResult), [quizResult]);
+    const correctAns = useMemo(
+        () => entries.filter(([, value]) => value.isCorrect).length,
+        [entries],
+    );
+    const totalQuestion = entries.length;
     const incorrectAns = totalQuestion - correctAns;
+    const percentageMark = totalQuestion
+        ? Math.round((correctAns / totalQuestion) * 100)
+        : 0;
 
     return (
         <View
@@ -79,7 +75,7 @@ export default function QuizSummary() {
                         alignItems: 'center',
                     }}
                 >
-                    {getPercentageMark() > 60 && (
+                    {percentageMark > 60 && (
                         <Image
                             style={{
                                 width: 100,
@@ -96,21 +92,19 @@ export default function QuizSummary() {
                             fontSize: RFValue(20),
                         }}
                     >
-                        {getPercentageMark() > 60
-                            ? 'Congratulation!'
-                            : 'Try again!'}
+                        {percentageMark > 60 ? 'Congratulations!' : 'Try again!'}
                     </Text>
                     <Text
                         style={{
                             fontFamily: 'outfit',
                             fontSize: RFValue(15),
                             color:
-                                getPercentageMark() >= 60
+                                percentageMark >= 60
                                     ? Colors.GREEN
                                     : Colors.RED,
                         }}
                     >
-                        You scored {getPercentageMark()}%
+                        You scored {percentageMark}%
                     </Text>
 
                     <View>
@@ -149,10 +143,8 @@ export default function QuizSummary() {
                     </View>
                 </View>
                 <Button
-                    loading={loading}
                     onPress={() => router.replace('/(tabs)/home')}
-                    text={'Back to Home'}
-                    disabled={loading}
+                    text="Back to Home"
                 />
                 <Text
                     style={{
@@ -176,56 +168,53 @@ export default function QuizSummary() {
                     }}
                 >
                     <FlatList
-                        data={Object.entries(quizResult)}
+                        data={entries}
                         keyExtractor={([key]) => key}
                         showsVerticalScrollIndicator={false}
-                        renderItem={({ item }) => {
-                            const quizItem = item[1];
-                            return (
-                                <View
+                        renderItem={({ item: [, quizItem] }) => (
+                            <View
+                                style={{
+                                    paddingVertical: 8,
+                                    borderBottomWidth: 0.5,
+                                    borderBottomColor: Colors.BLACK,
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <Text
                                     style={{
-                                        paddingVertical: 8,
-                                        borderBottomWidth: 0.5,
-                                        borderBottomColor: Colors.BLACK,
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
+                                        fontFamily: 'outfit-bold',
+                                        fontSize: RFValue(14),
+                                        color: quizItem.isCorrect
+                                            ? Colors.GREEN
+                                            : Colors.LIGHT_RED,
+                                        flex: 1,
+                                        marginLeft: 10,
                                     }}
                                 >
-                                    <Text
-                                        style={{
-                                            fontFamily: 'outfit-bold',
-                                            fontSize: RFValue(14),
-                                            color: quizItem.isCorrect
-                                                ? Colors.GREEN
-                                                : Colors.LIGHT_RED,
-                                            flex: 1,
-                                            marginLeft: 10,
-                                        }}
-                                    >
-                                        {quizItem.question}
-                                    </Text>
-                                    <Text
-                                        style={{
-                                            fontSize: RFValue(16),
-                                            color: quizItem.isCorrect
-                                                ? Colors.GREEN
-                                                : 'red',
-                                        }}
-                                    >
-                                        {quizItem.isCorrect ? (
-                                            <Ionicons
-                                                name="checkmark-outline"
-                                                size={24}
-                                            />
-                                        ) : (
-                                            <Entypo name="cross" size={24} />
-                                        )}
-                                    </Text>
-                                </View>
-                            );
-                        }}
+                                    {quizItem.question}
+                                </Text>
+                                <Text
+                                    style={{
+                                        fontSize: RFValue(16),
+                                        color: quizItem.isCorrect
+                                            ? Colors.GREEN
+                                            : Colors.RED,
+                                    }}
+                                >
+                                    {quizItem.isCorrect ? (
+                                        <Ionicons
+                                            name="checkmark-outline"
+                                            size={24}
+                                        />
+                                    ) : (
+                                        <Entypo name="cross" size={24} />
+                                    )}
+                                </Text>
+                            </View>
+                        )}
                     />
                 </View>
             </View>

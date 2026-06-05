@@ -114,7 +114,10 @@ export const useAddCourseHook = () => {
                     topicIdea = safeJsonParse(cleanedResponse) || [];
                 } catch (e) {
                     topicIdea = [];
-                    handleAiError(e, support);
+                    handleAiError({
+                        error: e instanceof Error ? e.message : String(e),
+                        supportEmail: support,
+                    });
                 }
             }
             setUserInput('');
@@ -181,7 +184,10 @@ export const useAddCourseHook = () => {
             try {
                 coursesObj = JSON.parse(aiResp);
             } catch (e) {
-                handleAiError(e, support);
+                handleAiError({
+                    error: e instanceof Error ? e.message : String(e),
+                    supportEmail: support,
+                });
                 if (typeof Sentry !== 'undefined') {
                     Sentry.captureException(e, {
                         extra: { aiResponse: aiResp },
@@ -222,7 +228,7 @@ export const useAddCourseHook = () => {
             safeReplace('/(tabs)/home');
             showToast('Course created successfully!');
         } catch (e: unknown) {
-            console.log('failed course', (e as Error).message);
+            console.error('Failed to generate course:', e);
             setErrorModal({
                 visible: true,
                 title: 'Error',

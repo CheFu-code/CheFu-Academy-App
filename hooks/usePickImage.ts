@@ -18,13 +18,12 @@ export const usePickImage = () => {
             });
 
             if (image && image.path) {
-                console.log("Selected Image URI:", image.path);
                 return image.path; // Return selected image URI
             }
 
             return null;
         } catch (error) {
-            console.log("Image pick error:", error);
+            console.error("Image pick error:", error);
             setError({
                 visible: true,
                 title: "Image Selection Error",

@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react';
+
 export type ButtonProps = {
     text: string;
-    type: string;
-    onPress: () => void;
-    loading: boolean;
-    disabled: boolean;
-    icon: any;
+    type?: 'fill' | 'outline';
+    onPress: () => void | Promise<void>;
+    loading?: boolean;
+    disabled?: boolean;
+    icon?: ReactNode;
 };

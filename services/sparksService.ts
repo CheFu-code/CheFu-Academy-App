@@ -38,7 +38,7 @@ export const fetchInitialSparks = async (
         setSparks(fetchedSparks);
         setLastVisible(snapshot.docs[snapshot.docs.length - 1] || null);
     } catch (error) {
-        console.log('Error fetching sparks:', error);
+        console.error('Error fetching sparks:', error);
     } finally {
         setLoading(false);
     }
@@ -77,7 +77,7 @@ export const fetchMoreSparks = async (
         setSparks((prev) => [...prev, ...moreSparks]);
         setLastVisible(snapshot.docs[snapshot.docs.length - 1] || lastVisible);
     } catch (error) {
-        console.log('Error fetching more sparks:', error);
+        console.error('Error fetching more sparks:', error);
     } finally {
         setLoadingMore(false);
     }

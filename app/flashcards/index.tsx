@@ -1,11 +1,15 @@
 import HeaderText from '@/component/common/Header';
 import useDarkMode from '@/hooks/useDarkMode';
+import { Course, Flashcard } from '@/types/course';
+import { parseJsonRouteParam } from '@/utils/routeParams';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
     Dimensions,
     FlatList,
     Image,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
     StyleSheet,
     Text,
     View,
@@ -19,12 +23,14 @@ import { Colors } from '../../constant/Colors';
 export default function Flashcards() {
     const { courseParams } = useLocalSearchParams();
     const { color, backgroundColor } = useDarkMode();
-    const course = JSON.parse(courseParams);
-    const flashcard = course?.flashcards;
+    const course = parseJsonRouteParam<Partial<Course>>(courseParams, {});
+    const flashcard = course?.flashcards || [];
     const [currentPage, setCurrentPage] = useState(0);
     const width = Dimensions.get('screen').width;
 
-    const onMomentumScrollEnd = (event) => {
+    const onMomentumScrollEnd = (
+        event: NativeSyntheticEvent<NativeScrollEvent>,
+    ) => {
         const contentOffsetX = event.nativeEvent.contentOffset.x;
         const newIndex = Math.round(contentOffsetX / width);
         setCurrentPage(newIndex);
@@ -69,8 +75,11 @@ export default function Flashcards() {
 
                 <FlatList
                     data={flashcard}
-                    pagingEnabled={true}
-                    horizontal={true}
+                    keyExtractor={(item: Flashcard, index) =>
+                        `${item.front}-${index}`
+                    }
+                    pagingEnabled
+                    horizontal
                     onMomentumScrollEnd={onMomentumScrollEnd}
                     showsHorizontalScrollIndicator={false}
                     renderItem={({ item, index }) => (

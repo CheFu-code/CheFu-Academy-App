@@ -57,7 +57,7 @@ export default function About() {
                 </ScrollView>
             </SafeAreaView>
         );
-    } catch (err) {
+    } catch {
         content = (
             <Text
                 style={{ color: 'red', margin: scale(20), textAlign: 'center' }}

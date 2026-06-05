@@ -5,6 +5,8 @@ import { interstitial } from '@/config/AdConfig';
 import { db } from '@/config/firebaseConfig';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { Course } from '@/types/course';
+import { parseJsonRouteParam } from '@/utils/routeParams';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -24,35 +26,45 @@ import { moderateScale, scale } from 'react-native-size-matters';
 import Button from '../../component/Shared/Button';
 import { Colors } from '../../constant/Colors';
 
+type QuizResultItem = {
+    correctAns?: string;
+    isCorrect: boolean;
+    question?: string;
+    userChoice: string;
+};
+
 export default function Quiz() {
     const { courseParams } = useLocalSearchParams();
     const { safeBack, safeReplace } = useSafeNavigation();
     const { color, backgroundColor } = useDarkMode();
-    const course = JSON.parse(courseParams);
+    const course = parseJsonRouteParam<Partial<Course>>(courseParams, {});
     const [currentPage, setCurrentPage] = useState(0);
-    const [selectedOption, setSelectedOption] = useState();
-    const quiz = course?.quiz;
-    const [result, setResult] = useState({});
+    const [selectedOption, setSelectedOption] = useState<number | null>(null);
+    const quiz = course?.quiz || [];
+    const currentQuiz = quiz[currentPage];
+    const hasSelection = selectedOption !== null;
+    const [result, setResult] = useState<Record<number, QuizResultItem>>({});
     const [loading, setLoading] = useState(false);
 
-    const GetProgress = (currentPage) => {
-        const percentage = currentPage / quiz?.length;
-        return percentage;
+    const getProgress = (page: number) => {
+        if (!quiz.length) return 0;
+        return page / quiz.length;
     };
 
-    const OnOptionSelect = (selectedChoice) => {
+    const onOptionSelect = (selectedChoice: string) => {
         setResult((prev) => ({
             ...prev,
             [currentPage]: {
                 userChoice: selectedChoice,
-                isCorrect: quiz[currentPage]?.correctAns === selectedChoice,
-                question: quiz[currentPage]?.question,
-                correctAns: quiz[currentPage]?.correctAns,
+                isCorrect: currentQuiz?.correctAns === selectedChoice,
+                question: currentQuiz?.question,
+                correctAns: currentQuiz?.correctAns,
             },
         }));
     };
 
     const onQuizFinish = async () => {
+        if (!course?.docId) return;
         setLoading(true);
 
         try {
@@ -138,7 +150,7 @@ export default function Quiz() {
                     }}
                 >
                     <Progress.Bar
-                        progress={GetProgress(currentPage)}
+                        progress={getProgress(currentPage)}
                         color={Colors.GREEN}
                         width={Dimensions.get('screen').width * 0.85}
                     />
@@ -162,14 +174,14 @@ export default function Quiz() {
                             textAlign: 'center',
                         }}
                     >
-                        {quiz[currentPage]?.question}
+                        {currentQuiz?.question}
                     </Text>
 
-                    {quiz[currentPage]?.options.map((item, index) => (
+                    {currentQuiz?.options.map((item: string, index: number) => (
                         <TouchableOpacity
                             onPress={() => {
                                 setSelectedOption(index);
-                                OnOptionSelect(item);
+                                onOptionSelect(item);
                             }}
                             style={{
                                 padding: 5,
@@ -184,9 +196,9 @@ export default function Quiz() {
                                 backgroundColor:
                                     selectedOption === index
                                         ? Colors.LIGHT_GREEN
-                                        : null,
+                                        : undefined,
                             }}
-                            key={index}
+                            key={`${item}-${index}`}
                         >
                             <Text
                                 style={{
@@ -200,8 +212,8 @@ export default function Quiz() {
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
-                {selectedOption?.toString() &&
-                    quiz?.length - 1 > currentPage && (
+                {hasSelection &&
+                    quiz.length - 1 > currentPage && (
                         <Button
                             onPress={() => {
                                 setCurrentPage(currentPage + 1);
@@ -214,8 +226,8 @@ export default function Quiz() {
                         />
                     )}
 
-                {selectedOption?.toString() &&
-                    quiz?.length - 1 === currentPage && (
+                {hasSelection &&
+                    quiz.length - 1 === currentPage && (
                         <Button
                             onPress={() => onQuizFinish()}
                             text={'Finish'}
