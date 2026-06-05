@@ -1,109 +1,117 @@
 import { TermsText } from '@/component/TermsText';
 import { SEEN_WELCOME } from '@/constant/caches';
+import { useAuth } from '@/context/AuthContext';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { Entypo, FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale } from 'react-native-size-matters';
-import { Colors } from '../constant/Colors';
 import { styles } from '../styles/WelcomeScreen.styles';
 
 export default function Index() {
     const { safeReplace } = useSafeNavigation();
-    // useImmersiveMode();
+    const { userDetail } = useAuth();
 
+    const [isReady, setIsReady] = useState(false);
     const [showWelcome, setShowWelcome] = useState(false);
 
     useEffect(() => {
+        let isMounted = true;
+
         const checkWelcome = async () => {
-            const hasSeen = await AsyncStorage.getItem(SEEN_WELCOME);
-            if (!hasSeen) {
-                setShowWelcome(true);
+            try {
+                const hasSeen = await AsyncStorage.getItem(SEEN_WELCOME);
+                if (!isMounted) return;
+
+                if (hasSeen === 'true') {
+                    safeReplace(
+                        userDetail ? '/(tabs)/home' : ('/auth/sso' as any),
+                    );
+                    return;
+                }
+            } catch {
+                if (!isMounted) return;
             }
+
+            setShowWelcome(true);
+            setIsReady(true);
         };
-        checkWelcome();
-    }, []);
+
+        void checkWelcome();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [safeReplace, userDetail]);
 
     const handleGetStarted = async () => {
         await AsyncStorage.setItem(SEEN_WELCOME, 'true');
         safeReplace('/auth/sso' as any);
     };
 
-    if (!showWelcome) return null; // don't render until check is done
+    if (!isReady || !showWelcome) {
+        return (
+            <SafeAreaView style={styles.loadingContainer}>
+                <ActivityIndicator color="#ffffff" />
+            </SafeAreaView>
+        );
+    }
 
     return (
-        <SafeAreaView style={styles.centeredContainer}>
-            {/* Hero Image */}
-            <Image
-                source={require('./../assets/images/landing.png')}
-                style={{ width: '100%', height: scale(400) }}
-                resizeMode="contain"
-            />
+        <SafeAreaView style={styles.container}>
+            <StatusBar style="light" />
 
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={styles.bottomSheet}
-                contentContainerStyle={{ flexGrow: 1 }}
-            >
-                {/* Title */}
-                <Text style={styles.title}>
-                    Welcome to{'\n'}
-                    <Text
-                        style={{
-                            color: Colors.BG_COLOR,
-                            fontFamily: 'outfit-bold',
-                        }}
-                    >
-                        CheFu Academy
-                    </Text>
-                </Text>
+            <View style={styles.hero}>
+                <Image
+                    source={require('./../assets/images/landing.png')}
+                    style={styles.heroImage}
+                    resizeMode="contain"
+                />
+            </View>
 
-                {/* Subtitle + Motivational Quote */}
-                <Text style={styles.subtitle}>Smart Learning Starts Here</Text>
-
-                {/* Get Started Button */}
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={handleGetStarted}
-                    activeOpacity={0.8}
-                >
-                    <Text style={styles.buttonText}>Get Started</Text>
-                </TouchableOpacity>
-
-                {/* Footer Icons */}
-                <View style={styles.footer}>
-                    <Text style={styles.footerText}>
-                        <Entypo
-                            name="open-book"
-                            size={scale(14)}
-                            color={Colors.WHITE}
-                        />{' '}
-                        Learn{' '}
-                        <Entypo
-                            name="dot-single"
-                            color={'black'}
-                            size={scale(14)}
-                        />
-                        <Entypo name="star" color={'gold'} size={scale(14)} />{' '}
-                        Grow{' '}
-                        <Entypo
-                            name="dot-single"
-                            color={'black'}
-                            size={scale(14)}
-                        />
-                        <FontAwesome
-                            name="trophy"
-                            color={Colors.GREEN}
-                            size={scale(14)}
-                        />{' '}
-                        Achieve
-                    </Text>
+            <View style={styles.panel}>
+                <View style={styles.badge}>
+                    <Text style={styles.badgeText}>CheFu Academy</Text>
                 </View>
 
+                <Text style={styles.title}>Learn with a path that feels clear.</Text>
+                <Text style={styles.subtitle}>
+                    Build skills, track progress, and continue from any CheFu app
+                    with one account.
+                </Text>
+
+                <View style={styles.metrics}>
+                    <View style={styles.metricItem}>
+                        <Text style={styles.metricValue}>1</Text>
+                        <Text style={styles.metricLabel}>account</Text>
+                    </View>
+                    <View style={styles.metricDivider} />
+                    <View style={styles.metricItem}>
+                        <Text style={styles.metricValue}>24/7</Text>
+                        <Text style={styles.metricLabel}>access</Text>
+                    </View>
+                    <View style={styles.metricDivider} />
+                    <View style={styles.metricItem}>
+                        <Text style={styles.metricValue}>SSO</Text>
+                        <Text style={styles.metricLabel}>ready</Text>
+                    </View>
+                </View>
+
+                <Pressable
+                    style={({ pressed }) => [
+                        styles.button,
+                        pressed && styles.buttonPressed,
+                    ]}
+                    onPress={handleGetStarted}
+                    android_ripple={{ color: 'rgba(255, 255, 255, 0.16)' }}
+                    hitSlop={8}
+                >
+                    <Text style={styles.buttonText}>Get Started</Text>
+                </Pressable>
+
                 <TermsText disabled={false} />
-            </ScrollView>
+            </View>
         </SafeAreaView>
     );
 }

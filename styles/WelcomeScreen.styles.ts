@@ -4,119 +4,128 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import { Colors } from '../constant/Colors';
 
 export const styles = StyleSheet.create({
-    centeredContainer: {
+    loadingContainer: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: Colors.BG_COLOR,
     },
-    conditions: {
-        textAlign: 'justify',
-        color: Colors.WHITE,
-        marginTop: verticalScale(40),
-        fontSize: RFValue(11),
-        fontFamily: 'outfit',
+    container: {
+        flex: 1,
+        backgroundColor: Colors.BG_COLOR,
     },
-    bottomSheet: {
-        padding: moderateScale(20),
-        backgroundColor: Colors.PRIMARY,
-        borderTopLeftRadius: moderateScale(35),
-        borderTopRightRadius: moderateScale(35),
+    hero: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: moderateScale(24),
+        paddingTop: verticalScale(18),
+    },
+    heroImage: {
+        width: '100%',
+        maxWidth: moderateScale(360),
+        height: '100%',
+        maxHeight: verticalScale(330),
+    },
+    panel: {
+        backgroundColor: Colors.WHITE,
+        borderTopLeftRadius: moderateScale(24),
+        borderTopRightRadius: moderateScale(24),
+        paddingHorizontal: moderateScale(22),
+        paddingTop: verticalScale(24),
+        paddingBottom: verticalScale(18),
+        shadowColor: Colors.BLACK,
+        shadowOffset: { width: 0, height: -8 },
+        shadowOpacity: 0.16,
+        shadowRadius: 18,
+        elevation: 10,
+    },
+    badge: {
+        alignSelf: 'flex-start',
+        paddingHorizontal: moderateScale(10),
+        paddingVertical: verticalScale(5),
+        borderRadius: moderateScale(8),
+        backgroundColor: Colors.LIGHT_YELLOW,
+        marginBottom: verticalScale(12),
+    },
+    badgeText: {
+        color: Colors.BG_COLOR,
+        fontFamily: 'outfit-bold',
+        fontSize: RFValue(11),
     },
     title: {
-        fontSize: RFValue(22),
-        textAlign: 'center',
-        color: Colors.WHITE,
+        color: Colors.BG_COLOR,
         fontFamily: 'outfit-bold',
+        fontSize: RFValue(28),
+        lineHeight: RFValue(34),
     },
     subtitle: {
-        fontSize: RFValue(16),
-        color: Colors.WHITE,
-        marginTop: verticalScale(5),
-        textAlign: 'center',
+        color: '#4b5563',
         fontFamily: 'outfit',
+        fontSize: RFValue(14),
+        lineHeight: RFValue(21),
+        marginTop: verticalScale(10),
+    },
+    metrics: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: verticalScale(20),
+        paddingVertical: verticalScale(12),
+        borderRadius: moderateScale(8),
+        backgroundColor: '#f6f8fb',
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: '#dfe7f3',
+    },
+    metricItem: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    metricValue: {
+        color: Colors.PRIMARY,
+        fontFamily: 'outfit-bold',
+        fontSize: RFValue(15),
+    },
+    metricLabel: {
+        color: '#6b7280',
+        fontFamily: 'outfit',
+        fontSize: RFValue(10),
+        marginTop: verticalScale(2),
+    },
+    metricDivider: {
+        width: StyleSheet.hairlineWidth,
+        height: verticalScale(28),
+        backgroundColor: '#d7dde7',
     },
     button: {
-        padding: moderateScale(12),
-        backgroundColor: Colors.WHITE,
-        marginTop: verticalScale(20),
-        borderRadius: moderateScale(10),
-        marginBottom: verticalScale(7),
-        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        minHeight: verticalScale(50),
+        marginTop: verticalScale(20),
+        borderRadius: moderateScale(8),
+        backgroundColor: Colors.BG_COLOR,
     },
-    button2: {
-        marginTop: verticalScale(10),
-        borderWidth: 0.4,
-        borderColor: Colors.BG_GRAY,
-        borderRadius: moderateScale(30),
-        padding: moderateScale(8),
-        marginHorizontal: moderateScale(40),
+    buttonPressed: {
+        opacity: 0.88,
+        transform: [{ scale: 0.99 }],
     },
     buttonText: {
-        textAlign: 'center',
-        fontSize: RFValue(16),
+        color: Colors.WHITE,
         fontFamily: 'outfit-bold',
+        fontSize: RFValue(15),
     },
-    gitHub: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-    },
-    iconsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: moderateScale(10),
-        marginVertical: verticalScale(15),
-        backgroundColor: Colors.BG,
-        borderRadius: moderateScale(12),
-        paddingVertical: verticalScale(10),
-    },
-
-    quote: {
-        fontSize: 14,
-        fontFamily: 'outfit-regular',
-        color: '#999',
-        textAlign: 'center',
-        marginBottom: 20,
-        fontStyle: 'italic',
-    },
-
-
-    socialContainer: {
-        marginTop: 10,
-    },
-
-    socialButton: {
-        backgroundColor: '#f5f5f5',
-        paddingVertical: 12,
-        borderRadius: 20,
-        marginVertical: 8,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-
-    socialText: {
-        fontSize: 16,
-        fontFamily: 'outfit-medium',
-        color: '#333',
-    },
-
-    footer: {
-        marginTop: verticalScale(30),
-        alignItems: 'center',
-        justifyContent: "center"
-    },
-
-    footerText: {
-        fontSize: RFValue(14),
+    conditions: {
+        color: '#6b7280',
         fontFamily: 'outfit',
-        color: '#aaa',
+        fontSize: RFValue(10),
+        lineHeight: RFValue(16),
+        marginTop: verticalScale(16),
+        textAlign: 'center',
+    },
+    conditionsLink: {
+        color: Colors.PRIMARY,
+        fontFamily: 'outfit-bold',
+        textDecorationLine: 'underline',
     },
 });
