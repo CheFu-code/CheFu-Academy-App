@@ -3,6 +3,7 @@ import {
     CodeChallengeMethod,
     ResponseType,
 } from 'expo-auth-session';
+import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -26,7 +27,6 @@ const SCOPES = [
     'email',
     'courses:read',
     'videos:read',
-    'keys:manage',
 ];
 
 const secureStoreOptions: SecureStore.SecureStoreOptions = {
@@ -352,15 +352,7 @@ function isTokenExpiring(tokens: CheFuSsoTokenSet) {
 function randomOauthValue(bytes: number) {
     const alphabet =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._~-';
-    const values = new Uint8Array(bytes);
-
-    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-        crypto.getRandomValues(values);
-    } else {
-        for (let index = 0; index < values.length; index += 1) {
-            values[index] = Math.floor(Math.random() * 256);
-        }
-    }
+    const values = Crypto.getRandomBytes(bytes);
 
     return Array.from(values, value => alphabet[value % alphabet.length]).join('');
 }

@@ -20,9 +20,12 @@ import { MenuProvider } from 'react-native-popup-menu';
 import { NetworkProvider, useNetwork } from '../context/NetworkContext';
 import { useBiometricAuth } from '../hooks/useBiometricAuth';
 
+const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN;
+
 Sentry.init({
-    dsn: 'https://edb99cb11fea0cae1b8af74d41b48fa5@o4509620168491008.ingest.de.sentry.io/4509640411381840',
-    sendDefaultPii: true,
+    dsn: SENTRY_DSN,
+    enabled: Boolean(SENTRY_DSN),
+    sendDefaultPii: false,
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1,
     integrations: [

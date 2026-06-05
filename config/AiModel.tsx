@@ -1,16 +1,9 @@
-import { Content } from "@/types/ai";
-import { GoogleGenAI } from "@google/genai";
+import { chefuApiClient } from '@/services/chefuApiClient';
+import { Content } from '@/types/ai';
 
-const ai = new GoogleGenAI({
-    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY_SECOND,
-});
-const config = {
-    responseMimeType: "application/json",
-};
-const model = "gemini-2.0-flash";
 export const GenerateTopicsAIModel = [
     {
-        role: "user",
+        role: 'user',
         parts: [
             {
                 text: `Learn Python: As you are coaching teacher
@@ -24,7 +17,7 @@ export const GenerateTopicsAIModel = [
         ],
     },
     {
-        role: "model",
+        role: 'model',
         parts: [
             {
                 text: `\`\`\`json
@@ -42,72 +35,35 @@ export const GenerateTopicsAIModel = [
         ],
     },
     {
-        role: "user",
+        role: 'user',
         parts: [
             {
-                text: `INSERT_INPUT_HERE`,
+                text: 'INSERT_INPUT_HERE',
             },
         ],
     },
 ];
 
 export async function generateTopics(contents: Content[]): Promise<string> {
-    try {
-        if (!ai || !ai.models || !ai.models.generateContent) {
-            throw new Error(
-                "GoogleGenAI SDK is not initialized or generateContent is missing"
-            );
-        }
-        const response = await ai.models.generateContent({
-            model,
-            config,
-            contents,
-        });
-        if (
-            !response ||
-            !response.candidates ||
-            !response.candidates[0] ||
-            !response.candidates[0].content
-        ) {
-            throw new Error("No candidates/content in Gemini response");
-        }
-        const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        return extractJsonFromText(text);
-    } catch (error) {
-        console.error("[AIModel ERROR] Error generating topics:", error);
-        throw error;
-    }
-}
-
-function extractJsonFromText(text: string): string {
-    if (!text) return "";
-    return text.replace(/^```json[\r\n]+|```$/gi, "").trim();
+    return generateWithBackend(contents);
 }
 
 export async function generateCourse(contents: Content[]): Promise<string> {
-    try {
-        if (!ai || !ai.models || !ai.models.generateContent) {
-            throw new Error(
-                "GoogleGenAI SDK is not initialized or generateContent is missing"
-            );
-        }
-        const response = await ai.models.generateContent({
-            model,
-            config,
-            contents,
-        });
-        if (
-            !response ||
-            !response.candidates ||
-            !response.candidates[0] ||
-            !response.candidates[0].content
-        ) {
-            throw new Error("No candidates/content in Gemini response");
-        }
-        const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        return extractJsonFromText(text);
-    } catch (error) {
-        console.error("[AIModel ERROR] Error generating courses:", error);
-        throw error;
+    return generateWithBackend(contents);
+}
+
+async function generateWithBackend(contents: Content[]) {
+    const response = await chefuApiClient.post('/ai/generate', { contents });
+    const result = response.data?.result;
+
+    if (typeof result !== 'string' || !result.trim()) {
+        throw new Error('No content returned from AI service.');
     }
+
+    return extractJsonFromText(result);
+}
+
+function extractJsonFromText(text: string): string {
+    if (!text) return '';
+    return text.replace(/^```json[\r\n]+|```$/gi, '').trim();
 }
