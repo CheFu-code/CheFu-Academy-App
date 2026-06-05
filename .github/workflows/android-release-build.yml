@@ -59,7 +59,19 @@ jobs:
 
       - name: Install Android packages
         run: |
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.1.12297006" "cmake;3.22.1"
+          set -euo pipefail
+          packages=("platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.1.12297006" "cmake;3.22.1")
+          for attempt in 1 2 3; do
+            if sdkmanager "${packages[@]}"; then
+              exit 0
+            fi
+
+            echo "Android package install failed on attempt ${attempt}; clearing partial SDK downloads before retry."
+            rm -rf "$ANDROID_HOME/.temp" "$ANDROID_HOME/temp" "$ANDROID_HOME/ndk/27.1.12297006"
+            sleep $((attempt * 10))
+          done
+
+          sdkmanager "${packages[@]}"
 
       - name: Decode keystore
         id: decode_keystore
