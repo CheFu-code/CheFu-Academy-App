@@ -8,7 +8,7 @@ const useHandleDynamicLinks = () => {
     const handleUrl = useCallback((url: string | null) => {
         if (!url) return;
 
-        const sparkId = url.split('/spark/')[1]?.split(/[?#]/)[0];
+        const sparkId = url.match(/\/spark\/([^/?#]+)/)?.[1];
         if (sparkId) {
             safePush({
                 pathname: '/sparkDetail',
