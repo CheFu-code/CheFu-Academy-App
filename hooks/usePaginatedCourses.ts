@@ -1,4 +1,4 @@
-import { CACHED_COURSES } from '@/constant/caches';
+import { CACHED_COURSES, scopedCacheKey } from '@/constant/caches';
 import { courseRef } from '@/constant/random';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { Course } from '@/types/course';
@@ -11,10 +11,15 @@ import {
     query,
     startAfter,
 } from '@react-native-firebase/firestore';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 export const usePaginatedCourses = (pageSize = 6) => {
     const { userDetail } = useContext(UserDetailContext);
+    const coursesCacheKey = useMemo(
+        () => scopedCacheKey(CACHED_COURSES, userDetail?.email),
+        [userDetail?.email],
+    );
+    const loadingMoreRef = useRef(false);
 
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
@@ -51,14 +56,13 @@ export const usePaginatedCourses = (pageSize = 6) => {
             );
 
             setCourses(data);
-            setHasMore(data.length === pageSize);
+            setHasMore(snapshot.docs.length === pageSize);
             setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
 
-            // Save cache
-            await AsyncStorage.setItem(CACHED_COURSES, JSON.stringify(data));
+            await AsyncStorage.setItem(coursesCacheKey, JSON.stringify(data));
         } catch (error) {
             console.error('Failed to fetch courses:', error);
-            const cached = await AsyncStorage.getItem(CACHED_COURSES);
+            const cached = await AsyncStorage.getItem(coursesCacheKey);
             if (cached) {
                 setCourses(JSON.parse(cached));
             }
@@ -66,11 +70,12 @@ export const usePaginatedCourses = (pageSize = 6) => {
             setRefreshing(false);
             setLoading(false);
         }
-    }, [pageSize, userDetail?.email]);
+    }, [coursesCacheKey, pageSize, userDetail?.email]);
 
     const loadMore = useCallback(async () => {
-        if (loadingMore || !lastDoc || !hasMore) return;
+        if (loadingMoreRef.current || !lastDoc || !hasMore) return;
 
+        loadingMoreRef.current = true;
         setLoadingMore(true);
 
         try {
@@ -102,21 +107,21 @@ export const usePaginatedCourses = (pageSize = 6) => {
 
             setCourses((prev) => [...prev, ...data]);
             setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-            setHasMore(data.length === pageSize);
+            setHasMore(snapshot.docs.length === pageSize);
 
-            // Update cache
-            const cached = await AsyncStorage.getItem(CACHED_COURSES);
+            const cached = await AsyncStorage.getItem(coursesCacheKey);
             const cachedData: Course[] = cached ? JSON.parse(cached) : [];
             await AsyncStorage.setItem(
-                CACHED_COURSES,
+                coursesCacheKey,
                 JSON.stringify([...cachedData, ...data]),
             );
         } catch (error) {
             console.error('Failed to load more courses:', error);
         } finally {
+            loadingMoreRef.current = false;
             setLoadingMore(false);
         }
-    }, [lastDoc, loadingMore, hasMore, pageSize, userDetail?.email]);
+    }, [coursesCacheKey, lastDoc, hasMore, pageSize, userDetail?.email]);
 
     useEffect(() => {
         fetchCourses();

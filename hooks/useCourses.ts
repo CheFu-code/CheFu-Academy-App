@@ -1,9 +1,9 @@
-import { CACHE_KEY } from '@/constant/caches';
+import { CACHE_KEY, scopedCacheKey } from '@/constant/caches';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import { chefuApiClient } from '@/services/chefuApiClient';
 import { Course } from '@/types/course';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ToastAndroid } from 'react-native';
 import { useSafeNavigation } from './useSafeNavigation';
 
@@ -11,27 +11,33 @@ export const useCourses = () => {
     const [courseList, setCourseList] = useState<Course[]>([]);
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
+    const fetchingRef = useRef(false);
     const { safeReplace } = useSafeNavigation();
-    const { userDetail, setUserDetail } = useContext(UserDetailContext);
+    const { userDetail } = useContext(UserDetailContext);
     const userEmail = userDetail?.email;
+    const courseCacheKey = useMemo(
+        () => scopedCacheKey(CACHE_KEY, userEmail),
+        [userEmail],
+    );
 
-    const loadCachedCourses = async () => {
+    const loadCachedCourses = useCallback(async () => {
         try {
-            const cached = await AsyncStorage.getItem(CACHE_KEY);
+            const cached = await AsyncStorage.getItem(courseCacheKey);
             if (!cached) return null;
 
-            const parsed = JSON.parse(cached);
+            const parsed = JSON.parse(cached) as Course[];
             setCourseList(parsed);
             return parsed;
         } catch (error) {
             console.error('Error loading cached courses:', error);
             return null;
         }
-    };
+    }, [courseCacheKey]);
 
     const fetchCourses = useCallback(async (isRefresh = false) => {
-        if (fetching && !isRefresh) return;
+        if (fetchingRef.current) return;
 
+        fetchingRef.current = true;
         setLoading(true);
         setFetching(true);
 
@@ -42,37 +48,18 @@ export const useCourses = () => {
                 return;
             }
 
-            if (!userDetail?.id) {
-                try {
-                    const response = await chefuApiClient.get('/api/academy/mobile/me');
-                    setUserDetail(response.data);
-                } catch (err) {
-                    console.error('Error refreshing userDetail:', err);
-                    ToastAndroid.show(
-                        'An error occurred while refreshing your profile.',
-                        ToastAndroid.LONG,
-                    );
-                }
-            }
-
             const response = await chefuApiClient.get(
                 '/api/academy/mobile/courses/my',
                 { params: { limit: 100 } },
             );
             const courses = (response.data?.courses || []) as Course[];
-
-            const cachedCoursesJSON = await AsyncStorage.getItem(CACHE_KEY);
-            const cachedCourses = cachedCoursesJSON
-                ? JSON.parse(cachedCoursesJSON)
-                : null;
-            const isSame =
-                cachedCourses &&
-                JSON.stringify(cachedCourses) === JSON.stringify(courses);
+            const nextCache = JSON.stringify(courses);
+            const cachedCoursesJSON = await AsyncStorage.getItem(courseCacheKey);
 
             setCourseList(courses);
 
-            if (!isSame) {
-                await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(courses));
+            if (cachedCoursesJSON !== nextCache) {
+                await AsyncStorage.setItem(courseCacheKey, nextCache);
             }
 
             if (isRefresh) {
@@ -102,10 +89,11 @@ export const useCourses = () => {
 
             ToastAndroid.show(errorMessage, ToastAndroid.LONG);
         } finally {
+            fetchingRef.current = false;
             setLoading(false);
             setFetching(false);
         }
-    }, [fetching, safeReplace, setUserDetail, userDetail?.id, userEmail]);
+    }, [courseCacheKey, safeReplace, userEmail]);
 
     useEffect(() => {
         if (!userEmail) {
@@ -128,7 +116,7 @@ export const useCourses = () => {
         return () => {
             mounted = false;
         };
-    }, [fetchCourses, userEmail]);
+    }, [fetchCourses, loadCachedCourses, userEmail]);
 
     return { courseList, fetchCourses, loading, fetching };
 };

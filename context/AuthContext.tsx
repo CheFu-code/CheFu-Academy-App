@@ -90,6 +90,10 @@ export function AuthProvider({
             }
 
             setTokens(storedTokens);
+            const cachedProfile = await loadCachedUserDetail();
+            if (cachedProfile) {
+                setUserDetail(cachedProfile);
+            }
             await reloadProfile();
         } catch (error) {
             Sentry.captureException(error);
@@ -146,9 +150,14 @@ export function AuthProvider({
         [isLoading, login, logout, refresh, reloadProfile, tokens, userDetail],
     );
 
+    const userDetailContextValue = useMemo(
+        () => ({ userDetail, setUserDetail }),
+        [userDetail],
+    );
+
     return (
         <AuthContext.Provider value={value}>
-            <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
+            <UserDetailContext.Provider value={userDetailContextValue}>
                 {children}
             </UserDetailContext.Provider>
         </AuthContext.Provider>
@@ -162,6 +171,18 @@ export function useAuth() {
     }
 
     return value;
+}
+
+async function loadCachedUserDetail() {
+    const cached = await AsyncStorage.getItem(USER_DETAIL);
+    if (!cached) return null;
+
+    try {
+        return JSON.parse(cached) as UserDetail;
+    } catch {
+        await AsyncStorage.removeItem(USER_DETAIL);
+        return null;
+    }
 }
 
 async function loadUserDetailFromSso(accessToken: string) {
