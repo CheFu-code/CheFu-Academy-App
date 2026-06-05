@@ -2,14 +2,14 @@ import { chefuApiClient } from "@/services/chefuApiClient";
 import { useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
 
-const HEARTBEAT_INTERVAL_MS = 30_000;      // send heartbeat every 30 seconds
-const HEARTBEAT_MIN_DELAY_MS = 25_000;     // minimum spacing between writes
+const HEARTBEAT_INTERVAL_MS = 60_000;
+const HEARTBEAT_MIN_DELAY_MS = 55_000;
 const BASE_RETRY_MS = 1000;
 const MAX_RETRIES = 3;
 
 export default function useLastSeenTracker(email?: string) {
     const mounted = useRef(true);
-    const heartbeatTimer = useRef<number | null>(null);
+    const heartbeatTimer = useRef<ReturnType<typeof setInterval> | null>(null);
     const lastHeartbeatAt = useRef<number>(0);
     const retryCount = useRef(0);
     const currentEmail = useRef<string | null>(null);
@@ -30,9 +30,8 @@ export default function useLastSeenTracker(email?: string) {
 
                 if (online) lastHeartbeatAt.current = Date.now();
             } catch (err) {
-                console.error("[LastSeenTracker] Firestore error:", err);
+                console.error("[LastSeenTracker] Presence update failed:", err);
 
-                // Retry (exponential backoff)
                 if (retryCount.current < MAX_RETRIES && mounted.current) {
                     retryCount.current++;
                     const delay = BASE_RETRY_MS * 2 ** (retryCount.current - 1);
@@ -91,7 +90,6 @@ export default function useLastSeenTracker(email?: string) {
             const email = currentEmail.current;
             if (!email) return;
 
-            // Fire-and-forget offline write
             void chefuApiClient.post("/api/academy/mobile/presence", {
                 online: false,
             }).catch(() => { });

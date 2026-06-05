@@ -51,7 +51,6 @@ export default function EmailAlerts() {
                 await chefuApiClient.patch('/api/academy/mobile/settings', {
                     emailPreferences: updated,
                 });
-                console.log('Email preferences updated successfully');
             }
         } catch (err) {
             console.error('Save failed', err);

@@ -47,6 +47,8 @@ export default function Loading({
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor }}>
             <View
+                accessibilityRole="progressbar"
+                accessibilityLabel={message}
                 style={{
                     flex: 1,
                     justifyContent: 'center',
@@ -73,7 +75,7 @@ export default function Loading({
                         fontSize: RFValue(15),
                         color,
                         textAlign: 'center',
-                        opacity: fadeAnim, // animated
+                        opacity: fadeAnim,
                     }}
                 >
                     {message}

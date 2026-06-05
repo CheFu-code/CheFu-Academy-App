@@ -2,19 +2,21 @@ import { UserDetailContext } from '@/context/UserDetailContext';
 import { chefuApiClient } from '@/services/chefuApiClient';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
+
+const closedModal = {
+    visible: false,
+    title: '',
+    message: '',
+};
 
 export const useExportUserData = () => {
     const { userDetail } = useContext(UserDetailContext);
     const [loading, setLoading] = useState(false);
-    const [fatalError, setFatalError] = useState(null);
-    const [errorModal, setErrorModal] = useState({
-        visible: false,
-        title: '',
-        message: '',
-    });
+    const [fatalError, setFatalError] = useState<unknown | null>(null);
+    const [errorModal, setErrorModal] = useState(closedModal);
 
-    const exportUserData = async () => {
+    const exportUserData = useCallback(async () => {
         try {
             setLoading(true);
             if (!userDetail?.email) {
@@ -23,11 +25,12 @@ export const useExportUserData = () => {
                     title: 'Error',
                     message: 'User not logged in',
                 });
-                setLoading(false);
                 return;
             }
 
-            const response = await chefuApiClient.get('/api/academy/mobile/me/export');
+            const response = await chefuApiClient.get(
+                '/api/academy/mobile/me/export',
+            );
             const userData = response.data;
 
             if (!userData) {
@@ -36,7 +39,6 @@ export const useExportUserData = () => {
                     title: 'Error',
                     message: 'No user data found to export.',
                 });
-                setLoading(false);
                 return;
             }
 
@@ -53,7 +55,7 @@ export const useExportUserData = () => {
                 dialogTitle: 'Export User Data',
                 UTI: 'public.json',
             });
-        } catch (error: any) {
+        } catch (error) {
             setFatalError(error);
             console.error('Export failed', error);
             setErrorModal({
@@ -64,7 +66,7 @@ export const useExportUserData = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [userDetail?.email]);
 
     return {
         loading,

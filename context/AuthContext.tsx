@@ -13,6 +13,7 @@ import {
 import { UserDetail } from '@/types/UserDetail';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sentry from '@sentry/react-native';
+import * as SecureStore from 'expo-secure-store';
 import {
     createContext,
     Dispatch,
@@ -40,6 +41,10 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const profileStoreOptions: SecureStore.SecureStoreOptions = {
+    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
+};
+
 export function AuthProvider({
     authGateReady,
     children,
@@ -56,7 +61,10 @@ export function AuthProvider({
     const clearLocalSession = useCallback(
         async (options?: { revokeRemote?: boolean }) => {
             await signOutOfCheFuSso({ revokeRemote: options?.revokeRemote });
-            await AsyncStorage.removeItem(USER_DETAIL);
+            await Promise.all([
+                SecureStore.deleteItemAsync(USER_DETAIL, profileStoreOptions),
+                AsyncStorage.removeItem(USER_DETAIL),
+            ]);
             setTokens(null);
             setUserDetail(null);
         },
@@ -73,7 +81,12 @@ export function AuthProvider({
         const profile = await loadUserDetailFromSso(accessToken);
         setTokens(await loadSsoTokens());
         setUserDetail(profile);
-        await AsyncStorage.setItem(USER_DETAIL, JSON.stringify(profile));
+        await SecureStore.setItemAsync(
+            USER_DETAIL,
+            JSON.stringify(profile),
+            profileStoreOptions,
+        );
+        await AsyncStorage.removeItem(USER_DETAIL).catch(() => undefined);
         return profile;
     }, [clearLocalSession]);
 
@@ -90,6 +103,10 @@ export function AuthProvider({
             }
 
             setTokens(storedTokens);
+            const cachedProfile = await loadCachedUserDetail();
+            if (cachedProfile) {
+                setUserDetail(cachedProfile);
+            }
             await reloadProfile();
         } catch (error) {
             Sentry.captureException(error);
@@ -146,9 +163,14 @@ export function AuthProvider({
         [isLoading, login, logout, refresh, reloadProfile, tokens, userDetail],
     );
 
+    const userDetailContextValue = useMemo(
+        () => ({ userDetail, setUserDetail }),
+        [userDetail],
+    );
+
     return (
         <AuthContext.Provider value={value}>
-            <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
+            <UserDetailContext.Provider value={userDetailContextValue}>
                 {children}
             </UserDetailContext.Provider>
         </AuthContext.Provider>
@@ -162,6 +184,32 @@ export function useAuth() {
     }
 
     return value;
+}
+
+async function loadCachedUserDetail() {
+    const cached =
+        (await SecureStore.getItemAsync(USER_DETAIL, profileStoreOptions)) ||
+        (await migrateLegacyCachedUserDetail());
+    if (!cached) return null;
+
+    try {
+        return JSON.parse(cached) as UserDetail;
+    } catch {
+        await Promise.all([
+            SecureStore.deleteItemAsync(USER_DETAIL, profileStoreOptions),
+            AsyncStorage.removeItem(USER_DETAIL),
+        ]);
+        return null;
+    }
+}
+
+async function migrateLegacyCachedUserDetail() {
+    const legacy = await AsyncStorage.getItem(USER_DETAIL);
+    if (!legacy) return null;
+
+    await SecureStore.setItemAsync(USER_DETAIL, legacy, profileStoreOptions);
+    await AsyncStorage.removeItem(USER_DETAIL);
+    return legacy;
 }
 
 async function loadUserDetailFromSso(accessToken: string) {

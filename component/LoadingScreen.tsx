@@ -5,7 +5,7 @@ import {
     SafeAreaView,
     Text,
     ToastAndroid,
-    TouchableOpacity,
+    View,
     useColorScheme,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -22,14 +22,13 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
     const color = scheme === 'dark' ? Colors.GREEN : Colors.BLACK;
     const [triggering, setTriggering] = useState<boolean>(false);
 
-    // re-trigger the auth-system-button when user accidentally close the biometric auth UI
     const trigger = async () => {
         try {
             setTriggering(true);
             await retryAuth();
         } catch (error: unknown) {
             ToastAndroid.show('Error unlocking your app', ToastAndroid.LONG);
-            console.log('Biometrics error', error);
+            console.error('Biometrics error', error);
         } finally {
             setTriggering(false);
         }
@@ -52,8 +51,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 loop
                 style={{ width: scale(130), height: verticalScale(130) }}
             />
-            <TouchableOpacity
-                onPress={() => trigger()}
+            <View
                 style={{
                     backgroundColor:
                         scheme === 'dark' ? Colors.BG_COLOR : Colors.GRAY,
@@ -83,7 +81,7 @@ const LoadingScreen = ({ retryAuth }: LoadingScreenProps) => {
                 >
                     We help you learn with confidence and privacy.
                 </Text>
-            </TouchableOpacity>
+            </View>
 
             <Button
                 type={scheme === 'dark' ? 'outline' : 'fill'}

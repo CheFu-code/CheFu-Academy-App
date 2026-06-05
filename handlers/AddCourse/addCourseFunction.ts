@@ -33,7 +33,7 @@ export const useAddCourseHook = () => {
         message: '',
     });
     const generateTopic = async () => {
-        if (generatingTopic) return; // Prevent double submission
+        if (generatingTopic) return;
         if (!userInput.trim()) {
             setErrorModal({
                 visible: true,
@@ -69,16 +69,6 @@ export const useAddCourseHook = () => {
 
         let topicIdea = [];
         try {
-            const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY_SECOND;
-            if (!apiKey) {
-                setErrorModal({
-                    visible: true,
-                    title: 'Missing Key',
-                    message: 'Your AI key is missing.',
-                });
-                setGeneratingTopic(false);
-                return;
-            }
             setGeneratingTopic(true);
             const promptText = userInput + Prompt.IDEA;
             const contents = [
@@ -96,7 +86,7 @@ export const useAddCourseHook = () => {
                 setErrorModal({
                     visible: true,
                     title: 'No Response',
-                    message: 'The AI didn’t return any results.',
+                    message: "The AI didn't return any results.",
                 });
                 topicIdea = [];
                 setGeneratingTopic(false);
@@ -110,11 +100,14 @@ export const useAddCourseHook = () => {
                     }
                 }
 
-                try {
-                    topicIdea = safeJsonParse(cleanedResponse) || [];
-                } catch (e) {
-                    topicIdea = [];
-                    handleAiError(e, support);
+                const parsed = safeJsonParse(cleanedResponse);
+                topicIdea = parsed || [];
+
+                if (parsed === null) {
+                    handleAiError({
+                        error: 'JSON parse failed',
+                        supportEmail: support,
+                    });
                 }
             }
             setUserInput('');
@@ -148,7 +141,7 @@ export const useAddCourseHook = () => {
     };
 
     const onGenerateCourse = async () => {
-        if (loading) return; // Prevent double submission
+        if (loading) return;
         if (!selectedTopic.length) {
             setErrorModal({
                 visible: true,
@@ -172,7 +165,7 @@ export const useAddCourseHook = () => {
                 setErrorModal({
                     visible: true,
                     title: 'No Response',
-                    message: 'The AI didn’t return any results.',
+                    message: "The AI didn't return any results.",
                 });
                 setLoading(false);
                 return;
@@ -181,12 +174,16 @@ export const useAddCourseHook = () => {
             try {
                 coursesObj = JSON.parse(aiResp);
             } catch (e) {
-                handleAiError(e, support);
+                handleAiError({
+                    error: e instanceof Error ? e.message : String(e),
+                    supportEmail: support,
+                });
                 if (typeof Sentry !== 'undefined') {
                     Sentry.captureException(e, {
                         extra: { aiResponse: aiResp },
                     });
                 }
+                setLoading(false);
                 return;
             }
             // Handle both array and object with courses property
@@ -198,7 +195,7 @@ export const useAddCourseHook = () => {
                 setErrorModal({
                     title: 'No Response',
                     visible: true,
-                    message: 'The AI didn’t return any results.',
+                    message: "The AI didn't return any results.",
                 });
                 setLoading(false);
                 return;
@@ -222,7 +219,7 @@ export const useAddCourseHook = () => {
             safeReplace('/(tabs)/home');
             showToast('Course created successfully!');
         } catch (e: unknown) {
-            console.log('failed course', (e as Error).message);
+            console.error('Failed to generate course:', e);
             setErrorModal({
                 visible: true,
                 title: 'Error',
@@ -260,7 +257,6 @@ export const useAddCourseHook = () => {
             );
         });
 
-        // Remove listeners when done
         return () => {
             unsubscribe();
         };

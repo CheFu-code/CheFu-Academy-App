@@ -52,7 +52,7 @@ const SparkDetail = () => {
                 setLoading(false);
             },
             (err) => {
-                console.log('Error fetching spark detail:', err);
+                console.error('Error fetching spark detail:', err);
                 setLoading(false);
             },
         );
@@ -147,7 +147,7 @@ const SparkDetail = () => {
 
             setComment('');
         } catch (error) {
-            console.log('Error adding comment:', error);
+            console.error('Error adding comment:', error);
             showToast('Failed to add comment');
         } finally {
             setCommenting(false);
@@ -171,7 +171,7 @@ const SparkDetail = () => {
             await updateDoc(sparkRef, { comments: updatedComments });
             showToast('Comment updated successfully');
         } catch (err) {
-            console.log('Error editing comment:', err);
+            console.error('Error editing comment:', err);
             showToast('Failed to update comment');
         }
     };
@@ -189,7 +189,7 @@ const SparkDetail = () => {
 
             await updateDoc(sparkRef, { comments: updatedComments });
         } catch (err) {
-            console.log('Error deleting comment:', err);
+            console.error('Error deleting comment:', err);
             showToast('Failed to delete comment');
         }
     };
@@ -249,7 +249,7 @@ const SparkDetail = () => {
             // Update local state immediately
             setSpark({ ...spark, comments: updatedComments });
         } catch (err) {
-            console.log('Error liking comment:', err);
+            console.error('Error liking comment:', err);
             showToast('Failed to like comment');
         }
     };
@@ -268,7 +268,7 @@ const SparkDetail = () => {
             await updateDoc(sparkRef, { comments: updatedComments });
             setSpark({ ...spark, comments: updatedComments });
         } catch (err) {
-            console.log('Error adding reply:', err);
+            console.error('Error adding reply:', err);
             showToast('Failed to reply');
         }
     };

@@ -1,5 +1,7 @@
 import HeaderText from '@/component/common/Header';
 import useDarkMode from '@/hooks/useDarkMode';
+import { Course, QA } from '@/types/course';
+import { parseJsonRouteParam } from '@/utils/routeParams';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -18,11 +20,13 @@ import { Colors } from '../../constant/Colors';
 export default function QuestionAnswer() {
     const { courseParams } = useLocalSearchParams();
     const { color, backgroundColor } = useDarkMode();
-    const course = JSON.parse(courseParams);
+    const course = parseJsonRouteParam<Partial<Course>>(courseParams, {});
     const qaList = course?.qa || [];
-    const [selectedQuestion, setSelectedQuestion] = useState();
+    const [selectedQuestion, setSelectedQuestion] = useState<number | null>(
+        null,
+    );
 
-    const getQuestionAnswer = (index) => {
+    const getQuestionAnswer = (index: number) => {
         if (selectedQuestion === index) {
             setSelectedQuestion(null);
         } else {
@@ -70,7 +74,7 @@ export default function QuestionAnswer() {
                     contentContainerStyle={{ paddingBottom: moderateScale(22) }}
                     showsVerticalScrollIndicator={false}
                     data={qaList}
-                    renderItem={({ item, index }) => (
+                    renderItem={({ item, index }: { item: QA; index: number }) => (
                         <Pressable
                             onPress={() => getQuestionAnswer(index)}
                             // key={index}
@@ -98,7 +102,7 @@ export default function QuestionAnswer() {
                         </Pressable>
                     )}
                     keyExtractor={(item, index) =>
-                        item?.id?.toString() || index.toString()
+                        item.id ? String(item.id) : String(index)
                     }
                 />
             </View>

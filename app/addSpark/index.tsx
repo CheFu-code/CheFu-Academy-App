@@ -79,7 +79,7 @@ const AddSpark = () => {
             setContent('');
             setSelectedCategory('');
         } catch (error) {
-            console.log('Error posting Spark:', error);
+            console.error('Error posting Spark:', error);
             showToast('Failed to post. Please try again');
         } finally {
             setLoading(false);

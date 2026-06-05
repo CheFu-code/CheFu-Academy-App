@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { FlatList, Image, Text, View } from 'react-native';
 import NoCourse from '../../component/Home/NoCourse';
 import CourseProgressCard from '../../component/Shared/CourseProgressCard';
@@ -23,7 +23,7 @@ export default function Progress({ enroll = false }) {
     const { backgroundColor } = useDarkMode();
     const [loading, setLoading] = useState(false);
     const [nextCursor, setNextCursor] = useState<string | null>(null);
-    const [fetching, setFetching] = useState(false);
+    const fetchingRef = useRef(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [courseList, setCourseList] = useState<Course[]>([]);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -35,14 +35,14 @@ export default function Progress({ enroll = false }) {
     );
 
     const GetCourseList = useCallback(async () => {
-        if (fetching) return;
+        if (fetchingRef.current) return;
+        fetchingRef.current = true;
         setLoading(true);
-        setFetching(true);
         setNextCursor(null);
 
         if (!userDetail?.email) {
             setLoading(false);
-            setFetching(false);
+            fetchingRef.current = false;
             return;
         }
 
@@ -61,9 +61,9 @@ export default function Progress({ enroll = false }) {
             showToast('Failed to load your progress');
         } finally {
             setLoading(false);
-            setFetching(false);
+            fetchingRef.current = false;
         }
-    }, [fetching, userDetail?.email]);
+    }, [userDetail?.email]);
 
     const loadMore = async () => {
         if (loadingMore || !nextCursor) return;
@@ -88,8 +88,8 @@ export default function Progress({ enroll = false }) {
     };
 
     useEffect(() => {
-        if (userDetail) GetCourseList();
-    }, [userDetail, GetCourseList]);
+        if (userDetail?.email) GetCourseList();
+    }, [userDetail?.email, GetCourseList]);
 
     const handlePress = (item: Course) => {
         const id = item.id || item.courseTitle || '';
@@ -128,6 +128,10 @@ export default function Progress({ enroll = false }) {
                         refreshing={loading}
                         data={courseList}
                         keyExtractor={(item) => item.id}
+                        initialNumToRender={7}
+                        maxToRenderPerBatch={7}
+                        windowSize={7}
+                        removeClippedSubviews
                         renderItem={({ item }) => {
                             const isLoading =
                                 loadingId ===

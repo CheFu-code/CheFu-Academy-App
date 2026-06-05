@@ -3,26 +3,24 @@ import { useVideos } from '@/hooks/useVideos';
 import { Video } from '@/types/video';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { FlatList } from 'react-native';
 import VideoCard from '../VideoCard';
 
+dayjs.extend(relativeTime);
+
 export default function VideoCardHomeScreen() {
     const { safePush } = useSafeNavigation();
-    const [selectedCategory, setSelectedCategory] = useState('');
     const { videos } = useVideos();
-
-    dayjs.extend(relativeTime);
 
     const handleCategoryPress = useCallback(
         (category: string) => {
-            setSelectedCategory(category);
             safePush({
                 pathname: '/searchResults',
                 params: { query: category },
             });
         },
-        [setSelectedCategory, safePush],
+        [safePush],
     );
 
     const renderVideoCard = useCallback(
@@ -52,7 +50,8 @@ export default function VideoCardHomeScreen() {
             contentContainerStyle={{ paddingBottom: 20 }}
             initialNumToRender={10}
             maxToRenderPerBatch={10}
-            windowSize={21}
+            windowSize={3}
+            removeClippedSubviews
         />
     );
 }

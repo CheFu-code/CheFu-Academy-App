@@ -2,7 +2,7 @@ import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { Course } from '@/types/course';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -30,7 +30,7 @@ export default function CourseList({
 }: CourseListProps) {
     const { safePush } = useSafeNavigation();
     const [loadingId, setLoadingId] = useState<string | null>(null);
-    const displayedCourses = courseList.slice(0, 4);
+    const displayedCourses = useMemo(() => courseList.slice(0, 4), [courseList]);
 
     useFocusEffect(
         useCallback(() => {
@@ -38,11 +38,11 @@ export default function CourseList({
         }, []),
     );
 
-    const handlePress = (item: Course) => {
-        const id = item.id || item.courseTitle || '';
-        setLoadingId(id);
+    const handlePress = useCallback(
+        (item: Course) => {
+            const id = item.id || item.courseTitle || '';
+            setLoadingId(id);
 
-        setTimeout(() => {
             safePush({
                 pathname: '/courseView',
                 params: {
@@ -50,8 +50,96 @@ export default function CourseList({
                     enroll: enroll.toString(),
                 },
             });
-        }, 10); // 10ms delay to show loading state
-    };
+        },
+        [enroll, safePush],
+    );
+
+    const renderCourse = useCallback(
+        ({ item }: { item: Course }) => {
+            const isLoading = loadingId === (item.id || item.courseTitle || '');
+
+            return (
+                <TouchableOpacity
+                    style={styles.courseContainer}
+                    onPress={() => handlePress(item)}
+                    disabled={Boolean(loadingId)}
+                >
+                    <Image
+                        style={{
+                            width: moderateScale(190),
+                            height: verticalScale(100),
+                            borderRadius: moderateScale(15),
+                            opacity: loadingId ? 0.5 : 1,
+                        }}
+                        source={
+                            imageAssets[
+                                item?.banner_image as keyof typeof imageAssets
+                            ]
+                        }
+                    />
+                    <Text
+                        style={{
+                            fontFamily: 'outfit-bold',
+                            fontSize: RFValue(12),
+                            marginTop: RFValue(5),
+                            maxWidth: 200,
+                            paddingHorizontal: 5,
+                        }}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                    >
+                        {item?.courseTitle}
+                    </Text>
+                    <View
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: 5,
+                            alignItems: 'center',
+                            paddingHorizontal: 5,
+                            paddingBottom: 4,
+                        }}
+                    >
+                        <Ionicons
+                            name="book-outline"
+                            size={RFValue(16)}
+                            color={Colors.PRIMARY}
+                        />
+                        <Text
+                            style={{
+                                fontFamily: 'outfit',
+                                fontSize: RFValue(11),
+                            }}
+                        >
+                            {item?.chapters?.length} Chapters
+                        </Text>
+                    </View>
+                    {isLoading && (
+                        <View
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                backgroundColor: 'rgba(255,255,255,0.5)',
+                                borderRadius: 15,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <ActivityIndicator
+                                style={{ alignItems: 'center' }}
+                                size="large"
+                                color={Colors.PRIMARY}
+                            />
+                        </View>
+                    )}
+                </TouchableOpacity>
+            );
+        },
+        [handlePress, loadingId],
+    );
 
     return (
         <View
@@ -80,90 +168,11 @@ export default function CourseList({
                 }
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}
-                renderItem={({ item }: { item: Course }) => {
-                    const isLoading =
-                        loadingId === (item.id || item.courseTitle || '');
-                    return (
-                        <TouchableOpacity
-                            style={styles.courseContainer}
-                            onPress={() => handlePress(item)}
-                            disabled={Boolean(loadingId)}
-                        >
-                            <Image
-                                style={{
-                                    width: moderateScale(190),
-                                    height: verticalScale(100),
-                                    borderRadius: moderateScale(15),
-                                    opacity: loadingId ? 0.5 : 1,
-                                }}
-                                source={
-                                    imageAssets[
-                                        item?.banner_image as keyof typeof imageAssets
-                                    ]
-                                }
-                            />
-                            <Text
-                                style={{
-                                    fontFamily: 'outfit-bold',
-                                    fontSize: RFValue(12),
-                                    marginTop: RFValue(5),
-                                    maxWidth: 200,
-                                    paddingHorizontal: 5,
-                                }}
-                                numberOfLines={2}
-                                ellipsizeMode="tail"
-                            >
-                                {item?.courseTitle}
-                            </Text>
-                            <View
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    gap: 5,
-                                    alignItems: 'center',
-                                    paddingHorizontal: 5,
-                                    paddingBottom: 4,
-                                }}
-                            >
-                                <Ionicons
-                                    name="book-outline"
-                                    size={RFValue(16)}
-                                    color={Colors.PRIMARY}
-                                />
-                                <Text
-                                    style={{
-                                        fontFamily: 'outfit',
-                                        fontSize: RFValue(11),
-                                    }}
-                                >
-                                    {item?.chapters?.length} Chapters
-                                </Text>
-                            </View>
-                            {isLoading && (
-                                <View
-                                    style={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        backgroundColor:
-                                            'rgba(255,255,255,0.5)',
-                                        borderRadius: 15,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <ActivityIndicator
-                                        style={{ alignItems: 'center' }}
-                                        size="large"
-                                        color={Colors.PRIMARY}
-                                    />
-                                </View>
-                            )}
-                        </TouchableOpacity>
-                    );
-                }}
+                initialNumToRender={4}
+                maxToRenderPerBatch={4}
+                windowSize={3}
+                removeClippedSubviews
+                renderItem={renderCourse}
             />
         </View>
     );

@@ -9,14 +9,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const CategorySpark = () => {
     const { category } = useLocalSearchParams();
     const { safeBack } = useSafeNavigation();
-    console.log('Category:', category);
+    const categoryTitle = Array.isArray(category) ? category[0] : category;
     return (
         <SafeAreaView style={styles.container}>
             <TouchableOpacity onPress={safeBack} style={styles.backButton}>
                 <AntDesign name="left" color={'white'} size={20} />
                 <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
-            <Text>CategorySpark</Text>
+            <Text
+                accessibilityLabel="category-title"
+                style={styles.categoryTitle}
+            >
+                {categoryTitle || 'Category'}
+            </Text>
         </SafeAreaView>
     );
 };
@@ -34,5 +39,12 @@ const styles = StyleSheet.create({
     backText: {
         color: 'white',
         fontSize: 16,
+    },
+    categoryTitle: {
+        color: 'white',
+        fontSize: 18,
+        fontFamily: 'outfit-bold',
+        marginTop: 20,
+        textAlign: 'center',
     },
 });

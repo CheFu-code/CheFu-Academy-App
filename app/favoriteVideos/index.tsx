@@ -56,7 +56,7 @@ export default function FavoriteVideos() {
                 prev.filter((item) => item.videoId !== videoId),
             );
             showToast('Removed from favorites.');
-        } catch (err) {
+        } catch {
             showToast('Something went wrong while removing favorite.');
         }
     };

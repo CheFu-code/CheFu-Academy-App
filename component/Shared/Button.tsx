@@ -9,15 +9,20 @@ export default function Button({
     text,
     type = 'fill',
     onPress,
-    loading,
-    disabled,
-    icon,
+    loading = false,
+    disabled = false,
+    icon = null,
+    accessibilityLabel,
 }: ButtonProps) {
     const isDisabled = loading || disabled;
     const { backgroundColor } = useDarkMode();
 
     return (
         <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={accessibilityLabel ?? text}
+            accessibilityState={{ busy: loading, disabled: isDisabled }}
+            hitSlop={6}
             onPress={onPress}
             disabled={isDisabled}
             style={{

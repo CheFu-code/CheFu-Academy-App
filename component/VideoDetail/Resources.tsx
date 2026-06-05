@@ -1,35 +1,23 @@
-import { Video } from "@/types/video";
-import { AntDesign } from "@expo/vector-icons";
-import React from "react";
-import { FlatList, Linking, Text, TouchableOpacity, View } from "react-native";
-import { styles } from "../../styles/Resources.styles";
+import { VideoResource } from '@/types/video';
+import { AntDesign } from '@expo/vector-icons';
+import { FlatList, Linking, Text, TouchableOpacity, View } from 'react-native';
+import { styles } from '../../styles/Resources.styles';
+import { Video } from '../../types/video';
 
 type Props = {
     video?: Video | null;
 };
 
-// Dummy video data
-const dummyVideo: Video = {
-    id: "1",
-    title: "React Native Crash Course",
-    description: "Learn React Native from scratch.",
-    resources: [
-        { name: "Lecture Slides", url: "https://example.com/slides.pdf" },
-        { name: "Code Examples", url: "https://example.com/code.zip" },
-        { name: "Reference PDF", url: "https://example.com/reference.pdf" },
-    ],
-};
-
 export default function Resources({ video }: Props) {
-    const currentVideo =  dummyVideo; // use dummy if no video passed
+    const resources = video?.resources || [];
 
     const handleDownload = (url: string) => {
         Linking.openURL(url).catch(() => {
-            alert("Failed to open resource.");
+            alert('Failed to open resource.');
         });
     };
 
-    if (!currentVideo.resources || currentVideo.resources.length === 0) {
+    if (!resources.length) {
         return (
             <View style={styles.container}>
                 <Text style={styles.title}>Resources</Text>
@@ -44,8 +32,10 @@ export default function Resources({ video }: Props) {
         <View style={styles.container}>
             <Text style={styles.title}>Resources</Text>
             <FlatList
-                data={currentVideo.resources}
-                keyExtractor={(item, index) => index.toString()}
+                data={resources}
+                keyExtractor={(item: VideoResource, index) =>
+                    `${item.url}-${index}`
+                }
                 renderItem={({ item }) => (
                     <View style={styles.resourceItem}>
                         <Text style={styles.resourceName}>{item.name}</Text>

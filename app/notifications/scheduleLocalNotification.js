@@ -8,12 +8,10 @@ export async function scheduleDailyNotification() {
     date.setMinutes(0);
     date.setSeconds(0);
 
-    // If it's already past 8AM today, schedule for tomorrow
     if (date.getTime() < Date.now()) {
         date.setDate(date.getDate() + 1);
     }
 
-    // Cancel existing notification with the same ID (if any)
     await notifee.cancelNotification(DAILY_NOTIFICATION_ID);
 
     const trigger = {
@@ -34,11 +32,6 @@ export async function scheduleDailyNotification() {
                 },
             },
         },
-        trigger
-    );
-
-    console.log(
-        "✅ Daily repeating notification scheduled for",
-        date.toLocaleString()
+        trigger,
     );
 }

@@ -1,4 +1,4 @@
-import LoggedOutMessage from '@/component/Profile/LoggedOutMessage ';
+import LoggedOutMessage from '@/component/Profile/LoggedOutMessage';
 import { ProfileHeader } from '@/component/Profile/ProfileHeader';
 import { ProfileMenu } from '@/component/Profile/ProfileMenu';
 import ErrorModal from '@/component/Shared/ErrorModal';

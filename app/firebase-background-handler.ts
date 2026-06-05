@@ -1,33 +1,58 @@
-// app/firebase-background-handler.ts
-import notifee from "@notifee/react-native";
-import messaging from "@react-native-firebase/messaging";
+import notifee, { AndroidImportance } from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
+
+const NOTIFICATION_CHANNEL_ID = 'default';
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
     try {
-        console.log("🔕 Background notification:", remoteMessage);
-
-        // Extract notification and data
-        const { notification, data } = remoteMessage;
+        const { data, notification } = remoteMessage;
         const title =
-            notification?.title || data?.title || "Background Notification";
-        const body = notification?.body || data?.body || "";
+            notification?.title ||
+            normalizeNotificationText(data?.title) ||
+            'Background Notification';
+        const body =
+            notification?.body || normalizeNotificationText(data?.body) || '';
+
+        await notifee.createChannel({
+            id: NOTIFICATION_CHANNEL_ID,
+            name: 'Default Channel',
+            sound: 'default',
+            importance: AndroidImportance.HIGH,
+        });
 
         await notifee.displayNotification({
             title,
             body,
             android: {
-                channelId: "default",
-                smallIcon: "ic_launcher",
-                color: "#1a73e8",
+                channelId: NOTIFICATION_CHANNEL_ID,
+                smallIcon: 'ic_launcher',
+                color: '#1a73e8',
                 pressAction: {
-                    id: "default",
+                    id: 'default',
                 },
-                sound: "default",
-                importance: notifee.AndroidImportance.HIGH,
+                sound: 'default',
+                importance: AndroidImportance.HIGH,
             },
-            data: data || {},
+            data: normalizeNotificationData(data),
         });
-    } catch (e) {
-        console.error("Error handling background notification:", e);
+    } catch (error) {
+        console.error('Error handling background notification:', error);
     }
 });
+
+function normalizeNotificationText(value: unknown) {
+    if (typeof value === 'string') return value;
+    if (value == null) return '';
+    return JSON.stringify(value);
+}
+
+function normalizeNotificationData(data: Record<string, unknown> | undefined) {
+    if (!data) return {};
+
+    return Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [
+            key,
+            normalizeNotificationText(value),
+        ]),
+    );
+}

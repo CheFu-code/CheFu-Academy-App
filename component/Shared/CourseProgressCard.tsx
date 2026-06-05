@@ -1,17 +1,10 @@
-import { db } from '@/config/firebaseConfig';
 import { styles } from '@/styles/CourseProgressCard.styles';
-import { Course } from '@/types/course';
 import { CourseProgressCardProps } from '@/types/courseProgressCard';
 import { sendNotification } from '@/utils/notifications';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-    doc,
-    FirebaseFirestoreTypes,
-    getDoc,
-} from '@react-native-firebase/firestore';
 import * as Notifications from 'expo-notifications';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -33,96 +26,50 @@ export default function CourseProgressCard({
     onPress,
 }: CourseProgressCardProps) {
     const { userDetail } = useContext(UserDetailContext);
-    const [userData, setUserData] =
-        useState<FirebaseFirestoreTypes.DocumentData | null>(null);
-
-    async function fetchUserFromFirestore() {
-        if (!userDetail?.email) {
-            console.log('No authenticated user.');
-            return;
-        }
-
-        const userDocRef = doc(db, 'users', userDetail.email);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-            const data = userDocSnap.data(); // data: DocumentData | undefined
-            if (data) {
-                setUserData(data);
-            } else {
-                setUserData(null); // fallback, just in case
-            }
-        } else {
-            console.log('No user document found in Firestore.');
-            setUserData(null);
-        }
-    }
-
-    useEffect(() => {
-        fetchUserFromFirestore();
-    }, [userDetail?.email]);
-
-    const GetCompletedChapters = (course: Course) => {
-        const total = course?.chapters?.length ?? 0;
-
-        const completed = course?.completedChapter?.length ?? 0;
-        if (total === 0) return 0;
-        const percentage = completed / total;
-        return Math.min(percentage, 1); // ensure it's not > 1
-    };
-
-    const notificationSentKey = `notificationSent-${item?.courseTitle}`;
+    const progressWidth =
+        typeof width === 'number' ? width - moderateScale(24) : 206;
+    const courseTitle = item?.courseTitle ?? '';
+    const notificationSentKey = `notificationSent-${courseTitle}`;
+    const completedCount = item?.completedChapter?.length ?? 0;
+    const chapterCount = item?.chapters?.length ?? 0;
+    const isComplete = chapterCount > 0 && completedCount === chapterCount;
+    const progress = useMemo(() => {
+        if (chapterCount === 0) return 0;
+        return Math.min(completedCount / chapterCount, 1);
+    }, [chapterCount, completedCount]);
 
     useEffect(() => {
         async function checkAndSendNotification() {
-            if (!item) {
-                return;
-            }
+            if (!courseTitle || !isComplete) return;
 
-            if (item.completedChapter?.length === item.chapters?.length) {
-                // Check if notification was already sent for this course
-                const sent = await AsyncStorage.getItem(notificationSentKey);
+            const sent = await AsyncStorage.getItem(notificationSentKey);
+            if (sent === 'true') return;
 
-                if (sent === 'true') {
-                    return; // already sent, do nothing
-                }
-
+            try {
                 const { status } = await Notifications.getPermissionsAsync();
-
                 if (status !== 'granted') {
                     const { status: newStatus } =
                         await Notifications.requestPermissionsAsync();
-                    if (newStatus !== 'granted') {
-                        console.log(
-                            'Notification permission not granted, aborting notification.',
-                        );
-                        return;
-                    }
+                    if (newStatus !== 'granted') return;
                 }
 
                 const userEmail = userDetail?.email;
                 if (userEmail) {
                     await sendNotification(
                         userEmail,
-                        'Course Completed! 🎉',
-                        `You completed all chapters in "${item.courseTitle}"`,
+                        'Course Completed!',
+                        `You completed all chapters in "${courseTitle}"`,
                     );
                 }
-
+            } catch (error) {
+                console.error('Failed to send completion notification:', error);
+            } finally {
                 await AsyncStorage.setItem(notificationSentKey, 'true');
-            } else {
             }
         }
 
-        checkAndSendNotification();
-    }, [
-        item?.completedChapter?.length,
-        item?.chapters?.length,
-        item?.courseTitle,
-        userDetail?.email,
-        notificationSentKey,
-        item,
-    ]);
+        void checkAndSendNotification();
+    }, [courseTitle, isComplete, notificationSentKey, userDetail?.email]);
 
     if (!item) return null;
 
@@ -150,28 +97,23 @@ export default function CourseProgressCard({
                         ]
                     }
                 />
-                <View
-                    style={{
-                        flex: 1,
-                    }}
-                >
+                <View style={{ flex: 1 }}>
                     <Text
                         style={styles.courseTitle}
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
-                        {item?.courseTitle}
+                        {courseTitle}
                     </Text>
 
                     <View style={styles.commonStyles}>
                         <Text style={styles.chapter}>
-                            {item?.chapters?.length} Chapters
+                            {chapterCount} Chapters
                         </Text>
 
-                        {item?.completedChapter?.length ===
-                            item.chapters?.length && (
+                        {isComplete && (
                             <Ionicons
-                                color={'green'}
+                                color="green"
                                 size={scale(15)}
                                 name="checkmark"
                             />
@@ -189,16 +131,15 @@ export default function CourseProgressCard({
             >
                 <Progress.Bar
                     color={Colors.GREEN}
-                    progress={GetCompletedChapters(item)}
-                    width={width - moderateScale(24)}
+                    progress={progress}
+                    width={progressWidth}
                 />
 
                 <View style={styles.commonStyles}>
-                    {item?.completedChapter?.length ===
-                        item.chapters?.length && (
+                    {isComplete && (
                         <FontAwesome
                             size={scale(15)}
-                            color={'green'}
+                            color="green"
                             name="flag-checkered"
                         />
                     )}
@@ -209,8 +150,7 @@ export default function CourseProgressCard({
                             fontFamily: 'outfit',
                         }}
                     >
-                        {item?.completedChapter?.length ===
-                        item?.chapters?.length ? (
+                        {isComplete ? (
                             <Text
                                 style={{
                                     color: 'green',
@@ -220,9 +160,7 @@ export default function CourseProgressCard({
                                 All chapters completed
                             </Text>
                         ) : (
-                            `${item?.completedChapter?.length ?? 0} of ${
-                                item.chapters?.length
-                            } chapters completed`
+                            `${completedCount} of ${chapterCount} chapters completed`
                         )}
                     </Text>
                 </View>

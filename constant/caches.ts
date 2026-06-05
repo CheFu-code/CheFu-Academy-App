@@ -7,3 +7,8 @@ export const SEEN_WELCOME = 'hasSeenWelcome';
 export const CACHED_COURSES = 'cachedCourses';
 export const OFFLINE_DOWNLOADS = 'offlineDownloads';
 export const DAILY_NOTIFICATION = 'dailyNotificationScheduled';
+
+export const scopedCacheKey = (baseKey: string, scope?: string | null) => {
+    const normalizedScope = scope?.trim().toLowerCase();
+    return normalizedScope ? `${baseKey}:${normalizedScope}` : baseKey;
+};

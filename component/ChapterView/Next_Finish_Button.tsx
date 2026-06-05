@@ -19,7 +19,7 @@ const Next_Finish_Button = ({
                     loading={loader}
                     onPress={() => setCurrentPage(currentPage + 1)}
                     text={'Next'}
-                    disabled={null}
+                    disabled={false}
                     icon={
                         <Ionicons
                             name="chevron-forward"

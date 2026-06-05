@@ -33,7 +33,6 @@ const useProtectedRoute = (
         }
 
         if (!userDetail && !hasSeenWelcome && !inAuthGroup) {
-            console.log('Redirecting to CheFu Academy welcome screen');
             safeReplace('/');
             return;
         }

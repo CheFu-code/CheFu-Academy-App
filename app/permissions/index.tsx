@@ -45,7 +45,6 @@ export default function Permissions() {
                 await chefuApiClient.put('/api/academy/mobile/permissions', {
                     permissions: updatedPermissions,
                 });
-                console.log('Permissions saved successfully');
             } catch (error) {
                 console.error('Error saving permissions:', error);
             }

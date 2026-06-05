@@ -5,9 +5,9 @@ import { styles } from '@/styles/SparkDetail';
 import { Spark } from '@/types/sparks';
 import { showToast } from '@/utils/toast';
 import { FontAwesome } from '@expo/vector-icons';
-import { deleteDoc, doc, getDoc } from '@react-native-firebase/firestore';
+import { deleteDoc, doc } from '@react-native-firebase/firestore';
 import dayjs from 'dayjs';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
@@ -17,27 +17,6 @@ interface Props {
 export default function SparkHeader({ spark }: Props) {
     const { safeReplace } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const [isVerified, setIsVerified] = useState(false);
-
-    useEffect(() => {
-        const checkVerified = async () => {
-            if (!spark.createdBy?.email) return;
-
-            try {
-                const userDoc = await getDoc(
-                    doc(db, 'users', spark.createdBy.email),
-                );
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    setIsVerified(!!userData?.isVerified);
-                }
-            } catch (err) {
-                console.log('Error checking verified status:', err);
-            }
-        };
-
-        checkVerified();
-    }, [spark.createdBy]);
 
     const handleDelete = () => {
         Alert.alert(
@@ -53,7 +32,7 @@ export default function SparkHeader({ spark }: Props) {
                             if (!spark.id) return;
                             const sparkRef = doc(db, 'sparks', spark.id);
                             await deleteDoc(sparkRef);
-                            safeReplace('/(tabs)/home')
+                            safeReplace('/(tabs)/home');
                             showToast('Spark deleted successfully!');
                         } catch (error) {
                             console.error('Error deleting spark:', error);
@@ -113,7 +92,7 @@ export default function SparkHeader({ spark }: Props) {
                 <View style={styles.categoryBox}>
                     <Text style={styles.category}>{spark.category}</Text>
                 </View>
-                {spark.createdBy.email === userDetail.email && (
+                {spark.createdBy.email === userDetail?.email && (
                     <TouchableOpacity
                         onPress={() => handleDelete()}
                         style={styles.delete}

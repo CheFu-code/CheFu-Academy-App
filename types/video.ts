@@ -16,6 +16,12 @@ export type Video = {
     duration: number;   // in seconds
     views: number;      // view count
     topics: string[];
+    resources?: VideoResource[];
+};
+
+export type VideoResource = {
+    name: string;
+    url: string;
 };
 
 export type YouTubeVideo = {
