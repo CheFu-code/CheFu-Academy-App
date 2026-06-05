@@ -12,8 +12,7 @@ import { User } from '@/types/user';
 import { changeAvatar } from '@/utils/changeAvatar';
 import { showToast } from '@/utils/toast';
 import { useContext, useEffect, useState } from 'react';
-import { Image, SafeAreaView } from 'react-native';
-import { verticalScale } from 'react-native-size-matters';
+import { SafeAreaView } from 'react-native';
 import AppModal from '../../component/Shared/AppModal';
 import { UserDetailContext } from '../../context/UserDetailContext';
 import { styles } from '../../styles/Profile.styles';
@@ -92,10 +91,6 @@ export default function Profile() {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor }]}>
-            <Image
-                source={require('../../assets/images/graph.png')}
-                style={{ position: 'absolute', width: '100%', height: verticalScale(500) }}
-            />
             {!userDetail ? (
                 <LoggedOutMessage />
             ) : (

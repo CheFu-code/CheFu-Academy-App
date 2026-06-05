@@ -6,21 +6,22 @@ import { Colors } from '../constant/Colors';
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: moderateScale(10),
+        paddingHorizontal: moderateScale(14),
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: verticalScale(4),
+        marginBottom: verticalScale(10),
+        paddingTop: verticalScale(4),
     },
     title: {
         fontFamily: 'outfit-bold',
         fontSize: RFValue(22),
     },
     icon: {
-        backgroundColor: 'gray',
-        padding: scale(4),
+        backgroundColor: Colors.PRIMARY,
+        padding: scale(5),
         borderRadius: scale(20),
     },
     dropdown: {
@@ -35,7 +36,7 @@ export const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
-        width: scale(100),
+        width: scale(150),
     },
     option: {
         padding: scale(10),
@@ -48,20 +49,25 @@ export const styles = StyleSheet.create({
         fontFamily: 'outfit-bold',
     },
     heading: {
-        fontSize: RFValue(18),
+        fontSize: RFValue(14),
         fontFamily: 'outfit-bold',
         marginTop: verticalScale(20),
-        marginBottom: verticalScale(10),
+        marginBottom: verticalScale(8),
     },
     itemRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: verticalScale(10),
-        borderBottomWidth: 0.3,
-        borderBottomColor: Colors.GRAY,
+        paddingHorizontal: scale(12),
+        paddingVertical: verticalScale(13),
+        borderRadius: scale(8),
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: 'rgba(148, 163, 184, 0.28)',
+        backgroundColor: 'rgba(148, 163, 184, 0.10)',
+        marginBottom: verticalScale(8),
     },
     itemLeft: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
     },

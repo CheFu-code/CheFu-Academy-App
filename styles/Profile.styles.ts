@@ -47,12 +47,13 @@ export const styles = StyleSheet.create({
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: verticalScale(16),
-        paddingHorizontal: scale(10),
-        backgroundColor: '#222',
-        borderRadius: moderateScale(10),
-        marginBottom: verticalScale(12),
-        elevation: 2,
+        paddingVertical: verticalScale(14),
+        paddingHorizontal: scale(12),
+        backgroundColor: 'rgba(148, 163, 184, 0.10)',
+        borderColor: 'rgba(148, 163, 184, 0.28)',
+        borderRadius: moderateScale(8),
+        borderWidth: StyleSheet.hairlineWidth,
+        marginBottom: verticalScale(10),
     },
     icon: {
         marginRight: scale(16),
@@ -64,8 +65,8 @@ export const styles = StyleSheet.create({
     },
     divider: {
         height: verticalScale(1),
-        backgroundColor: '#444',
-        marginVertical: verticalScale(10),
+        backgroundColor: 'rgba(148, 163, 184, 0.22)',
+        marginVertical: verticalScale(8),
     },
     modalOverlay: {
         flex: 1,

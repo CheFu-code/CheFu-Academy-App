@@ -6,9 +6,8 @@ import { useProfileActions } from '@/hooks/useProfileActions';
 import { useExportUserData } from '@/services/exportUserData';
 import { useFetchSetting } from '@/utils/fetchSettings';
 import { useToggle } from '@/utils/toggleSetting';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AppModal from '../component/Shared/AppModal';
-import { UserDetailContext } from '../context/UserDetailContext';
 import { useSafeNavigation } from '../hooks/useSafeNavigation';
 
 export default function SettingsScreen() {
@@ -25,16 +24,14 @@ export default function SettingsScreen() {
     const { toggleSetting } = useToggle();
     const {
         loading,
-        setLoading,
         fatalError,
         setFatalError,
         errorModal,
         setErrorModal,
         exportUserData,
     } = useExportUserData();
-    const { safePush, safeBack } = useSafeNavigation();
-    const { userDetail } = useContext(UserDetailContext);
-    const { handleLogout } = useProfileActions();
+    const { safePush } = useSafeNavigation();
+    const { loading: logoutLoading, handleLogout } = useProfileActions();
 
     const [successModal, setSuccessModal] = useState({
         visible: false,
@@ -58,12 +55,11 @@ export default function SettingsScreen() {
             content = (
                 <>
                     <SettingsUI
-                        safeBack={safeBack}
                         setIsOpen={setIsOpen}
                         isOpen={isOpen}
                         safePush={safePush}
                         loading={loading}
-                        setLoading={setLoading}
+                        logoutLoading={logoutLoading}
                         notifications={notifications}
                         setNotifications={setNotifications}
                         showVersion={showVersion}
@@ -73,7 +69,6 @@ export default function SettingsScreen() {
                         useBiometrics={useBiometrics}
                         setUseBiometrics={setUseBiometrics}
                         handleShare={handleShare}
-                        userDetail={userDetail}
                         handleLogout={handleLogout}
                     />
 

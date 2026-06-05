@@ -46,7 +46,7 @@ chefuApiClient.interceptors.response.use(
         const refreshed = await refreshCheFuSsoSession();
 
         if (!refreshed?.accessToken) {
-            await signOutOfCheFuSso();
+            await signOutOfCheFuSso({ revokeRemote: false });
             return Promise.reject(error);
         }
 
@@ -81,7 +81,7 @@ export async function chefuFetch(
 
     const refreshed = await refreshCheFuSsoSession();
     if (!refreshed?.accessToken) {
-        await signOutOfCheFuSso();
+        await signOutOfCheFuSso({ revokeRemote: false });
         return response;
     }
 
