@@ -64,8 +64,10 @@ jobs:
       - name: Decode keystore
         id: decode_keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
-          echo "keystore_path=android/app/keystore.jks" >> $GITHUB_OUTPUT
+          KEYSTORE_PATH="$GITHUB_WORKSPACE/android/app/keystore.jks"
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > "$KEYSTORE_PATH"
+          test -s "$KEYSTORE_PATH"
+          echo "keystore_path=$KEYSTORE_PATH" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps --include=dev
