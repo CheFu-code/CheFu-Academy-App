@@ -27,9 +27,10 @@ export const uploadVideo = async (
 
     const videoId = uuid.v4().toString();
 
-    // Upload video and thumbnail
-    const videoURL = await uploadFile(videoUri, `videos/${videoId}/video.mp4`);
-    const thumbnailURL = await uploadFile(thumbnailUri, `videos/${videoId}/thumbnail.jpg`);
+    const [videoURL, thumbnailURL] = await Promise.all([
+        uploadFile(videoUri, `videos/${videoId}/video.mp4`),
+        uploadFile(thumbnailUri, `videos/${videoId}/thumbnail.jpg`),
+    ]);
 
     // Save Firestore metadata
     await setDoc(doc(db, "videos", videoId), {

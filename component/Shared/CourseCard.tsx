@@ -1,11 +1,9 @@
-import { db } from '@/config/firebaseConfig';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { Course } from '@/types/course';
 import {
-    doc,
-    FirebaseFirestoreTypes,
-    getDoc
-} from '@react-native-firebase/firestore';
+    getUserProfileSummary,
+    UserProfileSummary,
+} from '@/services/userProfileCache';
+import { Course } from '@/types/course';
 import { useContext, useEffect, useState } from 'react';
 import {
     Image,
@@ -31,8 +29,9 @@ export default function CourseCard({
 }) {
     const { safePush } = useSafeNavigation();
     const { userDetail } = useContext(UserDetailContext);
-    const [creatorInfo, setCreatorInfo] =
-        useState<null | FirebaseFirestoreTypes.DocumentData>(null);
+    const [creatorInfo, setCreatorInfo] = useState<UserProfileSummary | null>(
+        null,
+    );
     const [modal, setModal] = useState({
         visible: false,
         title: '',
@@ -40,20 +39,29 @@ export default function CourseCard({
     });
 
     useEffect(() => {
+        let active = true;
+
         const fetchCreator = async () => {
-            if (!course?.createdBy) return;
+            if (!course?.createdBy) {
+                setCreatorInfo(null);
+                return;
+            }
 
-            const userDocRef = doc(db, 'users', course.createdBy);
-            const userDocSnap = await getDoc(userDocRef);
-
-            const data = userDocSnap.data();
-            if (userDocSnap.exists() && data !== undefined) {
-                setCreatorInfo(data);
+            try {
+                const data = await getUserProfileSummary(course.createdBy);
+                if (active) setCreatorInfo(data);
+            } catch (error) {
+                console.error('Failed to load course creator profile:', error);
+                if (active) setCreatorInfo(null);
             }
         };
 
-        fetchCreator();
-    }, [course]);
+        void fetchCreator();
+
+        return () => {
+            active = false;
+        };
+    }, [course?.createdBy]);
 
     return (
         <>

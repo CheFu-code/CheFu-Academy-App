@@ -43,30 +43,10 @@ const SparksFeed = () => {
     const [loading, setLoading] = useState(true);
     const [likeLock, setLikeLock] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<boolean>(false);
-    const [isVerified, setIsVerified] = useState(false);
+    const isVerified = Boolean(userDetail?.isVerified);
     const [loadingMore, setLoadingMore] = useState(false);
     const [lastVisible, setLastVisible] =
         useState<FirebaseFirestoreTypes.QueryDocumentSnapshot | null>(null);
-
-    useEffect(() => {
-        const checkVerified = async () => {
-            if (!userDetail?.email) return;
-
-            try {
-                const userDoc = await getDoc(
-                    doc(db, 'users', userDetail?.email),
-                );
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    setIsVerified(!!userData?.isVerified);
-                }
-            } catch (err) {
-                console.error('Error checking verified status:', err);
-            }
-        };
-
-        checkVerified();
-    }, [userDetail?.email]);
 
     useEffect(() => {
         fetchInitialSparks(SPARKS_LIMIT, setSparks, setLastVisible, setLoading);
@@ -86,7 +66,6 @@ const SparksFeed = () => {
     const handleLike = async (sparkId: string, likes: Likes[] = []) => {
         if (!userDetail) return;
 
-        // ⛔ prevent double tap
         if (likeLock === sparkId) return;
         setLikeLock(sparkId);
 
@@ -102,12 +81,10 @@ const SparksFeed = () => {
             );
 
             if (existingLike) {
-                // Unlike → remove
                 await updateDoc(sparkRef, {
                     likes: arrayRemove(existingLike),
                 });
             } else {
-                // Like → add new object
                 const newLike: Likes = {
                     id: userDetail?.uid,
                     text: 'Liked',
@@ -123,7 +100,6 @@ const SparksFeed = () => {
                     likes: arrayUnion(newLike),
                 });
 
-                // Send notification if not liking own spark
                 if (
                     sparkData.createdBy?.uid !== userDetail?.uid &&
                     sparkData.createdBy?.email
@@ -153,7 +129,6 @@ const SparksFeed = () => {
         } catch (e) {
             console.error('Like error:', e);
         } finally {
-            // 🔓 Unlock after Firestore completes
             setLikeLock(null);
         }
     };

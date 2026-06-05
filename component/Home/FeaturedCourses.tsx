@@ -8,7 +8,7 @@ import {
     limit,
     query
 } from "@react-native-firebase/firestore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../constant/Colors";
 import FeaturedCourseCard from "./FeaturedCourseCard";
@@ -41,7 +41,7 @@ export default function FeaturedCourses() {
         fetchFeaturedCourses();
     }, []);
 
-    const handlePress = (item: Course) => {
+    const handlePress = useCallback((item: Course) => {
         safePush({
             pathname: "/courseView",
             params: {
@@ -49,7 +49,17 @@ export default function FeaturedCourses() {
                 enroll: false.toString(),
             },
         });
-    };
+    }, [safePush]);
+
+    const renderCourse = useCallback(
+        ({ item }: { item: Course }) => (
+            <FeaturedCourseCard
+                course={item}
+                onPress={() => handlePress(item)}
+            />
+        ),
+        [handlePress],
+    );
 
     return (
         <View style={styles.container}>
@@ -66,12 +76,11 @@ export default function FeaturedCourses() {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item) => item.docId || item.courseTitle}
-                    renderItem={({ item }) => (
-                        <FeaturedCourseCard
-                            course={item}
-                            onPress={() => handlePress(item)}
-                        />
-                    )}
+                    initialNumToRender={5}
+                    maxToRenderPerBatch={5}
+                    windowSize={3}
+                    removeClippedSubviews
+                    renderItem={renderCourse}
                 />
             )}
         </View>
