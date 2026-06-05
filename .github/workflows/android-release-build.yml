@@ -31,6 +31,7 @@ jobs:
     env:
       NODE_ENV: production
       EXPO_NO_TELEMETRY: "1"
+      SENTRY_DISABLE_AUTO_UPLOAD: "true"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g"
 
     steps:
@@ -65,7 +66,7 @@ jobs:
           echo "keystore_path=android/app/keystore.jks" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --include=dev
 
       - name: Validate Expo config
         run: npx expo config --type public
