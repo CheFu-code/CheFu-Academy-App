@@ -4,7 +4,6 @@ import { formatDate } from '@/helpers/formatDate';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { chefuAccountManageUrl } from '@/services/ssoAuth';
-import { styles, styles2 } from '@/styles/Profile.styles';
 import { showToast } from '@/utils/toast';
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
@@ -21,7 +20,6 @@ import {
     Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { scale, verticalScale } from 'react-native-size-matters';
 import ErrorModal from '../Shared/ErrorModal';
 
 interface ProfileHeaderProps {
@@ -109,7 +107,6 @@ export const ProfileHeader = ({
         }
 
         try {
-            // Request permissions (iOS requires it)
             const { status } = await MediaLibrary.requestPermissionsAsync();
             if (status !== 'granted') {
                 setError({
@@ -120,14 +117,12 @@ export const ProfileHeader = ({
                 return;
             }
 
-            // Download image to cache
             const fileUri = `${FileSystem.cacheDirectory}avatar.jpg`;
             const downloadedFile = await FileSystem.downloadAsync(
                 profilePicture,
                 fileUri,
             );
 
-            // Save to media library
             const asset = await MediaLibrary.createAssetAsync(
                 downloadedFile.uri,
             );
@@ -146,41 +141,15 @@ export const ProfileHeader = ({
 
     return (
         <>
-            <SafeAreaView style={styles.header}>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        width: '90%',
-                    }}
-                >
-                    <TouchableOpacity
-                        onPress={() => Linking.openURL(chefuAccountManageUrl())}
-                    >
-                        <Text
-                            style={[
-                                styles.profileEmail,
-                                {
-                                    color: Colors.GREEN,
-                                    marginTop: verticalScale(10),
-                                    textDecorationLine: 'underline',
-                                },
-                            ]}
-                        >
+            <SafeAreaView className="items-center pb-6">
+                <View className="flex-row justify-between w-[90%]">
+                    <TouchableOpacity onPress={() => Linking.openURL(chefuAccountManageUrl())}>
+                        <Text className="text-green-500 mt-3 underline font-outfit text-sm">
                             CheFu Account
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => safePush('/settings')}>
-                        <Ionicons
-                            style={{
-                                marginTop: verticalScale(3),
-                                alignItems: 'flex-end',
-                                padding: scale(10),
-                            }}
-                            name="settings-outline"
-                            size={scale(18)}
-                            color={color}
-                        />
+                    <TouchableOpacity onPress={() => safePush('/settings')} className="mt-1 p-2">
+                        <Ionicons name="settings-outline" size={20} color={color} />
                     </TouchableOpacity>
                 </View>
 
@@ -188,24 +157,18 @@ export const ProfileHeader = ({
                     disabled={loader}
                     onPress={onChangeAvatar}
                     onLongPress={downloadAvatar}
+                    className="mt-6 mb-4"
                 >
                     {loader ? (
                         <LottieView
                             source={require('../../assets/animations/changingAvatar.json')}
                             autoPlay
                             loop
-                            style={styles2.changingAvatar}
+                            className="w-40 h-40"
                         />
                     ) : (
                         <Image
-                            style={[
-                                styles.avatar,
-                                {
-                                    borderColor: member
-                                        ? Colors.GREEN
-                                        : Colors.PRIMARY,
-                                },
-                            ]}
+                            className={`w-36 h-36 rounded-full border-4 ${member ? 'border-green-500' : 'border-primary'}`}
                             source={
                                 profilePicture
                                     ? { uri: profilePicture }
@@ -216,64 +179,44 @@ export const ProfileHeader = ({
                 </TouchableOpacity>
 
                 {userDetail && (
-                    <>
-                        <View style={styles.common}>
-                            <View>
-                                <View style={styles.common}>
-                                    <TouchableOpacity
-                                        disabled={loadingName}
-                                        onPress={() => setModalVisible(true)}
-                                    >
-                                        {loadingName ? (
-                                            <LottieView
-                                                source={require('../../assets/animations/changingName.json')}
-                                                autoPlay
-                                                loop
-                                                style={styles2.changingName}
-                                            />
-                                        ) : (
-                                            <Text
-                                                numberOfLines={1}
-                                                style={styles.profileName}
-                                            >
-                                                {fullname}
-                                            </Text>
-                                        )}
-                                    </TouchableOpacity>
-                                    {member && !loadingName && (
-                                        <Ionicons
-                                            color={Colors.PRIMARY}
-                                            size={scale(18)}
-                                            name="checkmark-circle"
-                                        />
-                                    )}
-                                </View>
-                                <Text
-                                    numberOfLines={1}
-                                    style={[
-                                        styles.profileEmail,
-                                        { color },
-                                    ]}
-                                >
-                                    Joined {formatDate(createdAt)}
-                                </Text>
-                            </View>
+                    <View className="items-center space-y-1">
+                        <View className="flex-row items-center space-x-1">
+                            <TouchableOpacity
+                                disabled={loadingName}
+                                onPress={() => setModalVisible(true)}
+                            >
+                                {loadingName ? (
+                                    <LottieView
+                                        source={require('../../assets/animations/changingName.json')}
+                                        autoPlay
+                                        loop
+                                        className="w-24 h-16"
+                                    />
+                                ) : (
+                                    <Text className="text-2xl font-outfitBold text-primary max-w-[250px] text-center" numberOfLines={1}>
+                                        {fullname}
+                                    </Text>
+                                )}
+                            </TouchableOpacity>
+                            {member && !loadingName && (
+                                <Ionicons color={Colors.PRIMARY} size={20} name="checkmark-circle" />
+                            )}
                         </View>
-
-                        <Text
-                            numberOfLines={1}
-                            style={[styles.profileEmail, { color }]}
-                        >
+                        
+                        <Text className="text-sm font-outfit" style={{ color }} numberOfLines={1}>
+                            Joined {formatDate(createdAt)}
+                        </Text>
+                        
+                        <Text className="text-sm font-outfit mt-1" style={{ color }} numberOfLines={1}>
                             {email}
                         </Text>
 
                         {planType && memberUntil && (
-                            <Text style={styles.expiryText}>
-                                Your plan will expire on{' '}
-                                {memberUntil ? formatDate(memberUntil) : 'N/A'}
+                            <Text className="text-sm font-outfit text-gray-400 mt-2 text-center px-4">
+                                Your plan will expire on {memberUntil ? formatDate(memberUntil) : 'N/A'}
                             </Text>
                         )}
-                    </>
+                    </View>
                 )}
             </SafeAreaView>
 
@@ -283,52 +226,34 @@ export const ProfileHeader = ({
                 visible={modalVisible}
                 onRequestClose={() => setModalVisible(false)}
             >
-                <View style={styles2.modalBackground}>
-                    <View style={[styles2.modalContainer, { backgroundColor }]}>
-                        <Text
-                            style={[styles2.modalTitle, { color }]}
-                        >
+                <View className="flex-1 bg-black/60 justify-center items-center">
+                    <View className="w-4/5 rounded-2xl p-6" style={{ backgroundColor }}>
+                        <Text className="text-lg font-bold mb-4" style={{ color }}>
                             Change Name
                         </Text>
                         <TextInput
                             value={nameInput}
                             onChangeText={setNameInput}
-                            style={[styles.input, { color }]}
+                            className="bg-gray-800 text-white rounded-xl p-4 text-base mb-6"
                             placeholder="Enter new name"
                             placeholderTextColor={Colors.GRAY}
                         />
-                        <View style={styles2.buttons}>
+                        <View className="flex-row justify-end space-x-3">
                             <TouchableOpacity
                                 disabled={loader}
-                                style={[
-                                    styles2.buttonCancel,
-                                    { opacity: loader ? 0.5 : 1 },
-                                ]}
+                                className={`p-3 ${loader ? 'opacity-50' : 'opacity-100'}`}
                                 onPress={() => setModalVisible(false)}
                             >
-                                <Text
-                                    style={[
-                                        styles2.buttonText,
-                                        { color },
-                                    ]}
-                                >
+                                <Text className="font-bold text-base" style={{ color }}>
                                     Cancel
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 disabled={loader}
-                                style={[
-                                    styles2.buttonSave,
-                                    { opacity: loader ? 0.5 : 1 },
-                                ]}
+                                className={`p-3 bg-green-500 rounded-xl px-6 ${loader ? 'opacity-50' : 'opacity-100'}`}
                                 onPress={handleSave}
                             >
-                                <Text
-                                    style={[
-                                        styles2.buttonText,
-                                        { color: backgroundColor },
-                                    ]}
-                                >
+                                <Text className="font-bold text-base" style={{ color: backgroundColor }}>
                                     Save
                                 </Text>
                             </TouchableOpacity>
@@ -341,12 +266,7 @@ export const ProfileHeader = ({
                 visible={error.visible}
                 title={error.title}
                 message={error.message}
-                onConfirm={() =>
-                    setError((prev) => ({
-                        ...prev,
-                        visible: false,
-                    }))
-                }
+                onConfirm={() => setError((prev) => ({ ...prev, visible: false }))}
             />
         </>
     );

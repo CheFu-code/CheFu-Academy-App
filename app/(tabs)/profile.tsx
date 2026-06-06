@@ -12,10 +12,9 @@ import { User } from '@/types/user';
 import { changeAvatar } from '@/utils/changeAvatar';
 import { showToast } from '@/utils/toast';
 import { useContext, useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AppModal from '../../component/Shared/AppModal';
 import { UserDetailContext } from '../../context/UserDetailContext';
-import { styles } from '../../styles/Profile.styles';
 
 export default function Profile() {
     const { safeReplace } = useSafeNavigation();
@@ -48,59 +47,61 @@ export default function Profile() {
         title: '',
         message: '',
     });
-    useEffect(() => {
-        if (!email) {
-            safeReplace('/auth/sso' as any);
-        } else {
-            refreshData();
-        }
-    }, [email, safeReplace, refreshData]);
 
     useEffect(() => {
-        setAvatarURL(userDetail?.profilePicture);
+        if (userDetail?.profilePicture) {
+            setAvatarURL(userDetail.profilePicture);
+        }
     }, [userDetail?.profilePicture]);
 
     const handleChangeAvatar = async () => {
-        setLoader(true);
-        try {
-            const newURL = await changeAvatar(setUserDetail, userDetail);
-            if (newURL) setAvatarURL(newURL);
-            await refreshData();
-        } finally {
-            setLoader(false);
-        }
+        await changeAvatar({
+            email,
+            avatarURL,
+            setLoader,
+            setAvatarURL,
+            setUserDetail,
+            setErrorModal,
+        });
     };
 
     const updateUserName = async (newName: string) => {
+        if (!email || !newName) return;
         setLoadingName(true);
         try {
-            if (userDetail?.email) {
-                await chefuApiClient.patch('/api/academy/mobile/me', {
-                    fullname: newName,
-                });
-                setUserDetail((prev: User) => ({ ...prev, fullname: newName }));
-                showToast('Name updated successfully');
-            }
-        } catch (error) {
+            // Replaced Firebase hit with our API client call
+            await chefuApiClient.put(`/academy-mobile/users/${email}/profile`, {
+                fullname: newName
+            });
+
+            setUserDetail((prev: User | null) => {
+                if (!prev) return null;
+                return { ...prev, fullname: newName };
+            });
+            showToast('Name updated successfully');
+        } catch (error: any) {
             console.error('Error updating name:', error);
-            showToast('Error updating name');
+            setErrorModal({
+                visible: true,
+                title: 'Update Failed',
+                message: error.message || 'Could not update name. Try again.',
+            });
         } finally {
             setLoadingName(false);
         }
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor }]}>
+        <SafeAreaView className="flex-1" style={{ backgroundColor }}>
             {!userDetail ? (
                 <LoggedOutMessage />
             ) : (
                 <>
-                    {userDetail && (
+                    {email && fullname && (
                         <ProfileHeader
-                            loadingName={loadingName}
                             loader={loader}
-                            loading={loading}
-                            profilePicture={avatarURL}
+                            loadingName={loadingName}
+                            profilePicture={avatarURL || ''}
                             fullname={fullname}
                             email={email}
                             member={Boolean(userDetail?.member)}

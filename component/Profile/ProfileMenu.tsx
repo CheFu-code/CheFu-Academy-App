@@ -1,13 +1,10 @@
-// components/Profile/ProfileMenu.tsx
 import { Colors } from '@/constant/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
-import { menuItems, url } from '@/data/menuItems';
+import { menuItems } from '@/data/menuItems';
 import useDarkMode from '@/hooks/useDarkMode';
 import { useRefreshProfile } from '@/hooks/useRefreshProfile';
 import { chefuAccountManageUrl } from '@/services/ssoAuth';
-import { styles } from '@/styles/Profile.styles';
-import { showToast } from '@/utils/toast';
-import { Entypo, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useContext, useMemo } from 'react';
@@ -20,139 +17,104 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { scale, verticalScale } from 'react-native-size-matters';
 
 interface ProfileMenuProps {
     loading: boolean;
     handleLogout: () => void;
 }
 
-export const ProfileMenu = ({
-    loading,
-    handleLogout,
-}: ProfileMenuProps) => {
+export const ProfileMenu = ({ loading, handleLogout }: ProfileMenuProps) => {
     const { userDetail, setUserDetail } = useContext(UserDetailContext);
     const { email } = userDetail || {};
-    const { color } = useDarkMode();
+    const { color, backgroundColor } = useDarkMode();
     const { refreshing, refreshData } = useRefreshProfile(email, setUserDetail);
+    
     const renderedMenuItems = useMemo(
         () => menuItems(router, Linking, ToastAndroid, Colors),
         [],
     );
+
     return (
         <ScrollView
-            style={styles.container}
+            className="flex-1 px-4 mt-2"
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             refreshControl={
                 <RefreshControl
                     refreshing={refreshing}
                     onRefresh={refreshData}
+                    colors={[Colors.PRIMARY]}
+                    tintColor={Colors.PRIMARY}
                 />
             }
         >
-            <View style={styles.menuSection}>
-                <Text
-                    style={{
-                        color,
-                        fontFamily: 'outfit-bold',
-                        fontSize: RFValue(17),
-                    }}
-                >
-                    Course
-                </Text>
-
-                {renderedMenuItems.map((item) => (
+            <View className="bg-gray-800/40 rounded-3xl p-4 shadow-sm border border-gray-800">
+                {renderedMenuItems.map((item, index) => (
                     <TouchableOpacity
-                        key={item.label}
-                        style={styles.menuItem}
-                        onPress={item.onPress}
-                        disabled={loading}
+                        key={index}
+                        className={`flex-row items-center py-4 ${
+                            index !== renderedMenuItems.length - 1 ? 'border-b border-gray-800/50' : ''
+                        }`}
+                        onPress={item.action}
                     >
-                        <Ionicons
-                            name={item.icon as keyof typeof Ionicons.glyphMap}
-                            size={scale(24)}
-                            color={Colors.PRIMARY}
-                            style={styles.icon}
-                        />
-                        <Text style={styles.menuLabel}>{item.label}</Text>
+                        <View className="w-10 h-10 rounded-full bg-gray-800 items-center justify-center mr-4">
+                            <Ionicons
+                                name={item.icon as any}
+                                size={20}
+                                color={Colors.PRIMARY}
+                            />
+                        </View>
+                        <Text className="flex-1 font-outfit text-base" style={{ color }}>
+                            {item.label}
+                        </Text>
+                        <Ionicons name="chevron-forward" size={20} color={Colors.GRAY} />
                     </TouchableOpacity>
                 ))}
+            </View>
 
-                <View style={styles.divider} />
-
+            <View className="bg-gray-800/40 rounded-3xl p-4 mt-6 mb-8 shadow-sm border border-gray-800">
                 <TouchableOpacity
-                    style={[styles.menuItem, { marginTop: verticalScale(5) }]}
-                    onPress={() =>
-                        Linking.openURL(url).catch((err) => {
-                            console.error('URL open failed:', err);
-                            showToast('Failed to open Google Play');
-                        })
-                    }
+                    className="flex-row items-center py-4 border-b border-gray-800/50"
+                    onPress={() => Linking.openURL('market://details?id=com.chefu.academy')}
                 >
-                    <Entypo
-                        name="google-play"
-                        size={scale(24)}
-                        color={Colors.GREEN}
-                        style={styles.icon}
-                    />
-                    <Text style={[styles.menuLabel, { color: Colors.GREEN }]}>
+                    <View className="w-10 h-10 rounded-full bg-green-500/10 items-center justify-center mr-4">
+                        <Ionicons name="cloud-download-outline" size={20} color={Colors.GREEN} />
+                    </View>
+                    <Text className="flex-1 font-outfit text-base text-green-500">
                         Check for App Updates
                     </Text>
                 </TouchableOpacity>
 
-                <View style={styles.divider} />
-
                 <TouchableOpacity
-                    style={[styles.menuItem, { marginTop: verticalScale(5) }]}
+                    className="flex-row items-center py-4 border-b border-gray-800/50"
                     onPress={() => Linking.openURL(chefuAccountManageUrl())}
                     disabled={loading}
                 >
-                    <Ionicons
-                        name="person-circle-outline"
-                        size={scale(24)}
-                        color={Colors.PRIMARY}
-                        style={styles.icon}
-                    />
-                    <Text style={styles.menuLabel}>
+                    <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mr-4">
+                        <Ionicons name="person-circle-outline" size={20} color={Colors.PRIMARY} />
+                    </View>
+                    <Text className="flex-1 font-outfit text-base" style={{ color }}>
                         Manage CheFu Account
                     </Text>
+                    <Ionicons name="open-outline" size={16} color={Colors.GRAY} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={[
-                        styles.menuItem,
-                        {
-                            marginTop: verticalScale(5),
-                            opacity: loading ? 0.5 : 1,
-                        },
-                    ]}
+                    className={`flex-row items-center py-4 ${loading ? 'opacity-50' : 'opacity-100'}`}
                     onPress={handleLogout}
                     disabled={loading}
                 >
-                    <Ionicons
-                        name="log-out-outline"
-                        size={scale(25)}
-                        color={Colors.RED}
-                        style={styles.icon}
-                    />
-                    <Text
-                        style={[
-                            styles.menuLabel,
-                            {
-                                color: Colors.RED,
-                                fontFamily: 'outfit-bold',
-                            },
-                        ]}
-                    >
+                    <View className="w-10 h-10 rounded-full bg-red-500/10 items-center justify-center mr-4">
+                        <Ionicons name="log-out-outline" size={20} color={Colors.RED} />
+                    </View>
+                    <Text className="flex-1 font-outfitBold text-base text-red-500">
                         Log Out
                     </Text>
                 </TouchableOpacity>
             </View>
 
-            <Text style={styles.versionText}>
-                Version {Constants.expoConfig?.version ?? 'N/A'}
+            <Text className="text-center font-outfit text-xs text-gray-500 mb-10">
+                Version {Constants.expoConfig?.version ?? '1.0.0'}
             </Text>
         </ScrollView>
     );

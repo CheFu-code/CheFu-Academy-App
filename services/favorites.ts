@@ -1,51 +1,22 @@
-import { db } from "@/config/firebaseConfig";
+import { chefuApiClient } from "./chefuApiClient";
 import { FavoriteCourse } from "@/types/video";
-import { collection, deleteDoc, doc, FirebaseFirestoreTypes, getDoc, getDocs } from "@react-native-firebase/firestore";
-
 
 export const fetchFavoritesFromFirestore = async (userEmail: string) => {
-    const favColRef = collection(db, "users", userEmail, "favorites");
-    const favSnapshot = await getDocs(favColRef);
-
-    const favorites: FavoriteCourse[] = [];
-
-    await Promise.all(
-        favSnapshot.docs.map(async (docSnap: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
-            const data = docSnap.data() as FavoriteCourse;
-
-            if (!data.videoId || !data.title || !data.thumbnailURL) {
-                return;
-            }
-
-            try {
-                // First check "videos"
-                const videoRef = doc(db, "videos", data.videoId);
-                const videoSnap = await getDoc(videoRef);
-
-                if (videoSnap.exists()) {
-                    favorites.push(data);
-                    return;
-                }
-
-                // Then check "youTubeVideos"
-                const ytRef = doc(db, "youTubeVideos", data.videoId);
-                const ytSnap = await getDoc(ytRef);
-
-                if (ytSnap.exists()) {
-                    favorites.push(data);
-                    return;
-                }
-
-            } catch (err) {
-                console.warn(`Failed to check video ${data.videoId}`, err);
-            }
-        })
-    );
-
-    return favorites;
+    try {
+        // Hitting our centralized API instead of direct Firestore queries
+        const response = await chefuApiClient.get(`/academy-mobile/users/${userEmail}/favorites`);
+        return response.data as FavoriteCourse[];
+    } catch (error) {
+        console.error("Failed to fetch favorites from API:", error);
+        return [];
+    }
 };
 
 export const removeFavoriteFromFirestore = async (userEmail: string, videoId: string) => {
-    const favRef = doc(db, "users", userEmail, "favorites", videoId);
-    await deleteDoc(favRef);
+    try {
+        await chefuApiClient.delete(`/academy-mobile/users/${userEmail}/favorites/${videoId}`);
+    } catch (error) {
+        console.error(`Failed to remove favorite ${videoId} for ${userEmail}:`, error);
+        throw error; // Re-throw to handle error state in UI
+    }
 };

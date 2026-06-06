@@ -1,3 +1,4 @@
+import '../global.css';
 import * as Sentry from '@sentry/react-native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';

@@ -1,42 +1,23 @@
-import { db } from '@/config/firebaseConfig';
+import { chefuApiClient } from '@/services/chefuApiClient';
 import { Spark } from '@/types/sparks';
-import {
-    collection,
-    FirebaseFirestoreTypes,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    startAfter,
-} from '@react-native-firebase/firestore';
 import { Dispatch, SetStateAction } from 'react';
 
+// Using a standard cursor string or page number instead of Firebase DocumentSnapshot
 export const fetchInitialSparks = async (
-    SPARKS_LIMIT: number,
+    limit: number,
     setSparks: (sparks: Spark[]) => void,
-    setLastVisible: (
-        doc: FirebaseFirestoreTypes.QueryDocumentSnapshot | null,
-    ) => void,
+    setLastVisible: (cursor: string | null) => void,
     setLoading: (loading: boolean) => void,
 ) => {
     setLoading(true);
     try {
-        const q = query(
-            collection(db, 'sparks'),
-            orderBy('createdAt', 'desc'),
-            limit(SPARKS_LIMIT),
-        );
-
-        const snapshot = await getDocs(q);
-        const fetchedSparks: Spark[] = snapshot.docs.map(
-            (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                id: doc.id,
-                ...(doc.data() as Omit<Spark, 'id'>),
-            }),
-        );
-
+        const response = await chefuApiClient.get('/academy-mobile/sparks', {
+            params: { limit }
+        });
+        
+        const fetchedSparks: Spark[] = response.data.data;
         setSparks(fetchedSparks);
-        setLastVisible(snapshot.docs[snapshot.docs.length - 1] || null);
+        setLastVisible(response.data.nextCursor || null);
     } catch (error) {
         console.error('Error fetching sparks:', error);
     } finally {
@@ -44,14 +25,11 @@ export const fetchInitialSparks = async (
     }
 };
 
-
 export const fetchMoreSparks = async (
-    SPARKS_LIMIT: number,
-    lastVisible: FirebaseFirestoreTypes.QueryDocumentSnapshot | null,
+    limit: number,
+    lastVisible: string | null,
     setSparks: Dispatch<SetStateAction<Spark[]>>,
-    setLastVisible: (
-        doc: FirebaseFirestoreTypes.QueryDocumentSnapshot | null,
-    ) => void,
+    setLastVisible: (cursor: string | null) => void,
     loadingMore: boolean,
     setLoadingMore: (loading: boolean) => void,
 ) => {
@@ -59,26 +37,34 @@ export const fetchMoreSparks = async (
 
     setLoadingMore(true);
     try {
-        const q = query(
-            collection(db, 'sparks'),
-            orderBy('createdAt', 'desc'),
-            startAfter(lastVisible),
-            limit(SPARKS_LIMIT),
-        );
+        const response = await chefuApiClient.get('/academy-mobile/sparks', {
+            params: { limit, cursor: lastVisible }
+        });
 
-        const snapshot = await getDocs(q);
-        const moreSparks: Spark[] = snapshot.docs.map(
-            (doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
-                id: doc.id,
-                ...(doc.data() as Omit<Spark, 'id'>),
-            }),
-        );
-
+        const moreSparks: Spark[] = response.data.data;
         setSparks((prev) => [...prev, ...moreSparks]);
-        setLastVisible(snapshot.docs[snapshot.docs.length - 1] || lastVisible);
+        setLastVisible(response.data.nextCursor || null);
     } catch (error) {
         console.error('Error fetching more sparks:', error);
     } finally {
         setLoadingMore(false);
+    }
+};
+
+export const toggleLikeSpark = async (sparkId: string, email: string) => {
+    try {
+        await chefuApiClient.post(`/academy-mobile/sparks/${sparkId}/like`, { email });
+    } catch (error) {
+        console.error('Error toggling like:', error);
+        throw error;
+    }
+};
+
+export const deleteSpark = async (sparkId: string) => {
+    try {
+        await chefuApiClient.delete(`/academy-mobile/sparks/${sparkId}`);
+    } catch (error) {
+        console.error('Error deleting spark:', error);
+        throw error;
     }
 };
